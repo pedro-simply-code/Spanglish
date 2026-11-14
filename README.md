@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Architecture and conventions
+
+See [docs/architecture.md](docs/architecture.md) (layout, T3 env, Server Components, `@/` imports). **Project language: English** for comments and docs.
+
+### Quality scripts
+
+```bash
+npm run typecheck   # TypeScript
+npm run lint        # ESLint
+npm run check       # typecheck + lint + build
+```
+
+Environment variables: copy `.env.example` → `.env` and keep the schema in `src/env.ts`.
+
 ## Getting Started
 
 First, run the development server:
