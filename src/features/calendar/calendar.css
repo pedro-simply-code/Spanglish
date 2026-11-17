@@ -1,0 +1,80 @@
+.rbc-event.event-default {
+  background-color: #fa896b;
+}
+
+.rbc-event.event-green {
+  background-color: #39b69a;
+}
+
+.rbc-event.event-red {
+  background-color: #fc4b6c;
+}
+
+.rbc-event.event-azure {
+  background-color: #1a97f5;
+}
+
+.rbc-event.event-warning {
+  background-color: #fdd43f;
+}
+
+.rbc-off-range-bg {
+  background-color: #d2d2d20d;
+}
+
+.rbc-today {
+  background-color: #fbf2ef;
+}
+
+.rbc-month-row + .rbc-month-row,
+.rbc-day-bg + .rbc-day-bg,
+.rbc-header,
+.rbc-month-view,
+.rbc-toolbar button,
+.rbc-time-content > * + * > * {
+  border-color: #f6f6f6;
+}
+
+.rbc-event:focus,
+.rbc-day-slot .rbc-background-event:focus {
+  outline: none;
+}
+
+.rbc-calendar {
+  min-height: 600px;
+}
+
+@media (max-width: 767px) {
+  .rbc-btn-group {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .rbc-toolbar .rbc-toolbar-label {
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .rbc-calendar {
+    height: 100vh !important;
+  }
+}
+
+.rbc-event.event-muted {
+  background-color: #b6bcc4;
+}
+
+.rbc-event.event-canceled {
+  background-color: #eceff1;
+  color: #7c8fac;
+  text-decoration: line-through;
+}
+
+/* Teacher availability behind the classes (week and day views). */
+.rbc-background-event.event-available {
+  background-color: #e6fffa;
+  border: 1px dashed #39b69a;
+  opacity: 1;
+  color: transparent;
+}

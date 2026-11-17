@@ -1,0 +1,249 @@
+{
+  "common": {
+    "or": "or",
+    "change": "Change",
+    "resendCode": "Resend code",
+    "codeExpires": "The code expires in {minutes} minutes.",
+    "codePlaceholder": "123456",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "save": "Save",
+    "cancel": "Cancel",
+    "optional": "optional"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "authShell": {
+    "login": {
+      "title": "Welcome back",
+      "description": "Sign in to continue your learning journey."
+    },
+    "register": {
+      "title": "Create your account",
+      "description": "Start learning at your own pace. You'll finish your profile in the next step."
+    },
+    "recover": {
+      "title": "Reset your password",
+      "description": "We'll email you a code to choose a new password."
+    },
+    "twoFactor": {
+      "title": "Two-factor verification",
+      "description": "Your account is protected with an authenticator app."
+    },
+    "onboarding": {
+      "title": "Complete your profile",
+      "description": "A few details so your teacher can prepare your first class."
+    },
+    "footer": {
+      "noAccount": "Don't have an account?",
+      "createOne": "Create one",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "remembered": "Remembered it?",
+      "backToSignIn": "Back to sign in"
+    }
+  },
+  "methods": {
+    "label": "Method",
+    "password": "Email & password",
+    "code": "Email code"
+  },
+  "google": {
+    "continue": "Continue with Google",
+    "connecting": "Connecting…",
+    "failed": "Google sign-in failed. Try again.",
+    "didNotFinish": "Google sign-in did not finish. Try again or use your email."
+  },
+  "login": {
+    "passwordPlaceholder": "Your password",
+    "forgot": "Forgot password?",
+    "submit": "Sign in",
+    "verifyIntro": "Verify your email to finish signing in. We sent a code to {email}.",
+    "resetDone": "Password updated. Sign in with your new password.",
+    "demoTitle": "Demo accounts",
+    "demoIntro": "Seeded accounts (run npm run db:seed). Password for all:"
+  },
+  "register": {
+    "passwordPlaceholder": "Create a password",
+    "passwordHint": "At least {min} characters.",
+    "confirm": "Confirm password",
+    "confirmPlaceholder": "Repeat the password",
+    "submit": "Create account",
+    "verifyNote": "We will email you a code to verify the address.",
+    "verifyIntro": "We sent a verification code to {email}. Enter it to activate your account."
+  },
+  "emailCode": {
+    "hint": "We will email you a one-time code. New here? Your account is created when you enter it.",
+    "send": "Email me a code",
+    "sent": "We sent a six-digit code to {email}.",
+    "codeLabel": "Six-digit code",
+    "submit": "Continue"
+  },
+  "verifyEmail": {
+    "codeLabel": "Verification code",
+    "submit": "Verify and continue",
+    "resent": "We sent a new code to {email}."
+  },
+  "recover": {
+    "send": "Email me a reset code",
+    "notice": "If {email} has an account, we sent a code to reset the password.",
+    "codeLabel": "Reset code",
+    "newPassword": "New password",
+    "confirm": "Confirm new password",
+    "submit": "Save new password",
+    "otherEmail": "Use another email"
+  },
+  "twoFactor": {
+    "totpLabel": "Authenticator code",
+    "totpHint": "Open your authenticator app and enter the 6-digit code for Spanglish.",
+    "backupLabel": "Backup code",
+    "backupHint": "Each backup code works once.",
+    "trust": "Trust this device for 30 days",
+    "submit": "Verify",
+    "useBackup": "Use a backup code",
+    "useApp": "Use the authenticator app",
+    "startOver": "Start over"
+  },
+  "onboarding": {
+    "name": "Full name",
+    "namePlaceholder": "Your name",
+    "nameHint": "Your teacher and class partner see this name.",
+    "appLanguage": "App language",
+    "timezone": "Time zone",
+    "timezoneHint": "Detected from your device. Class times are shown in this zone.",
+    "learn": "I want to learn",
+    "level": "My level",
+    "goal": "Goal",
+    "goalPlaceholder": "For example: travel to Mexico next summer, job interviews…",
+    "terms": "I accept the terms of service and the privacy policy.",
+    "submit": "Save and continue",
+    "learningLanguages": {
+      "spanish": "Spanish",
+      "english": "English"
+    },
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "This is what your teachers and class partners see.",
+    "saved": "Profile saved.",
+    "emailNote": "Your sign-in email cannot be changed here yet.",
+    "card": {
+      "title": "Complete your profile ({percent}%)",
+      "subtitle": "A complete profile helps your teacher prepare your classes.",
+      "goal": "Add your learning goal",
+      "photo": "Add a profile photo",
+      "twoFactor": "Turn on two-factor authentication",
+      "password": "Add a password",
+      "action": "Go to settings"
+    }
+  },
+  "security": {
+    "password": {
+      "changeTitle": "Change password",
+      "createTitle": "Create a password",
+      "changeHelp": "Use at least 8 characters. Signing out other devices is recommended.",
+      "createHelp": "You sign in with Google or an email code. Add a password to also sign in with email and password.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "signOutOthers": "Sign out my other devices",
+      "changeSubmit": "Change password",
+      "createSubmit": "Create password",
+      "changed": "Password changed.",
+      "created": "Password created. You can now sign in with it."
+    },
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "on": "On",
+      "off": "Off",
+      "help": "Optional. After signing in, you also enter a 6-digit code from an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password…).",
+      "setup": "Set up authenticator app",
+      "scan": "1. Scan this QR code with your authenticator app.",
+      "manualKey": "Can't scan? Enter this key: {key}",
+      "enterCode": "2. Enter the 6-digit code the app shows to finish.",
+      "codeLabel": "Authenticator code",
+      "codeHelp": "Accounts without a password confirm changes with a current code.",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "newBackupCodes": "New backup codes",
+      "backupTitle": "Backup codes — save them somewhere safe. Each one works once if you lose your phone.",
+      "enabled": "Two-factor authentication is on.",
+      "disabled": "Two-factor authentication is off.",
+      "needPassword": "Enter your password to continue.",
+      "needCode": "Enter a code from your authenticator app."
+    },
+    "sessions": {
+      "title": "Signed-in devices",
+      "help": "Sign out any device you do not recognize.",
+      "thisDevice": "This device",
+      "lastActive": "Last active {date}",
+      "signOut": "Sign out",
+      "signOutOthers": "Sign out all other devices",
+      "signedOutOthers": "Signed out of your other devices.",
+      "unknownDevice": "Unknown device"
+    }
+  },
+  "validation": {
+    "EMAIL_REQUIRED": "Enter your email address.",
+    "EMAIL_INVALID": "Enter a valid email address.",
+    "PASSWORD_REQUIRED": "Enter your password.",
+    "PASSWORD_TOO_SHORT": "Use at least 8 characters.",
+    "PASSWORDS_DONT_MATCH": "Passwords do not match.",
+    "CODE_REQUIRED": "Enter the six-digit code.",
+    "CODE_INVALID": "The code must be six digits.",
+    "BACKUP_CODE_REQUIRED": "Enter one of your backup codes.",
+    "CAPTCHA_REQUIRED": "Complete the security check and try again.",
+    "NAME_REQUIRED": "Enter your full name.",
+    "NAME_TOO_SHORT": "Use at least two characters.",
+    "NAME_TOO_LONG": "Use 80 characters or fewer.",
+    "TIMEZONE_REQUIRED": "Choose your time zone.",
+    "TIMEZONE_INVALID": "Choose your time zone.",
+    "LOCALE_INVALID": "Choose the language for the app.",
+    "LEARNING_LANGUAGE_INVALID": "Choose what you want to learn.",
+    "LEVEL_INVALID": "Choose your current level.",
+    "GOAL_TOO_LONG": "Keep your goal under 500 characters.",
+    "TERMS_REQUIRED": "Accept the terms of service and privacy policy to continue.",
+    "NOTHING_TO_UPDATE": "There is nothing to save.",
+    "INVALID_INPUT": "Check the form and try again."
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again.",
+    "INVALID_EMAIL_OR_PASSWORD": "Incorrect email or password.",
+    "INVALID_PASSWORD": "Incorrect password.",
+    "EMAIL_NOT_VERIFIED": "Verify your email to continue.",
+    "INVALID_OTP": "That code is invalid or expired.",
+    "OTP_EXPIRED": "That code expired. Request a new one.",
+    "TOO_MANY_ATTEMPTS": "Too many wrong codes. Request a new one.",
+    "INVALID_CODE": "That code is not valid. Try again.",
+    "INVALID_BACKUP_CODE": "That backup code is not valid.",
+    "INVALID_TWO_FACTOR_COOKIE": "Your sign-in expired. Start again.",
+    "TWO_FACTOR_PENDING": "Enter your authenticator code to finish signing in.",
+    "TWO_FACTOR_CODE_REQUIRED": "Confirm with your authenticator code in Settings → Security.",
+    "RATE_LIMITED": "Too many attempts. Try again in a few minutes.",
+    "TOO_MANY_REQUESTS": "Too many attempts. Try again in a few minutes.",
+    "MISSING_RESPONSE": "Complete the security check and try again.",
+    "VERIFICATION_FAILED": "The security check failed. Try again.",
+    "PASSWORD_TOO_SHORT": "Use at least 8 characters.",
+    "PASSWORD_TOO_LONG": "Use 72 characters or fewer.",
+    "PASSWORD_ALREADY_SET": "Your account already has a password. Use “Change password”.",
+    "HAS_PASSWORD": "Your account has a password. Confirm with your password instead.",
+    "SESSION_EXPIRED": "Your sign-in expired. Start again.",
+    "SIGNED_OUT": "Sign in again to continue.",
+    "SAVE_FAILED": "Could not save. Try again."
+  },
+  "adminSecurity": {
+    "title": "Protect the admin account",
+    "body": "This account has full access to the academy. Turn on two-factor authentication so a stolen password or email is not enough to get in.",
+    "action": "Turn on 2FA",
+    "skip": "Skip for now"
+  }
+}

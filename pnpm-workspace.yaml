@@ -1,0 +1,7 @@
+# Dependencies allowed to run install scripts (pnpm blocks them by default).
+# esbuild and @swc/core download their native binaries; @parcel/watcher
+# builds the file watcher used by the dev server.
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  esbuild: true

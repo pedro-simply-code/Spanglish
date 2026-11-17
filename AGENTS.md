@@ -35,8 +35,16 @@ New domain functionality → `src/features/<name>/`.
 
 - Define in `src/env.ts`; use `import { env } from "@/env"`.
 - No `process.env` in app code.
+- **Agents:** do not read `.env`. Use `.env.example` + `src/env.ts` for names and defaults; never echo secrets in chat.
 
 ### Imports and quality
 
 - Internal imports use the `@/` alias (ESLint).
 - After substantive changes, run `npm run check`.
+
+### List pagination
+
+- **10 rows per page** (`DEFAULT_PAGE_SIZE` in `src/lib/pagination.ts`) for any table or long list in the UI.
+- Server lists: `limit`/`offset` on the query + `QueryPagination` with `?page=` on the route.
+- Client-filtered lists: `sliceForPage` + `ListPagination` from `@/components/ui`.
+- Reset to page 1 when filters change (month, tab, search).

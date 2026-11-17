@@ -1,0 +1,249 @@
+{
+  "common": {
+    "or": "o",
+    "change": "Cambiar",
+    "resendCode": "Reenviar código",
+    "codeExpires": "El código vence en {minutes} minutos.",
+    "codePlaceholder": "123456",
+    "email": "Correo",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "password": "Contraseña",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "optional": "opcional"
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "authShell": {
+    "login": {
+      "title": "Hola de nuevo",
+      "description": "Inicia sesión para seguir aprendiendo."
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "description": "Aprende a tu ritmo. En el siguiente paso completas tu perfil."
+    },
+    "recover": {
+      "title": "Restablece tu contraseña",
+      "description": "Te enviaremos un código por correo para elegir una contraseña nueva."
+    },
+    "twoFactor": {
+      "title": "Verificación en dos pasos",
+      "description": "Tu cuenta está protegida con una app de autenticación."
+    },
+    "onboarding": {
+      "title": "Completa tu perfil",
+      "description": "Unos datos para que tu maestro prepare tu primera clase."
+    },
+    "footer": {
+      "noAccount": "¿No tienes cuenta?",
+      "createOne": "Crea una",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "signIn": "Inicia sesión",
+      "remembered": "¿La recordaste?",
+      "backToSignIn": "Volver a iniciar sesión"
+    }
+  },
+  "methods": {
+    "label": "Método",
+    "password": "Correo y contraseña",
+    "code": "Código por correo"
+  },
+  "google": {
+    "continue": "Continuar con Google",
+    "connecting": "Conectando…",
+    "failed": "No se pudo entrar con Google. Inténtalo de nuevo.",
+    "didNotFinish": "El inicio de sesión con Google no terminó. Inténtalo de nuevo o usa tu correo."
+  },
+  "login": {
+    "passwordPlaceholder": "Tu contraseña",
+    "forgot": "¿Olvidaste tu contraseña?",
+    "submit": "Iniciar sesión",
+    "verifyIntro": "Verifica tu correo para terminar de entrar. Enviamos un código a {email}.",
+    "resetDone": "Contraseña actualizada. Entra con tu contraseña nueva.",
+    "demoTitle": "Cuentas de demostración",
+    "demoIntro": "Cuentas sembradas (ejecuta npm run db:seed). Contraseña para todas:"
+  },
+  "register": {
+    "passwordPlaceholder": "Crea una contraseña",
+    "passwordHint": "Al menos {min} caracteres.",
+    "confirm": "Confirma la contraseña",
+    "confirmPlaceholder": "Repite la contraseña",
+    "submit": "Crear cuenta",
+    "verifyNote": "Te enviaremos un código para verificar el correo.",
+    "verifyIntro": "Enviamos un código de verificación a {email}. Escríbelo para activar tu cuenta."
+  },
+  "emailCode": {
+    "hint": "Te enviaremos un código de un solo uso. ¿Eres nuevo? Tu cuenta se crea al escribirlo.",
+    "send": "Envíame un código",
+    "sent": "Enviamos un código de seis dígitos a {email}.",
+    "codeLabel": "Código de seis dígitos",
+    "submit": "Continuar"
+  },
+  "verifyEmail": {
+    "codeLabel": "Código de verificación",
+    "submit": "Verificar y continuar",
+    "resent": "Enviamos un código nuevo a {email}."
+  },
+  "recover": {
+    "send": "Envíame un código",
+    "notice": "Si {email} tiene una cuenta, enviamos un código para restablecer la contraseña.",
+    "codeLabel": "Código de restablecimiento",
+    "newPassword": "Contraseña nueva",
+    "confirm": "Confirma la contraseña nueva",
+    "submit": "Guardar contraseña nueva",
+    "otherEmail": "Usar otro correo"
+  },
+  "twoFactor": {
+    "totpLabel": "Código del autenticador",
+    "totpHint": "Abre tu app de autenticación y escribe el código de 6 dígitos de Spanglish.",
+    "backupLabel": "Código de respaldo",
+    "backupHint": "Cada código de respaldo funciona una sola vez.",
+    "trust": "Confiar en este dispositivo por 30 días",
+    "submit": "Verificar",
+    "useBackup": "Usar un código de respaldo",
+    "useApp": "Usar la app de autenticación",
+    "startOver": "Empezar de nuevo"
+  },
+  "onboarding": {
+    "name": "Nombre completo",
+    "namePlaceholder": "Tu nombre",
+    "nameHint": "Tu maestro y tu compañero de clase ven este nombre.",
+    "appLanguage": "Idioma de la app",
+    "timezone": "Zona horaria",
+    "timezoneHint": "Detectada desde tu dispositivo. Los horarios de clase se muestran en esta zona.",
+    "learn": "Quiero aprender",
+    "level": "Mi nivel",
+    "goal": "Meta",
+    "goalPlaceholder": "Por ejemplo: viajar a México el próximo verano, entrevistas de trabajo…",
+    "terms": "Acepto los términos del servicio y la política de privacidad.",
+    "submit": "Guardar y continuar",
+    "learningLanguages": {
+      "spanish": "Español",
+      "english": "Inglés"
+    },
+    "levels": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Esto es lo que ven tus maestros y compañeros de clase.",
+    "saved": "Perfil guardado.",
+    "emailNote": "Por ahora el correo de inicio de sesión no se puede cambiar aquí.",
+    "card": {
+      "title": "Completa tu perfil ({percent}%)",
+      "subtitle": "Un perfil completo ayuda a tu maestro a preparar tus clases.",
+      "goal": "Agrega tu meta de aprendizaje",
+      "photo": "Agrega una foto de perfil",
+      "twoFactor": "Activa la verificación en dos pasos",
+      "password": "Agrega una contraseña",
+      "action": "Ir a configuración"
+    }
+  },
+  "security": {
+    "password": {
+      "changeTitle": "Cambiar contraseña",
+      "createTitle": "Crear una contraseña",
+      "changeHelp": "Usa al menos 8 caracteres. Recomendamos cerrar sesión en tus otros dispositivos.",
+      "createHelp": "Entras con Google o con un código por correo. Agrega una contraseña para entrar también con correo y contraseña.",
+      "current": "Contraseña actual",
+      "new": "Contraseña nueva",
+      "confirm": "Confirma la contraseña nueva",
+      "signOutOthers": "Cerrar sesión en mis otros dispositivos",
+      "changeSubmit": "Cambiar contraseña",
+      "createSubmit": "Crear contraseña",
+      "changed": "Contraseña cambiada.",
+      "created": "Contraseña creada. Ya puedes entrar con ella."
+    },
+    "twoFactor": {
+      "title": "Verificación en dos pasos",
+      "on": "Activa",
+      "off": "Inactiva",
+      "help": "Opcional. Después de iniciar sesión, también escribes un código de 6 dígitos de una app de autenticación (Google Authenticator, Microsoft Authenticator, 1Password…).",
+      "setup": "Configurar app de autenticación",
+      "scan": "1. Escanea este código QR con tu app de autenticación.",
+      "manualKey": "¿No puedes escanear? Escribe esta clave: {key}",
+      "enterCode": "2. Escribe el código de 6 dígitos que muestra la app para terminar.",
+      "codeLabel": "Código del autenticador",
+      "codeHelp": "Las cuentas sin contraseña confirman los cambios con un código actual.",
+      "turnOn": "Activar",
+      "turnOff": "Desactivar",
+      "newBackupCodes": "Nuevos códigos de respaldo",
+      "backupTitle": "Códigos de respaldo: guárdalos en un lugar seguro. Cada uno funciona una vez si pierdes tu teléfono.",
+      "enabled": "La verificación en dos pasos está activa.",
+      "disabled": "La verificación en dos pasos está desactivada.",
+      "needPassword": "Escribe tu contraseña para continuar.",
+      "needCode": "Escribe un código de tu app de autenticación."
+    },
+    "sessions": {
+      "title": "Dispositivos con sesión iniciada",
+      "help": "Cierra la sesión de cualquier dispositivo que no reconozcas.",
+      "thisDevice": "Este dispositivo",
+      "lastActive": "Última actividad {date}",
+      "signOut": "Cerrar sesión",
+      "signOutOthers": "Cerrar sesión en todos los demás",
+      "signedOutOthers": "Se cerró la sesión en tus otros dispositivos.",
+      "unknownDevice": "Dispositivo desconocido"
+    }
+  },
+  "validation": {
+    "EMAIL_REQUIRED": "Escribe tu correo.",
+    "EMAIL_INVALID": "Escribe un correo válido.",
+    "PASSWORD_REQUIRED": "Escribe tu contraseña.",
+    "PASSWORD_TOO_SHORT": "Usa al menos 8 caracteres.",
+    "PASSWORDS_DONT_MATCH": "Las contraseñas no coinciden.",
+    "CODE_REQUIRED": "Escribe el código de seis dígitos.",
+    "CODE_INVALID": "El código debe tener seis dígitos.",
+    "BACKUP_CODE_REQUIRED": "Escribe uno de tus códigos de respaldo.",
+    "CAPTCHA_REQUIRED": "Completa la verificación de seguridad e inténtalo de nuevo.",
+    "NAME_REQUIRED": "Escribe tu nombre completo.",
+    "NAME_TOO_SHORT": "Usa al menos dos caracteres.",
+    "NAME_TOO_LONG": "Usa 80 caracteres o menos.",
+    "TIMEZONE_REQUIRED": "Elige tu zona horaria.",
+    "TIMEZONE_INVALID": "Elige tu zona horaria.",
+    "LOCALE_INVALID": "Elige el idioma de la app.",
+    "LEARNING_LANGUAGE_INVALID": "Elige qué quieres aprender.",
+    "LEVEL_INVALID": "Elige tu nivel actual.",
+    "GOAL_TOO_LONG": "Tu meta debe tener menos de 500 caracteres.",
+    "TERMS_REQUIRED": "Acepta los términos del servicio y la política de privacidad para continuar.",
+    "NOTHING_TO_UPDATE": "No hay nada que guardar.",
+    "INVALID_INPUT": "Revisa el formulario e inténtalo de nuevo."
+  },
+  "errors": {
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "INVALID_EMAIL_OR_PASSWORD": "Correo o contraseña incorrectos.",
+    "INVALID_PASSWORD": "Contraseña incorrecta.",
+    "EMAIL_NOT_VERIFIED": "Verifica tu correo para continuar.",
+    "INVALID_OTP": "Ese código no es válido o ya venció.",
+    "OTP_EXPIRED": "Ese código venció. Pide uno nuevo.",
+    "TOO_MANY_ATTEMPTS": "Demasiados códigos incorrectos. Pide uno nuevo.",
+    "INVALID_CODE": "Ese código no es válido. Inténtalo de nuevo.",
+    "INVALID_BACKUP_CODE": "Ese código de respaldo no es válido.",
+    "INVALID_TWO_FACTOR_COOKIE": "Tu inicio de sesión venció. Empieza de nuevo.",
+    "TWO_FACTOR_PENDING": "Escribe el código de tu autenticador para terminar de entrar.",
+    "TWO_FACTOR_CODE_REQUIRED": "Confirma con el código de tu autenticador en Configuración → Seguridad.",
+    "RATE_LIMITED": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+    "TOO_MANY_REQUESTS": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+    "MISSING_RESPONSE": "Completa la verificación de seguridad e inténtalo de nuevo.",
+    "VERIFICATION_FAILED": "La verificación de seguridad falló. Inténtalo de nuevo.",
+    "PASSWORD_TOO_SHORT": "Usa al menos 8 caracteres.",
+    "PASSWORD_TOO_LONG": "Usa 72 caracteres o menos.",
+    "PASSWORD_ALREADY_SET": "Tu cuenta ya tiene contraseña. Usa “Cambiar contraseña”.",
+    "HAS_PASSWORD": "Tu cuenta tiene contraseña. Confirma con tu contraseña.",
+    "SESSION_EXPIRED": "Tu inicio de sesión venció. Empieza de nuevo.",
+    "SIGNED_OUT": "Vuelve a iniciar sesión para continuar.",
+    "SAVE_FAILED": "No se pudo guardar. Inténtalo de nuevo."
+  },
+  "adminSecurity": {
+    "title": "Protege la cuenta de administrador",
+    "body": "Esta cuenta tiene acceso total a la academia. Activa la verificación en dos pasos para que una contraseña o un correo robados no basten para entrar.",
+    "action": "Activar 2FA",
+    "skip": "Omitir por ahora"
+  }
+}

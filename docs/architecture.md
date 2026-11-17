@@ -36,11 +36,34 @@ Conventions for humans and AI agents. Enforceable rules live in ESLint and `tsco
 - Before uncommon APIs in this Next.js version, read `node_modules/next/dist/docs/`.
 - Data and APIs: prefer Server Actions or `app/api/` handlers as appropriate.
 
+## List pagination
+
+Admin and dashboard tables use **10 items per page** (`src/lib/pagination.ts`). Paginate on the server when the dataset is large; use `ListPagination` in client components when filtering happens in the browser.
+
 ## Environment variables
 
 - Define and read only via `src/env.ts`; import `env` from `@/env`.
 - Do not use `process.env` in application code.
 - New variables: schema in `env.ts`, value in `.env`, template in `.env.example`.
+
+## Product docs
+
+- [Roles and permissions](./roles-and-permissions.md): role model, cumulative
+  permissions, one visible dashboard, dashboard switcher, demo accounts.
+- [Live classes](./live-classes.md): status model, routes, cancel/reschedule
+  policy, classroom access, meeting provider.
+- [API](./api.md): `/api/v1` JSON API shared by the web and the Android app.
+
+## Translations (en / es)
+
+- `next-intl` without locale prefixes in URLs. The locale comes from the
+  user's profile when signed in, otherwise the `NEXT_LOCALE` cookie or the
+  browser's `Accept-Language` (`src/i18n/`).
+- Messages live in `src/i18n/messages/{en,es}.json`; add every key to both.
+- Server code returns stable error codes; the client translates them
+  (`errors.*`). Emails are localized in `src/server/email/templates.ts`.
+- Auth, onboarding, profile and security screens are translated; dashboards
+  are still English only.
 
 ## Quality
 

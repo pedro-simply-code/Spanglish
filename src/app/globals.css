@@ -3,12 +3,25 @@
 :root {
   --background: #f2f6fa;
   --foreground: #2a3547;
-  --primary: #5d87ff;
-  --primary-hover: #4570ea;
+  --primary: #fa896b;
+  --primary-hover: #f48162;
+  --primary-light: #fbf2ef;
+  --secondary: #0074ba;
+  --secondary-hover: #006fb1;
+  --secondary-light: #eff9ff;
+  --success: #13deb9;
+  --success-light: #e6fffa;
+  --info: #539bff;
+  --info-light: #ebf3fe;
+  --warning: #ffae1f;
+  --warning-light: #fef5e5;
+  --error: #fa896b;
+  --error-light: #fdede8;
   --surface: #ffffff;
   --muted: #5a6a85;
+  --subtle: #7c8fac;
   --border: #e5eaef;
-  --shadow-card: 0 2px 6px rgb(49 49 49 / 0.06), 0 12px 24px rgb(49 49 49 / 0.08);
+  --shadow-card: rgb(145 158 171 / 30%) 0 0 2px 0, rgb(145 158 171 / 12%) 0 12px 24px -4px;
   --shadow-soft: 0 1px 3px rgb(49 49 49 / 0.05), 0 4px 12px rgb(49 49 49 / 0.06);
 }
 
@@ -16,9 +29,27 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-light: var(--secondary-light);
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-info: var(--info);
+  --color-info-light: var(--info-light);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-error: var(--error);
+  --color-error-light: var(--error-light);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-border: var(--border);
   --color-surface: var(--surface);
+  --radius-card: 7px;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-dashboard: var(--font-plus-jakarta);
   --shadow-modern: var(--shadow-card);
   --shadow-modern-soft: var(--shadow-soft);
 }
@@ -27,4 +58,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

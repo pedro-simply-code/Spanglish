@@ -1,0 +1,538 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useTheme } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
+import Portal from "@mui/material/Portal";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconClock,
+  IconCopy,
+  IconMaximize,
+  IconMinimize,
+  IconVideoOff,
+} from "@tabler/icons-react";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { LinkButton } from "@/components/ui/link-button";
+import { SectionCard } from "@/components/ui/section-card";
+import { useAppToast } from "@/lib/use-app-toast";
+import { ClassroomVideoStageLazy } from "@/features/classes/components/classroom-video-stage-lazy";
+import { useClassroomPageLifecycle } from "@/features/classes/components/use-classroom-page-lifecycle";
+import { ClassStatusChip } from "@/features/classes/components/class-status-chip";
+import { classDetailHref } from "@/features/classes/data";
+import {
+  formatClassDateTime,
+  formatClassTimeRange,
+} from "@/features/classes/format";
+import { getClassStatus, getJoinState } from "@/features/classes/policy";
+import type { ClassPolicy } from "@/features/classes/policy";
+import type {
+  ClassroomVideoMode,
+  LiveClass,
+  LiveKitClassroomSession,
+  RecordingClientConfig,
+} from "@/features/classes/types";
+
+type ClassRoomProps = {
+  item: LiveClass;
+  now: string;
+  policy: ClassPolicy;
+  viewerName: string;
+  providerLabel: string;
+  providerConfigured: boolean;
+  videoMode: ClassroomVideoMode;
+  liveKit: LiveKitClassroomSession | null;
+  recordingConfig: RecordingClientConfig;
+  tokenExpiresAt: string | null;
+  guestJoinUrl: string | null;
+  guestViewer: boolean;
+  guestSelfServeMedia: boolean;
+  canModerate: boolean;
+  waitingInLobby: boolean;
+  viewerAvatarUrl: string;
+  teacherMustStartSession: boolean;
+  awaitingTeacherSession: boolean;
+  liveSessionActive: boolean;
+  canEndLiveSession: boolean;
+};
+
+/**
+ * Classroom with in-app video in the main stage. Pop-out remains optional.
+ */
+export function ClassRoom({
+  item,
+  now,
+  policy,
+  viewerName,
+  providerLabel,
+  providerConfigured,
+  videoMode,
+  liveKit,
+  recordingConfig,
+  tokenExpiresAt,
+  guestJoinUrl,
+  guestViewer,
+  guestSelfServeMedia,
+  canModerate,
+  waitingInLobby,
+  viewerAvatarUrl,
+  teacherMustStartSession,
+  awaitingTeacherSession,
+  liveSessionActive,
+  canEndLiveSession,
+}: ClassRoomProps) {
+  const theme = useTheme();
+  const searchParams = useSearchParams();
+  const guestJoinToken = guestViewer ? searchParams.get("join") : null;
+  const { showInfo } = useAppToast();
+  const [copied, setCopied] = useState(false);
+  const [guestCopied, setGuestCopied] = useState(false);
+  const [focusVideo, setFocusVideo] = useState(false);
+  const status = getClassStatus(item, now);
+  const join = getJoinState(item, now, policy);
+  const open = join.canJoin;
+  const inLiveCall =
+    open &&
+    liveSessionActive &&
+    !waitingInLobby &&
+    !teacherMustStartSession &&
+    !awaitingTeacherSession &&
+    (videoMode === "livekit" ? Boolean(liveKit) : true);
+
+  useClassroomPageLifecycle({
+    classId: item.id,
+    active: inLiveCall,
+    onLeaveRoute: () => {
+      setFocusVideo(false);
+      showInfo({ message: "You left the classroom. The call disconnected on this device." });
+    },
+  });
+
+  useEffect(() => {
+    if (!focusVideo) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [focusVideo]);
+
+  const copyRoom = async () => {
+    const value = liveKit?.serverUrl;
+    if (!value) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        `${value} (room: ${liveKit.roomName})`,
+      );
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const copyGuestLink = async () => {
+    if (!guestJoinUrl) return;
+    try {
+      await navigator.clipboard.writeText(guestJoinUrl);
+      setGuestCopied(true);
+      window.setTimeout(() => setGuestCopied(false), 2000);
+    } catch {
+      setGuestCopied(false);
+    }
+  };
+
+  return (
+    <Box sx={{ mt: focusVideo ? 0 : 3 }}>
+      <Box sx={{ display: focusVideo ? "none" : "block" }}>
+        <Breadcrumb
+          title="Classroom"
+          subtitle={`${item.topic} · ${formatClassTimeRange(item)}`}
+          items={[
+            { title: "My classes", to: "/classes" },
+            { title: item.topic, to: classDetailHref(item.id) },
+            { title: "Classroom" },
+          ]}
+        />
+      </Box>
+
+      <Grid container spacing={focusVideo ? 0 : 3}>
+        <Grid size={{ xs: 12, lg: focusVideo ? 12 : 8 }}>
+          <Portal disablePortal={!focusVideo}>
+            <Card
+              square={focusVideo}
+              elevation={focusVideo ? 0 : 9}
+              sx={{
+                overflow: "hidden",
+                p: 0,
+                ...(focusVideo
+                  ? {
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100vw",
+                      height: "100dvh",
+                      maxWidth: "none",
+                      margin: 0,
+                      zIndex: theme.zIndex.modal + 2,
+                      borderRadius: "0 !important",
+                      boxShadow: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      "& > .MuiBox-root": { borderRadius: "0 !important" },
+                    }
+                  : {}),
+              }}
+            >
+            {focusVideo ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  px: 2,
+                  py: 1,
+                  bgcolor: "#0f1014",
+                  color: "#fff",
+                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "0 !important",
+                  flexShrink: 0,
+                }}
+              >
+                <Typography variant="subtitle2" noWrap>
+                  {item.topic} · Focus mode
+                </Typography>
+                <Button
+                  size="small"
+                  color="inherit"
+                  startIcon={<IconMinimize size={16} />}
+                  onClick={() => setFocusVideo(false)}
+                >
+                  Exit full view
+                </Button>
+              </Box>
+            ) : null}
+            <Box
+              sx={{
+                position: "relative",
+                bgcolor: "#17181C",
+                color: "#fff",
+                aspectRatio: focusVideo ? "unset" : "16 / 9",
+                flex: focusVideo ? 1 : undefined,
+                minHeight: focusVideo ? 0 : undefined,
+                width: "100%",
+                overflow: "hidden",
+                ...(focusVideo
+                  ? {
+                      borderRadius: "0 !important",
+                      "& .MuiBox-root": { borderRadius: "0 !important" },
+                    }
+                  : {}),
+              }}
+            >
+              {open && !focusVideo ? (
+                <Button
+                  size="small"
+                  color="inherit"
+                  startIcon={<IconMaximize size={16} />}
+                  onClick={() => setFocusVideo(true)}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    left: 8,
+                    zIndex: 5,
+                    bgcolor: "rgba(0,0,0,0.55)",
+                    "&:hover": { bgcolor: "rgba(0,0,0,0.75)" },
+                  }}
+                >
+                  Full view
+                </Button>
+              ) : null}
+              {open ? (
+                <ClassroomVideoStageLazy
+                  mode={videoMode}
+                  liveKit={liveKit}
+                  classId={item.id}
+                  meetingRoom={item.meetingRoom}
+                  viewerName={viewerName}
+                  topic={item.topic}
+                  teacherName={item.teacherName}
+                  recordingConfig={recordingConfig}
+                  guestViewer={guestViewer}
+                  guestSelfServeMedia={guestSelfServeMedia}
+                  canModerate={canModerate}
+                  waitingInLobby={waitingInLobby}
+                  viewerAvatarUrl={viewerAvatarUrl}
+                  teacherMustStartSession={teacherMustStartSession}
+                  awaitingTeacherSession={awaitingTeacherSession}
+                  canEndLiveSession={canEndLiveSession}
+                  guestJoinToken={guestJoinToken}
+                />
+              ) : (
+                <Stack
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="center"
+                  textAlign="center"
+                  px={2}
+                  sx={{ position: "absolute", inset: 0, p: 3 }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 72,
+                      height: 72,
+                      bgcolor: "rgba(255,255,255,0.08)",
+                      color: "rgba(255,255,255,0.8)",
+                    }}
+                  >
+                    <IconVideoOff size={34} />
+                  </Avatar>
+                  <Typography variant="h5" color="#fff">
+                    The room is not open yet
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "rgba(255,255,255,0.65)", maxWidth: 420 }}
+                  >
+                    {join.message}
+                  </Typography>
+                  <LinkButton
+                    href={classDetailHref(item.id)}
+                    variant="contained"
+                    color="primary"
+                    startIcon={<IconArrowLeft size={16} />}
+                  >
+                    Back to class details
+                  </LinkButton>
+                </Stack>
+              )}
+            </Box>
+
+            <CardContent sx={{ p: { xs: "20px", md: "24px" }, display: focusVideo ? "none" : "block" }}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                justifyContent="space-between"
+              >
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Avatar
+                    src={item.teacherAvatar}
+                    alt={item.teacherName}
+                    sx={{ width: 48, height: 48 }}
+                  />
+                  <Box minWidth={0}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                      flexWrap="wrap"
+                      gap={0.75}
+                    >
+                      <ClassStatusChip status={status} />
+                      <Chip
+                        label={`${item.duration} min`}
+                        size="small"
+                        variant="outlined"
+                      />
+                      {open && teacherMustStartSession ? (
+                        <Chip
+                          label="Start the call"
+                          size="small"
+                          color="warning"
+                          variant="outlined"
+                        />
+                      ) : null}
+                      {open && awaitingTeacherSession ? (
+                        <Chip
+                          label="Waiting for teacher"
+                          size="small"
+                          color="warning"
+                          variant="outlined"
+                        />
+                      ) : null}
+                      {open && liveSessionActive && !teacherMustStartSession ? (
+                        <Chip
+                          label="Live in app"
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                        />
+                      ) : null}
+                    </Stack>
+                    <Typography variant="h6" mt={0.5}>
+                      {item.topic}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.teacherName} · {formatClassTimeRange(item)}
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                {open ? (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={copyRoom}
+                      disabled={!liveKit}
+                      startIcon={
+                        copied ? <IconCheck size={15} /> : <IconCopy size={15} />
+                      }
+                    >
+                      {copied ? "Room copied" : "Copy room info"}
+                    </Button>
+                    {guestJoinUrl ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={copyGuestLink}
+                        startIcon={
+                          guestCopied ? (
+                            <IconCheck size={15} />
+                          ) : (
+                            <IconCopy size={15} />
+                          )
+                        }
+                      >
+                        {guestCopied ? "Guest link copied" : "Copy guest link"}
+                      </Button>
+                    ) : null}
+                  </Stack>
+                ) : (
+                  <LinkButton
+                    href={classDetailHref(item.id)}
+                    variant="outlined"
+                    startIcon={<IconArrowLeft size={16} />}
+                  >
+                    Class details
+                  </LinkButton>
+                )}
+              </Stack>
+            </CardContent>
+            </Card>
+          </Portal>
+          {focusVideo ? (
+            <Box sx={{ aspectRatio: "16 / 9", visibility: "hidden" }} aria-hidden />
+          ) : null}
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 4 }} sx={{ display: focusVideo ? "none" : undefined }}>
+          <Stack spacing={3}>
+            <SectionCard
+              title="Room status"
+              subtitle={providerConfigured ? "Video in this page" : "Local preview"}
+              action={
+                <Avatar
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    bgcolor: open ? "success.light" : "primary.light",
+                    color: open ? "success.main" : "primary.main",
+                  }}
+                >
+                  <IconClock size={20} />
+                </Avatar>
+              }
+            >
+              <Stack spacing={2}>
+                <Alert severity={open ? "success" : "info"}>
+                  {open
+                    ? guestViewer
+                      ? guestSelfServeMedia
+                        ? "Staff guest: same classroom toolbar as a student; mic, camera, and screen are not blocked by mute-all."
+                        : "You joined with a signed guest link (view-only mic/camera)."
+                      : "Private classroom: enrolled students and the assigned teacher join here; visitors use the teacher's guest link."
+                    : join.message}
+                </Alert>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Opens
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {formatClassDateTime(join.opensAt)}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Closes
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {formatClassDateTime(join.closesAt)}
+                  </Typography>
+                </Stack>
+                <Divider />
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Provider
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {providerLabel}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    Room
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {item.meetingRoom}
+                  </Typography>
+                </Stack>
+                {open && tokenExpiresAt ? (
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2" color="text.secondary">
+                      Access expires
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {formatClassDateTime(tokenExpiresAt)}
+                    </Typography>
+                  </Stack>
+                ) : null}
+              </Stack>
+            </SectionCard>
+
+            <SectionCard title="Before you join" subtitle="A smooth class">
+              <Stack spacing={1.5} divider={<Divider />}>
+                <Typography variant="body2" color="text.secondary">
+                  Use headphones and test your microphone before the call.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {providerConfigured
+                    ? "This room uses LiveKit for multi-participant video."
+                    : "Without LiveKit keys, the room falls back to a single-device preview."}{" "}
+                  Use the toolbar for screen share and recording.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Zoom-style layout: large stage for screen share, filmstrip for participants, your camera in the corner.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Access: signed-in students and teachers, plus optional{" "}
+                  <Typography component="span" variant="body2" fontWeight={600}>
+                    guest links
+                  </Typography>{" "}
+                  (expire with the meeting token).{" "}
+                  {recordingConfig.storage === "cloud"
+                    ? "Cloud recordings need B2_* when RECORDING_STORAGE=cloud."
+                    : "Local recordings do not require B2_*."}
+                </Typography>
+              </Stack>
+            </SectionCard>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}

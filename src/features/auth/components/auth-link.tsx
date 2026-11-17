@@ -7,7 +7,7 @@ type AuthLinkProps = ComponentProps<typeof Link> & {
 
 const variantClasses = {
   primary:
-    "bg-primary text-white shadow-modern-soft hover:bg-[#4570ea]",
+    "bg-primary text-white shadow-modern-soft hover:bg-primary-hover",
   secondary:
     "border border-[#dfe5ef] bg-surface text-[#2a3547] shadow-modern-soft hover:bg-[#f6f9fc]",
 } as const;

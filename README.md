@@ -10,6 +10,18 @@ See [docs/architecture.md](docs/architecture.md) (layout, T3 env, Server Compone
 npm run typecheck   # TypeScript
 npm run lint        # ESLint
 npm run check       # typecheck + lint + build
+npm test            # unit tests (Vitest): roles, class policy, time zones, levels, pay
+```
+
+End-to-end tests (Playwright) run against a running app and a freshly seeded
+database; they create and approve data, so never point them at production:
+
+```bash
+pnpm db:reset && pnpm db:migrate && pnpm db:seed
+pnpm admin:promote -- you@example.com --yes
+pnpm build && pnpm start            # in another terminal
+pnpm exec playwright install chromium   # first time only
+E2E_ADMIN_EMAIL=you@example.com pnpm test:e2e
 ```
 
 Environment variables: copy `.env.example` → `.env` and keep the schema in `src/env.ts`.
