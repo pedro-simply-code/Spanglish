@@ -15,6 +15,7 @@ import {
   IconPlayerPlay,
   IconVideo,
 } from "@tabler/icons-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -24,8 +25,16 @@ import {
 } from "@/features/materials/components/material-kind-chip";
 import { ShareMaterialDialog } from "@/features/materials/components/share-material-dialog";
 import {
+  localizeAssignments,
+  localizeFormQuestions,
+  localizeMaterial,
+  localizeMaterialGrants,
+  localizeSubmissions,
+} from "@/features/materials/data";
+import {
   formatMaterialDateTime,
   formatMaterialKind,
+  formatMaterialLevel,
 } from "@/features/materials/format";
 import type {
   Assignment,
@@ -35,11 +44,11 @@ import type {
   Submission,
 } from "@/features/materials/types";
 
-const questionTypeLabels: Record<FormQuestion["type"], string> = {
-  "multiple-choice": "Multiple choice",
-  "short-answer": "Short answer",
-  speaking: "Speaking",
-  listening: "Listening",
+const questionTypeKeys: Record<FormQuestion["type"], string> = {
+  "multiple-choice": "multipleChoice",
+  "short-answer": "shortAnswer",
+  speaking: "speaking",
+  listening: "listening",
 };
 
 type MaterialDetailProps = {
@@ -51,23 +60,37 @@ type MaterialDetailProps = {
   questions?: FormQuestion[];
 };
 
-export function MaterialDetail({
-  material,
+type Translator = Awaited<ReturnType<typeof getTranslations<"educator.materials">>>;
+
+export async function MaterialDetail({
+  material: sourceMaterial,
   viewer,
-  grants = [],
-  assignments = [],
-  submissions = [],
-  questions = [],
+  grants: sourceGrants = [],
+  assignments: sourceAssignments = [],
+  submissions: sourceSubmissions = [],
+  questions: sourceQuestions = [],
 }: MaterialDetailProps) {
+  const t = await getTranslations("educator.materials");
+  const locale = await getLocale();
   const isTeacher = viewer === "teacher";
+  /** Learning copy is teacher-authored; students see it as stored (including demo seeds). */
+  const material = isTeacher
+    ? (localizeMaterial(sourceMaterial, t) ?? sourceMaterial)
+    : sourceMaterial;
+  const grants = isTeacher ? localizeMaterialGrants(sourceGrants, t) : sourceGrants;
+  const assignments = isTeacher ? localizeAssignments(sourceAssignments, t) : sourceAssignments;
+  const submissions = isTeacher ? localizeSubmissions(sourceSubmissions, t) : sourceSubmissions;
+  const questions = isTeacher
+    ? localizeFormQuestions(sourceQuestions, sourceMaterial.id, t)
+    : sourceQuestions;
   const libraryHref = isTeacher ? "/teacher/materials" : "/materials";
-  const libraryLabel = isTeacher ? "Materials" : "My materials";
+  const libraryLabel = isTeacher ? t("detail.title") : t("studentOverview.title");
 
   return (
     <Box mt={3}>
       <Breadcrumb
         title={material.title}
-        subtitle={`${materialKindLabelsForTitle(material)} · ${material.level}`}
+        subtitle={`${materialKindLabelForTitle(material, t)} · ${formatMaterialLevel(material.level, t)}`}
         items={[
           { title: libraryLabel, to: libraryHref },
           { title: material.title },
@@ -77,7 +100,10 @@ export function MaterialDetail({
       <Stack spacing={3}>
         <SectionCard
           title={material.title}
-          subtitle={`By ${material.ownerName} · updated ${formatMaterialDateTime(material.updatedAt)}`}
+          subtitle={t("detail.createdByUpdated", {
+            name: material.ownerName,
+            date: formatMaterialDateTime(material.updatedAt, locale),
+          })}
           action={
             <Stack direction="row" spacing={1} flexWrap="wrap">
               {isTeacher ? (
@@ -91,7 +117,7 @@ export function MaterialDetail({
                   size="small"
                   variant="contained"
                 >
-                  Start practice
+                  {t("detail.startPractice")}
                 </LinkButton>
               ) : null}
               <LinkButton
@@ -109,7 +135,7 @@ export function MaterialDetail({
             <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
               <MaterialKindChip kind={material.kind} />
               {isTeacher ? <MaterialStatusChip status={material.status} /> : null}
-              <Chip label={material.level} size="small" variant="outlined" />
+              <Chip label={formatMaterialLevel(material.level, t)} size="small" variant="outlined" />
               {material.duration ? (
                 <Chip
                   label={material.duration}
@@ -120,7 +146,7 @@ export function MaterialDetail({
               ) : null}
               {material.classId ? (
                 <Chip
-                  label="Linked to a class"
+                  label={t("detail.linkedToClass")}
                   size="small"
                   variant="outlined"
                   icon={<IconCalendarEvent size={13} />}
@@ -136,16 +162,16 @@ export function MaterialDetail({
               ))}
             </Stack>
 
-            <MaterialPreview material={material} questions={questions} />
+            <MaterialPreview material={material} questions={questions} t={t} />
           </Stack>
         </SectionCard>
 
         <SectionCard
-          title={isTeacher ? "Shared with" : "How to use this"}
+          title={isTeacher ? t("detail.sharedWith") : t("detail.howToUse")}
           subtitle={
             isTeacher
-              ? "Every class, student, or cohort that received this material"
-              : "This material is attached to your classes and practice plan"
+              ? t("detail.sharedWithSubtitle")
+              : t("detail.howToUseSubtitle")
           }
         >
           {grants.length ? (
@@ -162,19 +188,21 @@ export function MaterialDetail({
                       {grant.audienceLabel}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Shared by {grant.sharedBy} ·{" "}
-                      {formatMaterialDateTime(grant.sharedAt)}
+                      {t("detail.sharedBy", {
+                        name: grant.sharedBy,
+                        date: formatMaterialDateTime(grant.sharedAt, locale),
+                      })}
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Chip
-                      label={formatMaterialKind(grant.audience)}
+                      label={t(`audience.${grant.audience}`)}
                       size="small"
                       variant="outlined"
                     />
                     {grant.dueAt ? (
                       <Chip
-                        label={`Due ${formatMaterialDateTime(grant.dueAt)}`}
+                        label={t("detail.due", { date: formatMaterialDateTime(grant.dueAt, locale) })}
                         size="small"
                         color="warning"
                         variant="outlined"
@@ -186,17 +214,15 @@ export function MaterialDetail({
             </Stack>
           ) : (
             <Alert severity="info">
-              {isTeacher
-                ? "This material has not been shared yet. Use Share to assign it to a class or student."
-                : "Open the class page to see when this material is used."}
+              {isTeacher ? t("detail.notSharedTeacher") : t("detail.notSharedStudent")}
             </Alert>
           )}
         </SectionCard>
 
         {isTeacher && assignments.length ? (
           <SectionCard
-            title="Assignments and results"
-            subtitle="Who received the form and how far they are"
+            title={t("detail.assignmentsTitle")}
+            subtitle={t("detail.assignmentsSubtitle")}
           >
             <Stack spacing={3}>
               {assignments.map((assignment) => {
@@ -224,12 +250,17 @@ export function MaterialDetail({
                         <Typography variant="body2" color="text.secondary">
                           {assignment.audienceLabel}
                           {assignment.dueAt
-                            ? ` · due ${formatMaterialDateTime(assignment.dueAt)}`
+                            ? t("detail.dueAssignment", {
+                                date: formatMaterialDateTime(assignment.dueAt, locale),
+                              })
                             : ""}
                         </Typography>
                       </Box>
                       <Chip
-                        label={`${assignment.submitted}/${assignment.totalStudents} submitted`}
+                        label={t("detail.submittedCount", {
+                          submitted: assignment.submitted,
+                          total: assignment.totalStudents,
+                        })}
                         size="small"
                         variant="outlined"
                       />
@@ -263,7 +294,7 @@ export function MaterialDetail({
                               </Typography>
                             ) : null}
                             <Chip
-                              label={submission.status}
+                              label={t(`detail.submission.${submission.status}`)}
                               size="small"
                               color={
                                 submission.status === "graded"
@@ -289,16 +320,20 @@ export function MaterialDetail({
   );
 }
 
-function materialKindLabelsForTitle(material: Material) {
-  return material.kind === "form" ? "Practice form" : formatMaterialKind(material.kind);
+function materialKindLabelForTitle(material: Material, t: Translator) {
+  return material.kind === "form"
+    ? t("detail.practiceForm")
+    : formatMaterialKind(material.kind, t);
 }
 
 function MaterialPreview({
   material,
   questions,
+  t,
 }: {
   material: Material;
   questions: FormQuestion[];
+  t: Translator;
 }) {
   if (material.kind === "form") {
     return (
@@ -306,7 +341,10 @@ function MaterialPreview({
         <Stack direction="row" spacing={1} alignItems="center" mb={2}>
           <IconFileText size={18} />
           <Typography variant="subtitle1" fontWeight={600}>
-            {questions.length} questions · {material.estimatedMinutes ?? 5} minutes
+            {t("detail.questionsMinutes", {
+              count: questions.length,
+              minutes: material.estimatedMinutes ?? 5,
+            })}
           </Typography>
         </Stack>
         <Stack spacing={1.5}>
@@ -322,12 +360,12 @@ function MaterialPreview({
               </Typography>
               <Stack direction="row" spacing={0.75} flexShrink={0}>
                 <Chip
-                  label={questionTypeLabels[question.type]}
+                  label={t(`questionType.${questionTypeKeys[question.type]}`)}
                   size="small"
                   variant="outlined"
                 />
                 <Chip
-                  label={`${question.points} pt`}
+                  label={t("detail.point", { count: question.points })}
                   size="small"
                   variant="outlined"
                 />
@@ -358,16 +396,16 @@ function MaterialPreview({
         </Avatar>
         <Box flexGrow={1} minWidth={180}>
           <Typography variant="subtitle1" fontWeight={600}>
-            {material.duration ?? "Media"} · {formatMaterialKind(material.kind)}
+            {material.duration ?? t("detail.media")} · {formatMaterialKind(material.kind, t)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {material.transcriptReady
-              ? "Transcript ready. Playback and captions use the meeting provider in production."
-              : "Transcript will appear after the provider finishes processing."}
+              ? t("detail.transcriptReady")
+              : t("detail.transcriptPending")}
           </Typography>
           {material.views !== undefined ? (
             <Typography variant="caption" color="text.secondary">
-              {material.views} views
+              {t("detail.views", { count: material.views })}
             </Typography>
           ) : null}
         </Box>
@@ -378,7 +416,7 @@ function MaterialPreview({
           endIcon={<IconPlayerPlay size={14} />}
           disabled={!material.href}
         >
-          Play
+          {t("detail.play")}
         </LinkButton>
       </Box>
     );
@@ -392,10 +430,10 @@ function MaterialPreview({
         </Avatar>
         <Box flexGrow={1} minWidth={180}>
           <Typography variant="subtitle1" fontWeight={600}>
-            {material.fileName ?? "Resource"}
+            {material.fileName ?? t("detail.resource")}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {material.fileSize ?? "Open the resource in a new view"}
+            {material.fileSize ?? t("detail.openResource")}
           </Typography>
         </Box>
         <LinkButton
@@ -405,7 +443,7 @@ function MaterialPreview({
           endIcon={<IconExternalLink size={14} />}
           disabled={!material.href}
         >
-          Open
+          {t("detail.open")}
         </LinkButton>
       </Stack>
     </Box>

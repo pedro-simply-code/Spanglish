@@ -1,23 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { SectionCard } from "@/components/ui/section-card";
 import { shiftUtcMonth } from "@/lib/payout-month";
-
-const money = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-
-const monthTitle = (month: string) => {
-  const [year, value] = month.split("-").map(Number);
-  if (!year || !value) return month;
-  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(
-    new Date(Date.UTC(year, value - 1, 1)),
-  );
-};
 
 type Props = {
   month: string;
@@ -30,17 +21,29 @@ type Props = {
 };
 
 export function PayoutMonthNav({ month, minMonth, maxMonth, onMonthChange, paidCents, pendingCents }: Props) {
+  const t = useTranslations("educator.payouts.monthNav");
+  const locale = useLocale();
   const atLatest = month >= maxMonth;
   const atEarliest = month <= minMonth;
+
+  const money = useMemo(
+    () => (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100),
+    [locale],
+  );
+  const monthTitle = (value: string) => {
+    const [year, number] = value.split("-").map(Number);
+    if (!year || !number) return value;
+    return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(
+      new Date(Date.UTC(year, number - 1, 1)),
+    );
+  };
+
   return (
-    <SectionCard
-      title="By month"
-      subtitle="Teachers request payouts when they are ready — browse months to see what was paid or is still open."
-    >
+    <SectionCard title={t("title")} subtitle={t("subtitle")}>
       <Stack spacing={2}>
         <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
           <IconButton
-            aria-label="Previous month"
+            aria-label={t("previous")}
             disabled={atEarliest}
             onClick={() => !atEarliest && onMonthChange(shiftUtcMonth(month, -1))}
           >
@@ -50,7 +53,7 @@ export function PayoutMonthNav({ month, minMonth, maxMonth, onMonthChange, paidC
             {monthTitle(month)}
           </Typography>
           <IconButton
-            aria-label="Next month"
+            aria-label={t("next")}
             disabled={atLatest}
             onClick={() => !atLatest && onMonthChange(shiftUtcMonth(month, 1))}
           >
@@ -61,7 +64,7 @@ export function PayoutMonthNav({ month, minMonth, maxMonth, onMonthChange, paidC
         <Stack direction={{ xs: "column", sm: "row" }} spacing={3} justifyContent="center" textAlign="center">
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Paid this month
+              {t("paidThisMonth")}
             </Typography>
             <Typography variant="h6" fontWeight={700}>
               {money(paidCents)}
@@ -69,7 +72,7 @@ export function PayoutMonthNav({ month, minMonth, maxMonth, onMonthChange, paidC
           </Box>
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Awaiting payment
+              {t("awaitingPayment")}
             </Typography>
             <Typography variant="h6" fontWeight={700}>
               {money(pendingCents)}

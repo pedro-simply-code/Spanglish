@@ -11,8 +11,8 @@ import ListItemText from "@mui/material/ListItemText";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconMenu2, IconSearch } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { searchMessageRecipientsAction } from "@/features/email/actions";
-import { roleDefinitions } from "@/features/auth";
 import type { MessageRecipient } from "@/server/messages/recipients";
 
 type EmailSearchProps = {
@@ -23,7 +23,15 @@ type EmailSearchProps = {
 };
 
 export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient }: EmailSearchProps) {
+  const t = useTranslations("apps");
   const [matches, setMatches] = useState<MessageRecipient[]>([]);
+
+  const roleLabels: Record<MessageRecipient["role"], string> = {
+    student: t("email.roles.student"),
+    teacher: t("email.roles.teacher"),
+    manager: t("email.roles.manager"),
+    admin: t("email.roles.admin"),
+  };
 
   useEffect(() => {
     const q = value.trim();
@@ -47,7 +55,7 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
           onClick={onToggleSidebar}
           color="primary"
           size="small"
-          aria-label="Open email filters"
+          aria-label={t("email.search.openFilters")}
           sx={{
             mr: 1,
             flexShrink: "0",
@@ -62,7 +70,7 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
           fullWidth
           size="small"
           value={value}
-          placeholder="Search messages or academy email"
+          placeholder={t("email.search.placeholder")}
           variant="outlined"
           onChange={(event) => onChange(event.target.value)}
           slotProps={{
@@ -80,7 +88,7 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
       {matches.length > 0 && onPickRecipient ? (
         <Box sx={{ mt: 1, mb: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ px: 0.5 }}>
-            Academy contacts (all roles)
+            {t("email.search.contacts")}
           </Typography>
           <List dense disablePadding>
             {matches.map((recipient) => (
@@ -94,7 +102,7 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
                   secondary={recipient.email}
                   primaryTypographyProps={{ variant: "subtitle2" }}
                 />
-                <Chip size="small" variant="outlined" label={roleDefinitions[recipient.role].badge} />
+                <Chip size="small" variant="outlined" label={roleLabels[recipient.role]} />
               </ListItemButton>
             ))}
           </List>

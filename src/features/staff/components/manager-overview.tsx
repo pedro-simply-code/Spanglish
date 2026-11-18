@@ -18,6 +18,7 @@ import {
   IconUsers,
   IconVideo,
 } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -28,31 +29,32 @@ type ManagerOverviewProps = {
   snapshot: ManagerDashboardSnapshot;
 };
 
-function formatUsd(cents: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(cents / 100);
-}
-
-const quickLinks = [
-  { label: "Academy schedule", href: "/apps/calendar", icon: IconVideo },
-  { label: "Students & credits", href: "/manager/students", icon: IconUsers },
-  { label: "Teacher payouts", href: "/manager/payouts", icon: IconCash },
-  { label: "Applications", href: "/manager/applications", icon: IconSchool },
-  { label: "Billing", href: "/manager/billing", icon: IconReceipt2 },
-] as const;
-
 export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
   const { stats, team, attention, operations, billing } = snapshot;
+
+  const formatUsd = (cents: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(cents / 100);
+
+  const quickLinks = [
+    { label: t("manager.dashboard.academySchedule"), href: "/apps/calendar", icon: IconVideo },
+    { label: t("manager.dashboard.studentsCredits"), href: "/manager/students", icon: IconUsers },
+    { label: t("manager.dashboard.teacherPayouts"), href: "/manager/payouts", icon: IconCash },
+    { label: t("manager.dashboard.applications"), href: "/manager/applications", icon: IconSchool },
+    { label: t("manager.dashboard.billing"), href: "/manager/billing", icon: IconReceipt2 },
+  ];
 
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={`Operations, ${firstName}`}
-        subtitle="Operations only — you do not teach or take classes. Review staff, students, billing, and schedules here."
+        title={t("manager.dashboard.title", { firstName })}
+        subtitle={t("manager.dashboard.subtitle")}
       />
 
       <Grid container spacing={3}>
@@ -108,18 +110,18 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
 
         <Grid size={{ xs: 12, lg: 7 }}>
           <SectionCard
-            title="Teachers"
-            subtitle={`${snapshot.teacherCount} on staff · by classes delivered`}
+            title={t("manager.dashboard.teachers")}
+            subtitle={t("manager.dashboard.teachersSubtitle", { count: snapshot.teacherCount })}
             action={
               <LinkButton size="small" href="/manager/staff" endIcon={<IconArrowRight size={14} />}>
-                Staff
+                {t("manager.dashboard.staff")}
               </LinkButton>
             }
           >
             <Stack spacing={2} divider={<Divider />}>
               {!team.length ? (
                 <Typography variant="body2" color="text.secondary">
-                  No teachers on the roster yet.
+                  {t("manager.dashboard.noTeachers")}
                 </Typography>
               ) : null}
               {team.map((teacher) => (
@@ -132,15 +134,17 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
                       {teacher.name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {teacher.headline || "Profile not completed"} · {teacher.levelName}
+                      {teacher.headline || t("manager.dashboard.profileNotCompleted")} · {teacher.levelName}
                     </Typography>
                   </Box>
                   <Box textAlign="right">
                     <Typography variant="subtitle2" fontWeight={600}>
-                      {teacher.ratingCount ? `${teacher.ratingAverage.toFixed(1)} ★` : "No ratings"}
+                      {teacher.ratingCount
+                        ? `${teacher.ratingAverage.toFixed(1)} ★`
+                        : t("manager.dashboard.noRatings")}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {teacher.classesTaught} classes
+                      {t("manager.dashboard.classes", { count: teacher.classesTaught })}
                     </Typography>
                   </Box>
                 </Stack>
@@ -150,11 +154,11 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 5 }}>
-          <SectionCard title="Your queue" subtitle="Items you can resolve as a manager">
+          <SectionCard title={t("manager.dashboard.yourQueue")} subtitle={t("manager.dashboard.queueSubtitle")}>
             <Stack spacing={2.5}>
               {!attention.length ? (
                 <Typography variant="body2" color="text.secondary">
-                  Nothing waiting on you right now.
+                  {t("manager.dashboard.nothingWaiting")}
                 </Typography>
               ) : null}
               {attention.map((item) => (
@@ -169,7 +173,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
                       </Typography>
                     </Box>
                     <Chip
-                      label={item.severity}
+                      label={t(`status.${item.severity}`)}
                       size="small"
                       color={
                         item.severity === "high" ? "error" : item.severity === "normal" ? "warning" : "default"
@@ -185,8 +189,8 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
 
         <Grid size={{ xs: 12, md: 6 }}>
           <SectionCard
-            title="Academy schedule"
-            subtitle="Headline counts — open Calendar to filter by teacher"
+            title={t("manager.dashboard.academySchedule")}
+            subtitle={t("manager.dashboard.scheduleSubtitle")}
             action={
               <Avatar sx={{ width: 38, height: 38, bgcolor: "primary.light", color: "primary.main" }}>
                 <IconVideo size={20} />
@@ -195,12 +199,12 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
           >
             <Stack spacing={2}>
               <Typography variant="body2" color="text.secondary">
-                Reschedules inside the policy window are automatic. Paired class proposals appear under Rooms.
+                {t("manager.dashboard.scheduleNote")}
               </Typography>
               <Divider />
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Scheduled this week
+                  {t("manager.dashboard.scheduledThisWeek")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {operations.classesThisWeek}
@@ -208,7 +212,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Upcoming (all)
+                  {t("manager.dashboard.upcomingAll")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {operations.upcoming}
@@ -216,7 +220,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Delivered this week
+                  {t("manager.dashboard.deliveredThisWeek")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {operations.deliveredThisWeek}
@@ -224,7 +228,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Open paired change requests
+                  {t("manager.dashboard.openPairedChanges")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {operations.pendingChangeRequests}
@@ -236,7 +240,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
                 endIcon={<IconArrowRight size={14} />}
                 sx={{ alignSelf: "flex-start", px: 0 }}
               >
-                Open calendar
+                {t("manager.dashboard.openCalendar")}
               </LinkButton>
             </Stack>
           </SectionCard>
@@ -244,8 +248,8 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
 
         <Grid size={{ xs: 12, md: 6 }}>
           <SectionCard
-            title="Billing & payouts"
-            subtitle="Paid orders, credits, and teacher earnings you prepare"
+            title={t("manager.dashboard.billingPayouts")}
+            subtitle={t("manager.dashboard.billingSubtitle")}
             action={
               <Avatar sx={{ width: 38, height: 38, bgcolor: "success.light", color: "success.main" }}>
                 <IconReceipt2 size={20} />
@@ -254,13 +258,12 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
           >
             <Stack spacing={2}>
               <Typography variant="body2" color="text.secondary">
-                Revenue and teacher pay come from paid orders and delivered classes. Payout batches are sent to the admin
-                for approval and payment.
+                {t("manager.dashboard.billingNote")}
               </Typography>
               <Divider />
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Paid checkout revenue
+                  {t("manager.dashboard.paidCheckoutRevenue")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {formatUsd(billing.revenueCents)}
@@ -268,7 +271,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Paid orders
+                  {t("manager.dashboard.paidOrders")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {billing.paidOrders}
@@ -276,7 +279,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Credits outstanding
+                  {t("manager.dashboard.creditsOutstanding")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {billing.creditsOutstanding}
@@ -284,7 +287,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Teacher earnings this month
+                  {t("manager.dashboard.teacherEarningsMonth")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {formatUsd(billing.teacherEarnedThisMonthCents)}
@@ -292,7 +295,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" color="text.secondary">
-                  Not in a payout batch yet
+                  {t("manager.dashboard.notInBatch")}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
                   {formatUsd(billing.teacherUnbatchedCents)}
@@ -300,10 +303,10 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
               </Stack>
               <Stack direction="row" spacing={2} flexWrap="wrap">
                 <LinkButton href="/manager/billing" size="small" sx={{ px: 0 }}>
-                  Billing
+                  {t("manager.dashboard.billing")}
                 </LinkButton>
                 <LinkButton href="/manager/payouts" size="small" endIcon={<IconArrowRight size={14} />} sx={{ px: 0 }}>
-                  Prepare payouts
+                  {t("manager.dashboard.preparePayouts")}
                 </LinkButton>
               </Stack>
             </Stack>

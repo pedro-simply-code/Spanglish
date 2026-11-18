@@ -1,0 +1,189 @@
+{
+  "marketing": {
+    "metadata": {
+      "homeTitle": "Learn Spanish with native teachers in Guatemala",
+      "homeDescription": "Spanglish Academy — live Spanish classes online with native teachers from Guatemala. Individual or paired sessions, flexible scheduling, and classroom recordings.",
+      "packagesTitle": "Packages & pricing",
+      "packagesDescription": "Compare Spanglish Academy class packages — individual or paired, 25 or 50 minutes, native teachers from Guatemala."
+    },
+    "common": {
+      "loading": "Loading…",
+      "signIn": "Sign in",
+      "register": "Register",
+      "getStarted": "Get started",
+      "createAccount": "Create account",
+      "viewPricing": "View pricing"
+    },
+    "header": {
+      "programs": "Programs",
+      "whySpanglish": "Why Spanglish",
+      "stories": "Stories",
+      "pricing": "Pricing"
+    },
+    "footer": {
+      "description": "Live Spanish classes with native teachers from Guatemala — individual or paired sessions, classroom recordings, and learning materials on one academy platform.",
+      "timezone": "Teachers in · {timezone}",
+      "getStartedFree": "Get started free",
+      "exploreTitle": "Explore",
+      "academyTitle": "Academy",
+      "hoursTitle": "Hours & support",
+      "supportQuestion": "Questions after sign-in? Use <email>Email</email> in your dashboard to reach the academy team.",
+      "copyright": "© {year} Spanglish Academy. All rights reserved.",
+      "home": "Home",
+      "explore": {
+        "programs": "Programs",
+        "whySpanglish": "Why Spanglish",
+        "learnerStories": "Learner stories",
+        "pricing": "Pricing"
+      },
+      "academy": {
+        "createAccount": "Create account",
+        "signIn": "Sign in",
+        "teacherApplication": "Teacher application",
+        "bookAClass": "Book a class"
+      }
+    },
+    "landing": {
+      "timezoneLabel": "Guatemala (CST, UTC−6)",
+      "timezoneShort": "Guatemala · CST (UTC−6)",
+      "hero": {
+        "eyebrow": "Spanish with native teachers from Guatemala",
+        "title": "Learn <highlight>Spanish</highlight> live with Guatemalan natives",
+        "subtitle": "100% Spanish classes — individual or paired sessions, classroom recordings, and materials that follow what you practice with your teacher.",
+        "chipLive": "Live classes",
+        "chipNative": "Native · Guatemala",
+        "chipSpanishOnly": "Spanish only",
+        "primaryCta": "Create free account",
+        "imageAlt": "Student taking notes during a live online language class"
+      },
+      "testimonials": {
+        "eyebrow": "Learner stories",
+        "title": "Do not take our word for it — hear from students and teachers",
+        "roleLearner": "Spanish learner",
+        "roleTeacher": "Academy teacher · Guatemala",
+        "items": {
+          "alex": "I book 25-minute classes between meetings. My teacher from Guatemala catches my mistakes every week — it finally feels natural when I speak.",
+          "priya": "The paired option let my sister and I practice Spanish together with one native teacher. We split the cost and still get personal feedback.",
+          "maria": "As a teacher based in Guatemala, the schedule tools and payout visibility are straightforward — I focus on conversation, not admin."
+        }
+      },
+      "programs": {
+        "eyebrow": "Programs",
+        "title": "Spanish programs for your level and goals",
+        "subtitle": "Immersion tracks with native Guatemalan teachers — conversation, beginners, or paired learning.",
+        "sessionsChip": "Sessions: {length}",
+        "expectTitle": "You can expect",
+        "expectLive": "Live video classroom every session",
+        "expectSchedule": "Book around your week",
+        "expectRecordings": "Recordings when available",
+        "teacherCta": "Apply as a teacher",
+        "learnerCta": "Start with a free account",
+        "tracks": {
+          "spanish": {
+            "title": "Live Spanish",
+            "length": "25 or 50 min",
+            "audience": "Teens & adults",
+            "summary": "Every class is in Spanish with a native teacher from Guatemala — real conversation, pronunciation, and grammar you can use the same day."
+          },
+          "natives": {
+            "title": "Guatemalan teachers",
+            "length": "25 or 50 min",
+            "audience": "All levels",
+            "summary": "Learn from native speakers rooted in Guatemala: natural rhythm, local expressions, and cultural context you cannot get from recorded lessons."
+          },
+          "beginners": {
+            "title": "First steps",
+            "length": "25 min suggested",
+            "audience": "New learners",
+            "summary": "Greetings, core verbs, and guided speaking from class one — friendly pace, instruction entirely in Spanish with support when you need it."
+          },
+          "conversation": {
+            "title": "Conversation focus",
+            "length": "50 min suggested",
+            "audience": "Intermediate+",
+            "summary": "Less drill, more dialogue: storytelling, situational role-play, and corrections in context with your Guatemalan teacher."
+          },
+          "paired": {
+            "title": "Paired classes",
+            "length": "25 or 50 min",
+            "audience": "Friends & families",
+            "summary": "Share a native teacher with a partner, split the package, and keep each other accountable — still 100% Spanish, still live."
+          },
+          "teachers": {
+            "title": "Teach with us",
+            "length": "Flexible",
+            "audience": "Educators in Guatemala",
+            "summary": "Native Spanish educators join the roster, set weekly availability, and teach 1:1 or paired live classes on our classroom platform."
+          }
+        }
+      },
+      "features": {
+        "eyebrow": "Why Spanglish",
+        "title": "Everything you need for Spanish fluency",
+        "subtitle": "Native-led live classes and the same tools students use inside the academy dashboard.",
+        "pillars": {
+          "spanishOnly": {
+            "title": "Spanish only",
+            "description": "All live instruction is in Spanish — built for learners who want immersion, not translation drills."
+          },
+          "nativeTeachers": {
+            "title": "Native teachers",
+            "description": "Teachers on the roster are native speakers from Guatemala, with real classroom experience."
+          },
+          "individualOrPaired": {
+            "title": "Individual or paired",
+            "description": "Study solo or bring a partner and split the package."
+          },
+          "flexibleScheduling": {
+            "title": "Flexible scheduling",
+            "description": "Book, move, or cancel within academy policy from your dashboard."
+          },
+          "recordings": {
+            "title": "Classroom recordings",
+            "description": "Review sessions afterward and keep momentum between lessons."
+          },
+          "secure": {
+            "title": "Secure & private",
+            "description": "Signed join links, role-based access, and platform-managed classrooms."
+          }
+        }
+      },
+      "help": {
+        "title": "Need help choosing a program?",
+        "description": "Create a free account, compare packages, and book live classes when you are ready. No credit card required to sign up.",
+        "timezoneNote": "Teachers operate on {timezone} — times below are local to Guatemala.",
+        "hoursTitle": "Academy hours"
+      },
+      "hours": {
+        "monThu": "Monday – Thursday",
+        "monThuTime": "6:00 AM – 10:00 PM",
+        "friday": "Friday",
+        "fridayTime": "6:00 AM – 8:00 PM",
+        "saturday": "Saturday",
+        "saturdayTime": "8:00 AM – 12:00 PM",
+        "sunday": "Sunday",
+        "closed": "Closed"
+      },
+      "finalCta": {
+        "title": "Learn Spanish with live native teachers from Guatemala"
+      }
+    },
+    "packages": {
+      "eyebrow": "Packages",
+      "title": "Simple, transparent class credits",
+      "subtitle": "Choose session length and class format, then compare package sizes",
+      "plan": {
+        "details": "{count} classes · {type} · {duration} min",
+        "individual": "Individual",
+        "paired": "Paired",
+        "perClass": "/ class",
+        "total": "{amount} total",
+        "perStudent": "{amount} per student",
+        "save": "Save {savings}%"
+      },
+      "empty": "No packages are published for this combination yet. Try another option or sign in to see full pricing.",
+      "getStarted": "Get started",
+      "fullPricing": "Open full pricing (sign in)"
+    }
+  }
+}

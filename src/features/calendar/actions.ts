@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { getActor } from "@/server/auth/session";
 import { calendarRoleOf, loadCalendarData, resetCalendarFeed } from "@/server/calendar/events";
@@ -13,9 +14,10 @@ export async function loadCalendarAction(input: { from: string; to: string; teac
 
 /** Creates or resets the private .ics link; the URL is shown once. */
 export async function resetCalendarFeedAction(): Promise<{ ok: boolean; url?: string; message: string }> {
+  const t = await getTranslations("apps");
   const actor = await getActor();
-  if (!calendarRoleOf(actor)) return { ok: false, message: "The admin dashboard has no calendar." };
+  if (!calendarRoleOf(actor)) return { ok: false, message: t("calendar.errors.adminNoCalendar") };
   const token = await resetCalendarFeed(actor.userId);
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
-  return { ok: true, url: `${base}/api/calendar/${token}.ics`, message: "New private link created." };
+  return { ok: true, url: `${base}/api/calendar/${token}.ics`, message: t("calendar.success.linkCreated") };
 }

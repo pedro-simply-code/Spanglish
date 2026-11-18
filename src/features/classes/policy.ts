@@ -1,6 +1,10 @@
 import type { ClassPolicy } from "@/lib/class-policy";
 import { demoNow } from "@/lib/demo-clock";
-import { formatClassDateTime } from "@/features/classes/format";
+import type { AppLocale } from "@/i18n/config";
+import {
+  formatClassDateTime,
+  type StudentTranslator,
+} from "@/features/classes/format";
 import type {
   ClassChangeAction,
   ClassChangeDecision,
@@ -10,6 +14,9 @@ import type {
 } from "@/features/classes/types";
 
 export type { ClassPolicy } from "@/lib/class-policy";
+
+/** Scoped student translator accepted by the class policy helpers. */
+export type ClassPolicyTranslator = StudentTranslator;
 
 /**
  * Safe defaults used when a policy value is not provided. The server wrapper
@@ -26,6 +33,42 @@ export const defaultClassPolicy: ClassPolicy = {
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 3_600_000;
+
+const englishPolicyMessages = {
+  "policy.alreadyCanceled": "This class was already canceled.",
+  "policy.completedCannotChange": "Completed classes cannot be changed.",
+  "policy.inProgressCannotChange": "Classes that are already in progress cannot be changed.",
+  "policy.changeCutoff":
+    "Changes must be requested at least {hours} hours before the class starts.",
+  "policy.freeCancellation": "Free cancellation until {date}.",
+  "policy.freeRescheduling": "Free rescheduling until {date}.",
+  "policy.joinCanceled": "This class was canceled, so the room is closed.",
+  "policy.joinCompleted": "This class has finished. Watch the recording instead.",
+  "policy.joinTooEarly": "The classroom opens {minutes} minutes before the class starts.",
+  "policy.joinRelaxed":
+    "Join window relaxed for testing. The room is open before the usual pre-start window.",
+  "policy.joinClosed": "The join window closed {minutes} minutes after the class started.",
+  "policy.joinOpen": "The classroom is open. Your teacher is waiting.",
+} as const;
+
+type PolicyMessageKey = keyof typeof englishPolicyMessages;
+
+function interpolate(
+  message: string,
+  values?: Record<string, string | number>,
+) {
+  if (!values) return message;
+  return Object.entries(values).reduce(
+    (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+    message,
+  );
+}
+
+/** Keeps unowned callers compiling with the original English messages. */
+const englishPolicyTranslator = ((
+  key: PolicyMessageKey,
+  values?: Record<string, string | number>,
+) => interpolate(englishPolicyMessages[key] ?? key, values)) as ClassPolicyTranslator;
 
 export function getClassStart(item: LiveClass) {
   return new Date(item.startsAt).getTime();
@@ -74,6 +117,8 @@ export function decideClassChange(
   action: ClassChangeAction,
   nowIso: string,
   policy: ClassPolicy = defaultClassPolicy,
+  t: ClassPolicyTranslator = englishPolicyTranslator,
+  locale: AppLocale = "en",
 ): ClassChangeDecision {
   const cutoffHours = getChangeCutoffHours(action, policy);
   const hoursUntilStart = getHoursUntilStart(item, nowIso);
@@ -91,23 +136,24 @@ export function decideClassChange(
   });
 
   if (status === "canceled") {
-    return denied("This class was already canceled.");
+    return denied(t("policy.alreadyCanceled"));
   }
 
   if (status === "completed") {
-    return denied("Completed classes cannot be changed.");
+    return denied(t("policy.completedCannotChange"));
   }
 
   if (status === "in-progress") {
-    return denied("Classes that are already in progress cannot be changed.");
+    return denied(t("policy.inProgressCannotChange"));
   }
 
   if (hoursUntilStart < cutoffHours) {
     return denied(
-      `Changes must be requested at least ${cutoffHours} hours before the class starts.`,
+      t("policy.changeCutoff", { hours: cutoffHours }),
     );
   }
 
+  const date = formatClassDateTime(cutoffAt, locale, t);
   return {
     allowed: true,
     cutoffHours,
@@ -115,8 +161,8 @@ export function decideClassChange(
     cutoffAt,
     message:
       action === "cancel"
-        ? `Free cancellation until ${formatClassDateTime(cutoffAt)}.`
-        : `Free rescheduling until ${formatClassDateTime(cutoffAt)}.`,
+        ? t("policy.freeCancellation", { date })
+        : t("policy.freeRescheduling", { date }),
   };
 }
 
@@ -136,6 +182,7 @@ export function getJoinState(
   item: LiveClass,
   nowIso: string,
   policy: ClassPolicy = defaultClassPolicy,
+  t: ClassPolicyTranslator = englishPolicyTranslator,
 ): JoinState {
   const status = getClassStatus(item, nowIso);
   const { opensAt, closesAt } = getJoinWindow(item, policy);
@@ -150,11 +197,11 @@ export function getJoinState(
   });
 
   if (status === "canceled") {
-    return unavailable("This class was canceled, so the room is closed.");
+    return unavailable(t("policy.joinCanceled"));
   }
 
   if (status === "completed") {
-    return unavailable("This class has finished. Watch the recording instead.");
+    return unavailable(t("policy.joinCompleted"));
   }
 
   if (!policy.relaxJoinWindow && now < new Date(opensAt).getTime()) {
@@ -163,7 +210,9 @@ export function getJoinState(
       canJoin: false,
       opensAt,
       closesAt,
-      message: `The classroom opens ${policy.joinWindowBeforeMinutes} minutes before the class starts.`,
+      message: t("policy.joinTooEarly", {
+        minutes: policy.joinWindowBeforeMinutes,
+      }),
     };
   }
 
@@ -177,8 +226,7 @@ export function getJoinState(
       canJoin: true,
       opensAt,
       closesAt,
-      message:
-        "Join window relaxed for testing. The room is open before the usual pre-start window.",
+      message: t("policy.joinRelaxed"),
     };
   }
 
@@ -188,7 +236,9 @@ export function getJoinState(
       canJoin: false,
       opensAt,
       closesAt,
-      message: `The join window closed ${policy.joinWindowAfterMinutes} minutes after the class started.`,
+      message: t("policy.joinClosed", {
+        minutes: policy.joinWindowAfterMinutes,
+      }),
     };
   }
 
@@ -197,7 +247,7 @@ export function getJoinState(
     canJoin: true,
     opensAt,
     closesAt,
-    message: "The classroom is open. Your teacher is waiting.",
+    message: t("policy.joinOpen"),
   };
 }
 

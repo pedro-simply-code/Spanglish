@@ -1,0 +1,962 @@
+{
+  "admin": {
+    "actions": {
+      "managers": {
+        "accessRemoved": "Acceso de manager eliminado; la cuenta vuelve a ser estudiante.",
+        "accountNotFound": "Cuenta no encontrada.",
+        "adminCannotBecomeManager": "La cuenta de administrador no puede convertirse en manager.",
+        "alreadyHasAccess": "Esta persona ya tiene acceso de manager o administrador.",
+        "alreadyManager": "Esta cuenta ya es manager.",
+        "emailNotVerified": "La cuenta debe verificar el correo antes de convertirse en manager.",
+        "experienceTooShort": "Describe tu experiencia operativa (al menos 20 caracteres).",
+        "invalidEmail": "Introduce una dirección de correo válida.",
+        "inviteInboxSent": "Invitación guardada y enviada a su bandeja de Spanglish (Email en la app).",
+        "inviteRevoked": "Invitación revocada.",
+        "inviteSaved": "Invitación guardada para {email}. Cuando se registren con esa dirección, inicia sesión y abre Email o /join/manager con su token.",
+        "inviteUnavailable": "Esta invitación no existe, expiró o ya se usó.",
+        "noAccountWithEmail": "No hay ninguna cuenta con ese correo.",
+        "notAllowed": "No permitido.",
+        "notManager": "Esta cuenta no es manager.",
+        "onlyAdminGrant": "Solo el administrador puede otorgar el rol de manager.",
+        "onlyAdminInvite": "Solo el administrador puede invitar managers.",
+        "onlyAdminRemove": "Solo el administrador puede quitar el acceso de manager.",
+        "onlyAdminRevokeInvite": "Solo el administrador puede revocar invitaciones.",
+        "roleChangeDenied": "Cambio de rol no permitido.",
+        "roleGranted": "Rol de manager otorgado.",
+        "signInWithInvitedEmail": "Inicia sesión con la misma dirección de correo que recibió la invitación.",
+        "welcomeManager": "Bienvenido al panel de manager. Cambia de panel desde la barra superior."
+      },
+      "pricing": {
+        "created": "Paquete creado.",
+        "forbidden": "Solo el administrador de la academia puede cambiar paquetes.",
+        "imported": "Catálogo predeterminado de {scope} importado ({count, plural, one {# paquete} other {# paquetes}}).",
+        "invalidData": "Datos del paquete no válidos.",
+        "missingId": "Falta el id del paquete.",
+        "removed": "Paquete eliminado.",
+        "updated": "Paquete actualizado."
+      },
+      "providers": {
+        "forbidden": "Solo el administrador puede cambiar los proveedores de pago."
+      }
+    },
+    "adminStat": {
+      "margin": {
+        "helper": "Ingresos impartidos menos la parte del docente",
+        "label": "Margen de la academia (est.)"
+      },
+      "payouts": {
+        "helper": "{share}% de la matrícula impartida · pendiente",
+        "label": "Pagos a docentes (est.)"
+      },
+      "revenue": {
+        "helper": "{pipeline} reservado en próximas / en curso",
+        "label": "Ingresos brutos (impartidos)"
+      },
+      "taught": {
+        "helper": "{completed} completadas · {attended}% marcadas como asistidas",
+        "label": "Clases impartidas"
+      }
+    },
+    "alert": {
+      "emailBounce": "{count} cuenta(s) con correo rebotado",
+      "emailBounceDetail": "El correo transaccional está bloqueado para estas direcciones.",
+      "emailFromMissing": "EMAIL_FROM no está configurado",
+      "emailFromMissingDetail": "Los códigos de acceso y los correos de seguridad no se pueden enviar hasta configurar la dirección de remitente.",
+      "integrationNotReady": "{name} no está listo",
+      "joinWindowOn": "CLASS_RELAX_JOIN_WINDOW está activo",
+      "joinWindowOnDetail": "Cualquiera puede unirse a clases fuera del horario programado en producción.",
+      "managerWithout2Fa": "{count} cuenta(s) de manager sin 2FA",
+      "managerWithout2FaDetail": "Activa una app de autenticación antes de gestionar pagos o cambios de rol."
+    },
+    "audit": {
+      "action": {
+        "adminGranted": "Rol de administrador otorgado",
+        "adminRevoked": "Rol de administrador eliminado",
+        "availabilityUpdated": "Disponibilidad actualizada",
+        "classBooked": "Clase reservada",
+        "classCanceled": "Clase cancelada",
+        "classRated": "Clase valorada",
+        "classRescheduled": "Clase reprogramada",
+        "creditsChangedByStaff": "Créditos cambiados por el personal",
+        "emailBounced": "Correo rebotado",
+        "emailVerified": "Correo verificado",
+        "managerInvited": "Manager invitado",
+        "managerRoleGranted": "Rol de manager otorgado",
+        "managerRoleRevoked": "Rol de manager eliminado",
+        "materialApproved": "Material aprobado",
+        "materialRejected": "Material rechazado",
+        "materialSentForReview": "Material enviado a revisión",
+        "onboardingCompleted": "Registro completado",
+        "packagePurchased": "Paquete comprado",
+        "pairEnded": "Pareja finalizada",
+        "passwordChanged": "Contraseña cambiada",
+        "passwordCreated": "Contraseña añadida",
+        "passwordReset": "Contraseña restablecida por código de correo",
+        "payoutApproved": "Pago aprobado",
+        "payoutMarkedPaid": "Pago marcado como pagado",
+        "payoutPrepared": "Pago preparado",
+        "payoutRejected": "Pago rechazado",
+        "payoutStripeSent": "Pago enviado con Stripe",
+        "profileUpdated": "Perfil actualizado",
+        "rateLimited": "Límite de frecuencia alcanzado",
+        "recordingSaved": "Grabación guardada",
+        "sessionsRevoked": "Dispositivos cerrados",
+        "signIn": "Inicio de sesión",
+        "signInFailed": "Inicio de sesión fallido",
+        "signOut": "Cierre de sesión",
+        "signUp": "Cuenta creada",
+        "stripeAmountMismatch": "El importe de Stripe no coincide con el pedido",
+        "stripeTransferFailed": "Transferencia de Stripe fallida",
+        "studentsPaired": "Estudiantes emparejados",
+        "teacherApplicationApproved": "Solicitud de docente aprobada",
+        "teacherApplicationRejected": "Solicitud de docente rechazada",
+        "teacherApplicationSent": "Solicitud de docente enviada",
+        "teacherRatesChanged": "Tarifas docentes cambiadas",
+        "teacherStripeConnected": "Docente conectó Stripe",
+        "twoFactorBackupCodesRegenerated": "Nuevos códigos de respaldo 2FA",
+        "twoFactorDisabled": "2FA desactivado",
+        "twoFactorEnabled": "2FA activado",
+        "twoFactorLockout": "2FA bloqueado tras códigos fallidos"
+      },
+      "unknownAccount": "Cuenta desconocida"
+    },
+    "classStatus": {
+      "canceled": "Cancelada",
+      "completed": "Completada",
+      "inProgress": "En curso",
+      "upcoming": "Próxima"
+    },
+    "commerce": {
+      "editor": {
+        "addTitle": "Añadir paquete",
+        "confirmDelete": "¿Eliminar el paquete {name}?",
+        "editTitle": "Editar paquete",
+        "field": {
+          "badge": "Etiqueta distintiva",
+          "credits": "Créditos (clases del paquete)",
+          "description": "Descripción",
+          "displayName": "Nombre visible",
+          "id": "Id del paquete",
+          "liveOnPricing": "Visible en /pricing",
+          "packageTotal": "Total del paquete (USD)",
+          "pricePerClass": "Precio por clase (USD)",
+          "savings": "Ahorro % frente al nivel inicial",
+          "suggested": "Sugerido: {id}"
+        },
+        "newBadge": "Nuevo",
+        "newDescription": "Describe para quién es este paquete.",
+        "newPackage": "Nuevo paquete",
+        "useSuggestedId": "Usar id sugerido"
+      },
+      "packages": {
+        "addPackage": "Añadir paquete",
+        "catalog": "Catálogo",
+        "catalogSubtitle": "Precios en USD · Los paquetes activos son visibles en /pricing y en el pago (sin paso de publicación aparte)",
+        "column": {
+          "package": "Paquete"
+        },
+        "editPackage": "Editar {name}",
+        "empty": "Aún no hay paquetes. Añade uno o importa el catálogo predeterminado.",
+        "importDefault": "Importar catálogo predeterminado",
+        "importDefaultKind": "Importar catálogo predeterminado de {kind}",
+        "importDone": "Catálogo predeterminado importado.",
+        "liveSince": "Activo · {date}",
+        "subtitle": "Precios y paquetes de créditos para estudiantes de inglés que compran español en vivo.",
+        "subtitleForKind": "Paquetes de créditos para este tipo de clase · el pago docente es una parte de los ingresos de cada crédito (Finanzas → Tarifas docentes).",
+        "title": "Paquetes de clases"
+      },
+      "publish": {
+        "drafts": "Borradores",
+        "heldBack": "Retenido",
+        "included": "Incluido",
+        "lastPublish": "Última publicación (ejemplo): 12 nov 2026 · por admin",
+        "livePackages": "Paquetes activos",
+        "notice": "La página pública /pricing lee las filas activas de pricing_packages ({count} en total). Activa active y publishedAt aquí cuando se implemente la publicación.",
+        "publishButton": "Publicar en /pricing",
+        "queued": "Cambios en cola",
+        "queuedSubtitle": "Lo que los estudiantes verán tras la próxima publicación",
+        "snapshot": "Instantánea",
+        "subtitle": "Publica los cambios del catálogo en el sitio público que ven los hispanohablantes que aprenden inglés.",
+        "title": "Publicar precios"
+      },
+      "rules": {
+        "individual": {
+          "booking": {
+            "detail": "Solo ese estudiante está en la lista de la clase. Los cambios de horario se aplican de inmediato.",
+            "title": "El estudiante reserva solo"
+          },
+          "credits": {
+            "detail": "Los créditos pertenecen al estudiante; cada clase reservada consume un crédito de su saldo.",
+            "title": "Cartera de créditos personal"
+          },
+          "footnote": "Los estudiantes compran y reservan con su propia cuenta.",
+          "subtitle": "Un estudiante por clase en vivo",
+          "title": "Reglas de clases individuales"
+        },
+        "paired": {
+          "booking": {
+            "detail": "El otro recibe un correo; los cambios de horario requieren aceptación o el espacio se mantiene durante 24 h.",
+            "title": "Cualquiera de la pareja puede reservar"
+          },
+          "credits": {
+            "detail": "Un paquete paga por la pareja; cada clase reservada consume un crédito del fondo común.",
+            "title": "Fondo de créditos compartido"
+          },
+          "footnote": "Forma parejas en Organización → Estudiantes (manager) antes de que los estudiantes puedan comprar estos paquetes.",
+          "payout": {
+            "detail": "Un crédito sale del fondo común por cada clase en pareja impartida. Pago = valor medio de compra de ese crédito × la parte del docente según su nivel — misma tabla de retención que en individual (Finanzas → Tarifas docentes). Sin multiplicador adicional para parejas."
+          },
+          "subtitle": "Dos estudiantes comparten un fondo de créditos",
+          "title": "Reglas de clases en pareja"
+        },
+        "payout": {
+          "detail": "Por clase impartida: valor de compra del crédito × parte del docente según su nivel. El % de retención baja al subir de nivel — edítalo en Finanzas → Tarifas docentes. Las pruebas usan un valor de crédito de referencia y un % de prueba.",
+          "title": "Pago docente (participación en ingresos)"
+        }
+      },
+      "teacherRates": {
+        "adminOverride": "Anulación del administrador",
+        "autoAssign": "Asignación automática",
+        "empty": "Aún no hay cuentas de docentes en la base de datos.",
+        "levelCohort": "Grupo por nivel",
+        "noticePrefix": "El pago es una parte de los ingresos del valor de compra de cada crédito (individual y en pareja). Configura los niveles en",
+        "noticeSuffix": ". Los recuentos siguientes son docentes agrupados por nivel de perfil.",
+        "subtitle": "Vista heredada — edita la retención en Finanzas → Tarifas docentes.",
+        "teacherCount": "{count} docentes",
+        "title": "Niveles de tarifa docente"
+      }
+    },
+    "common": {
+      "action": "Acción",
+      "actions": "Acciones",
+      "active": "Activo",
+      "admin": "Admin",
+      "all": "Todos",
+      "cancel": "Cancelar",
+      "classType": {
+        "individual": "Individual",
+        "label": "Tipo de clase",
+        "paired": "En pareja"
+      },
+      "close": "Cerrar",
+      "credits": "Créditos",
+      "delete": "Eliminar",
+      "disabled": "Desactivado",
+      "draft": "Borrador",
+      "duration": "Duración",
+      "email": "Correo",
+      "emailInApp": "Email en la app",
+      "enabled": "Activado",
+      "expired": "Expirado",
+      "manager": "Manager",
+      "no": "No",
+      "now": "ahora",
+      "off": "Desactivado",
+      "on": "Activado",
+      "open": "Abierto",
+      "page": {
+        "audit": "Registro de auditoría",
+        "classroom": "Aula",
+        "classroomDefaults": "Valores predeterminados del aula",
+        "email": "Entregabilidad de correo",
+        "ledger": "Libro de créditos",
+        "ledgerShort": "Libro",
+        "managers": "Managers",
+        "packages": "Paquetes",
+        "payouts": "Aprobación de pagos",
+        "payoutsShort": "Pagos",
+        "providers": "Proveedores de pago",
+        "providersShort": "Proveedores",
+        "publish": "Publicar",
+        "roles": "Roles",
+        "security": "Política de seguridad",
+        "teacherRates": "Tarifas docentes",
+        "users": "Usuarios"
+      },
+      "pending": "Pendiente",
+      "price": "Precio",
+      "quickActions": {
+        "approvePayouts": "Aprobar pagos",
+        "editPackages": "Editar paquetes",
+        "reviewUsers": "Revisar usuarios"
+      },
+      "save": "Guardar",
+      "section": {
+        "commerce": "Comercio",
+        "compliance": "Cumplimiento",
+        "finance": "Finanzas",
+        "organization": "Organización",
+        "platform": "Plataforma"
+      },
+      "status": "Estado",
+      "studentsPairs": "Estudiantes y créditos",
+      "suspended": "Suspendido",
+      "teacher": "Docente",
+      "teacherPayRates": "Finanzas → Tarifas docentes",
+      "teachers": "Docentes",
+      "total": "Total",
+      "type": "Tipo",
+      "value": "Valor",
+      "viewPublicPricing": "Ver precios públicos",
+      "yes": "Sí",
+      "severity": {
+        "info": "info",
+        "warning": "advertencia",
+        "critical": "crítico"
+      }
+    },
+    "emailHealth": {
+      "metric": {
+        "accounts": "Cuentas con correo",
+        "bounced": "Direcciones rebotadas",
+        "delivery": "Entrega de correo configurada",
+        "signIns": "Inicios de sesión (7 días)",
+        "verified": "Bandejas verificadas",
+        "webhook": "Webhook de rebotes de Postmark"
+      },
+      "value": {
+        "configured": "Configurado",
+        "missingSecret": "Falta el secreto",
+        "verified": "{count} ({percent}%)"
+      }
+    },
+    "executiveStat": {
+      "accounts": {
+        "helper": "Filas en users",
+        "label": "Total de cuentas"
+      },
+      "integrations": {
+        "helper": "Desde la configuración del entorno",
+        "label": "Integraciones correctas"
+      },
+      "security": {
+        "helper": "Eventos de auditoría de advertencia o críticos",
+        "label": "Alertas de seguridad (7 d)"
+      },
+      "sessions": {
+        "helper": "Inicios de sesión actuales",
+        "label": "Sesiones activas"
+      }
+    },
+    "finance": {
+      "ledger": {
+        "chart": {
+          "delivered": "Impartidas",
+          "earned": "Ganado",
+          "orders": "Pedidos",
+          "paid": "Pagado",
+          "revenue": "Ingresos",
+          "unsettled": "Pendiente"
+        },
+        "charts": {
+          "cashCollected": "Efectivo recaudado de paquetes pagados (USD por día)",
+          "deliveredClasses": "Clases marcadas como impartidas con ganancias (número por día)",
+          "lifetimeTotals": "Ingresos totales, ganado, pagado y pago docente pendiente (USD)",
+          "paidCheckouts": "Compras de paquetes marcadas como pagadas (número por día)",
+          "subtitle": "Ingresos, pedidos, impartición y totales históricos desde PostgreSQL.",
+          "teacherEarnings": "Pago docente ganado por clase impartida (USD por día)",
+          "title": "Tendencias (7 días)"
+        },
+        "notice": "Créditos pendientes, pasivo prepagado y ganancias docentes sin liquidar.",
+        "snapshot": {
+          "deferred": "Prepagado, sin impartir",
+          "deferredTrend": "{credits} créditos en cuentas de estudiantes",
+          "earned": "Pago docente ganado",
+          "earnedTrend": "{classes} clases impartidas · {thisMonth} este mes",
+          "margin": "Margen de la academia (impartido)",
+          "marginTrend": "Ingresos − prepagado − pago docente",
+          "paid": "Pago docente enviado",
+          "paidTrend": "{amount} aún no está en un pago",
+          "revenue": "Ingresos por paquetes",
+          "revenueTrend": "{orders} pedidos · {credits} créditos vendidos"
+        },
+        "subtitle": "Créditos pendientes, pasivo prepagado y ganancias docentes sin liquidar."
+      },
+      "payouts": {
+        "approveAndPay": "Aprobar y pagar",
+        "batches": "Lotes",
+        "batchesSubtitle": "Liquidaciones quincenales o mensuales a docentes",
+        "byTeacher": "Por docente",
+        "byTeacherSubtitle": "Clases impartidas en la base de datos",
+        "classes": "Clases",
+        "empty": "No hay lotes de pago en la base de datos. Los managers enviarán borradores aquí cuando exista payout_batches.",
+        "notice": "{count} lote(s) en espera. Los importes se estiman a partir de las clases impartidas (55 % de la matrícula) hasta que estén Stripe Connect y payout_batches. La aprobación sigue requiriendo contraseña o TOTP.",
+        "payoutEst": "Pago (est.)",
+        "period": "Período",
+        "subtitle": "Los managers envían períodos; el administrador aprueba y ejecuta con reautenticación.",
+        "tuitionGross": "Matrícula (bruta)",
+        "status": {
+          "draft": "Borrador",
+          "awaiting-approval": "Esperando aprobación",
+          "paid": "Pagado"
+        }
+      },
+      "providers": {
+        "configureStripe": "Configurar Stripe",
+        "enabledForAcademy": "Activado para la academia",
+        "notice": "Las claves de API están en variables de entorno (ver Plataforma → Integraciones). Los interruptores controlan qué canales están activos — sin secretos en el navegador.",
+        "saveSettings": "Guardar ajustes del proveedor",
+        "subtitle": "Pago para estudiantes y canales de pago para docentes.",
+        "status": {
+          "connected": "conectado",
+          "setup-needed": "configuración necesaria",
+          "not-configured": "no configurado",
+          "disabled": "desactivado"
+        }
+      }
+    },
+    "integration": {
+      "description": {
+        "billing": "Pago de paquetes (Stripe Checkout) y pagos docentes (transferencias Connect). Webhook: /api/webhooks/stripe.",
+        "email": "Códigos de verificación, restablecimiento de contraseña y avisos de seguridad.",
+        "google": "Cliente OAuth para web (y cliente Android cuando esté configurado).",
+        "meet": "Proveedor de reuniones: {provider}. Claves: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET.",
+        "storageCloud": "Grabaciones de clases en B2 (variables B2_*).",
+        "storageLocal": "Archivos en storage/recordings hasta RECORDING_STORAGE=cloud."
+      },
+      "name": {
+        "googleSignIn": "Inicio de sesión con Google",
+        "localRecordings": "Grabaciones locales",
+        "stripeTest": "Stripe (modo de prueba)"
+      },
+      "owner": {
+        "finance": "Finanzas",
+        "platform": "Plataforma"
+      }
+    },
+    "ledgerSnapshot": {
+      "booked": {
+        "label": "Créditos reservados",
+        "trend": "{count} cancelados (incluye reembolsos)"
+      },
+      "delivered": {
+        "label": "Clases impartidas",
+        "trend": "{credits} créditos consumidos"
+      },
+      "gross": {
+        "label": "Ingresos brutos (impartidos)",
+        "trend": "Según precio del catálogo × créditos reservados"
+      },
+      "margin": {
+        "label": "Margen de la academia (est.)",
+        "trend": "Ingresos impartidos − parte del docente"
+      },
+      "payouts": {
+        "label": "Ganancias docentes (sin liquidar)",
+        "trend": "{teachers} docentes con clases impartidas"
+      },
+      "pipeline": {
+        "label": "Cartera (sin impartir)",
+        "trend": "{count} próximas o en vivo"
+      }
+    },
+    "management": {
+      "audit": {
+        "action": {
+          "accountSuspended": "Suspendió una cuenta",
+          "cancellationPolicyUpdated": "Actualizó la política de cancelación",
+          "creditRefundIssued": "Emidió un reembolso de créditos",
+          "lateCancelationRejected": "Rechazó una cancelación tardía",
+          "managerRoleGranted": "Otorgó el rol de Manager",
+          "signingKeyRotated": "Rotó la clave de firma del proveedor de reuniones",
+          "teachersInvited": "Invitó a dos docentes"
+        },
+        "at": {
+          "nov11": "11 nov · {time}",
+          "nov12": "12 nov · {time}",
+          "nov13": "13 nov · {time}",
+          "nov14": "14 nov · {time}",
+          "today": "Hoy · {time}",
+          "yesterday": "Ayer · {time}"
+        },
+        "empty": "Aún no hay eventos. Los inicios de sesión y cambios de seguridad aparecen aquí.",
+        "recentEvents": "Eventos recientes",
+        "recentEventsSubtitle": "Últimos {count} eventos · {warnings} advertencias",
+        "subtitle": "Inicios de sesión, cambios de contraseña y de doble factor, límites de frecuencia y otros eventos de seguridad.",
+        "system": "Sistema",
+        "target": {
+          "academySettings": "Ajustes de la academia",
+          "class": "Clase {id}",
+          "invoice": "Factura {id}",
+          "meetingProvider": "Proveedor de reuniones"
+        },
+        "via": "vía {method}"
+      },
+      "billing": {
+        "date": {
+          "nov10": "10 nov 2026",
+          "nov12": "12 nov 2026",
+          "nov13": "13 nov 2026",
+          "nov14": "14 nov 2026",
+          "nov15": "15 nov 2026"
+        },
+        "demoNotice": "El pago es una demostración estática claramente indicada. Las acciones de factura validan permisos pero no cargan tarjetas ni escriben en un proveedor de pagos.",
+        "issued": "emitida el {date}",
+        "plan": {
+          "individual": "Individual · {minutes} min · {classes} clases",
+          "paired": "En pareja · {minutes} min · {classes} clases"
+        },
+        "planCatalog": "Catálogo de planes",
+        "recentInvoices": "Facturas recientes",
+        "recentInvoicesSubtitle": "Los últimos cinco planes emitidos a estudiantes",
+        "stat": {
+          "mrr": {
+            "helper": "+8,4 % frente a octubre",
+            "label": "Ingresos mensuales recurrentes"
+          },
+          "open": {
+            "helper": "2 pendientes de pago",
+            "label": "Facturas abiertas"
+          },
+          "refunds": {
+            "helper": "3 clases acreditadas",
+            "label": "Reembolsos este mes"
+          },
+          "renewal": {
+            "helper": "Objetivo del 80 %",
+            "label": "Tasa de renovación"
+          }
+        },
+        "subtitle": "Planes, facturas y reembolsos de la academia.",
+        "title": "Facturación",
+        "status": {
+          "paid": "pagada",
+          "due": "pendiente",
+          "refunded": "reembolsada"
+        }
+      },
+      "breadcrumb": {
+        "manager": "Manager"
+      },
+      "integration": {
+        "billing": {
+          "description": "El pago es una demostración estática. Conecta el proveedor antes de cobrar tarjetas reales.",
+          "name": "Pagos"
+        },
+        "email": {
+          "description": "Códigos de verificación y notificaciones vía Gmail SMTP (predeterminado) o Postmark (EMAIL_PROVIDER).",
+          "name": "Correo transaccional"
+        },
+        "google": {
+          "description": "Cliente OAuth para inicio de sesión rápido. Usa la sesión de ejemplo hasta que existan las claves.",
+          "name": "Inicio de sesión con Google"
+        },
+        "meet": {
+          "description": "Vídeo en la app, uso compartido de pantalla y tokens de sala. Configura LIVEKIT_* en el entorno."
+        },
+        "owner": {
+          "finance": "Finanzas",
+          "platform": "Plataforma"
+        },
+        "storage": {
+          "description": "Bucket compatible con S3 para grabaciones de clases y archivos grandes de material (variables B2_*)."
+        }
+      },
+      "integrations": {
+        "keysNotice": "Las claves están en el .env del servidor, nunca en la base de datos ni en el navegador: edítalas allí y reinicia el servidor. Esta página solo muestra qué variables están configuradas, no sus valores.",
+        "owner": "Responsable: {owner}",
+        "providerDocs": "Documentación del proveedor",
+        "subtitle": "Servicios externos de los que depende la academia.",
+        "title": "Integraciones",
+        "variable": {
+          "missing": "falta",
+          "optional": "opcional",
+          "set": "configurada"
+        },
+        "status": {
+          "connected": "Conectado",
+          "action-needed": "Acción necesaria",
+          "not-configured": "No configurado"
+        }
+      },
+      "people": {
+        "accounts": "Cuentas",
+        "accountsSubtitle": "Suspendido significa que el correo rebotó — el correo transaccional está bloqueado hasta corregir la dirección.",
+        "allRoles": "Todos los roles",
+        "clearFilters": "Borrar filtros",
+        "column": {
+          "joined": "Se unió",
+          "links": "Enlaces",
+          "name": "Nombre",
+          "roles": "Roles",
+          "status": "Estado",
+          "twoFactor": "2FA"
+        },
+        "contactTopic": "mensaje para {role}",
+        "empty": {
+          "filtered": "Ninguna cuenta coincide con estos filtros.",
+          "none": "Aún no hay cuentas. Ejecuta db:seed o regístrate en el sitio."
+        },
+        "manageRoles": "Gestionar roles",
+        "roleLabel": "Rol",
+        "search": "Buscar",
+        "searchLabel": "Buscar nombre o correo",
+        "studentsAndPairs": "Estudiantes y parejas",
+        "studentsAriaLabel": "Abrir directorio de estudiantes para {name}",
+        "studentsTooltip": "Estudiantes, parejas y saldos de créditos",
+        "subtitle": "Las cuentas pueden tener varios roles; el estado refleja la verificación del correo y la salud de entrega.",
+        "twoFactor": {
+          "off": "Desactivado",
+          "on": "Activado"
+        },
+        "status": {
+          "active": "Activo",
+          "invited": "Invitado",
+          "suspended": "Suspendido"
+        },
+        "statusHint": {
+          "active": "Verificado y entregable",
+          "invited": "Correo aún no verificado",
+          "suspended": "Correo rebotado — no es una suspensión manual"
+        }
+      },
+      "roles": {
+        "cardHelper": "cuentas · prioridad {priority}",
+        "granted": "Concedido",
+        "matrixSubtitle": "{permissions} permisos en {roles} roles",
+        "matrixTitle": "Matriz de permisos",
+        "openSettings": "Abrir ajustes de acceso",
+        "permissionHeader": "Permiso",
+        "serverRules": "Reglas del servidor: el rol de Estudiante no se puede eliminar y la academia debe conservar al menos un administrador. Abrir otro panel de rol redirige al panel activo en lugar de mostrar dos a la vez.",
+        "subtitle": "Acceso acumulativo: un rol superior incluye todos los permisos inferiores.",
+        "title": "Roles y permisos"
+      },
+      "rooms": {
+        "classDetails": "Detalles de la clase",
+        "classrooms": "Aulas",
+        "close": "Cerrar",
+        "column": {
+          "actions": "Acciones",
+          "class": "Clase",
+          "time": "Hora"
+        },
+        "detail": {
+          "absent": "Ausente",
+          "agenda": "Agenda",
+          "classroom": "Aula",
+          "description": "Descripción",
+          "inRoom": "En el aula",
+          "joined": "Se unió al aula",
+          "notJoined": "Aún no se ha unido",
+          "outcomes": "Resultados",
+          "provider": "Proveedor: {provider} · Id de sala: {roomId}",
+          "schedule": "Horario",
+          "sessionNotStarted": "no iniciada.",
+          "sessionNotStartedWaiting": "todavía no iniciada — los estudiantes esperan al docente.",
+          "sessionStarted": "iniciada — el aula está transmitiendo.",
+          "startGateOff": "El bloqueo de inicio del docente está desactivado — el aula sigue solo el horario programado.",
+          "students": "Estudiantes",
+          "teacher": "Docente",
+          "teacherLiveSession": "Sesión en vivo del docente:"
+        },
+        "empty": {
+          "filtered": "Ninguna clase coincide con los filtros actuales.",
+          "noClasses": "No hay clases programadas para este día. Elige otra fecha o consulta el calendario de la academia."
+        },
+        "enter": "Entrar",
+        "enterBlocked": {
+          "canceled": "Esta clase fue cancelada.",
+          "ended": "Esta clase ha terminado.",
+          "onlyLive": "Solo puedes entrar mientras la clase esté en vivo.",
+          "waitingTeacher": "Esperando a que el docente inicie la sesión en vivo."
+        },
+        "enterRoom": "Entrar al aula",
+        "filter": {
+          "any": "Cualquiera",
+          "canEnter": "Puede entrar",
+          "day": "Día",
+          "live": "En vivo",
+          "search": "Buscar",
+          "searchPlaceholder": "Tema, docente, estudiante…",
+          "status": "Estado"
+        },
+        "live": "En vivo",
+        "liveNow": "En vivo ahora",
+        "liveOnly": "Solo en vivo",
+        "noStudentsEnrolled": "No hay estudiantes inscritos",
+        "noStudentsEnrolledYet": "Aún no hay estudiantes inscritos.",
+        "notLive": "No en vivo",
+        "onSchedule": "Según lo programado",
+        "sessionStatus": {
+          "canceled": "Cancelada",
+          "ended": "Terminada",
+          "inProgress": "En curso",
+          "scheduled": "Programada"
+        },
+        "status": {
+          "live": "En vivo ahora",
+          "maintenance": "Mantenimiento",
+          "ready": "Listo"
+        },
+        "studentsCount": "{count} estudiantes",
+        "subtitle": "Clases programadas para el día — puedes entrar al aula solo mientras esté en vivo.",
+        "subtitleFiltered": "{shown} de {total} coinciden con los filtros",
+        "subtitleMany": "{count} clases el {day}",
+        "subtitleOne": "1 clase el {day}",
+        "teacherSessionOpen": "Sesión del docente abierta",
+        "title": "Aulas",
+        "viewClassDetails": "Ver detalles de la clase",
+        "waiting": "Esperando",
+        "waitingForTeacher": "Esperando al docente"
+      },
+      "staff": {
+        "detail": {
+          "classes": "Clases",
+          "profileNotCompleted": "Perfil no completado",
+          "rating": "Calificación",
+          "teacher": "Docente"
+        },
+        "empty": {
+          "filtered": "Ningún docente coincide con los filtros actuales.",
+          "none": "Aún no hay docentes en la lista. Aprueba solicitudes o promueve a un estudiante verificado."
+        },
+        "filter": {
+          "allCountries": "Todos los países",
+          "allLevels": "Todos los niveles",
+          "any": "Cualquiera",
+          "availability": "Disponibilidad",
+          "bookable": "Reservable",
+          "country": "País",
+          "hasWindows": "Tiene franjas",
+          "level": "Nivel",
+          "noWindows": "Sin franjas",
+          "notBookable": "No reservable",
+          "search": "Buscar",
+          "searchPlaceholder": "Nombre, titular, país…"
+        },
+        "matchFilters": "{shown} de {total} coinciden con los filtros",
+        "onRoster": "{count} en la lista",
+        "schedule": "Horario",
+        "specialty": {
+          "business": "Español para negocios y entrevistas",
+          "conversation": "Conversación para principiantes",
+          "grammar": "Gramática y preparación de exámenes",
+          "operations": "Operaciones y facturación de la academia",
+          "pronunciation": "Pronunciación y español para viajes"
+        },
+        "subtitle": "Docentes en la lista de la academia — filtra y revisa la carga docente y la disponibilidad para reservas.",
+        "teachers": "Docentes",
+        "title": "Personal",
+        "level": {
+          "1": "Docente nuevo",
+          "2": "Consolidado",
+          "3": "Senior",
+          "4": "Docente destacado"
+        }
+      }
+    },
+    "managerStat": {
+      "classes": {
+        "helper": "{attended}% asistidas (completadas)",
+        "label": "Clases esta semana"
+      },
+      "revenue": {
+        "helper": "{pipeline} en cartera",
+        "label": "Ingresos impartidos"
+      },
+      "students": {
+        "helper": "Cuentas con rol de estudiante",
+        "label": "Estudiantes activos"
+      },
+      "utilization": {
+        "helper": "{classes} clases / {teachers} docentes",
+        "label": "Uso de docentes"
+      }
+    },
+    "meta": {
+      "applications": {
+        "description": "Revisar solicitudes para enseñar",
+        "title": "Solicitudes de docentes"
+      },
+      "audit": {
+        "description": "Eventos de seguridad y de cuentas",
+        "title": "Registro de auditoría"
+      },
+      "dashboard": {
+        "description": "Acceso a la plataforma y gobierno de la academia",
+        "title": "Panel de administración"
+      },
+      "email": {
+        "description": "Salud del correo transaccional y rebotes",
+        "title": "Entregabilidad de correo"
+      },
+      "integrations": {
+        "description": "Proveedores de reuniones, correo, almacenamiento y pagos",
+        "title": "Integraciones"
+      },
+      "ledger": {
+        "description": "Ingresos, créditos prepagados y pago docente desde la base de datos",
+        "title": "Libro de créditos"
+      },
+      "managers": {
+        "description": "Managers de operaciones de la academia",
+        "title": "Managers"
+      },
+      "packages": {
+        "description": "Catálogo de paquetes de clases y precios",
+        "title": "Paquetes"
+      },
+      "payouts": {
+        "description": "Aprobar y registrar pagos docentes",
+        "title": "Aprobación de pagos"
+      },
+      "providers": {
+        "description": "Estado de los proveedores de pago y cobro",
+        "title": "Proveedores de pago"
+      },
+      "roles": {
+        "description": "Roles y permisos acumulativos",
+        "title": "Roles"
+      },
+      "rooms": {
+        "description": "Política de clases en vivo desde el entorno",
+        "title": "Valores predeterminados del aula"
+      },
+      "security": {
+        "description": "Autenticación y controles de acceso de la plataforma",
+        "title": "Política de seguridad"
+      },
+      "students": {
+        "description": "Parejas, créditos de clase y compras de paquetes",
+        "title": "Estudiantes y créditos"
+      },
+      "teacherRates": {
+        "description": "Pago por clase impartida y niveles docentes",
+        "title": "Tarifas docentes"
+      },
+      "users": {
+        "description": "Cuentas de la academia y estado de acceso",
+        "title": "Usuarios"
+      }
+    },
+    "organization": {
+      "managers": {
+        "active": "Managers activos",
+        "activeEmpty": "Aún no hay managers. Invita a alguien o promueve a un usuario existente.",
+        "activeSubtitle": "Quitar el acceso devuelve la cuenta a estudiante.",
+        "grantRole": "Otorgar rol de manager",
+        "inviteByEmail": "Invitar por correo",
+        "inviteDialogHelp": "Si ya tienen cuenta, recibirán esto en Email en la app. Si no, primero se registran con esta dirección.",
+        "inviteManagerByEmail": "Invitar manager por correo",
+        "join": {
+          "accept": "Aceptar y abrir panel de manager",
+          "confirmation": "Entiendo que los managers preparan lotes de pago y supervisan a los docentes; solo el administrador aprueba las transferencias.",
+          "emailMismatchMiddle": "Has iniciado sesión como {email}.",
+          "emailMismatchPrefix": "Esta invitación se envió a",
+          "emailMismatchSuffix": "Cierra sesión e inicia sesión con el correo invitado para continuar.",
+          "experienceLabel": "Experiencia operativa",
+          "experiencePlaceholder": "Ejemplo: 3 años coordinando docentes de inglés, nómina mensual, soporte a estudiantes…",
+          "intro": "Cuéntanos tu experiencia operativa (programación, facturación, soporte docente). El administrador aprobó invitarte a preparar pagos y gestionar el trabajo diario de la academia.",
+          "noteTitle": "Nota del administrador"
+        },
+        "managerSince": "Manager desde {date}",
+        "noteLabel": "Nota para el invitado (opcional)",
+        "notice": "Los managers no pueden autogestionarse: invita desde la bandeja Email de la app o promueve una cuenta verificada existente. Las solicitudes de docentes permanecen en la página de solicitudes — este flujo es solo para responsables de operaciones.",
+        "pending": "Invitaciones pendientes",
+        "pendingEmpty": "No hay invitaciones pendientes. Usa el icono de correo o usuario de arriba para invitar o promover.",
+        "pendingSubtitle": "Las invitaciones abiertas expiran a los 14 días",
+        "promoteDialogHelp": "La cuenta debe existir con un correo verificado. El rol de manager se otorga de inmediato.",
+        "promoteExisting": "Promover usuario existente",
+        "promoteVerifiedUser": "Promover usuario verificado a manager",
+        "removeAccess": "Quitar acceso",
+        "revoke": "Revocar",
+        "sendInvitation": "Enviar invitación",
+        "sentExpires": "Enviada {sent} · expira {expires}",
+        "subtitle": "Las invitaciones notifican la bandeja de la academia dentro de la app — no Gmail. Los invitados aceptan en /join/manager.",
+        "verifiedEmail": "Correo de cuenta verificada"
+      }
+    },
+    "overview": {
+      "activityEmpty": "Aún no hay eventos de auditoría.",
+      "chart": {
+        "bookings": "Todas las reservas por estado del ciclo de vida (ahora)",
+        "cashCollected": "Efectivo recaudado (USD por día)",
+        "classes": "Clases",
+        "fullFinanceHint": "Ingresos",
+        "individual": "Individual {percent}%",
+        "paired": "En pareja {percent}%",
+        "revenue": "Ingresos",
+        "sessions": "Sesiones programadas para iniciar (diarias)"
+      },
+      "dataNote": "Los KPI de la plataforma y los gráficos de operaciones cargan desde PostgreSQL. Las tendencias financieras y el detalle de márgenes están en Libro de créditos.",
+      "healthEmpty": "No hay alertas abiertas. Integraciones, correo y seguridad parecen correctos según los datos actuales.",
+      "openAuditLog": "Abrir registro completo de auditoría",
+      "operations": {
+        "subtitle": "Volumen de reservas y un pulso rápido de ingresos (últimos 7 días).",
+        "title": "Operaciones"
+      },
+      "subtitle": "Este es el resumen de hoy de Spanglish — ingresos, inscripciones y todo lo que requiere tu atención.",
+      "toolbar": {
+        "latestActivity": "Actividad reciente",
+        "platformHealth": "Salud de la plataforma",
+        "studentsCredits": "Estudiantes y créditos"
+      },
+      "welcome": "Bienvenido, {name}"
+    },
+    "payoutBatch": {
+      "manager": "Estimado desde live_classes",
+      "period": "Hasta {date}"
+    },
+    "platform": {
+      "email": {
+        "dnsHint": "Añade los registros DKIM y SPF de Postmark en tu DNS antes de enviar correo de producción.",
+        "health": "Salud",
+        "healthSubtitle": "Desde users y audit_logs",
+        "metric": "Métrica",
+        "noticeMiddle": "SMTP/Postmark es solo para códigos de verificación de acceso.",
+        "noticePrefix": "Los avisos de clase se entregan en",
+        "noticeSuffix": "Los rebotes actualizan users.email_bounced_at mediante el webhook de Postmark cuando está configurado.",
+        "subtitle": "SMTP/Postmark es solo para códigos de verificación de acceso. Los demás avisos van a Email en la app.",
+        "status": {
+          "ok": "correcto",
+          "watch": "vigilar",
+          "action": "acción"
+        }
+      },
+      "rooms": {
+        "policyFlags": "Banderas de política",
+        "policyFlagsSubtitle": "Cámbialo en el entorno de despliegue y vuelve a desplegar",
+        "relaxJoin": "Flexibilizar ventana de ingreso",
+        "relaxJoinDetail": "Permitir unirse fuera del horario programado (mantener desactivado en producción).",
+        "subtitle": "Política de sesión en vivo desde el entorno (aún no hay efectos por clase).",
+        "teacherStarts": "El docente inicia la sesión",
+        "teacherStartsDetail": "El aula permanece bloqueada hasta que el docente asignado inicie la sesión en vivo.",
+        "waitingRoom": "Sala de espera",
+        "waitingRoomDetail": "Los estudiantes esperan a que el docente los admita (cuando LiveKit lo admita).",
+        "notice": "Proveedor de reuniones: {provider}. La lista operativa de aulas para managers está en el panel de manager."
+      },
+      "security": {
+        "activePolicies": "Políticas activas",
+        "captchaDetail": "Registro, solicitudes de código y restablecimiento de contraseña cuando TURNSTILE_SECRET_KEY está configurado.",
+        "demoAccounts": "Cuentas de demostración en el inicio de sesión",
+        "demoDetail": "Solo en desarrollo o con ENABLE_DEMO_ACCOUNTS=true.",
+        "googleDetail": "OAuth con PKCE mediante Better Auth.",
+        "googleSignIn": "Inicio de sesión con Google",
+        "notice": "Gestionado en src/env.ts y en el entorno de despliegue.",
+        "singleAdmin": "Administrador único de la academia",
+        "singleAdminDetail": "ADMIN_EMAIL o CLI de promoción; no se puede cambiar el administrador desde la app.",
+        "status": {
+          "enforced": "Aplicado",
+          "hidden": "Oculto",
+          "optional": "Opcional",
+          "visible": "Visible"
+        },
+        "subtitle": "Autenticación y controles de acceso de toda la plataforma (resumen de solo lectura).",
+        "twoFactor": {
+          "detail": "Opcional para todas las cuentas hoy. El personal debe activarla antes de gestionar pagos.",
+          "title": "Autenticación de doble factor"
+        },
+        "your2fa": "Tu 2FA"
+      }
+    },
+    "teacherRates": {
+      "description": "Docentes en la base de datos con este nivel de aprendizaje.",
+      "level": {
+        "advanced": "Grupo avanzado",
+        "beginner": "Grupo principiante",
+        "intermediate": "Grupo intermedio",
+        "notSet": "Nivel no definido"
+      }
+    }
+  }
+}

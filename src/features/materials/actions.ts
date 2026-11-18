@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getMaterialById, getFormQuestions } from "@/features/materials/data";
+import { getTranslations } from "next-intl/server";
+import { getMaterialById } from "@/features/materials/data";
 import { getActorWithPermission } from "@/server/auth/session";
 import {
   insertMaterial,
@@ -11,9 +12,7 @@ import {
 import type {
   CreateMaterialInput,
   MaterialActionResult,
-  PracticeResult,
   ShareMaterialInput,
-  SubmitPracticeInput,
 } from "@/features/materials/types";
 import type { MaterialKind } from "@/features/materials/types";
 
@@ -26,9 +25,13 @@ const allowedKinds: readonly MaterialKind[] = [
   "recording",
 ];
 
-function failure(title: string, message: string): MaterialActionResult {
-  return { ok: false, title, message };
-}
+type Translator = Awaited<ReturnType<typeof getTranslations>>;
+
+const failure = (t: Translator, title: string, message: string): MaterialActionResult => ({
+  ok: false,
+  title: t(title),
+  message: t(message),
+});
 
 function slugify(value: string) {
   return value
@@ -41,23 +44,25 @@ function slugify(value: string) {
 export async function createMaterialAction(
   input: CreateMaterialInput,
 ): Promise<MaterialActionResult> {
+  const t = await getTranslations("educator.materials.actions");
   const actor = await getActorWithPermission("materials:write");
 
   if (!actor) {
     return failure(
-      "Not allowed",
-      "Only teachers and managers can add material to the academy library.",
+      t,
+      "notAllowedTitle",
+      "notAllowedCreate",
     );
   }
 
   const title = input.title.trim();
 
   if (title.length < 3) {
-    return failure("Missing title", "Give the material a title of at least 3 characters.");
+    return failure(t, "missingTitleTitle", "missingTitle");
   }
 
   if (!allowedKinds.includes(input.kind)) {
-    return failure("Unsupported type", "Choose a supported material type.");
+    return failure(t, "unsupportedTypeTitle", "unsupportedType");
   }
 
   if (input.kind === "form") {
@@ -66,19 +71,38 @@ export async function createMaterialAction(
     );
 
     if (!questions.length) {
-      return failure(
-        "Add a question",
-        "A form needs at least one question before it can be shared.",
-      );
+      return failure(t, "addQuestionTitle", "addQuestion");
     }
   }
+
+  // Keep only what each question type needs; multiple choice needs two options.
+  const questions =
+    input.kind === "form"
+      ? (input.questions ?? [])
+          .filter((question) => question.prompt.trim())
+          .map((question, index) => {
+            const raw = (question.options ?? []).map((option) => option.trim());
+            const options = raw.filter(Boolean);
+            const choice = question.type === "multiple-choice" && options.length >= 2;
+            // The right answer is picked among the typed options; blanks are dropped.
+            const correct = Math.max(0, options.indexOf(raw[Number(question.correctOption ?? 0)] ?? ""));
+            return {
+              id: `q${index + 1}`,
+              prompt: question.prompt.trim(),
+              type: choice ? question.type : question.type === "multiple-choice" ? "short-answer" : question.type,
+              options: choice ? options : undefined,
+              correctOption: choice ? correct : undefined,
+              points: Math.max(1, Math.min(100, Math.round(Number(question.points) || 1))),
+            };
+          })
+      : [];
 
   // The composer has no class picker: a new material goes to the library and
   // is attached to classes afterwards (share dialog).
   const materialId = `mat-${slugify(title)}-${Date.now().toString(36)}`;
   const visibility = input.visibility ?? "private";
   if (!["private", "shared", "global"].includes(visibility)) {
-    return failure("Choose who sees it", "Pick private, shared with teachers, or academy library.");
+    return failure(t, "chooseVisibilityTitle", "chooseVisibility");
   }
 
   const moderation = await insertMaterial(actor, {
@@ -91,8 +115,8 @@ export async function createMaterialAction(
     payload: {
       audience: input.audience,
       classId: input.classId,
-      questions: input.questions ?? [],
-      questionCount: input.kind === "form" ? (input.questions ?? []).length : undefined,
+      questions,
+      questionCount: input.kind === "form" ? questions.length : undefined,
     },
   });
 
@@ -101,11 +125,11 @@ export async function createMaterialAction(
 
   return {
     ok: true,
-    title: "Material saved",
+    title: t("savedTitle"),
     message:
       moderation === "pending"
-        ? `“${title}” was saved and sent to a manager for the academy library.`
-        : `“${title}” was saved to your library.`,
+        ? t("savedPending", { title })
+        : t("savedPrivate", { title }),
     materialId,
   };
 }
@@ -115,15 +139,20 @@ export async function setMaterialVisibilityAction(input: {
   materialId: string;
   visibility: "private" | "shared" | "global";
 }): Promise<MaterialActionResult> {
+  const t = await getTranslations("educator.materials.actions");
   const actor = await getActorWithPermission("materials:write");
-  if (!actor) return failure("Not allowed", "Only teachers and staff manage materials.");
+  if (!actor) return failure(t, "notAllowedTitle", "notAllowedManage");
   const result = await setMaterialVisibility(actor, input.materialId, input.visibility);
   if (result.ok) {
     revalidatePath(`/teacher/materials/${input.materialId}`);
     revalidatePath("/teacher/materials");
     revalidatePath("/manager/materials");
   }
-  return { ok: result.ok, title: result.ok ? "Saved" : "Not saved", message: result.message };
+  return {
+    ok: result.ok,
+    title: result.ok ? t("saved") : t("notSaved"),
+    message: result.message,
+  };
 }
 
 /** A manager approves or rejects a material for the academy library. */
@@ -132,41 +161,44 @@ export async function reviewMaterialAction(input: {
   approve: boolean;
   note?: string;
 }): Promise<MaterialActionResult> {
+  const t = await getTranslations("educator.materials.actions");
   const actor = await getActorWithPermission("materials:moderate");
-  if (!actor) return failure("Not allowed", "Only managers review materials.");
+  if (!actor) return failure(t, "notAllowedTitle", "notAllowedReview");
   const result = await reviewMaterial(actor, { id: input.materialId, approve: input.approve, note: input.note });
   if (result.ok) {
     revalidatePath("/manager/materials");
     revalidatePath(`/manager/materials/${input.materialId}`);
     revalidatePath("/materials");
   }
-  return { ok: result.ok, title: result.ok ? "Done" : "Not saved", message: result.message };
+  return {
+    ok: result.ok,
+    title: result.ok ? t("done") : t("notSaved"),
+    message: result.message,
+  };
 }
 
 export async function shareMaterialAction(
   input: ShareMaterialInput,
 ): Promise<MaterialActionResult> {
+  const t = await getTranslations("educator.materials.actions");
   const actor = await getActorWithPermission("materials:share");
 
   if (!actor) {
-    return failure(
-      "Not allowed",
-      "Only teachers and managers can share material with students.",
-    );
+    return failure(t, "notAllowedTitle", "notAllowedShare");
   }
 
   const material = getMaterialById(input.materialId);
 
   if (!material) {
-    return failure("Material not found", "Reload the library and try again.");
+    return failure(t, "notFoundTitle", "notFound");
   }
 
   if (input.audience === "class" && !input.classId) {
-    return failure("Choose a class", "Select the class that should receive it.");
+    return failure(t, "chooseClassTitle", "chooseClass");
   }
 
   if (input.audience === "student" && !input.studentName?.trim()) {
-    return failure("Choose a student", "Select the student that should receive it.");
+    return failure(t, "chooseStudentTitle", "chooseStudent");
   }
 
   const audienceLabel =
@@ -174,67 +206,15 @@ export async function shareMaterialAction(
       ? input.classId
       : input.audience === "student"
         ? input.studentName
-        : "Cohort";
+        : t("cohort");
+  const audience = audienceLabel ?? "";
 
   revalidatePath("/teacher/materials");
   revalidatePath("/materials");
 
   return {
     ok: true,
-    title: "Material shared",
-    message: `“${material.title}” is queued for ${audienceLabel}.`,
-  };
-}
-
-export async function submitPracticeAction(
-  input: SubmitPracticeInput,
-): Promise<PracticeResult> {
-  const actor = await getActorWithPermission("materials:read");
-
-  if (!actor) {
-    return {
-      ok: false,
-      title: "Not allowed",
-      message: "Sign in as a student to start this practice.",
-    };
-  }
-
-  const material = getMaterialById(input.materialId);
-  const questions = getFormQuestions(input.materialId);
-
-  if (!material || material.kind !== "form") {
-    return {
-      ok: false,
-      title: "Practice not found",
-      message: "This activity is no longer available.",
-    };
-  }
-
-  if (!questions.length) {
-    return {
-      ok: false,
-      title: "No questions yet",
-      message: "Your teacher has not added questions to this form.",
-    };
-  }
-
-  const answered = input.answers.filter((answer) => answer.trim()).length;
-
-  if (answered < questions.length) {
-    return {
-      ok: false,
-      title: "Finish every question",
-      message: `You answered ${answered} of ${questions.length} questions.`,
-    };
-  }
-
-  const total = questions.reduce((sum, question) => sum + question.points, 0);
-
-  return {
-    ok: true,
-    title: "Practice saved",
-    message: `Answers for “${material.title}” were saved (${total}/${total} points).`,
-    score: total,
-    total,
+    title: t("sharedTitle"),
+    message: t("shared", { title: material.title, audience }),
   };
 }

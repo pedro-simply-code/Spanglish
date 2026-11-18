@@ -7,6 +7,7 @@ import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import { IconExternalLink, IconHeartbeat, IconHistory } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { LinkButton } from "@/components/ui/link-button";
 import { adminQuickActions } from "@/features/admin/data";
 
@@ -23,6 +24,7 @@ export function AdminOverviewToolbar({
   onOpenHealth,
   onOpenActivity,
 }: AdminOverviewToolbarProps) {
+  const t = useTranslations("admin");
   return (
     <Paper
       elevation={0}
@@ -51,7 +53,7 @@ export function AdminOverviewToolbar({
             startIcon={<IconHeartbeat size={16} />}
             onClick={onOpenHealth}
           >
-            Platform health
+            {t("overview.toolbar.platformHealth")}
           </Button>
         </Badge>
 
@@ -62,7 +64,7 @@ export function AdminOverviewToolbar({
             startIcon={<IconHistory size={16} />}
             onClick={onOpenActivity}
           >
-            Latest activity
+            {t("overview.toolbar.latestActivity")}
           </Button>
         </Badge>
 
@@ -72,14 +74,14 @@ export function AdminOverviewToolbar({
           variant="outlined"
           startIcon={<IconExternalLink size={14} />}
         >
-          Students & credits
+          {t("overview.toolbar.studentsCredits")}
         </LinkButton>
 
         <Box sx={{ display: { xs: "none", md: "block" } }}>
           <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
         </Box>
 
-        {adminQuickActions.map((action) => (
+        {adminQuickActions(t).map((action) => (
           <LinkButton
             key={action.id}
             href={action.href}

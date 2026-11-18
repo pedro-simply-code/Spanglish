@@ -35,7 +35,11 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), display-capture=(), geolocation=(), payment=()",
+    // Same origin only (third-party frames stay blocked). Allowed on every page
+    // because Next.js navigates client-side: the classroom keeps the policy of
+    // the first page loaded, so blocking it elsewhere made the browser refuse
+    // the camera and microphone without asking.
+    value: "camera=(self), microphone=(self), display-capture=(self), geolocation=(), payment=()",
   },
   ...(isDev
     ? []
@@ -70,18 +74,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
-      {
-        // The classroom is the only place that needs camera, microphone and
-        // screen sharing.
-        source: "/classes/:id/room",
-        headers: [
-          {
-            key: "Permissions-Policy",
-            value:
-              "camera=(self), microphone=(self), display-capture=(self), geolocation=(), payment=()",
-          },
-        ],
-      },
     ];
   },
 };

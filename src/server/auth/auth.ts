@@ -27,6 +27,9 @@ import {
 } from "@/server/auth/auth-events";
 import { sendAuthCodeEmail } from "@/server/email/send-verification";
 import { syncOwnerRoles } from "@/server/auth/owner";
+import { captchaEnabled, googleSignInEnabled } from "@/server/auth/platform-flags";
+
+export { captchaEnabled, googleSignInEnabled } from "@/server/auth/platform-flags";
 
 const developmentSecret =
   "spanglish-better-auth-development-secret-do-not-use-in-production";
@@ -39,23 +42,10 @@ function getBetterAuthSecret() {
   return developmentSecret;
 }
 
-export const googleSignInEnabled = Boolean(
-  env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET,
-);
-
-// Half a Google configuration hides the button silently; say which half is missing.
-if (!googleSignInEnabled && (env.GOOGLE_CLIENT_ID || env.GOOGLE_CLIENT_SECRET)) {
-  console.warn(
-    `[auth] Google sign-in is off: ${env.GOOGLE_CLIENT_ID ? "GOOGLE_CLIENT_SECRET" : "GOOGLE_CLIENT_ID"} is missing in .env.`,
-  );
-}
-
 /** Web client first (OAuth redirects); the Android client for native ID tokens. */
 const googleClientIds = [env.GOOGLE_CLIENT_ID, env.GOOGLE_ANDROID_CLIENT_ID].filter(
   (value): value is string => Boolean(value),
 );
-
-export const captchaEnabled = Boolean(env.TURNSTILE_SECRET_KEY);
 
 /**
  * Turning off 2FA or creating new backup codes needs the password. Accounts

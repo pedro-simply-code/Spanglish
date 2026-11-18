@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SectionCard } from "@/components/ui/section-card";
+// eslint-disable-next-line no-restricted-imports -- ManagerJoinForm is not re-exported by the admin public API.
 import { ManagerJoinForm } from "@/features/admin/components/manager-join-form";
 import { getManagerInvitationByToken } from "@/server/admin/manager-access";
 import { getAuthState } from "@/server/auth/session";
 import { LinkButton } from "@/components/ui/link-button";
 
-export const metadata: Metadata = {
-  title: "Manager invitation",
-  description: "Accept an operations manager invitation",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.joinManager");
+  return { title: t("title"), description: t("description") };
+}
 
 type PageProps = {
   searchParams: Promise<{ token?: string }>;
@@ -28,6 +30,7 @@ export default function ManagerJoinPage({ searchParams }: PageProps) {
 }
 
 async function Content({ searchParams }: PageProps) {
+  const t = await getTranslations("educator");
   const query = await searchParams;
   const token = query.token?.trim() ?? "";
   const auth = await getAuthState();
@@ -35,7 +38,7 @@ async function Content({ searchParams }: PageProps) {
   if (!token) {
     return (
       <Box mt={3}>
-        <Alert severity="error">Missing invitation token. Open the link from your Spanglish inbox (Email in the app).</Alert>
+        <Alert severity="error">{t("join.missingToken")}</Alert>
       </Box>
     );
   }
@@ -45,7 +48,7 @@ async function Content({ searchParams }: PageProps) {
   if (!invitation) {
     return (
       <Box mt={3}>
-        <Alert severity="error">This invitation was not found.</Alert>
+        <Alert severity="error">{t("join.notFound")}</Alert>
       </Box>
     );
   }
@@ -53,9 +56,7 @@ async function Content({ searchParams }: PageProps) {
   if (!invitation.open) {
     return (
       <Box mt={3}>
-        <Alert severity="warning">
-          This invitation is no longer open (expired, revoked, or already accepted).
-        </Alert>
+        <Alert severity="warning">{t("join.closed")}</Alert>
       </Box>
     );
   }
@@ -65,16 +66,15 @@ async function Content({ searchParams }: PageProps) {
     return (
       <Box mt={3}>
         <Breadcrumb
-          title="Manager invitation"
-          subtitle={`Invitation for ${invitation.email}`}
+          title={t("join.title")}
+          subtitle={t("join.signInSubtitle", { email: invitation.email })}
         />
-        <SectionCard title="Sign in to continue">
+        <SectionCard title={t("join.signInTitle")}>
           <Alert severity="info" sx={{ mb: 2 }}>
-            Create an account or sign in with <strong>{invitation.email}</strong>, then return here to submit your
-            experience and accept the role.
+            {t("join.signInHelp", { email: invitation.email })}
           </Alert>
           <LinkButton href={loginHref} variant="contained">
-            Sign in
+            {t("join.signIn")}
           </LinkButton>
         </SectionCard>
       </Box>
@@ -87,10 +87,10 @@ async function Content({ searchParams }: PageProps) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Manager invitation"
-        subtitle="Submit your experience and accept operations access"
+        title={t("join.title")}
+        subtitle={t("join.acceptSubtitle")}
       />
-      <SectionCard title="Operations manager onboarding">
+      <SectionCard title={t("join.onboardingTitle")}>
         <ManagerJoinForm
           token={token}
           inviteEmail={invitation.email}

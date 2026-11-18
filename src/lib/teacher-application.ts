@@ -44,3 +44,49 @@ export function trackLabel(track: TeacherApplicationTrack) {
 export function fluencyLabel(fluency: TeacherFluencyLevel) {
   return teacherFluencyLevels.find((item) => item.id === fluency)?.label ?? fluency;
 }
+
+/* Localized variants. Callers pass a translator scoped to the educator namespace. */
+
+type Translator = (key: string) => string;
+
+const credentialTypeKeys: Record<string, string> = {
+  celta: "celta",
+  dele: "dele",
+  degree: "degree",
+  license: "license",
+  other: "other",
+};
+
+export function localizedTeacherApplicationTracks(t: Translator) {
+  return teacherApplicationTracks.map((track) => ({
+    ...track,
+    label: t(`application.tracks.${track.id}.label`),
+    description: t(`application.tracks.${track.id}.description`),
+  }));
+}
+
+export function localizedTeacherFluencyLevels(t: Translator) {
+  return teacherFluencyLevels.map((level) => ({
+    ...level,
+    label: t(`application.fluency.${level.id}`),
+  }));
+}
+
+export function localizedCredentialTypes(t: Translator) {
+  return credentialTypes.map((credential) => ({
+    ...credential,
+    label: t(`application.credentials.${credentialTypeKeys[credential.id] ?? "other"}`),
+  }));
+}
+
+export function localizedTrackLabel(track: TeacherApplicationTrack, t: Translator) {
+  return t(`application.tracks.${track}.label`);
+}
+
+export function localizedFluencyLabel(fluency: TeacherFluencyLevel, t: Translator) {
+  return t(`application.fluency.${fluency}`);
+}
+
+export function localizedCredentialTypeLabel(type: string, t: Translator) {
+  return t(`application.credentials.${credentialTypeKeys[type] ?? "other"}`);
+}

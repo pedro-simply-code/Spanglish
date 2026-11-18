@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { IconAlertCircle, IconStar, IconTrash } from "@tabler/icons-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { EmailLabelChip } from "@/features/email/components/email-label-chip";
 import type { Email } from "@/features/email/types";
 
@@ -27,6 +28,7 @@ type EmailContentProps = {
 };
 
 export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: EmailContentProps) {
+  const t = useTranslations("apps");
   const [show, setShow] = useState(false);
   const [text, setText] = useState("");
 
@@ -49,11 +51,11 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
         alignItems="center"
       >
         <Box>
-          <Typography variant="h4">Please Select a Mail</Typography>
+          <Typography variant="h4">{t("email.content.emptyTitle")}</Typography>
           <br />
           <Image
             src="/images/breadcrumb/emailSv.png"
-            alt="emailIcon"
+            alt={t("email.content.emptyImageAlt")}
             width={250}
             height={250}
           />
@@ -66,9 +68,11 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
     <Box>
       <Stack p={2} gap={0} direction="row">
         {email.inbox ? (
-          <Tooltip title={email.starred ? "Unstar" : "Star"}>
+          <Tooltip title={email.starred ? t("email.content.unstar") : t("email.content.star")}>
             <IconButton
-              aria-label={email.starred ? "Unstar email" : "Star email"}
+              aria-label={
+                email.starred ? t("email.content.unstarAria") : t("email.content.starAria")
+              }
               onClick={() => onStar(email.id)}
             >
               <IconStar
@@ -84,9 +88,17 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
         ) : null}
 
         {email.inbox ? (
-          <Tooltip title={email.important ? "Not Important" : "Important"}>
+          <Tooltip
+            title={
+              email.important ? t("email.content.notImportant") : t("email.content.important")
+            }
+          >
             <IconButton
-              aria-label={email.important ? "Mark not important" : "Mark important"}
+              aria-label={
+                email.important
+                  ? t("email.content.markNotImportant")
+                  : t("email.content.markImportant")
+              }
               onClick={() => onImportant(email.id)}
             >
               <IconAlertCircle
@@ -98,9 +110,9 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
           </Tooltip>
         ) : null}
 
-        <Tooltip title="Delete">
+        <Tooltip title={t("email.content.delete")}>
           <IconButton
-            aria-label="Move email to trash"
+            aria-label={t("email.content.deleteAria")}
             onClick={() => onDelete(email.id)}
           >
             <IconTrash size={18} stroke={1.3} />
@@ -133,7 +145,9 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
         <>
           <Divider />
           <Box p={3}>
-            <Typography variant="h6">Attachments ({email.attachments.length})</Typography>
+            <Typography variant="h6">
+              {t("email.content.attachments", { count: email.attachments.length })}
+            </Typography>
 
             <Grid container spacing={3}>
               {email.attachments.map((attachment) => (
@@ -177,10 +191,10 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
             color="primary"
             onClick={() => (onReply && email ? onReply(email) : toggleEditor())}
           >
-            Reply
+            {t("email.content.reply")}
           </Button>
           <Button variant="outlined" size="small">
-            Forward
+            {t("email.content.forward")}
           </Button>
         </Stack>
 
@@ -189,7 +203,7 @@ export function EmailContent({ email, onStar, onImportant, onDelete, onReply }: 
             <Paper variant="outlined">
               <TextField
                 value={text}
-                placeholder="Type here..."
+                placeholder={t("email.content.replyPlaceholder")}
                 multiline
                 fullWidth
                 minRows={4}

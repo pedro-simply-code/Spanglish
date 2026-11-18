@@ -93,7 +93,8 @@ export const env = createEnv({
     B2_S3_ENDPOINT: optionalHttpsUrl,
     B2_REGION: z.string().min(1).default("us-west-004"),
     /** Class recordings: `local` (disk + browser download) or `cloud` (Backblaze B2). */
-    RECORDING_STORAGE: z.enum(["local", "cloud"]).default("local"),
+    /** Unset: "cloud" when the B2_* variables are set, otherwise "local". */
+    RECORDING_STORAGE: z.enum(["local", "cloud"]).optional(),
 
     // Stripe: package checkout (receive) and Connect transfers to teachers (send).
     STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),

@@ -9,7 +9,10 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { formatDistanceToNowStrict } from "date-fns";
+import enUS from "date-fns/locale/en-US";
+import es from "date-fns/locale/es";
 import { IconAlertCircle, IconStar, IconTrash } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { EmailLabelChip } from "@/features/email/components/email-label-chip";
 import type { Email } from "@/features/email/types";
 
@@ -27,6 +30,9 @@ export function EmailListItem({
   onCheckedChange,
 }: EmailListItemProps) {
   const theme = useTheme();
+  const locale = useLocale();
+  const t = useTranslations("apps");
+  const dateLocale = locale === "es" ? es : enUS;
 
   const warningColor = theme.palette.warning.main;
   const errorColor = theme.palette.error.light;
@@ -45,7 +51,9 @@ export function EmailListItem({
           tabIndex={-1}
           disableRipple
           checked={email.checked}
-          inputProps={{ "aria-label": `Select email from ${email.from}` }}
+          inputProps={{
+            "aria-label": t("email.list.selectEmail", { from: email.from }),
+          }}
           onClick={(event) => event.stopPropagation()}
           onChange={(event) => onCheckedChange(event.target.checked)}
         />
@@ -80,7 +88,10 @@ export function EmailListItem({
           {email.checked ? <IconTrash stroke={1.5} size={16} /> : null}
           <Box sx={{ ml: "auto" }}>
             <Typography variant="caption" noWrap>
-              {formatDistanceToNowStrict(email.time, { addSuffix: false })} ago
+              {formatDistanceToNowStrict(email.time, {
+                addSuffix: true,
+                locale: dateLocale,
+              })}
             </Typography>
           </Box>
         </Stack>

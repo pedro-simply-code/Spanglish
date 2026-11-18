@@ -6,6 +6,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { adminBreadcrumb } from "@/features/admin/components/admin-breadcrumb-items";
 import type { AdminDashboardCharts, LedgerSnapshot } from "@/features/admin";
@@ -17,17 +18,17 @@ type Props = {
 };
 
 export function FinanceLedgerOverview({ snapshots, charts }: Props) {
+  const t = useTranslations("admin");
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Credit ledger"
-        subtitle="Outstanding credits, prepaid liability, and unsettled teacher earnings."
-        items={adminBreadcrumb("Finance", "Ledger", "/admin/finance/ledger")}
+        title={t("common.page.ledger")}
+        subtitle={t("finance.ledger.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.finance"), t("common.page.ledgerShort"), "/admin/finance/ledger")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        From orders, credit balances, and teacher earnings in the database (Stripe and demo orders both count
-        when paid).
+        {t("finance.ledger.notice")}
       </Alert>
 
       <Grid container spacing={3}>

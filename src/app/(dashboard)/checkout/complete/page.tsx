@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { CheckoutResult } from "@/features/academy";
 import { requireDashboard } from "@/server/auth/session";
 import { fulfillFromReturn } from "@/server/payments/checkout";
 import { stripeEnabled } from "@/server/payments/stripe";
 
-export const metadata: Metadata = {
-  title: "Payment",
-  description: "Your Spanglish package payment",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("student");
+  return {
+    title: t("meta.payment.title"),
+    description: t("meta.payment.description"),
+  };
+}
 
 type Props = { searchParams: Promise<{ session_id?: string }> };
 

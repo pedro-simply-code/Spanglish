@@ -5,7 +5,16 @@ import { SnackbarProvider, closeSnackbar } from "notistack";
 import IconButton from "@mui/material/IconButton";
 import { IconX } from "@tabler/icons-react";
 
-export function AppSnackbarProvider({ children }: { children: ReactNode }) {
+type AppSnackbarProviderProps = {
+  children: ReactNode;
+  /** Rendered above every LocaleProvider, so the label defaults to English. */
+  dismissLabel?: string;
+};
+
+export function AppSnackbarProvider({
+  children,
+  dismissLabel = "Dismiss notification",
+}: AppSnackbarProviderProps) {
   return (
     <SnackbarProvider
       maxSnack={4}
@@ -14,7 +23,7 @@ export function AppSnackbarProvider({ children }: { children: ReactNode }) {
       action={(snackbarId) => (
         <IconButton
           size="small"
-          aria-label="Dismiss notification"
+          aria-label={dismissLabel}
           onClick={() => closeSnackbar(snackbarId)}
           sx={{ color: "inherit" }}
         >

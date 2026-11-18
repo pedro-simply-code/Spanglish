@@ -57,7 +57,7 @@ export type PayoutBatch = {
 export type PaymentProvider = {
   id: string;
   name: string;
-  role: "Checkout" | "Teacher payouts";
+  role: string;
   status: "connected" | "setup-needed" | "not-configured" | "disabled";
   note: string;
   enabled: boolean;

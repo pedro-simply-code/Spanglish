@@ -8,17 +8,19 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import type { AcademyPlan } from "@/features/academy";
 import { PackagePlanFilters } from "@/features/academy/components/package-plan-filters";
 import { formatMoney, type ClassDuration, type ClassType } from "@/features/academy/data";
 import { MarketingBlankCard } from "@/components/ui/marketing-blank-card";
 import { LinkButton } from "@/components/ui/link-button";
-import { classTypeLabel } from "@/lib/class-type-label";
 import { MarketingSectionTitle } from "@/features/marketing/components/marketing-section-title";
 
 const ctaSx = { px: 4, py: 1.5, fontSize: 16 } as const;
 
 function PlanTeaser({ plan }: { plan: AcademyPlan }) {
+  const t = useTranslations("marketing");
+
   return (
     <MarketingBlankCard sx={{ height: "100%" }}>
       <CardContent sx={{ p: 3, display: "flex", flexDirection: "column", height: "100%" }}>
@@ -28,7 +30,11 @@ function PlanTeaser({ plan }: { plan: AcademyPlan }) {
               {plan.name}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {plan.classes} classes · {classTypeLabel(plan.type)} · {plan.duration} min
+              {t("packages.plan.details", {
+                count: plan.classes,
+                type: t(plan.type === "paired" ? "packages.plan.paired" : "packages.plan.individual"),
+                duration: plan.duration,
+              })}
             </Typography>
           </Box>
           <Chip
@@ -43,20 +49,25 @@ function PlanTeaser({ plan }: { plan: AcademyPlan }) {
             {formatMoney(plan.pricePerClass)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            / class
+            {t("packages.plan.perClass")}
           </Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" mt={0.5}>
-          {formatMoney(plan.total)} total
+          {t("packages.plan.total", { amount: formatMoney(plan.total) })}
           {plan.perStudentPerClass !== null
-            ? ` · ${formatMoney(plan.perStudentPerClass)} per student`
+            ? ` · ${t("packages.plan.perStudent", { amount: formatMoney(plan.perStudentPerClass) })}`
             : ""}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ flex: 1, mt: 1.5 }}>
           {plan.description}
         </Typography>
         {plan.savings > 0 ? (
-          <Chip label={`Save ${plan.savings}%`} color="success" size="small" sx={{ mt: 2, alignSelf: "flex-start" }} />
+          <Chip
+            label={t("packages.plan.save", { savings: plan.savings })}
+            color="success"
+            size="small"
+            sx={{ mt: 2, alignSelf: "flex-start" }}
+          />
         ) : null}
       </CardContent>
     </MarketingBlankCard>
@@ -75,6 +86,7 @@ export function MarketingPackagesSection({
   sectionId = "packages",
   showCheckoutActions = false,
 }: MarketingPackagesSectionProps) {
+  const t = useTranslations("marketing");
   const [packageDuration, setPackageDuration] = useState<ClassDuration>(25);
   const [packageType, setPackageType] = useState<ClassType>("one-on-one");
 
@@ -104,9 +116,9 @@ export function MarketingPackagesSection({
     >
       <Container maxWidth="lg">
         <MarketingSectionTitle
-          eyebrow="Packages"
-          title="Simple, transparent class credits"
-          subtitle="Choose session length and class format, then compare package sizes"
+          eyebrow={t("packages.eyebrow")}
+          title={t("packages.title")}
+          subtitle={t("packages.subtitle")}
         />
         <PackagePlanFilters
           duration={packageDuration}
@@ -125,8 +137,7 @@ export function MarketingPackagesSection({
         </Grid>
         {filteredPlans.length === 0 ? (
           <Typography variant="body2" color="text.secondary" textAlign="center" mt={3}>
-            No packages are published for this combination yet. Try another option or sign in to see
-            full pricing.
+            {t("packages.empty")}
           </Typography>
         ) : null}
         {showCheckoutActions && featuredPlan ? (
@@ -142,7 +153,7 @@ export function MarketingPackagesSection({
               variant="contained"
               sx={ctaSx}
             >
-              Get started
+              {t("packages.getStarted")}
             </LinkButton>
             <LinkButton
               href={`/login?next=${encodeURIComponent("/pricing")}`}
@@ -150,7 +161,7 @@ export function MarketingPackagesSection({
               color="secondary"
               sx={ctaSx}
             >
-              Open full pricing (sign in)
+              {t("packages.fullPricing")}
             </LinkButton>
           </Stack>
         ) : null}

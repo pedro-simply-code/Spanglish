@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { ClassroomLiveKitStage } from "@/features/classes/components/classroom-livekit-stage";
 import { ClassroomAwaitTeacherLobby } from "@/features/classes/components/classroom-await-teacher-lobby";
 import { ClassroomTeacherStartLobby } from "@/features/classes/components/classroom-teacher-start-lobby";
@@ -105,6 +106,7 @@ function LocalMediaStage({
   viewerAvatarUrl: string;
 }) {
   const { showError, showSuccess, showInfo } = useAppToast();
+  const t = useTranslations("classroom");
   const videoRef = useRef<HTMLVideoElement>(null);
   const cameraRef = useRef<MediaStream | null>(null);
   const screenRef = useRef<MediaStream | null>(null);
@@ -179,7 +181,7 @@ function LocalMediaStage({
         await attachVideo(stream);
       }
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
@@ -193,7 +195,7 @@ function LocalMediaStage({
     try {
       const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const audioTrack = audioStream.getAudioTracks()[0];
-      if (!audioTrack) throw new Error("No microphone track returned.");
+      if (!audioTrack) throw new Error(t("local.noMicTrack"));
 
       if (cameraRef.current) {
         cameraRef.current.addTrack(audioTrack);
@@ -205,7 +207,7 @@ function LocalMediaStage({
 
       setMicOn(true);
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
@@ -218,7 +220,7 @@ function LocalMediaStage({
     } else {
       await attachVideo(null);
     }
-    showInfo({ message: "Screen sharing stopped." });
+    showInfo({ message: t("local.screenStopped") });
   };
 
   const startScreenShare = async () => {
@@ -234,9 +236,9 @@ function LocalMediaStage({
       display.getVideoTracks()[0]?.addEventListener("ended", () => {
         void stopScreenShare();
       });
-      showSuccess({ message: "You are sharing your screen." });
+      showSuccess({ message: t("local.screenSharing") });
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
@@ -295,9 +297,7 @@ function LocalMediaStage({
               textAlign: "center",
             }}
           >
-            <Typography variant="body2">
-              Camera preview area (black when off). Use the toolbar to share screen or enable devices.
-            </Typography>
+            <Typography variant="body2">{t("local.previewHint")}</Typography>
           </Stack>
         ) : null}
 
@@ -336,10 +336,10 @@ function LocalMediaStage({
         <Typography variant="caption" color="rgba(255,255,255,0.65)">
           {viewerName} · {teacherName}
           {recordingConfig.storage === "local"
-            ? " · recordings saved locally"
+            ? t("local.savedLocally")
             : recordingConfig.cloudReady
-              ? " · recordings upload to B2"
-              : " · set B2 keys for cloud recordings"}
+              ? t("local.uploadToB2")
+              : t("local.setB2Keys")}
         </Typography>
       </Box>
     </Box>

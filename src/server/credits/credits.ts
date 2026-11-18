@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/server/db";
 import {
   creditAccounts,
@@ -34,8 +35,8 @@ export function holderFor(input: { classType: ClassType; userId: string; pairId?
 }
 
 export class InsufficientCreditsError extends Error {
-  constructor() {
-    super("Not enough credits.");
+  constructor(message: string) {
+    super(message);
   }
 }
 
@@ -56,9 +57,10 @@ export async function changeCredits(input: {
   /** USD cents per credit when adding to the pool (updates weighted average). */
   unitValueCents?: number;
 }) {
+  const t = await getTranslations("ops.credits");
   const unitValueCents = Math.max(0, Math.round(input.unitValueCents ?? 0));
   if (!Number.isInteger(input.delta) || input.delta === 0) {
-    throw new Error("Credit changes must be a non-zero whole number.");
+    throw new Error(t("invalidDelta"));
   }
 
   const transactionId = randomUUID();
@@ -115,7 +117,7 @@ export async function changeCredits(input: {
         `);
 
   const row = rowsOf<{ accountId: string; balance: number }>(result)[0];
-  if (!row) throw new InsufficientCreditsError();
+  if (!row) throw new InsufficientCreditsError(t("insufficient"));
   return { accountId: row.accountId, balance: Number(row.balance) };
 }
 

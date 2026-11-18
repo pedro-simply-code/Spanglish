@@ -1,18 +1,22 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { getTranslations } from "next-intl/server";
 import { addDays, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { CalendarOverview } from "@/features/calendar";
 import { getActor } from "@/server/auth/session";
 import { calendarRoleOf, hasCalendarFeed, loadCalendarData } from "@/server/calendar/events";
 import { listTeachers } from "@/server/classes/teachers";
 import { requestTime } from "@/server/request-time";
 
-export const metadata: Metadata = {
-  title: "Calendar",
-  description: "Academy class schedule",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("apps");
+  return {
+    title: t("metadata.calendar.title"),
+    description: t("metadata.calendar.description"),
+  };
+}
 
 export default function CalendarPage() {
   return (

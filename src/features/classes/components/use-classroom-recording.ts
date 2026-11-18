@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   completeRecordingUploadAction,
   createRecordingUploadAction,
@@ -21,7 +22,13 @@ function pickRecorderMime() {
   return types.find((type) => MediaRecorder.isTypeSupported(type)) ?? "";
 }
 
-function buildRecordingFile(classId: string, topic: string, blob: Blob, mimeType: string) {
+function buildRecordingFile(
+  classId: string,
+  topic: string,
+  blob: Blob,
+  mimeType: string,
+  t: (key: string) => string,
+) {
   const slug = topic
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -30,17 +37,19 @@ function buildRecordingFile(classId: string, topic: string, blob: Blob, mimeType
   formData.append("classId", classId);
   formData.append(
     "file",
-    new File([blob], `spanglish-${slug || "class"}.webm`, { type: mimeType }),
+    new File([blob], `spanglish-${slug || t("recording.fallbackClassSlug")}.webm`, {
+      type: mimeType,
+    }),
   );
   return formData;
 }
 
-function recordingFileName(topic: string) {
+function recordingFileName(topic: string, t: (key: string) => string) {
   const slug = topic
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-  return `spanglish-${slug || "class"}.webm`;
+  return `spanglish-${slug || t("recording.fallbackClassSlug")}.webm`;
 }
 
 /** Signed URL from the server, then a direct PUT to B2 (no server upload). */
@@ -49,14 +58,17 @@ async function uploadRecordingToCloud(
   topic: string,
   blob: Blob,
   mimeType: string,
+  t: (key: string) => string,
 ): Promise<RecordingUploadResult> {
   const ticket = await createRecordingUploadAction({
     classId,
-    fileName: recordingFileName(topic),
+    fileName: recordingFileName(topic, t),
     sizeBytes: blob.size,
     contentType: mimeType,
   });
-  if (!ticket.ok) return { ok: false, title: "Upload not available", message: ticket.message };
+  if (!ticket.ok) {
+    return { ok: false, title: t("recording.uploadUnavailable"), message: ticket.message };
+  }
 
   try {
     const response = await fetch(ticket.uploadUrl, {
@@ -68,8 +80,8 @@ async function uploadRecordingToCloud(
   } catch {
     return {
       ok: false,
-      title: "Upload failed",
-      message: "The file could not reach storage. Check the B2 bucket CORS rules and try again.",
+      title: t("recording.uploadFailed"),
+      message: t("recording.uploadError"),
     };
   }
 
@@ -85,6 +97,7 @@ export function useClassroomRecording(options: {
   localOnly?: boolean;
 }) {
   const { showError, showInfo, showSuccess } = useAppToast();
+  const t = useTranslations("classroom");
   const [recording, setRecording] = useState(false);
   const [persisting, setPersisting] = useState(false);
   const [localUrl, setLocalUrl] = useState<string | null>(null);
@@ -103,13 +116,13 @@ export function useClassroomRecording(options: {
   const startRecording = useCallback(() => {
     const stream = options.getMediaStream();
     if (!stream) {
-      showError({ message: "No video stream available to record." });
+      showError({ message: t("recording.noStream") });
       return;
     }
 
     const mimeType = pickRecorderMime();
     if (!mimeType) {
-      showError({ message: "This browser does not support video recording." });
+      showError({ message: t("recording.unsupported") });
       return;
     }
 
@@ -129,21 +142,21 @@ export function useClassroomRecording(options: {
       setLastMime(mimeType);
       if (options.localOnly) {
         showSuccess({
-          title: "Recording ready",
-          message: "Download a copy from the toolbar. It stays on your device only.",
+          title: t("recording.ready"),
+          message: t("recording.localReady"),
         });
         return;
       }
 
       showSuccess({
-        title: "Recording ready",
+        title: t("recording.ready"),
         message:
           options.recordingConfig.storage === "local"
-            ? "Download a copy or keep it on the server disk."
-            : "You can download a copy from the toolbar.",
+            ? t("recording.serverReady")
+            : t("recording.downloadReady"),
       });
 
-      const formData = buildRecordingFile(options.classId, options.topic, blob, mimeType);
+      const formData = buildRecordingFile(options.classId, options.topic, blob, mimeType, t);
 
       if (options.recordingConfig.storage === "local") {
         setPersisting(true);
@@ -159,7 +172,7 @@ export function useClassroomRecording(options: {
 
       if (options.recordingConfig.autoCloudUpload) {
         setPersisting(true);
-        void uploadRecordingToCloud(options.classId, options.topic, blob, mimeType).then((result) => {
+        void uploadRecordingToCloud(options.classId, options.topic, blob, mimeType, t).then((result) => {
           setPersisting(false);
           if (result.ok) {
             setCloudSaved(true);
@@ -173,19 +186,17 @@ export function useClassroomRecording(options: {
 
     recorder.start(1000);
     setRecording(true);
-    showInfo({ message: "Recording class video…" });
-  }, [localUrl, options, showError, showInfo, showSuccess]);
+    showInfo({ message: t("recording.started") });
+  }, [localUrl, options, showError, showInfo, showSuccess, t]);
 
   const uploadToCloud = useCallback(() => {
     if (!lastBlob || !options.recordingConfig.cloudReady) {
-      showError({
-        message: "Configure Backblaze B2 credentials before uploading to the cloud.",
-      });
+      showError({ message: t("recording.configureB2") });
       return;
     }
 
     setPersisting(true);
-    void uploadRecordingToCloud(options.classId, options.topic, lastBlob, lastMime).then((result) => {
+    void uploadRecordingToCloud(options.classId, options.topic, lastBlob, lastMime, t).then((result) => {
       setPersisting(false);
       if (result.ok) {
         setCloudSaved(true);
@@ -194,7 +205,7 @@ export function useClassroomRecording(options: {
         showError({ title: result.title, message: result.message });
       }
     });
-  }, [lastBlob, lastMime, options, showError, showSuccess]);
+  }, [lastBlob, lastMime, options, showError, showSuccess, t]);
 
   return {
     recording,

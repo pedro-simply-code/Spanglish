@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AuthShell, TwoFactorForm } from "@/features/auth";
 import { getAuthState } from "@/server/auth/session";
 
-export const metadata: Metadata = {
-  title: "Two-factor verification",
-  description: "Enter your authenticator code",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("twoFactorTitle"),
+    description: t("twoFactorDescription"),
+  };
+}
 
 export default function TwoFactorPage() {
   return (

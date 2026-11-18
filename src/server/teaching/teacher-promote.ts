@@ -2,6 +2,7 @@ import "server-only";
 
 import { and, eq, gt, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { canChangeRole, hasRole, type RoleCode } from "@/lib/auth-roles";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent, requestContextFromHeaders } from "@/server/audit/audit-log";
@@ -32,6 +33,7 @@ async function findUserByEmail(email: string) {
 }
 
 async function assertCanBecomeTeacher(userId: string) {
+  const t = await getTranslations("ops.teaching");
   const upcoming = await db
     .select({ id: classSessions.id })
     .from(classParticipants)
@@ -47,32 +49,33 @@ async function assertCanBecomeTeacher(userId: string) {
   if (upcoming.length) {
     return {
       ok: false as const,
-      message: "This account still has upcoming classes as a student. Promote after those classes (or cancel them).",
+      message: t("promoteUpcomingClasses"),
     };
   }
   return { ok: true as const };
 }
 
 export async function promoteUserToTeacherByEmail(actor: AuthSession, email: string) {
+  const t = await getTranslations("ops.teaching");
   if (!hasRole(actor.roles, "admin")) {
-    return { ok: false as const, message: "Only the admin can promote a user directly to teacher." };
+    return { ok: false as const, message: t("promoteAdminOnly") };
   }
 
   const user = await findUserByEmail(email);
-  if (!user) return { ok: false as const, message: "No account with that email." };
+  if (!user) return { ok: false as const, message: t("promoteNoAccount") };
   if (!user.emailVerified) {
-    return { ok: false as const, message: "The account must verify email before becoming a teacher." };
+    return { ok: false as const, message: t("promoteVerifyEmail") };
   }
 
   const targetRoles = user.roles as RoleCode[];
   if (hasRole(targetRoles, "teacher")) {
-    return { ok: false as const, message: "This account is already a teacher." };
+    return { ok: false as const, message: t("promoteAlreadyTeacher") };
   }
   if (hasRole(targetRoles, "admin") || hasRole(targetRoles, "manager")) {
-    return { ok: false as const, message: "Managers and admins cannot be promoted to teacher." };
+    return { ok: false as const, message: t("promoteStaffCannot") };
   }
   if (!hasRole(targetRoles, "student")) {
-    return { ok: false as const, message: "Only student accounts can become teachers." };
+    return { ok: false as const, message: t("promoteStudentsOnly") };
   }
 
   const decision = canChangeRole(actor.roles, targetRoles, { role: "teacher", action: "grant" });
@@ -86,7 +89,9 @@ export async function promoteUserToTeacherByEmail(actor: AuthSession, email: str
 
   await db.update(users).set({ roles: ["teacher"], updatedAt: new Date() }).where(eq(users.id, user.id));
 
-  const headline = user.name?.trim() ? `${user.name.trim()} · Spanglish teacher` : "Spanglish teacher";
+  const headline = user.name?.trim()
+    ? t("promoteHeadline", { name: user.name.trim() })
+    : t("promoteHeadlineNoName");
   await saveTeacherProfile(user.id, {
     headline: headline.slice(0, 120),
     bio: "",
@@ -99,7 +104,7 @@ export async function promoteUserToTeacherByEmail(actor: AuthSession, email: str
     .set({
       status: "approved",
       reviewerUserId: actor.userId,
-      reviewNote: "Direct promotion by admin.",
+      reviewNote: t("promoteReviewNote"),
       reviewedAt: new Date(),
     })
     .where(and(eq(teacherApplications.userId, user.id), eq(teacherApplications.status, "submitted")));
@@ -128,6 +133,6 @@ export async function promoteUserToTeacherByEmail(actor: AuthSession, email: str
 
   return {
     ok: true as const,
-    message: "Teacher role granted. They can set availability and profile in the teacher dashboard.",
+    message: t("promoteSuccess"),
   };
 }

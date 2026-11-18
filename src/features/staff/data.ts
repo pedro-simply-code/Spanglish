@@ -8,6 +8,8 @@ export type TeacherStudent = {
   level: string;
   goal: string;
   nextClass: string;
+  /** ISO timestamp used to format the next class in the viewer's locale. */
+  nextClassAt: string;
   progress: number;
 };
 
@@ -18,6 +20,7 @@ export const teacherStudents: TeacherStudent[] = [
     level: "Intermediate",
     goal: "Travel conversations",
     nextClass: "Tue, Nov 17 · 18:00",
+    nextClassAt: "2026-11-17T18:00:00-05:00",
     progress: 72,
   },
   {
@@ -26,6 +29,7 @@ export const teacherStudents: TeacherStudent[] = [
     level: "Advanced",
     goal: "Business presentations",
     nextClass: "Wed, Nov 18 · 09:30",
+    nextClassAt: "2026-11-18T09:30:00-05:00",
     progress: 88,
   },
   {
@@ -34,6 +38,7 @@ export const teacherStudents: TeacherStudent[] = [
     level: "Beginner",
     goal: "Everyday conversation",
     nextClass: "Thu, Nov 19 · 15:00",
+    nextClassAt: "2026-11-19T15:00:00-05:00",
     progress: 34,
   },
   {
@@ -42,9 +47,32 @@ export const teacherStudents: TeacherStudent[] = [
     level: "Intermediate",
     goal: "Interview preparation",
     nextClass: "Fri, Nov 20 · 11:00",
+    nextClassAt: "2026-11-20T11:00:00-05:00",
     progress: 61,
   },
 ];
+
+type StudentFieldTranslator = (key: string) => string;
+
+/** Localized copy of the demo roster for educator views. */
+export function localizedTeacherStudents(t: StudentFieldTranslator): TeacherStudent[] {
+  const levelKey: Record<string, string> = {
+    Beginner: "beginner",
+    Intermediate: "intermediate",
+    Advanced: "advanced",
+  };
+  const goalKey: Record<string, string> = {
+    "Travel conversations": "travel",
+    "Business presentations": "business",
+    "Everyday conversation": "everyday",
+    "Interview preparation": "interview",
+  };
+  return teacherStudents.map((student) => ({
+    ...student,
+    level: t(`staff.student.level.${levelKey[student.level] ?? "beginner"}`),
+    goal: t(`staff.student.goal.${goalKey[student.goal] ?? "travel"}`),
+  }));
+}
 
 export const teacherFollowUps = [
   {

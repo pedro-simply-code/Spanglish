@@ -1,0 +1,270 @@
+{
+  "shell": {
+    "roles": {
+      "student": "Estudiante",
+      "teacher": "Maestro",
+      "manager": "Coordinador",
+      "admin": "Administrador",
+      "descriptions": {
+        "student": "Reserva clases en vivo, entra al aula y sigue el material de aprendizaje.",
+        "teacher": "Imparte clases en vivo, revisa listas y publica materiales, formularios y grabaciones.",
+        "manager": "Supervisa maestros, clases y facturación sin acceso a toda la plataforma.",
+        "admin": "Acceso total, incluidos cambios de roles y configuración de la plataforma."
+      },
+      "badges": {
+        "student": "Estudiante",
+        "teacher": "Maestro",
+        "manager": "Coordinador",
+        "admin": "Administrador"
+      }
+    },
+    "dashboards": {
+      "student": "Panel del estudiante",
+      "teacher": "Panel del maestro",
+      "manager": "Panel del coordinador",
+      "admin": "Panel del administrador"
+    },
+    "language": {
+      "label": "Idioma",
+      "en": "Inglés",
+      "es": "Español"
+    },
+    "nav": {
+      "dashboard": "Panel",
+      "academy": "Academia",
+      "learning": "Aprendizaje",
+      "insights": "Análisis",
+      "teaching": "Enseñanza",
+      "operations": "Operaciones",
+      "account": "Cuenta",
+      "commerce": "Comercio",
+      "finance": "Finanzas",
+      "organization": "Organización",
+      "platform": "Plataforma",
+      "compliance": "Cumplimiento",
+      "overview": "Resumen",
+      "myClasses": "Mis clases",
+      "bookAClass": "Reservar una clase",
+      "pricing": "Precios",
+      "lessons": "Lecciones",
+      "practice": "Práctica",
+      "vocabulary": "Vocabulario",
+      "materials": "Materiales",
+      "progress": "Progreso",
+      "achievements": "Logros",
+      "teachWithUs": "Enseña con nosotros",
+      "settings": "Configuración",
+      "availability": "Disponibilidad",
+      "earnings": "Ganancias",
+      "assignments": "Tareas",
+      "recordings": "Grabaciones",
+      "students": "Estudiantes",
+      "academySchedule": "Horario de la academia",
+      "studentsAndCredits": "Estudiantes y créditos",
+      "teacherApplications": "Solicitudes de maestros",
+      "materialReview": "Revisión de materiales",
+      "teacherPayouts": "Pagos a maestros",
+      "billing": "Facturación",
+      "staff": "Personal",
+      "rooms": "Salas",
+      "packages": "Paquetes",
+      "teacherPayRates": "Tarifas de maestros",
+      "payoutApprovals": "Aprobación de pagos",
+      "paymentProviders": "Proveedores de pago",
+      "creditLedger": "Registro de créditos",
+      "users": "Usuarios",
+      "managers": "Coordinadores",
+      "roles": "Roles",
+      "integrations": "Integraciones",
+      "securityPolicy": "Política de seguridad",
+      "emailDeliverability": "Entrega de correo",
+      "classroomDefaults": "Valores de aula",
+      "auditLog": "Registro de auditoría",
+      "myCredits": "Mis créditos"
+    },
+    "notifications": {
+      "classReminder": {
+        "title": "Recordatorio de clase",
+        "subtitle": "María González mañana a las 18:00"
+      },
+      "badge": {
+        "title": "Nueva insignia desbloqueada",
+        "subtitle": "Conseguiste Coleccionista de Palabras"
+      },
+      "streak": {
+        "title": "Racha de {days} días",
+        "subtitle": "Mantenla viva con una revisión rápida"
+      },
+      "dailyGoal": {
+        "title": "Casi alcanzas tu meta diaria",
+        "subtitle": "Te faltan {minutes} minutos para alcanzar tu meta"
+      },
+      "vocabulary": {
+        "title": "Revisión de vocabulario lista",
+        "subtitle": "Hoy vencen {count} palabras"
+      },
+      "lesson": {
+        "title": "Lección en curso",
+        "subtitle": "Frases cotidianas de Spanglish va al {percent} %"
+      }
+    },
+    "profileMenu": {
+      "ariaLabel": "Perfil",
+      "heading": "Mi cuenta",
+      "activeDashboard": "Panel de {role} activo",
+      "signOut": "Cerrar sesión",
+      "links": {
+        "profileTitle": "Mi perfil",
+        "profileSubtitle": "Configuración de la cuenta",
+        "messagesTitle": "Mensajes",
+        "messagesSubtitle": "Tu bandeja de entrada",
+        "progressSubtitle": "Rachas y logros",
+        "classesStudentSubtitle": "Únete y administra clases en vivo",
+        "classesTeacherSubtitle": "Tu horario y tus aulas",
+        "earningsSubtitle": "Pago por clase y pagos",
+        "academyScheduleSubtitle": "Filtra por maestro, no por tus clases personales",
+        "payoutsSubtitle": "Prepara los pagos mensuales",
+        "payoutApprovalsSubtitle": "Aprueba y envía el pago a los maestros",
+        "auditSubtitle": "Eventos de seguridad y gobernanza",
+        "integrationsSubtitle": "Correo, Google, Stripe y LiveKit"
+      }
+    },
+    "search": {
+      "ariaLabel": "Buscar",
+      "placeholder": "Busca aquí",
+      "close": "Cerrar búsqueda",
+      "quickLinks": "Accesos rápidos",
+      "noResults": "No se encontraron resultados"
+    },
+    "sidebar": {
+      "dashboardSuffix": "Panel de {role}",
+      "signOut": "Cerrar sesión"
+    },
+    "topbar": {
+      "toggleSidebar": "Mostrar u ocultar la barra lateral",
+      "switchDashboard": "Cambiar de panel",
+      "notifications": "Notificaciones",
+      "unread": "{count} sin leer",
+      "empty": "Aún no hay mensajes. El correo de la academia aparece aquí cuando alguien te escribe o envía un aviso.",
+      "openEmail": "Abrir correo",
+      "apps": {
+        "calendar": "Calendario",
+        "email": "Correo"
+      }
+    },
+    "footer": {
+      "tagline": "Español en vivo con maestros nativos de Guatemala."
+    },
+    "snackbar": {
+      "dismiss": "Descartar notificación"
+    },
+    "contact": {
+      "tooltip": "Contactar con la app de correo",
+      "ariaLabel": "Enviar correo a {name}"
+    },
+    "chart": {
+      "studyMinutes": "Minutos de estudio"
+    },
+    "pagination": {
+      "showing": "Mostrando {from}–{to} de {total}"
+    },
+    "breadcrumb": {
+      "decorationAlt": "Decoración de ruta de navegación",
+      "ariaLabel": "ruta de navegación"
+    },
+    "settings": {
+      "metadata": {
+        "title": "Configuración",
+        "description": "Configuración de Spanglish: roles, acceso y seguridad"
+      },
+      "breadcrumb": {
+        "title": "Configuración",
+        "subtitle": "Haz que Spanglish sea tuyo"
+      },
+      "tabs": {
+        "ariaLabel": "Secciones de configuración",
+        "profile": "Perfil",
+        "notifications": "Notificaciones",
+        "preferences": "Preferencias",
+        "rolesAccess": "Roles y acceso",
+        "security": "Seguridad"
+      },
+      "profile": {
+        "signOutTitle": "Cerrar sesión",
+        "signOutHelp": "Tu elección de panel se recuerda para el próximo inicio de sesión.",
+        "signOut": "Cerrar sesión"
+      },
+      "notifications": {
+        "daily": {
+          "title": "Recordatorios diarios",
+          "description": "Recibe un recordatorio para practicar cada día."
+        },
+        "weekly": {
+          "title": "Resumen semanal",
+          "description": "Recibe un resumen de tu progreso cada semana."
+        },
+        "achievements": {
+          "title": "Alertas de logros",
+          "description": "Entérate en cuanto consigas una insignia nueva."
+        }
+      },
+      "preferences": {
+        "levelLabel": "Nivel de español",
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado",
+        "goalLabel": "Meta diaria",
+        "minutes10": "10 minutos",
+        "minutes20": "20 minutos",
+        "minutes30": "30 minutos",
+        "theme": "Tema",
+        "themeHelp": "Spanglish usa un único tema naranja en toda la app. No hay selector de tema."
+      },
+      "rolesAccess": {
+        "notice": "Se muestra un panel a la vez. Cambiar de rol modifica la barra lateral, la barra superior y todo el contenido del panel. El servidor te redirige fuera de cualquier panel que no esté activo.",
+        "heading": "Roles y acceso",
+        "description": "Los permisos son acumulativos. Cada rol que tienes suma acceso, pero solo el rol activo decide qué panel se ve.",
+        "priority": "Prioridad {priority}",
+        "granted": "Otorgado",
+        "notGranted": "No otorgado",
+        "addsPermissions": "Agrega permisos",
+        "activeNow": "Este panel está activo ahora mismo.",
+        "switch": "Cambiar al panel de {role}",
+        "notAssigned": "Este rol no está asignado a tu cuenta. Un administrador puede otorgarlo desde las herramientas de administración de roles.",
+        "effectiveTitle": "Tus permisos efectivos",
+        "effectiveSubtitle": "{permissions} permisos de {roles, plural, one {rol} other {roles}}",
+        "activeDashboard": "Panel activo",
+        "defaultNote": "El rol de estudiante es el predeterminado y no se puede quitar. La academia siempre conserva al menos un administrador."
+      }
+    },
+    "permissions": {
+      "classesViewOwn": "Ver mis clases",
+      "classesBook": "Reservar clases",
+      "classesJoinOwn": "Unirme a mis clases",
+      "classesCancelOwn": "Cancelar mis clases",
+      "classesRescheduleOwn": "Reprogramar mis clases",
+      "classesViewRoster": "Ver listas de clases",
+      "classesManage": "Administrar clases",
+      "studentsView": "Ver estudiantes",
+      "materialsRead": "Leer materiales",
+      "materialsWrite": "Crear materiales",
+      "materialsShare": "Compartir materiales",
+      "formsGrade": "Calificar formularios",
+      "recordingsManage": "Administrar grabaciones",
+      "progressViewOwn": "Ver mi progreso",
+      "billingViewOwn": "Ver mi facturación",
+      "billingManage": "Administrar facturación",
+      "staffView": "Ver personal",
+      "teachersApprove": "Aprobar maestros",
+      "materialsModerate": "Moderar materiales",
+      "payoutsPrepare": "Preparar pagos",
+      "payoutsApprove": "Aprobar pagos",
+      "rolesManage": "Administrar roles",
+      "platformManage": "Administrar la plataforma"
+    },
+    "demo": {
+      "noteStudent": "Panel del estudiante: clases, materiales y progreso.",
+      "noteRole": "Panel activo: {role}."
+    }
+  }
+}

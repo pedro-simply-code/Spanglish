@@ -1,4 +1,5 @@
 import { and, eq, gte, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { PaymentProvider } from "@/features/admin";
 import { env } from "@/env";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -47,13 +48,14 @@ export function manualPayoutAllowed(settings: PaymentProviderSettings = defaults
 }
 
 export async function savePaymentProviderSettings(actor: AuthSession, input: PaymentProviderSettings) {
+  const t = await getTranslations("ops.payments");
   const values = {
     stripeCheckoutEnabled: Boolean(input.stripeCheckoutEnabled),
     stripePayoutEnabled: Boolean(input.stripePayoutEnabled),
     manualPayoutEnabled: Boolean(input.manualPayoutEnabled),
   };
   if (!values.stripePayoutEnabled && !values.manualPayoutEnabled) {
-    return { ok: false as const, message: "Keep at least one teacher payout method enabled." };
+    return { ok: false as const, message: t("keepPayoutMethod") };
   }
   await db
     .insert(paymentProviderSettings)
@@ -74,7 +76,7 @@ export async function savePaymentProviderSettings(actor: AuthSession, input: Pay
     targetId: "payment_providers",
     metadata: values,
   });
-  return { ok: true as const, message: "Payment provider settings saved." };
+  return { ok: true as const, message: t("settingsSaved") };
 }
 
 const REVENUE_WINDOW_DAYS = 30;
@@ -134,6 +136,7 @@ export async function buildPaymentProviders(): Promise<{
   settings: PaymentProviderSettings;
   revenue: Record<OrderProvider, number>;
 }> {
+  const t = await getTranslations("ops.payments");
   // Caller must await requestTime() first (page Suspense boundary).
   const since = revenueWindowStart(REVENUE_WINDOW_DAYS, new Date());
   const [settings, revenue] = await Promise.all([
@@ -147,48 +150,51 @@ export async function buildPaymentProviders(): Promise<{
     {
       id: "stripe-checkout",
       name: "Stripe Checkout",
-      role: "Checkout",
+      role: t("providerCheckoutRole"),
       status: stripeCheckoutStatus(settings),
       enabled: settings.stripeCheckoutEnabled,
       envReady: stripeEnabled,
       canToggle: true,
-      revenueLabel: stripeRevenue > 0 ? `${money(stripeRevenue)} last ${REVENUE_WINDOW_DAYS} days` : "No paid orders yet",
+      revenueLabel:
+        stripeRevenue > 0
+          ? t("providerCheckoutRevenue", { amount: money(stripeRevenue), days: REVENUE_WINDOW_DAYS })
+          : t("noPaidOrders"),
       note: stripeEnabled
         ? settings.stripeCheckoutEnabled
           ? stripeWebhookEnabled
-            ? "Students pay on Stripe Checkout; credits apply when payment is confirmed."
-            : "Stripe keys are set but STRIPE_WEBHOOK_SECRET is missing — webhooks must work in production."
-          : "Turned off in admin — students use demo checkout until you re-enable Stripe."
-        : "Add STRIPE_SECRET_KEY (and webhooks in production) under Platform → Integrations.",
+            ? t("checkoutNoteConnected")
+            : t("checkoutNoteWebhookMissing")
+          : t("checkoutNoteDisabled")
+        : t("checkoutNoteNoKeys"),
     },
     {
       id: "stripe-connect",
       name: "Stripe Connect",
-      role: "Teacher payouts",
+      role: t("providerPayoutRole"),
       status: stripeConnectStatus(settings),
       enabled: settings.stripePayoutEnabled,
       envReady: stripeEnabled,
       canToggle: true,
-      revenueLabel: "Payout rail",
+      revenueLabel: t("payoutRail"),
       note: stripeEnabled
         ? settings.stripePayoutEnabled
-          ? "Pay approved batches with in-app Stripe transfers to connected teacher accounts."
-          : "Turned off — use international / bank transfers and Mark as paid."
-        : "Configure Stripe to pay teachers through Connect.",
+          ? t("connectNoteConnected")
+          : t("connectNoteDisabled")
+        : t("connectNoteNoKeys"),
     },
     {
       id: "manual-transfer",
-      name: "International & bank transfers",
-      role: "Teacher payouts",
+      name: t("manualName"),
+      role: t("providerPayoutRole"),
       status: manualTransferStatus(settings),
       enabled: settings.manualPayoutEnabled,
       envReady: true,
       canToggle: true,
-      revenueLabel: "Off-platform",
+      revenueLabel: t("offPlatform"),
       note:
         stripeRevenue > 0 && demoRevenue === 0
-          ? "All recent student revenue went through Stripe — Connect is usually enough, but you can still pay teachers by Wise or wire."
-          : "Record Wise, SWIFT, or other transfers with Mark as paid after approval.",
+          ? t("manualNoteStripe")
+          : t("manualNoteDefault"),
     },
   ];
 

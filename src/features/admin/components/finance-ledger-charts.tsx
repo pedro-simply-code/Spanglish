@@ -2,6 +2,7 @@
 
 import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
+import { useTranslations } from "next-intl";
 import { ApexChart } from "@/components/charts/apex-chart";
 import { SectionCard } from "@/components/ui/section-card";
 import type { AdminDashboardCharts } from "@/features/admin";
@@ -21,16 +22,20 @@ type Props = {
 };
 
 export function FinanceLedgerChartsPanel({ data }: Props) {
+  const t = useTranslations("admin");
   const theme = useTheme();
 
   return (
-    <SectionCard title="Trends (7 days)" subtitle="Revenue, orders, delivery, and lifetime totals from PostgreSQL.">
+    <SectionCard
+      title={t("finance.ledger.charts.title")}
+      subtitle={t("finance.ledger.charts.subtitle")}
+    >
       <Grid container spacing={3}>
         <Grid size={chartGridFinance}>
-          <ChartCell title="Cash collected from paid packages (USD per day)">
+          <ChartCell title={t("finance.ledger.charts.cashCollected")}>
             <ApexChart
               options={paidRevenueByDayOptions(theme, data.paidRevenueByDay.categories)}
-              series={[{ name: "Revenue", data: data.paidRevenueByDay.values }]}
+              series={[{ name: t("finance.ledger.chart.revenue"), data: data.paidRevenueByDay.values }]}
               type="area"
               height={CHART_HEIGHT}
               width="100%"
@@ -39,10 +44,10 @@ export function FinanceLedgerChartsPanel({ data }: Props) {
         </Grid>
 
         <Grid size={chartGridFinance}>
-          <ChartCell title="Teacher payout earned per delivered class (USD per day)">
+          <ChartCell title={t("finance.ledger.charts.teacherEarnings")}>
             <ApexChart
               options={teacherEarningsByDayOptions(theme, data.teacherEarningsByDay.categories)}
-              series={[{ name: "Earnings", data: data.teacherEarningsByDay.values }]}
+              series={[{ name: t("finance.ledger.chart.earned"), data: data.teacherEarningsByDay.values }]}
               type="line"
               height={CHART_HEIGHT}
               width="100%"
@@ -51,10 +56,10 @@ export function FinanceLedgerChartsPanel({ data }: Props) {
         </Grid>
 
         <Grid size={chartGridFinance}>
-          <ChartCell title="Package checkouts marked paid (count per day)">
+          <ChartCell title={t("finance.ledger.charts.paidCheckouts")}>
             <ApexChart
               options={dayCountBarOptions(theme, data.paidOrdersByDay.categories, theme.palette.secondary.main)}
-              series={[{ name: "Orders", data: data.paidOrdersByDay.values }]}
+              series={[{ name: t("finance.ledger.chart.orders"), data: data.paidOrdersByDay.values }]}
               type="bar"
               height={CHART_HEIGHT}
               width="100%"
@@ -63,10 +68,10 @@ export function FinanceLedgerChartsPanel({ data }: Props) {
         </Grid>
 
         <Grid size={chartGridFinance}>
-          <ChartCell title="Classes marked delivered with earnings (count per day)">
+          <ChartCell title={t("finance.ledger.charts.deliveredClasses")}>
             <ApexChart
               options={dayCountBarOptions(theme, data.classesDeliveredByDay.categories, theme.palette.success.dark)}
-              series={[{ name: "Delivered", data: data.classesDeliveredByDay.values }]}
+              series={[{ name: t("finance.ledger.chart.delivered"), data: data.classesDeliveredByDay.values }]}
               type="bar"
               height={CHART_HEIGHT}
               width="100%"
@@ -75,9 +80,9 @@ export function FinanceLedgerChartsPanel({ data }: Props) {
         </Grid>
 
         <Grid size={chartGridFinance}>
-          <ChartCell title="All-time revenue, earned, paid out, and unsettled teacher pay (USD)">
+          <ChartCell title={t("finance.ledger.charts.lifetimeTotals")}>
             <ApexChart
-              options={financeTotalsBarOptions(theme)}
+              options={financeTotalsBarOptions(theme, t)}
               series={[{ name: "USD", data: financeTotalsSeries(data) }]}
               type="bar"
               height={CHART_HEIGHT}

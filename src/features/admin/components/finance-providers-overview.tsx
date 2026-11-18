@@ -13,6 +13,7 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { adminBreadcrumb } from "@/features/admin/components/admin-breadcrumb-items";
 import { savePaymentProviderSettingsAction } from "@/features/admin/actions/payment-providers";
@@ -33,6 +34,7 @@ type Props = {
 };
 
 export function FinanceProvidersOverview({ providers, settings }: Props) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [draft, setDraft] = useState(settings);
@@ -69,14 +71,13 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Payment providers"
-        subtitle="Checkout for students and payout rails for teachers."
-        items={adminBreadcrumb("Finance", "Providers", "/admin/finance/providers")}
+        title={t("common.page.providers")}
+        subtitle={t("finance.providers.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.finance"), t("common.page.providersShort"), "/admin/finance/providers")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        API keys stay in environment variables (see Platform → Integrations). Toggles here control which
-        rails are active — no secrets in the browser.
+        {t("finance.providers.notice")}
       </Alert>
 
       <Grid container spacing={3}>
@@ -93,12 +94,17 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
                         <Typography variant="h6" fontWeight={700}>
                           {provider.name}
                         </Typography>
-                        <Chip label={provider.role} size="small" variant="outlined" sx={{ mt: 1 }} />
+                        <Chip
+                          label={provider.role}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mt: 1 }}
+                        />
                       </Box>
                       <Chip
                         size="small"
                         color={statusColor[provider.status]}
-                        label={provider.status.replace("-", " ")}
+                        label={t(`finance.providers.status.${provider.status}`)}
                       />
                     </Stack>
                     <Typography variant="caption" color="text.secondary">
@@ -116,12 +122,12 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
                             onChange={toggle(key)}
                           />
                         }
-                        label={draft[key] ? "Enabled for academy" : "Disabled"}
+                        label={t(draft[key] ? "finance.providers.enabledForAcademy" : "common.disabled")}
                       />
                     ) : null}
                     {key && !provider.envReady && key !== "manualPayoutEnabled" ? (
                       <Typography variant="caption" color="text.secondary">
-                        Configure Stripe in the server environment before enabling this rail.
+                        {t("finance.providers.configureStripe")}
                       </Typography>
                     ) : null}
                   </Stack>
@@ -134,7 +140,7 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
 
       <Stack direction="row" justifyContent="flex-end" mt={3}>
         <Button variant="contained" disabled={!dirty || pending} onClick={save}>
-          Save provider settings
+          {t("finance.providers.saveSettings")}
         </Button>
       </Stack>
     </Box>

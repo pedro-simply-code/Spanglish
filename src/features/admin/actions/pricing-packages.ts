@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import {
   deletePricingPackage,
   savePricingPackage,
@@ -26,12 +27,13 @@ function revalidatePricing() {
 }
 
 async function requireAdmin(): Promise<ActionResult | null> {
+  const t = await getTranslations("admin");
   const actor = await getActorWithPermission("platform:manage");
   if (!actor) {
     return {
       ok: false,
       code: "FORBIDDEN",
-      message: "Only the academy admin can change packages.",
+      message: t("actions.pricing.forbidden"),
     };
   }
   return null;
@@ -41,16 +43,16 @@ export async function savePricingPackageAction(
   input: PricingPackageInput,
   previousId?: string,
 ): Promise<ActionResult> {
+  const t = await getTranslations("admin");
   const denied = await requireAdmin();
   if (denied) return denied;
 
   const parsed = pricingPackageInputSchema.safeParse(input);
   if (!parsed.success) {
-    const issue = parsed.error.issues[0];
     return {
       ok: false,
-      code: issue?.path.join("_").toUpperCase() || "INVALID",
-      message: issue?.message ?? "Invalid package data.",
+      code: "INVALID",
+      message: t("actions.pricing.invalidData"),
     };
   }
 
@@ -70,16 +72,20 @@ export async function savePricingPackageAction(
   });
 
   revalidatePricing();
-  return { ok: true, message: previousId ? "Package updated." : "Package created." };
+  return {
+    ok: true,
+    message: previousId ? t("actions.pricing.updated") : t("actions.pricing.created"),
+  };
 }
 
 export async function deletePricingPackageAction(id: string): Promise<ActionResult> {
+  const t = await getTranslations("admin");
   const denied = await requireAdmin();
   if (denied) return denied;
 
   const trimmed = id.trim();
   if (!trimmed) {
-    return { ok: false, code: "INVALID", message: "Missing package id." };
+    return { ok: false, code: "INVALID", message: t("actions.pricing.missingId") };
   }
 
   const result = await deletePricingPackage(trimmed);
@@ -88,13 +94,14 @@ export async function deletePricingPackageAction(id: string): Promise<ActionResu
   }
 
   revalidatePricing();
-  return { ok: true, message: "Package removed." };
+  return { ok: true, message: t("actions.pricing.removed") };
 }
 
 /** Merge the built-in catalog from academy/data into pricing_packages. */
 export async function importDefaultPricingCatalogAction(
   scope: AdminPackageKindFilter = "all",
 ): Promise<ActionResult> {
+  const t = await getTranslations("admin");
   const denied = await requireAdmin();
   if (denied) return denied;
 
@@ -102,13 +109,15 @@ export async function importDefaultPricingCatalogAction(
   revalidatePricing();
   const count =
     scope === "all" ? academyPlans.length : academyPlans.filter((plan) => plan.type === scope).length;
-  const scopeLabel =
-    scope === "one-on-one" ? "individual" : scope === "paired" ? "paired" : "full";
+  const scopeLabel = t(
+    scope === "one-on-one"
+      ? "common.classType.individual"
+      : scope === "paired"
+        ? "common.classType.paired"
+        : "common.all",
+  );
   return {
     ok: true,
-    message:
-      count === 1
-        ? `Default ${scopeLabel} catalog imported (1 package).`
-        : `Default ${scopeLabel} catalog imported (${count} packages).`,
+    message: t("actions.pricing.imported", { scope: scopeLabel, count }),
   };
 }

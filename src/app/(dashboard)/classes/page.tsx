@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { loadClassesForActor } from "@/features/classes";
 import { ClassesOverview } from "@/features/classroom";
@@ -9,10 +10,13 @@ import { getClassPolicy } from "@/server/classes/class-policy";
 import { getActor } from "@/server/auth/session";
 import { listBalancesForStudent } from "@/server/credits/credits";
 
-export const metadata: Metadata = {
-  title: "My classes",
-  description: "Join, review, reschedule, or cancel your live classes",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("student");
+  return {
+    title: t("meta.classes.title"),
+    description: t("meta.classes.description"),
+  };
+}
 
 export default function ClassesPage() {
   return (
@@ -41,6 +45,7 @@ async function ClassesContent() {
       items={items}
       now={appNow()}
       viewMode={staffView ? "staff" : "student"}
+      viewerId={actor.userId}
       credits={
         balances?.map(({ classType, durationMinutes, balance, shared }) => ({
           classType,

@@ -25,18 +25,21 @@ import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconEye } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { SectionCard } from "@/components/ui/section-card";
 import { reviewMaterialAction } from "@/features/materials/actions";
-import { materialKindLabels, materialKindOptions } from "@/features/materials/data";
+import {
+  materialKindOptions,
+  localizeMaterials,
+} from "@/features/materials/data";
 import { MaterialKindChip } from "@/features/materials/components/material-kind-chip";
+import { formatMaterialDate, formatMaterialLevel } from "@/features/materials/format";
 import type { Material, MaterialKind } from "@/features/materials/types";
 import { DEFAULT_PAGE_SIZE, sliceForPage } from "@/lib/pagination";
 import { useAppToast } from "@/lib/use-app-toast";
-
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 const moderationColor = {
   pending: "warning",
@@ -45,11 +48,21 @@ const moderationColor = {
   none: "default",
 } as const;
 
+const moderationKeys: Record<NonNullable<Material["moderation"]>, string> = {
+  none: "moderation.none",
+  pending: "moderation.pending",
+  approved: "moderation.published",
+  rejected: "moderation.rejected",
+};
+
 type StatusTab = "open" | "history";
+type Translator = ReturnType<typeof useTranslations<"educator.materials">>;
 
 function MaterialDetailDialog({
   open,
   item,
+  t,
+  locale,
   pending,
   note,
   onNoteChange,
@@ -59,6 +72,8 @@ function MaterialDetailDialog({
 }: {
   open: boolean;
   item: Material | null;
+  t: Translator;
+  locale: string;
   pending: boolean;
   note: string;
   onNoteChange: (value: string) => void;
@@ -76,31 +91,40 @@ function MaterialDetailDialog({
         <Stack spacing={2} sx={{ mt: 0.5 }}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <MaterialKindChip kind={item.kind} />
-            <Chip size="small" variant="outlined" label={item.level} />
+            <Chip size="small" variant="outlined" label={formatMaterialLevel(item.level, t)} />
             {item.moderation && item.moderation !== "none" ? (
-              <Chip size="small" color={moderationColor[item.moderation]} label={item.moderation} />
+              <Chip
+                size="small"
+                color={moderationColor[item.moderation]}
+                label={t(moderationKeys[item.moderation])}
+              />
             ) : null}
           </Stack>
           <Typography variant="body2" color="text.secondary">
-            {item.ownerName} · updated {dateFormat.format(new Date(item.updatedAt))}
-            {item.reviewedAt ? ` · reviewed ${dateFormat.format(new Date(item.reviewedAt))}` : ""}
+            {t("moderation.updatedBy", {
+              name: item.ownerName,
+              date: formatMaterialDate(item.updatedAt, locale),
+            })}
+            {item.reviewedAt
+              ? t("moderation.reviewed", { date: formatMaterialDate(item.reviewedAt, locale) })
+              : ""}
           </Typography>
           <Typography variant="body2" whiteSpace="pre-line">
-            {item.description || "No description."}
+            {item.description || t("moderation.noDescription")}
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
             <LinkButton href={`/manager/materials/${item.id}`} size="small" variant="outlined">
-              Full preview
+              {t("moderation.fullPreview")}
             </LinkButton>
             {item.href ? (
               <LinkButton href={item.href} size="small" target="_blank" rel="noreferrer noopener">
-                Open link
+                {t("moderation.openLink")}
               </LinkButton>
             ) : null}
           </Stack>
           {item.reviewNote ? (
             <Box>
-              <Typography variant="subtitle2">Reviewer note</Typography>
+              <Typography variant="subtitle2">{t("moderation.reviewerNote")}</Typography>
               <Typography variant="body2" color="text.secondary">
                 {item.reviewNote}
               </Typography>
@@ -110,7 +134,7 @@ function MaterialDetailDialog({
             <TextField
               size="small"
               fullWidth
-              label="Note to the author (optional)"
+              label={t("moderation.noteToAuthor")}
               value={note}
               onChange={(event) => onNoteChange(event.target.value)}
             />
@@ -119,15 +143,15 @@ function MaterialDetailDialog({
       </DialogContent>
       <DialogActions sx={{ flexWrap: "wrap", gap: 1 }}>
         <Button onClick={onClose} disabled={pending}>
-          Close
+          {t("moderation.close")}
         </Button>
         {canReview ? (
           <>
             <Button color="error" disabled={pending} onClick={onReject}>
-              Reject
+              {t("moderation.reject")}
             </Button>
             <Button variant="contained" disabled={pending} onClick={onApprove}>
-              Publish
+              {t("moderation.publish")}
             </Button>
           </>
         ) : null}
@@ -137,6 +161,10 @@ function MaterialDetailDialog({
 }
 
 export function MaterialsModeration({ materials }: { materials: Material[] }) {
+  const t = useTranslations("educator.materials");
+  const shellT = useTranslations("educator");
+  const commonT = useTranslations("educator.common");
+  const locale = useLocale();
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -146,23 +174,26 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
-  const openCount = materials.filter((item) => item.moderation === "pending").length;
+  const rows = useMemo(() => localizeMaterials(materials, t), [materials, t]);
+  const openCount = rows.filter((item) => item.moderation === "pending").length;
 
   const filtered = useMemo(() => {
-    let rows = materials;
+    let visible = rows;
     if (statusTab === "open") {
-      rows = rows.filter((item) => item.moderation === "pending");
+      visible = visible.filter((item) => item.moderation === "pending");
     } else {
-      rows = rows.filter((item) => item.moderation === "approved" || item.moderation === "rejected");
+      visible = visible.filter(
+        (item) => item.moderation === "approved" || item.moderation === "rejected",
+      );
     }
-    if (kindFilter) rows = rows.filter((item) => item.kind === kindFilter);
-    return rows.sort(
+    if (kindFilter) visible = visible.filter((item) => item.kind === kindFilter);
+    return [...visible].sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     );
-  }, [materials, statusTab, kindFilter]);
+  }, [rows, statusTab, kindFilter]);
 
   const pageRows = sliceForPage(filtered, listPage, DEFAULT_PAGE_SIZE);
-  const detail = detailId ? materials.find((item) => item.id === detailId) ?? null : null;
+  const detail = detailId ? rows.find((item) => item.id === detailId) ?? null : null;
 
   const openDetail = (id: string, existingNote?: string | null) => {
     setDetailId(id);
@@ -183,9 +214,12 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Material review"
-        subtitle="Blog-style posts for the student library — open each one to preview the link, then publish."
-        items={[{ title: "Manager", to: "/manager" }, { title: "Material review" }]}
+        title={t("moderation.title")}
+        subtitle={t("moderation.subtitle")}
+        items={[
+          { title: shellT("shell.roles.manager"), to: "/manager" },
+          { title: t("moderation.title") },
+        ]}
       />
 
       <Tabs
@@ -196,31 +230,36 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
         }}
         sx={{ mb: 2 }}
       >
-        <Tab value="open" label={`Waiting for review (${openCount})`} />
-        <Tab value="history" label="History" />
+        <Tab
+          value="open"
+          label={t("moderation.awaitingCount", { count: openCount })}
+        />
+        <Tab value="history" label={t("moderation.history")} />
       </Tabs>
 
       <SectionCard
-        title={statusTab === "open" ? "Open materials" : "Reviewed materials"}
+        title={statusTab === "open" ? t("moderation.openMaterials") : t("moderation.reviewedMaterials")}
         subtitle={
-          kindFilter ? `Filtered: ${materialKindLabels[kindFilter] ?? kindFilter}` : "All kinds"
+          kindFilter
+            ? t("moderation.filtered", { kind: t(`kind.${kindFilter}`) })
+            : t("moderation.allKinds")
         }
         action={
           <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel id="materials-kind-filter">Kind</InputLabel>
+            <InputLabel id="materials-kind-filter">{t("library.type")}</InputLabel>
             <Select
               labelId="materials-kind-filter"
-              label="Kind"
+              label={t("library.type")}
               value={kindFilter}
               onChange={(event) => {
                 setKindFilter(event.target.value as "" | MaterialKind);
                 setListPage(1);
               }}
             >
-              <MenuItem value="">All kinds</MenuItem>
+              <MenuItem value="">{t("moderation.allKinds")}</MenuItem>
               {materialKindOptions.map((kind) => (
                 <MenuItem key={kind} value={kind}>
-                  {materialKindLabels[kind]}
+                  {t(`kind.${kind}`)}
                 </MenuItem>
               ))}
             </Select>
@@ -231,13 +270,17 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Author</TableCell>
-                <TableCell>Kind</TableCell>
-                <TableCell>Level</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>{statusTab === "open" ? "Submitted" : "Reviewed"}</TableCell>
-                <TableCell>View</TableCell>
-                {statusTab === "history" ? <TableCell>Status</TableCell> : null}
+                <TableCell>{t("moderation.author")}</TableCell>
+                <TableCell>{t("library.type")}</TableCell>
+                <TableCell>{commonT("level")}</TableCell>
+                <TableCell>{t("composer.title")}</TableCell>
+                <TableCell>
+                  {statusTab === "open"
+                    ? t("moderation.submitted")
+                    : t("moderation.reviewedDate")}
+                </TableCell>
+                <TableCell>{t("moderation.view")}</TableCell>
+                {statusTab === "history" ? <TableCell>{commonT("status")}</TableCell> : null}
                 <TableCell align="right"> </TableCell>
               </TableRow>
             </TableHead>
@@ -246,7 +289,7 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
                 <TableRow>
                   <TableCell colSpan={statusTab === "history" ? 8 : 7}>
                     <Typography variant="body2" color="text.secondary">
-                      No materials match this view.
+                      {t("moderation.noMatches")}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -259,22 +302,23 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
                   <TableCell>
                     <MaterialKindChip kind={item.kind} />
                   </TableCell>
-                  <TableCell>{item.level}</TableCell>
+                  <TableCell>{formatMaterialLevel(item.level, t)}</TableCell>
                   <TableCell sx={{ maxWidth: 240 }}>
                     <Typography variant="body2" noWrap title={item.title}>
                       {item.title}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    {dateFormat.format(
-                      new Date(
-                        statusTab === "history" && item.reviewedAt ? item.reviewedAt : item.updatedAt,
-                      ),
+                    {formatMaterialDate(
+                      statusTab === "history" && item.reviewedAt
+                        ? item.reviewedAt
+                        : item.updatedAt,
+                      locale,
                     )}
                   </TableCell>
                   <TableCell>
                     <LinkButton href={`/manager/materials/${item.id}`} size="small">
-                      Preview
+                      {t("moderation.preview")}
                     </LinkButton>
                   </TableCell>
                   {statusTab === "history" && item.moderation ? (
@@ -282,13 +326,13 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
                       <Chip
                         size="small"
                         color={moderationColor[item.moderation]}
-                        label={item.moderation}
+                        label={t(moderationKeys[item.moderation])}
                       />
                     </TableCell>
                   ) : null}
                   <TableCell align="right">
                     <IconButton
-                      aria-label={`Review ${item.title}`}
+                      aria-label={t("moderation.reviewMaterial", { title: item.title })}
                       size="small"
                       onClick={() => openDetail(item.id, item.reviewNote)}
                     >
@@ -307,6 +351,8 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
       <MaterialDetailDialog
         open={Boolean(detail)}
         item={detail}
+        t={t}
+        locale={locale}
         pending={pending}
         note={note}
         onNoteChange={setNote}

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { getActorWithPermission } from "@/server/auth/session";
 import { createDashboardLink, createOnboardingLink, payBatchWithStripe } from "@/server/payments/connect";
 import {
@@ -39,9 +40,10 @@ export async function previewPayoutAction(periodEnd: string) {
 
 /** Teacher: individual payout request (min $50, Stripe ready). */
 export async function requestTeacherPayoutAction(): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("classes:manage");
   if (!actor || !actor.roles.includes("teacher")) {
-    return { ok: false, message: "Only teachers can request payouts." };
+    return { ok: false, message: t("actions.onlyTeachersRequest") };
   }
   const result = await requestTeacherPayout(actor);
   if (result.ok) refresh();
@@ -49,35 +51,39 @@ export async function requestTeacherPayoutAction(): Promise<PayoutActionResult> 
 }
 
 export async function createPayoutBatchAction(input: { periodStart: string; periodEnd: string }): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:prepare");
-  if (!actor) return { ok: false, message: "Only managers and the admin prepare payouts." };
+  if (!actor) return { ok: false, message: t("actions.onlyManagersPrepare") };
   const result = await createPayoutBatch(actor, input);
   if (result.ok) refresh();
   return result;
 }
 
 export async function approvePayoutBatchAction(id: string): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:approve");
-  if (!actor) return { ok: false, message: "Only the admin approves payouts." };
+  if (!actor) return { ok: false, message: t("actions.onlyAdminApproves") };
   const result = await approvePayoutBatch(actor, id);
   if (result.ok) refresh();
   return result;
 }
 
 export async function rejectPayoutBatchAction(id: string, reason: string): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:approve");
-  if (!actor) return { ok: false, message: "Only the admin rejects payouts." };
+  if (!actor) return { ok: false, message: t("actions.onlyAdminRejects") };
   const result = await rejectPayoutBatch(actor, id, reason);
   if (result.ok) refresh();
   return result;
 }
 
 export async function markPayoutBatchPaidAction(id: string, reference: string): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:approve");
-  if (!actor) return { ok: false, message: "Only the admin marks payouts as paid." };
+  if (!actor) return { ok: false, message: t("actions.onlyAdminMarksPaid") };
   const settings = await getPaymentProviderSettings();
   if (!manualPayoutAllowed(settings)) {
-    return { ok: false, message: "Manual transfers are turned off in payment provider settings." };
+    return { ok: false, message: t("actions.manualTransfersOff") };
   }
   const result = await markPayoutBatchPaid(actor, id, reference);
   if (result.ok) refresh();
@@ -85,8 +91,9 @@ export async function markPayoutBatchPaidAction(id: string, reference: string): 
 }
 
 export async function savePayoutSettingsAction(input: PayoutSettings): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:approve");
-  if (!actor) return { ok: false, message: "Only the admin changes teacher rates." };
+  if (!actor) return { ok: false, message: t("actions.onlyAdminChangesRates") };
   const result = await savePayoutSettings(actor, input);
   if (result.ok) {
     revalidatePath("/admin/finance/teacher-rates");
@@ -97,41 +104,46 @@ export async function savePayoutSettingsAction(input: PayoutSettings): Promise<P
 
 /** Teacher: opens Stripe onboarding (creates the Connect account the first time). */
 export async function startStripeOnboardingAction(): Promise<{ ok: boolean; message: string; url?: string }> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("classes:manage");
-  if (!actor || !actor.roles.includes("teacher")) return { ok: false, message: "Only teachers connect Stripe." };
+  if (!actor || !actor.roles.includes("teacher")) return { ok: false, message: t("actions.onlyTeachersConnectStripe") };
   const settings = await getPaymentProviderSettings();
   if (!payoutUsesStripeConnect(settings)) {
-    return { ok: false, message: "Stripe Connect payouts are turned off." };
+    return { ok: false, message: t("actions.stripeConnectOff") };
   }
-  if (!stripeEnabled) return { ok: false, message: "Stripe is not configured yet." };
+  if (!stripeEnabled) return { ok: false, message: t("actions.stripeNotConfigured") };
   try {
-    return { ok: true, message: "Opening Stripe…", url: await createOnboardingLink(actor) };
+    return { ok: true, message: t("actions.openingStripe"), url: await createOnboardingLink(actor) };
   } catch (error) {
-    return { ok: false, message: stripeErrorMessage(error) };
+    return { ok: false, message: stripeErrorMessage(error, t("unknownStripeError")) };
   }
 }
 
 /** Teacher: Stripe Express dashboard (bank account, payout history). */
 export async function openStripeDashboardAction(): Promise<{ ok: boolean; message: string; url?: string }> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("classes:manage");
   const settings = await getPaymentProviderSettings();
-  if (!payoutUsesStripeConnect(settings)) return { ok: false, message: "Stripe Connect payouts are turned off." };
-  if (!actor || !stripeEnabled) return { ok: false, message: "Stripe is not available." };
+  if (!payoutUsesStripeConnect(settings)) return { ok: false, message: t("actions.stripeConnectOff") };
+  if (!actor || !stripeEnabled) return { ok: false, message: t("actions.stripeUnavailable") };
   try {
     const url = await createDashboardLink(actor);
-    return url ? { ok: true, message: "Opening Stripe…", url } : { ok: false, message: "Finish connecting Stripe first." };
+    return url
+      ? { ok: true, message: t("actions.openingStripe"), url }
+      : { ok: false, message: t("actions.finishConnectingStripe") };
   } catch (error) {
-    return { ok: false, message: stripeErrorMessage(error) };
+    return { ok: false, message: stripeErrorMessage(error, t("unknownStripeError")) };
   }
 }
 
 /** Admin: pays an approved batch with Stripe transfers. */
 export async function payBatchWithStripeAction(batchId: string): Promise<PayoutActionResult> {
+  const t = await getTranslations("educator.payouts");
   const actor = await getActorWithPermission("payouts:approve");
-  if (!actor) return { ok: false, message: "Only the admin sends payouts." };
+  if (!actor) return { ok: false, message: t("actions.onlyAdminSends") };
   const settings = await getPaymentProviderSettings();
-  if (!payoutUsesStripeConnect(settings)) return { ok: false, message: "Stripe Connect payouts are turned off." };
-  if (!stripeEnabled) return { ok: false, message: "Stripe is not configured." };
+  if (!payoutUsesStripeConnect(settings)) return { ok: false, message: t("actions.stripeConnectOff") };
+  if (!stripeEnabled) return { ok: false, message: t("actions.stripeNotConfiguredShort") };
   const result = await payBatchWithStripe(actor, batchId);
   refresh();
   return result;

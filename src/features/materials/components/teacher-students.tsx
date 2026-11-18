@@ -9,23 +9,44 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconMail, IconTargetArrow, IconUsers } from "@tabler/icons-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
-import { materialGrants } from "@/features/materials/data";
-import { teacherStudents } from "@/features/staff";
+import {
+  localizeMaterialGrants,
+  materialGrants,
+} from "@/features/materials/data";
+import { localizedTeacherStudents } from "@/features/staff";
 
-export function TeacherStudents() {
+export async function TeacherStudents() {
+  const t = await getTranslations("educator");
+  const locale = await getLocale();
+  const students = localizedTeacherStudents(t);
+  const grants = localizeMaterialGrants(materialGrants, (key) =>
+    t(`materials.${key}`),
+  );
+  const dateFormat = new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Students"
-        subtitle="Your roster, their goals, and the materials they currently have."
-        items={[{ title: "Teacher", to: "/teacher" }, { title: "Students" }]}
+        title={t("teacher.students.title")}
+        subtitle={t("teacher.students.subtitle")}
+        items={[
+          { title: t("shell.roles.teacher"), to: "/teacher" },
+          { title: t("teacher.students.title") },
+        ]}
       />
 
       <Grid container spacing={3}>
-        {teacherStudents.map((student) => {
-          const shared = materialGrants.filter(
+        {students.map((student) => {
+          const shared = grants.filter(
             (grant) =>
               grant.audience === "student" &&
               grant.audienceLabel === student.name,
@@ -43,7 +64,7 @@ export function TeacherStudents() {
                       <Box flexGrow={1} minWidth={0}>
                         <Typography variant="h5">{student.name}</Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {student.level} · next class {student.nextClass}
+                          {student.level} · {t("staff.teacherStudents.nextClass", { date: dateFormat.format(new Date(student.nextClassAt)) })}
                         </Typography>
                       </Box>
                       <LinkButton
@@ -51,7 +72,7 @@ export function TeacherStudents() {
                         size="small"
                         variant="outlined"
                       >
-                        Share material
+                        {t("staff.teacherStudents.shareMaterial")}
                       </LinkButton>
                     </Stack>
 
@@ -61,7 +82,7 @@ export function TeacherStudents() {
                       <IconTargetArrow size={18} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Learning goal
+                          {t("staff.teacherStudents.learningGoal")}
                         </Typography>
                         <Typography variant="subtitle2" fontWeight={600}>
                           {student.goal}
@@ -76,7 +97,7 @@ export function TeacherStudents() {
                         mb={0.75}
                       >
                         <Typography variant="caption" color="text.secondary">
-                          Course progress
+                          {t("staff.teacherStudents.courseProgress")}
                         </Typography>
                         <Typography variant="caption" fontWeight={600}>
                           {student.progress}%
@@ -91,13 +112,13 @@ export function TeacherStudents() {
 
                     <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
                       <Chip
-                        label={`${shared.length} personal materials`}
+                        label={t("staff.teacherStudents.personalMaterials", { count: shared.length })}
                         size="small"
                         variant="outlined"
                         icon={<IconUsers size={13} />}
                       />
                       <Chip
-                        label="Roster active"
+                        label={t("staff.teacherStudents.rosterActive")}
                         size="small"
                         color="success"
                         variant="outlined"
@@ -110,7 +131,7 @@ export function TeacherStudents() {
                         size="small"
                         variant="text"
                       >
-                        Assignments
+                        {t("teacher.assignments.title")}
                       </LinkButton>
                       <LinkButton
                         href="/apps/email"
@@ -118,7 +139,7 @@ export function TeacherStudents() {
                         variant="text"
                         startIcon={<IconMail size={14} />}
                       >
-                        Message
+                        {t("staff.teacherStudents.message")}
                       </LinkButton>
                     </Stack>
                   </Stack>

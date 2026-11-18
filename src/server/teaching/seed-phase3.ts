@@ -1,5 +1,8 @@
 import { and, eq, inArray, isNotNull, like, lt, sql } from "drizzle-orm";
-import { materials as mockMaterials } from "@/features/materials";
+// The seed runs outside Next.js: import the data module directly, because the
+// feature barrel pulls in server actions that import "server-only".
+// eslint-disable-next-line no-restricted-imports
+import { materials as mockMaterials } from "@/features/materials/data";
 import { seedAccounts } from "@/lib/demo-accounts";
 import { db } from "@/server/db";
 import {

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, gt } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AuthSession } from "@/lib/auth-types";
 import { hasRole } from "@/lib/auth-roles";
 import type {
@@ -90,45 +91,46 @@ function normalizeCredentials(input: TeacherApplicationCredential[] | undefined)
     .filter((item) => item.label.length >= 3);
 }
 
-export function validateApplication(input: ApplicationInput): string | null {
+export async function validateApplication(input: ApplicationInput): Promise<string | null> {
+  const t = await getTranslations("ops.teaching");
   if (input.track !== "conversation" && input.track !== "certified") {
-    return "Choose an application track.";
+    return t("validateTrack");
   }
   if (!["native", "c2", "other"].includes(input.fluency)) {
-    return "Choose your fluency level.";
+    return t("validateFluency");
   }
   if (input.fluency === "other" && (input.fluencyNote ?? "").trim().length < 10) {
-    return "Explain your fluency (at least 10 characters).";
+    return t("validateFluencyNote");
   }
   const years = Number(input.yearsTeaching);
   if (!Number.isFinite(years) || years < 0 || years > 60) {
-    return "Years teaching must be between 0 and 60.";
+    return t("validateYears");
   }
-  if ((input.headline ?? "").trim().length < 5) return "Add a headline (at least 5 characters).";
-  if ((input.bio ?? "").trim().length < 40) return "Tell us about yourself (at least 40 characters).";
-  if ((input.country ?? "").trim().length < 2) return "Add where you live.";
+  if ((input.headline ?? "").trim().length < 5) return t("validateHeadline");
+  if ((input.bio ?? "").trim().length < 40) return t("validateBio");
+  if ((input.country ?? "").trim().length < 2) return t("validateCountry");
   if ((input.experience ?? "").trim().length < 20) {
-    return "Describe your teaching experience (at least 20 characters).";
+    return t("validateExperience");
   }
   if (!Array.isArray(input.teaches) || !input.teaches.some((item) => languages.includes(item))) {
-    return "Choose the language you teach.";
+    return t("validateLanguages");
   }
 
   const video = httpsOptional(input.videoUrl);
   if (input.track === "conversation" && !video) {
-    return "Conversation track requires an intro video link (https://, e.g. YouTube or Loom).";
+    return t("validateVideoRequired");
   }
   if (input.videoUrl?.trim() && !video) {
-    return "The video link must start with https://.";
+    return t("validateVideoHttps");
   }
 
   const credentials = normalizeCredentials(input.credentials);
   if (input.track === "certified" && credentials.length === 0) {
-    return "Certified track requires at least one credential (type, name, optional link).";
+    return t("validateCredentialRequired");
   }
   for (const cred of credentials) {
     if (cred.url && !httpsOptional(cred.url)) {
-      return "Credential links must start with https://.";
+      return t("validateCredentialHttps");
     }
   }
 
@@ -173,10 +175,11 @@ export async function getMyApplication(actor: AuthSession) {
 }
 
 export async function submitApplication(actor: AuthSession, input: ApplicationInput) {
+  const t = await getTranslations("ops.teaching");
   if (!hasRole(actor.roles, "student")) {
-    return { ok: false as const, message: "Only student accounts can apply to teach." };
+    return { ok: false as const, message: t("onlyStudentsApply") };
   }
-  const error = validateApplication(input);
+  const error = await validateApplication(input);
   if (error) return { ok: false as const, message: error };
 
   const credentials = normalizeCredentials(input.credentials);
@@ -200,7 +203,7 @@ export async function submitApplication(actor: AuthSession, input: ApplicationIn
       videoUrl: video,
     });
   } catch {
-    return { ok: false as const, message: "You already have an application under review." };
+    return { ok: false as const, message: t("alreadyApplied") };
   }
 
   await recordAuditEvent({
@@ -212,7 +215,7 @@ export async function submitApplication(actor: AuthSession, input: ApplicationIn
   });
   await markTeacherInvitationSubmitted(actor.email, id);
   notifyRole("application-received", "manager", { name: actor.name });
-  return { ok: true as const, message: "Application sent. We will email you when it is reviewed." };
+  return { ok: true as const, message: t("applicationSent") };
 }
 
 export async function withdrawApplication(actor: AuthSession) {
@@ -249,12 +252,13 @@ export async function reviewApplication(
   actor: AuthSession,
   input: { applicationId: string; approve: boolean; note?: string },
 ) {
+  const t = await getTranslations("ops.teaching");
   const [row] = await db
     .select()
     .from(teacherApplications)
     .where(and(eq(teacherApplications.id, input.applicationId), eq(teacherApplications.status, "submitted")))
     .limit(1);
-  if (!row) return { ok: false as const, message: "This application was already reviewed." };
+  if (!row) return { ok: false as const, message: t("alreadyReviewed") };
   const note = input.note?.trim().slice(0, 1000) || null;
 
   if (input.approve) {
@@ -274,7 +278,7 @@ export async function reviewApplication(
     if (upcoming.length) {
       return {
         ok: false as const,
-        message: "The applicant still has upcoming classes as a student. Approve after those classes (or cancel them).",
+        message: t("applicantUpcomingClasses"),
       };
     }
 
@@ -314,8 +318,6 @@ export async function reviewApplication(
 
   return {
     ok: true as const,
-    message: input.approve
-      ? "Approved. The account is now a teacher account."
-      : "Application rejected. The applicant was notified.",
+    message: input.approve ? t("approvedAccount") : t("applicationRejected"),
   };
 }

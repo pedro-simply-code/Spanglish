@@ -10,6 +10,7 @@ import type {
   TeacherEarningsRow,
 } from "@/features/admin";
 import { listAllClasses } from "@/server/classes/class-repository";
+import type { AdminTranslator } from "@/server/admin/translator";
 import { listPricingPackageRows } from "@/server/pricing/packages";
 
 /** Share of student price paid to teachers for delivered classes (until earnings table exists). */
@@ -17,8 +18,8 @@ const TEACHER_PAYOUT_SHARE = 0.55;
 
 export type { AcademyEconomicsSnapshot, ManagerDashboardStat, TeacherEarningsRow };
 
-function formatUsd(amount: number) {
-  return new Intl.NumberFormat("en-US", {
+function formatUsd(amount: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
@@ -26,8 +27,8 @@ function formatUsd(amount: number) {
   }).format(amount);
 }
 
-function formatInt(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+function formatInt(value: number, locale: string) {
+  return new Intl.NumberFormat(locale).format(value);
 }
 
 function priceKey(item: LiveClass) {
@@ -203,34 +204,45 @@ export async function getAcademyEconomicsSnapshot(
   };
 }
 
-export function economicsToAdminStats(snapshot: AcademyEconomicsSnapshot): AdminStat[] {
+export function economicsToAdminStats(
+  snapshot: AcademyEconomicsSnapshot,
+  t: AdminTranslator,
+  locale: string,
+): AdminStat[] {
   return [
     {
       id: "taught",
-      label: "Classes delivered",
-      value: formatInt(snapshot.classesTaught),
-      helper: `${formatInt(snapshot.completed)} completed · ${snapshot.attendanceRatePct}% marked attended`,
+      label: t("adminStat.taught.label"),
+      value: formatInt(snapshot.classesTaught, locale),
+      helper: t("adminStat.taught.helper", {
+        completed: formatInt(snapshot.completed, locale),
+        attended: snapshot.attendanceRatePct,
+      }),
       href: "/admin/finance/ledger",
     },
     {
       id: "revenue",
-      label: "Gross revenue (delivered)",
-      value: formatUsd(snapshot.grossDeliveredUsd),
-      helper: `${formatUsd(snapshot.pipelineRevenueUsd)} booked in upcoming / in progress`,
+      label: t("adminStat.revenue.label"),
+      value: formatUsd(snapshot.grossDeliveredUsd, locale),
+      helper: t("adminStat.revenue.helper", {
+        pipeline: formatUsd(snapshot.pipelineRevenueUsd, locale),
+      }),
       href: "/admin/finance/ledger",
     },
     {
       id: "payouts",
-      label: "Teacher payouts (est.)",
-      value: formatUsd(snapshot.teacherPayoutUsd),
-      helper: `${Math.round(TEACHER_PAYOUT_SHARE * 100)}% of delivered tuition · unsettled`,
+      label: t("adminStat.payouts.label"),
+      value: formatUsd(snapshot.teacherPayoutUsd, locale),
+      helper: t("adminStat.payouts.helper", {
+        share: Math.round(TEACHER_PAYOUT_SHARE * 100),
+      }),
       href: "/admin/finance/payouts",
     },
     {
       id: "margin",
-      label: "Academy margin (est.)",
-      value: formatUsd(snapshot.academyMarginUsd),
-      helper: "Delivered revenue minus teacher share",
+      label: t("adminStat.margin.label"),
+      value: formatUsd(snapshot.academyMarginUsd, locale),
+      helper: t("adminStat.margin.helper"),
       href: "/admin/finance/ledger",
     },
   ];
@@ -240,6 +252,8 @@ export function economicsToManagerStats(
   snapshot: AcademyEconomicsSnapshot,
   activeStudents: number,
   teacherCount: number,
+  t: AdminTranslator,
+  locale: string,
 ): ManagerDashboardStat[] {
   const utilization =
     teacherCount === 0
@@ -252,82 +266,97 @@ export function economicsToManagerStats(
   return [
     {
       id: "students",
-      label: "Active students",
-      value: formatInt(activeStudents),
-      helper: "Accounts with student role",
+      label: t("managerStat.students.label"),
+      value: formatInt(activeStudents, locale),
+      helper: t("managerStat.students.helper"),
     },
     {
       id: "classes",
-      label: "Classes this week",
-      value: formatInt(snapshot.classesThisWeek),
-      helper: `${snapshot.attendanceRatePct}% attended (completed)`,
+      label: t("managerStat.classes.label"),
+      value: formatInt(snapshot.classesThisWeek, locale),
+      helper: t("managerStat.classes.helper", { attended: snapshot.attendanceRatePct }),
     },
     {
       id: "revenue",
-      label: "Revenue delivered",
-      value: formatUsd(snapshot.grossDeliveredUsd),
-      helper: `${formatUsd(snapshot.pipelineRevenueUsd)} in the pipeline`,
+      label: t("managerStat.revenue.label"),
+      value: formatUsd(snapshot.grossDeliveredUsd, locale),
+      helper: t("managerStat.revenue.helper", {
+        pipeline: formatUsd(snapshot.pipelineRevenueUsd, locale),
+      }),
     },
     {
       id: "utilization",
-      label: "Teacher utilization",
+      label: t("managerStat.utilization.label"),
       value: `${utilization}%`,
-      helper: `${formatInt(snapshot.classesThisWeek)} classes / ${teacherCount || 0} teachers`,
+      helper: t("managerStat.utilization.helper", {
+        classes: formatInt(snapshot.classesThisWeek, locale),
+        teachers: teacherCount || 0,
+      }),
     },
   ];
 }
 
 export function economicsToLedgerSnapshots(
   snapshot: AcademyEconomicsSnapshot,
+  t: AdminTranslator,
+  locale: string,
 ): LedgerSnapshot[] {
   return [
     {
       id: "delivered",
-      label: "Classes delivered",
-      value: formatInt(snapshot.classesTaught),
-      trend: `${formatInt(snapshot.creditsDelivered)} credits consumed`,
+      label: t("ledgerSnapshot.delivered.label"),
+      value: formatInt(snapshot.classesTaught, locale),
+      trend: t("ledgerSnapshot.delivered.trend", {
+        credits: formatInt(snapshot.creditsDelivered, locale),
+      }),
     },
     {
       id: "gross",
-      label: "Gross revenue (delivered)",
-      value: formatUsd(snapshot.grossDeliveredUsd),
-      trend: "From catalog price × booked credits",
+      label: t("ledgerSnapshot.gross.label"),
+      value: formatUsd(snapshot.grossDeliveredUsd, locale),
+      trend: t("ledgerSnapshot.gross.trend"),
     },
     {
       id: "payouts",
-      label: "Teacher earnings (unsettled)",
-      value: formatUsd(snapshot.teacherPayoutUsd),
-      trend: `${snapshot.teachers.length} teachers with delivered classes`,
+      label: t("ledgerSnapshot.payouts.label"),
+      value: formatUsd(snapshot.teacherPayoutUsd, locale),
+      trend: t("ledgerSnapshot.payouts.trend", { teachers: snapshot.teachers.length }),
     },
     {
       id: "pipeline",
-      label: "Pipeline (not delivered)",
-      value: formatUsd(snapshot.pipelineRevenueUsd),
-      trend: `${formatInt(snapshot.upcoming + snapshot.inProgress)} upcoming or live`,
+      label: t("ledgerSnapshot.pipeline.label"),
+      value: formatUsd(snapshot.pipelineRevenueUsd, locale),
+      trend: t("ledgerSnapshot.pipeline.trend", {
+        count: formatInt(snapshot.upcoming + snapshot.inProgress, locale),
+      }),
     },
     {
       id: "booked",
-      label: "Credits booked",
-      value: formatInt(snapshot.creditsBooked),
-      trend: `${formatInt(snapshot.canceled)} canceled (incl. refunds)`,
+      label: t("ledgerSnapshot.booked.label"),
+      value: formatInt(snapshot.creditsBooked, locale),
+      trend: t("ledgerSnapshot.booked.trend", {
+        count: formatInt(snapshot.canceled, locale),
+      }),
     },
     {
       id: "margin",
-      label: "Academy margin (est.)",
-      value: formatUsd(snapshot.academyMarginUsd),
-      trend: "Delivered revenue − teacher share",
+      label: t("ledgerSnapshot.margin.label"),
+      value: formatUsd(snapshot.academyMarginUsd, locale),
+      trend: t("ledgerSnapshot.margin.trend"),
     },
   ];
 }
 
 export function economicsToPayoutBatches(
   snapshot: AcademyEconomicsSnapshot,
+  t: AdminTranslator,
+  locale: string,
 ): PayoutBatch[] {
   if (snapshot.teacherPayoutUsd <= 0) {
     return [];
   }
 
-  const periodEnd = new Date(snapshot.nowIso).toLocaleDateString("en-US", {
+  const periodEnd = new Date(snapshot.nowIso).toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -336,9 +365,9 @@ export function economicsToPayoutBatches(
   return [
     {
       id: "batch-demo-est",
-      period: `Through ${periodEnd}`,
-      manager: "Estimated from live_classes",
-      totalUsd: formatUsd(snapshot.teacherPayoutUsd),
+      period: t("payoutBatch.period", { date: periodEnd }),
+      manager: t("payoutBatch.manager"),
+      totalUsd: formatUsd(snapshot.teacherPayoutUsd, locale),
       teachers: snapshot.teachers.filter((row) => row.payoutUsd > 0).length,
       status: "awaiting-approval",
     },

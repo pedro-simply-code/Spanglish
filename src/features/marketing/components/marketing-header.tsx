@@ -8,15 +8,10 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
+import { useTranslations } from "next-intl";
 import { SpanglishLogo } from "@/components/brand/spanglish-logo";
 import { LinkButton } from "@/components/ui/link-button";
-
-const navLinks = [
-  { label: "Programs", href: "#programs" },
-  { label: "Why Spanglish", href: "#features" },
-  { label: "Stories", href: "#testimonials" },
-  { label: "Pricing", href: "/packages" },
-] as const;
+import { getMarketingHeaderNav } from "@/features/marketing/data";
 
 const SCROLL_ELEVATION_THRESHOLD = 8;
 
@@ -59,6 +54,8 @@ const HeaderZone = styled(Box)(({ theme }) => ({
 }));
 
 function NavMenu({ onNavigate }: { onNavigate?: () => void }) {
+  const t = useTranslations("marketing");
+
   return (
     <Stack
       component="nav"
@@ -69,9 +66,9 @@ function NavMenu({ onNavigate }: { onNavigate?: () => void }) {
       useFlexGap
       justifyContent="center"
     >
-      {navLinks.map((item) => (
+      {getMarketingHeaderNav(t).map((item) => (
         <Link
-          key={item.label}
+          key={item.href}
           href={item.href}
           underline="hover"
           color="text.secondary"
@@ -87,6 +84,8 @@ function NavMenu({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function AuthActions() {
+  const t = useTranslations("marketing");
+
   return (
     <Stack direction="row" spacing={1} alignItems="center" flexWrap="nowrap" useFlexGap>
       <LinkButton
@@ -96,10 +95,10 @@ function AuthActions() {
         color="secondary"
         sx={{ whiteSpace: "nowrap", borderColor: "divider" }}
       >
-        Sign in
+        {t("common.signIn")}
       </LinkButton>
       <LinkButton href="/register" variant="contained" size="small" sx={{ whiteSpace: "nowrap" }}>
-        Get started
+        {t("common.getStarted")}
       </LinkButton>
     </Stack>
   );

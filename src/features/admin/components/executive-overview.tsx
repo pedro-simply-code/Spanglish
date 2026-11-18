@@ -13,7 +13,9 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconAlertTriangle, IconArrowRight, IconX } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { adminAuditActionKeys } from "@/features/admin/components/audit-action-keys";
 import { AdminOverviewChartsPanel } from "@/features/admin/components/admin-overview-charts";
 import { AdminOverviewToolbar } from "@/features/admin/components/admin-overview-toolbar";
 import { LinkButton } from "@/components/ui/link-button";
@@ -23,23 +25,6 @@ import type {
   AdminStat,
   DashboardAuditRow,
 } from "@/features/admin/types";
-
-const auditActionLabels: Record<string, string> = {
-  "auth.sign_up": "Account created",
-  "auth.sign_in": "Signed in",
-  "auth.sign_in_failed": "Failed sign-in",
-  "auth.rate_limited": "Rate limit hit",
-  "auth.email_verified": "Email verified",
-  "auth.password_changed": "Password changed",
-  "auth.password_reset": "Password reset",
-  "auth.two_factor_enabled": "2FA enabled",
-  "auth.two_factor_disabled": "2FA disabled",
-  "auth.sessions_revoked": "Sessions revoked",
-  "role.admin_granted": "Admin role granted",
-  "role.admin_revoked": "Admin role removed",
-  "email.bounced": "Email bounced",
-  "profile.completed": "Onboarding completed",
-};
 
 type ExecutiveOverviewProps = {
   firstName: string;
@@ -66,6 +51,7 @@ function MetricCard({
   stat: AdminStat;
   accent?: "primary" | "success";
 }) {
+  const t = useTranslations("admin");
   const valueColor = accent === "success" ? "success.dark" : "primary.main";
   return (
     <Card
@@ -94,7 +80,7 @@ function MetricCard({
             sx={{ mt: 1, px: 0 }}
             endIcon={<IconArrowRight size={14} />}
           >
-            Open
+            {t("common.open")}
           </LinkButton>
         ) : null}
       </CardContent>
@@ -103,6 +89,7 @@ function MetricCard({
 }
 
 function AlertRow({ alert }: { alert: AdminAlert }) {
+  const t = useTranslations("admin");
   return (
     <Stack
       direction={{ xs: "column", sm: "row" }}
@@ -115,7 +102,11 @@ function AlertRow({ alert }: { alert: AdminAlert }) {
           <Typography variant="subtitle2" fontWeight={600}>
             {alert.title}
           </Typography>
-          <Chip size="small" color={severityColor[alert.severity]} label={alert.severity} />
+          <Chip
+            size="small"
+            color={severityColor[alert.severity]}
+            label={t(`common.severity.${alert.severity}`)}
+          />
         </Stack>
         <Typography variant="body2" color="text.secondary" mt={0.5}>
           {alert.detail}
@@ -123,7 +114,7 @@ function AlertRow({ alert }: { alert: AdminAlert }) {
       </Box>
       {alert.href ? (
         <LinkButton href={alert.href} size="small" endIcon={<IconArrowRight size={14} />}>
-          Open
+          {t("common.open")}
         </LinkButton>
       ) : null}
     </Stack>
@@ -131,6 +122,8 @@ function AlertRow({ alert }: { alert: AdminAlert }) {
 }
 
 function ActivityRow({ entry }: { entry: DashboardAuditRow }) {
+  const t = useTranslations("admin");
+  const key = adminAuditActionKeys[entry.action];
   return (
     <Stack
       direction={{ xs: "column", sm: "row" }}
@@ -141,10 +134,14 @@ function ActivityRow({ entry }: { entry: DashboardAuditRow }) {
       <Box>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
           <Typography variant="subtitle2" fontWeight={600}>
-            {auditActionLabels[entry.action] ?? entry.action}
+            {key ? t(key) : entry.action}
           </Typography>
           {entry.severity !== "info" ? (
-            <Chip size="small" color={severityColor[entry.severity]} label={entry.severity} />
+            <Chip
+              size="small"
+              color={severityColor[entry.severity]}
+              label={t(`common.severity.${entry.severity}`)}
+            />
           ) : null}
         </Stack>
         <Typography variant="body2" color="text.secondary">
@@ -159,11 +156,12 @@ function ActivityRow({ entry }: { entry: DashboardAuditRow }) {
 }
 
 function ModalTitle({ title, onClose }: { title: string; onClose: () => void }) {
+  const t = useTranslations("admin");
   return (
     <DialogTitle sx={{ pr: 6 }}>
       {title}
       <IconButton
-        aria-label="Close"
+        aria-label={t("common.close")}
         onClick={onClose}
         sx={{ position: "absolute", right: 12, top: 12 }}
       >
@@ -182,6 +180,7 @@ export function ExecutiveOverview({
   activity,
   topMargin = 0,
 }: ExecutiveOverviewProps) {
+  const t = useTranslations("admin");
   const welcomeName = [firstName, lastName.trim()].filter(Boolean).join(" ");
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -189,8 +188,8 @@ export function ExecutiveOverview({
   return (
     <Box mt={topMargin}>
       <Breadcrumb
-        title={`Welcome back, ${welcomeName}`}
-        subtitle="Here's today's snapshot of Spanglish — revenue, enrollments, and anything that needs your attention."
+        title={t("overview.welcome", { name: welcomeName })}
+        subtitle={t("overview.subtitle")}
       />
 
       <AdminOverviewToolbar
@@ -213,11 +212,11 @@ export function ExecutiveOverview({
       </Grid>
 
       <Dialog open={alertsOpen} onClose={() => setAlertsOpen(false)} fullWidth maxWidth="md">
-        <ModalTitle title="Platform health" onClose={() => setAlertsOpen(false)} />
+        <ModalTitle title={t("overview.toolbar.platformHealth")} onClose={() => setAlertsOpen(false)} />
         <DialogContent dividers>
           {alerts.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No open alerts. Integrations, email, and security look clear from current data.
+              {t("overview.healthEmpty")}
             </Typography>
           ) : (
             <Stack spacing={2.5}>
@@ -230,11 +229,11 @@ export function ExecutiveOverview({
       </Dialog>
 
       <Dialog open={activityOpen} onClose={() => setActivityOpen(false)} fullWidth maxWidth="md">
-        <ModalTitle title="Latest activity" onClose={() => setActivityOpen(false)} />
+        <ModalTitle title={t("overview.toolbar.latestActivity")} onClose={() => setActivityOpen(false)} />
         <DialogContent dividers>
           {activity.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No audit events yet.
+              {t("overview.activityEmpty")}
             </Typography>
           ) : (
             <Stack spacing={2.5}>
@@ -249,7 +248,7 @@ export function ExecutiveOverview({
             sx={{ mt: 2 }}
             endIcon={<IconArrowRight size={14} />}
           >
-            Open full audit log
+            {t("overview.openAuditLog")}
           </LinkButton>
         </DialogContent>
       </Dialog>
@@ -257,7 +256,7 @@ export function ExecutiveOverview({
       <Stack direction="row" spacing={1} alignItems="center" color="text.secondary" mt={3}>
         <IconAlertTriangle size={16} />
         <Typography variant="caption">
-          Platform KPIs and operations charts load from PostgreSQL. Finance trends and margin detail are on Credit ledger.
+          {t("overview.dataNote")}
         </Typography>
       </Stack>
     </Box>

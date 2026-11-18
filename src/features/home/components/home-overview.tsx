@@ -6,195 +6,214 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
-import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import {
   IconArrowRight,
-  IconBook,
+  IconBolt,
   IconCalendarEvent,
   IconCards,
-  IconCheck,
+  IconChecklist,
+  IconClock,
   IconFlame,
-  IconHeadphones,
-  IconPlayerPlay,
+  IconMedal,
+  IconNotebook,
+  IconSchool,
+  IconStar,
   IconTargetArrow,
   IconTrophy,
   IconVideo,
 } from "@tabler/icons-react";
+import { useFormatter, useTranslations } from "next-intl";
 import { WeeklyActivityChart } from "@/components/charts/weekly-activity-chart";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
 import { formatClassType } from "@/features/classes/format";
-import {
-  dailyGoal,
-  featuredLesson,
-  homeStats,
-  latestAchievement,
-  liveClass,
-  livePackage,
-  nextAchievement,
-  reviewWords,
-  todayPlan,
-  wordsToReview,
-} from "@/features/home/data";
-import type { HomeStatIcon, PlanTaskIcon } from "@/features/home/data";
-import { skills, weeklyActivity } from "@/features/progress";
+import type { ClassType } from "@/features/academy/data";
+import type {
+  AssignmentSummary,
+  LessonEntry,
+  StudentAchievement,
+  StudentInsights,
+} from "@/lib/learning-types";
 
-const statIcons: Record<HomeStatIcon, ComponentType<{ size?: number }>> = {
+const achievementIcons: Record<StudentAchievement["icon"], ComponentType<{ size?: number }>> = {
+  trophy: IconTrophy,
   flame: IconFlame,
+  star: IconStar,
+  bolt: IconBolt,
   target: IconTargetArrow,
-  cards: IconCards,
-  book: IconBook,
+  medal: IconMedal,
 };
 
-const planIcons: Record<PlanTaskIcon, ComponentType<{ size?: number }>> = {
-  cards: IconCards,
-  book: IconBook,
-  headphones: IconHeadphones,
+export type HomeNextClass = {
+  id: string;
+  topic: string;
+  teacherName: string;
+  teacherAvatar: string;
+  startsAt: string;
+  durationMinutes: number;
+  type: ClassType;
+  /** The classroom is open now. */
+  canJoin: boolean;
+};
+
+export type HomeBalance = {
+  classType: ClassType;
+  durationMinutes: number;
+  balance: number;
+  shared: boolean;
 };
 
 type HomeOverviewProps = {
   firstName: string;
+  timeZone: string;
+  nextClass: HomeNextClass | null;
+  upcomingCount: number;
+  balances: HomeBalance[];
+  insights: StudentInsights;
+  pendingAssignments: AssignmentSummary[];
+  lastLesson: LessonEntry | null;
 };
 
-export function HomeOverview({ firstName }: HomeOverviewProps) {
-  const completedTasks = todayPlan.filter((task) => task.done).length;
+/** The student's home: next class, credits, what to do now, and real progress. */
+export function HomeOverview({
+  firstName,
+  timeZone,
+  nextClass,
+  upcomingCount,
+  balances,
+  insights,
+  pendingAssignments,
+  lastLesson,
+}: HomeOverviewProps) {
+  const t = useTranslations("student.learn.home");
+  const tStudent = useTranslations("student");
+  const tAch = useTranslations("student.learn.achievements");
+  const format = useFormatter();
+  const date = (iso: string) =>
+    format.dateTime(new Date(iso), { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", timeZone });
+  const credits = balances.reduce((sum, item) => sum + item.balance, 0);
+  const nextAchievement = insights.achievements.find((item) => !item.unlocked) ?? null;
+
+  const stats = [
+    { key: "classes", value: insights.classesCompleted, icon: IconSchool, color: "primary" },
+    { key: "streak", value: insights.weekStreak, icon: IconFlame, color: "warning" },
+    { key: "words", value: insights.wordsDue, icon: IconCards, color: "secondary" },
+    { key: "practice", value: insights.assignmentsPending, icon: IconChecklist, color: "success" },
+  ] as const;
+
+  const todo: { key: string; label: string; href: string; icon: ComponentType<{ size?: number }> }[] = [];
+  if (nextClass?.canJoin) {
+    todo.push({ key: "join", label: t("todo.join", { topic: nextClass.topic }), href: `/classes/${nextClass.id}/room`, icon: IconVideo });
+  }
+  for (const assignment of pendingAssignments) {
+    todo.push({
+      key: assignment.id,
+      label: assignment.dueAt
+        ? t("todo.practiceDue", { title: assignment.title, date: date(assignment.dueAt) })
+        : t("todo.practice", { title: assignment.title }),
+      href: `/practice/${assignment.id}`,
+      icon: IconChecklist,
+    });
+  }
+  if (insights.wordsDue) {
+    todo.push({ key: "words", label: t("todo.words", { count: insights.wordsDue }), href: "/vocabulary", icon: IconCards });
+  }
+  if (lastLesson?.homework) {
+    todo.push({ key: "homework", label: t("todo.homework", { topic: lastLesson.topic }), href: `/classes/${lastLesson.id}`, icon: IconNotebook });
+  }
+  if (!nextClass) {
+    todo.push({ key: "book", label: t("todo.book"), href: "/schedule", icon: IconCalendarEvent });
+  }
 
   return (
     <Box mt={3}>
-      <Breadcrumb
-        title={`Learning overview, ${firstName}`}
-        subtitle="Your plan for today while the Student dashboard is active. Switch roles from the top bar to open Teacher, Manager, or Admin."
-      />
+      <Breadcrumb title={tStudent("home.breadcrumbTitle", { firstName })} subtitle={t("subtitle")} />
 
       <Grid container spacing={3}>
         <Grid size={12}>
-          <Card
-            elevation={9}
-            sx={{
-              background: "linear-gradient(120deg, #FFFFFF 0%, #FBF2EF 100%)",
-            }}
-          >
+          <Card elevation={9} sx={{ background: "linear-gradient(120deg, #FFFFFF 0%, #FBF2EF 100%)" }}>
             <CardContent sx={{ p: { xs: "30px", md: "35px" } }}>
               <Grid container spacing={3} alignItems="center">
                 <Grid size={{ xs: 12, md: 7 }}>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    alignItems="center"
-                    mb={2}
-                  >
+                  <Stack direction="row" spacing={2} alignItems="center" mb={2}>
                     <Avatar
-                      sx={{
-                        width: 52,
-                        height: 52,
-                        bgcolor: "primary.main",
-                        color: "#fff",
-                      }}
+                      src={nextClass?.teacherAvatar}
+                      sx={{ width: 52, height: 52, bgcolor: "primary.main", color: "#fff" }}
                     >
                       <IconCalendarEvent size={26} />
                     </Avatar>
                     <Box>
                       <Chip
-                        label="Live classes"
-                        color="primary"
+                        label={nextClass?.canJoin ? t("liveNow") : t("nextClassChip")}
+                        color={nextClass?.canJoin ? "error" : "primary"}
                         size="small"
-                        variant="outlined"
+                        variant={nextClass?.canJoin ? "filled" : "outlined"}
                       />
                       <Typography variant="h5" mt={0.75}>
-                        Next class with {liveClass.teacherName}
+                        {nextClass ? nextClass.topic : t("noNextClass")}
                       </Typography>
                     </Box>
                   </Stack>
-
-                  <Typography color="text.secondary" mb={2.5}>
-                    {liveClass.shortDate} at {liveClass.time} ·{" "}
-                    {liveClass.duration} min ·{" "}
-                    {formatClassType(liveClass.type)} ·{" "}
-                    {liveClass.topic}
-                  </Typography>
-
-                  <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={2}
-                  >
-                    <LinkButton
-                      href="/classes"
-                      variant="contained"
-                      startIcon={<IconVideo size={18} />}
-                    >
-                      My classes
-                    </LinkButton>
-                    <LinkButton
-                      href="/schedule"
-                      variant="outlined"
-                      startIcon={<IconCalendarEvent size={18} />}
-                    >
-                      Book a class
-                    </LinkButton>
-                    <LinkButton href="/pricing" variant="outlined">
-                      View plans
+                  {nextClass ? (
+                    <Typography color="text.secondary" mb={2.5}>
+                      {date(nextClass.startsAt)} · {t("with", { name: nextClass.teacherName })} ·{" "}
+                      {tStudent("common.minutes", { count: nextClass.durationMinutes })} ·{" "}
+                      {formatClassType(nextClass.type, tStudent)}
+                      {upcomingCount > 1 ? ` · ${t("moreUpcoming", { count: upcomingCount - 1 })}` : ""}
+                    </Typography>
+                  ) : (
+                    <Typography color="text.secondary" mb={2.5}>
+                      {t("noNextClassHint")}
+                    </Typography>
+                  )}
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    {nextClass ? (
+                      <LinkButton
+                        href={nextClass.canJoin ? `/classes/${nextClass.id}/room` : `/classes/${nextClass.id}`}
+                        variant="contained"
+                        startIcon={<IconVideo size={18} />}
+                      >
+                        {nextClass.canJoin ? t("join") : t("viewClass")}
+                      </LinkButton>
+                    ) : null}
+                    <LinkButton href="/schedule" variant="outlined" startIcon={<IconCalendarEvent size={18} />}>
+                      {tStudent("actions.bookClass")}
                     </LinkButton>
                   </Stack>
                 </Grid>
-
                 <Grid size={{ xs: 12, md: 5 }}>
-                  <Box
-                    sx={{
-                      p: 3,
-                      bgcolor: "background.paper",
-                      border: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="flex-start"
-                      spacing={2}
-                    >
-                      <Box>
-                        <Typography variant="body2" color="text.secondary">
-                          Active package
+                  <Box sx={{ p: 3, bgcolor: "background.paper", border: "1px solid", borderColor: "divider" }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("credits")}
+                    </Typography>
+                    <Typography variant="h4" fontWeight={700} mb={1}>
+                      {t("classesLeft", { count: credits })}
+                    </Typography>
+                    <Stack spacing={0.5} mb={2}>
+                      {balances.map((item) => (
+                        <Typography key={`${item.classType}-${item.durationMinutes}-${item.shared}`} variant="body2" color="text.secondary">
+                          {t("balanceLine", {
+                            count: item.balance,
+                            minutes: item.durationMinutes,
+                            type: formatClassType(item.classType, tStudent),
+                          })}
+                          {item.shared ? ` · ${t("shared")}` : ""}
                         </Typography>
-                        <Typography variant="h4" fontWeight={700}>
-                          {livePackage.classesRemaining} classes left
-                        </Typography>
-                      </Box>
-                      <Avatar
-                        src={liveClass.teacherAvatar}
-                        alt={liveClass.teacherName}
-                        sx={{ width: 40, height: 40 }}
-                      />
+                      ))}
                     </Stack>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      mb={2}
-                    >
-                      {livePackage.plan.classes}-class package ·{" "}
-                      {livePackage.plan.duration} min ·{" "}
-                      {formatClassType(livePackage.plan.type)}
-                    </Typography>
-
-                    <LinearProgress
-                      variant="determinate"
-                      value={
-                        (livePackage.classesRemaining /
-                          livePackage.plan.classes) *
-                        100
-                      }
-                      sx={{ height: 8, borderRadius: 4 }}
-                    />
-
-                    <Typography variant="body2" color="text.secondary" mt={1}>
-                      Renews {livePackage.renewalDate}
-                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                      <LinkButton href="/pricing" size="small" variant={credits ? "outlined" : "contained"}>
+                        {t("buy")}
+                      </LinkButton>
+                      <LinkButton href="/credits" size="small" variant="text">
+                        {t("history")}
+                      </LinkButton>
+                    </Stack>
                   </Box>
                 </Grid>
               </Grid>
@@ -202,124 +221,22 @@ export function HomeOverview({ firstName }: HomeOverviewProps) {
           </Card>
         </Grid>
 
-        <Grid size={12}>
-          <Card
-            elevation={9}
-            sx={{
-              background: "linear-gradient(135deg, #FBF2EF 0%, #FFFFFF 62%)",
-              overflow: "hidden",
-            }}
-          >
-            <CardContent sx={{ p: { xs: "30px", md: "40px" } }}>
-              <Grid container spacing={3} alignItems="center">
-                <Grid size={{ xs: 12, md: 8 }}>
-                  <Chip label="Continue learning" color="primary" size="small" />
-                  <Typography variant="h3" fontWeight={700} mt={2}>
-                    {featuredLesson.title}
-                  </Typography>
-                  <Typography color="text.secondary" mt={1}>
-                    {featuredLesson.level} · {featuredLesson.duration} · Lesson{" "}
-                    {featuredLesson.id}
-                  </Typography>
-
-                  <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={2}
-                    mt={3}
-                  >
-                    <LinkButton
-                      href="/lessons"
-                      variant="contained"
-                      color="primary"
-                      startIcon={<IconPlayerPlay size={18} />}
-                    >
-                      Resume lesson
-                    </LinkButton>
-                    <LinkButton
-                      href="/practice"
-                      variant="outlined"
-                      color="primary"
-                    >
-                      Practice 5 min
-                    </LinkButton>
-                  </Stack>
-
-                  <Box mt={3} maxWidth={460}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      mb={0.75}
-                    >
-                      <Typography variant="body2" color="text.secondary">
-                        Lesson progress
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {featuredLesson.progress}%
-                      </Typography>
-                    </Stack>
-                    <LinearProgress
-                      variant="determinate"
-                      value={featuredLesson.progress}
-                      sx={{ height: 8, borderRadius: 4 }}
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid
-                  size={{ xs: 12, md: 4 }}
-                  sx={{
-                    display: { xs: "none", md: "flex" },
-                    justifyContent: "center",
-                  }}
-                >
-                  <Avatar
-                    sx={{
-                      width: 160,
-                      height: 160,
-                      bgcolor: "primary.main",
-                      color: "#fff",
-                      boxShadow: "0 12px 24px -4px rgba(250,137,107,0.35)",
-                    }}
-                  >
-                    <IconBook size={72} />
-                  </Avatar>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {homeStats.map((stat) => {
-          const Icon = statIcons[stat.icon];
-
+        {stats.map((stat) => {
+          const Icon = stat.icon;
           return (
-            <Grid key={stat.id} size={{ xs: 12, sm: 6, lg: 3 }}>
-              <Card elevation={9} sx={{ height: "100%" }}>
-                <CardContent sx={{ p: "30px" }}>
+            <Grid key={stat.key} size={{ xs: 12, sm: 6, lg: 3 }}>
+              <Card elevation={9}>
+                <CardContent sx={{ p: "24px" }}>
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        bgcolor: `${stat.color}.light`,
-                        color: `${stat.color}.main`,
-                      }}
-                    >
+                    <Avatar sx={{ bgcolor: `${stat.color}.light`, color: `${stat.color}.main`, width: 48, height: 48 }}>
                       <Icon size={24} />
                     </Avatar>
-                    <Box minWidth={0}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        {stat.title}
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        color={`${stat.color}.main`}
-                      >
+                    <Box>
+                      <Typography variant="h4" fontWeight={700}>
                         {stat.value}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {stat.helper}
+                        {t(`stat.${stat.key}`)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -330,251 +247,116 @@ export function HomeOverview({ firstName }: HomeOverviewProps) {
         })}
 
         <Grid size={{ xs: 12, lg: 5 }}>
-          <SectionCard
-            title="Today's plan"
-            subtitle="Three small wins"
-            action={
-              <Chip
-                label={`${completedTasks}/${todayPlan.length} done`}
-                color="primary"
-                size="small"
-                variant="outlined"
-              />
-            }
-          >
-            <Stack spacing={2}>
-              {todayPlan.map((task) => {
-                const Icon = planIcons[task.icon];
-
-                return (
-                  <Stack
-                    key={task.id}
-                    direction="row"
-                    spacing={2}
-                    alignItems="center"
-                    sx={{
-                      p: 1.5,
-                      bgcolor: task.done ? "success.light" : "grey.100",
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        bgcolor: task.done ? "success.main" : "background.paper",
-                        color: task.done ? "#fff" : "primary.main",
-                      }}
-                    >
-                      {task.done ? <IconCheck size={20} /> : <Icon size={20} />}
-                    </Avatar>
-
-                    <Box flexGrow={1} minWidth={0}>
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {task.title}
+          <SectionCard title={t("todoTitle")} subtitle={t("todoSubtitle")}>
+            {todo.length ? (
+              <Stack spacing={1.5}>
+                {todo.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Stack key={item.key} direction="row" spacing={1.5} alignItems="center">
+                      <Avatar sx={{ bgcolor: "grey.100", color: "text.primary", width: 36, height: 36 }}>
+                        <Icon size={18} />
+                      </Avatar>
+                      <Typography variant="body2" flexGrow={1}>
+                        {item.label}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {task.description}
-                      </Typography>
-                    </Box>
-
-                    <Stack alignItems="flex-end" spacing={0.5}>
-                      <Typography variant="body2" color="text.secondary">
-                        {task.minutes} min
-                      </Typography>
-                      {task.done ? (
-                        <Typography
-                          variant="body2"
-                          color="success.main"
-                          fontWeight={600}
-                        >
-                          Done
-                        </Typography>
-                      ) : (
-                        <LinkButton
-                          size="small"
-                          href={task.href}
-                          endIcon={<IconArrowRight size={14} />}
-                        >
-                          Start
-                        </LinkButton>
-                      )}
+                      <LinkButton href={item.href} size="small" variant="text" endIcon={<IconArrowRight size={14} />}>
+                        {t("go")}
+                      </LinkButton>
                     </Stack>
-                  </Stack>
-                );
-              })}
-            </Stack>
+                  );
+                })}
+              </Stack>
+            ) : (
+              <Typography color="text.secondary">{t("allDone")}</Typography>
+            )}
           </SectionCard>
         </Grid>
 
         <Grid size={{ xs: 12, lg: 7 }}>
-          <SectionCard
-            title="Weekly activity"
-            subtitle="Minutes studied per day"
-            action={
-              <Chip
-                label={`${dailyGoal.completed}/${dailyGoal.target} min today`}
-                color="secondary"
-                size="small"
-                variant="outlined"
-              />
-            }
-          >
+          <SectionCard title={t("weekTitle")} subtitle={t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })}>
             <WeeklyActivityChart
-              categories={weeklyActivity.categories}
-              data={weeklyActivity.minutes}
-              height={300}
+              categories={insights.weeklyMinutes.map((day) =>
+                format.dateTime(new Date(`${day.date}T12:00:00Z`), { weekday: "short", timeZone: "UTC" }),
+              )}
+              data={insights.weeklyMinutes.map((day) => day.minutes)}
+              height={240}
+              label={t("minutesLabel")}
             />
           </SectionCard>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard
-            title="Vocabulary review"
-            subtitle={`${wordsToReview} words due today`}
-            action={
-              <LinkButton
-                size="small"
-                href="/vocabulary"
-                endIcon={<IconArrowRight size={14} />}
-              >
-                Review all
-              </LinkButton>
-            }
-          >
-            <Stack spacing={2}>
-              {reviewWords.map((word) => (
-                <Box key={word.id} sx={{ p: 1.5, bgcolor: "grey.100" }}>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="flex-start"
-                    spacing={1}
-                  >
-                    <Box minWidth={0}>
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {word.term}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {word.translation}
-                      </Typography>
-                    </Box>
-                    <Chip
-                      label={word.category}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-          </SectionCard>
-        </Grid>
-
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard
-            title="Achievements"
-            subtitle="Keep the momentum"
-            action={
-              <LinkButton
-                size="small"
-                href="/achievements"
-                endIcon={<IconArrowRight size={14} />}
-              >
-                View all
-              </LinkButton>
-            }
-          >
-            <Stack spacing={3}>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar
-                  sx={{
-                    width: 52,
-                    height: 52,
-                    bgcolor: "primary.light",
-                    color: "primary.main",
-                  }}
-                >
-                  <IconTrophy size={26} />
-                </Avatar>
-                <Box minWidth={0}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard title={t("lastLessonTitle")}>
+            {lastLesson ? (
+              <Stack spacing={1.5}>
+                <Typography variant="h6">{lastLesson.topic}</Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <IconClock size={16} />
                   <Typography variant="body2" color="text.secondary">
-                    Latest badge
-                  </Typography>
-                  <Typography variant="h6">
-                    {latestAchievement.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {latestAchievement.description}
-                  </Typography>
-                </Box>
-              </Stack>
-
-              <Divider />
-
-              <Box>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="flex-start"
-                  mb={1}
-                >
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Next badge
-                    </Typography>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {nextAchievement.title}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" fontWeight={600}>
-                    {nextAchievement.progress}%
+                    {date(lastLesson.startsAt)} · {t("with", { name: lastLesson.teacherName })}
                   </Typography>
                 </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={nextAchievement.progress}
-                  sx={{ height: 8, borderRadius: 4 }}
-                />
-              </Box>
-            </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "pre-wrap" }}>
+                  {lastLesson.recap
+                    ? lastLesson.recap.length > 240
+                      ? `${lastLesson.recap.slice(0, 240)}…`
+                      : lastLesson.recap
+                    : t("noRecap")}
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <LinkButton href={`/classes/${lastLesson.id}`} size="small" variant="outlined">
+                    {t("openLesson")}
+                  </LinkButton>
+                  <LinkButton href="/lessons" size="small" variant="text">
+                    {t("allLessons")}
+                  </LinkButton>
+                </Stack>
+              </Stack>
+            ) : (
+              <Typography color="text.secondary">{t("noLessons")}</Typography>
+            )}
           </SectionCard>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard
-            title="Skill snapshot"
-            subtitle="Where to focus next"
-            action={
-              <LinkButton
-                size="small"
-                href="/progress"
-                endIcon={<IconArrowRight size={14} />}
-              >
-                Progress
-              </LinkButton>
-            }
-          >
-            <Stack spacing={2.5}>
-              {skills.map((skill) => (
-                <Box key={skill.name}>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    mb={0.75}
-                  >
-                    <Typography variant="subtitle2">{skill.name}</Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {skill.value}%
-                    </Typography>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard title={t("nextAchievementTitle")}>
+            {nextAchievement ? (
+              (() => {
+                const Icon = achievementIcons[nextAchievement.icon];
+                return (
+                  <Stack spacing={2}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Avatar sx={{ bgcolor: "primary.light", color: "primary.main", width: 48, height: 48 }}>
+                        <Icon size={24} />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6">{tAch(`${nextAchievement.id}.title`)}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {tAch(`${nextAchievement.id}.description`)}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Box>
+                      <Stack direction="row" justifyContent="space-between" mb={0.5}>
+                        <Typography variant="body2" color="text.secondary">
+                          {tStudent("common.progress")}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={600}>
+                          {nextAchievement.current}/{nextAchievement.goal}
+                        </Typography>
+                      </Stack>
+                      <LinearProgress variant="determinate" value={nextAchievement.progress} sx={{ height: 8, borderRadius: 4 }} />
+                    </Box>
+                    <LinkButton href="/achievements" size="small" variant="text" sx={{ alignSelf: "flex-start" }}>
+                      {t("allAchievements")}
+                    </LinkButton>
                   </Stack>
-                  <LinearProgress
-                    variant="determinate"
-                    value={skill.value}
-                    sx={{ height: 8, borderRadius: 4 }}
-                  />
-                </Box>
-              ))}
-            </Stack>
+                );
+              })()
+            ) : (
+              <Typography color="text.secondary">{t("allAchievementsDone")}</Typography>
+            )}
           </SectionCard>
         </Grid>
       </Grid>

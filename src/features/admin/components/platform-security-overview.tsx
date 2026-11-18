@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -21,53 +22,54 @@ export function PlatformSecurityOverview({
   demoAccountsEnabled,
   googleSignInEnabled,
 }: PlatformSecurityOverviewProps) {
+  const t = useTranslations("admin");
   const policies = [
     {
       id: "2fa",
-      title: "Two-factor authentication",
-      detail: "Optional for all accounts today. Staff should enable before handling payouts.",
-      status: "Optional",
+      title: t("platform.security.twoFactor.title"),
+      detail: t("platform.security.twoFactor.detail"),
+      status: t("platform.security.status.optional"),
       href: "/settings?tab=security",
     },
     {
       id: "captcha",
       title: "Cloudflare Turnstile",
-      detail: "Sign-up, code requests, and password reset when TURNSTILE_SECRET_KEY is set.",
-      status: captchaEnabled ? "On" : "Off",
+      detail: t("platform.security.captchaDetail"),
+      status: t(captchaEnabled ? "common.on" : "common.off"),
     },
     {
       id: "demo",
-      title: "Demo accounts on login",
-      detail: "Only development or ENABLE_DEMO_ACCOUNTS=true.",
-      status: demoAccountsEnabled ? "Visible" : "Hidden",
+      title: t("platform.security.demoAccounts"),
+      detail: t("platform.security.demoDetail"),
+      status: t(demoAccountsEnabled ? "platform.security.status.visible" : "platform.security.status.hidden"),
     },
     {
       id: "google",
-      title: "Google sign-in",
-      detail: "OAuth with PKCE via Better Auth.",
-      status: googleSignInEnabled ? "Enabled" : "Disabled",
+      title: t("platform.security.googleSignIn"),
+      detail: t("platform.security.googleDetail"),
+      status: t(googleSignInEnabled ? "common.enabled" : "common.disabled"),
     },
     {
       id: "admin",
-      title: "Single academy admin",
-      detail: "ADMIN_EMAIL or promote CLI; cannot change admin from the app.",
-      status: "Enforced",
+      title: t("platform.security.singleAdmin"),
+      detail: t("platform.security.singleAdminDetail"),
+      status: t("platform.security.status.enforced"),
     },
   ];
 
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Security policy"
-        subtitle="Platform-wide auth and access controls (read-only summary)."
-        items={adminBreadcrumb("Platform", "Security", "/admin/platform/security")}
+        title={t("common.page.security")}
+        subtitle={t("platform.security.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.platform"), t("common.page.security"), "/admin/platform/security")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Sensitive values live in <code>src/env.ts</code> and deployment secrets, not in this UI.
+        {t("platform.security.notice")}
       </Alert>
 
-      <SectionCard title="Active policies">
+      <SectionCard title={t("platform.security.activePolicies")}>
         <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
           {policies.map((policy) => (
             <Stack
@@ -89,7 +91,7 @@ export function PlatformSecurityOverview({
                 <Chip size="small" label={policy.status} />
                 {policy.href ? (
                   <LinkButton href={policy.href} size="small">
-                    Your 2FA
+                    {t("platform.security.your2fa")}
                   </LinkButton>
                 ) : null}
               </Stack>

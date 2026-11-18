@@ -80,3 +80,65 @@ export const emptyTeacherStats: TeacherStats = {
   ratingAverage: 0,
   fiveStarCount: 0,
 };
+
+/* Localized variants. Callers pass a translator scoped to the educator namespace. */
+
+const levelNameKeys = ["new", "established", "senior", "top"] as const;
+
+const badgeKeys: Record<string, string> = {
+  "first-class": "firstClass",
+  fifty: "fifty",
+  "two-hundred": "twoHundred",
+  "paired-pro": "pairedPro",
+  "top-rated": "topRated",
+  "student-favorite": "studentFavorite",
+};
+
+/** Level name from the educator catalog, keyed by numeric level. */
+export function localizedTeacherLevelName(
+  level: TeacherLevel["level"],
+  t: (key: string) => string,
+) {
+  return t(`levels.${levelNameKeys[level - 1] ?? "new"}`);
+}
+
+/** Level name from a raw (English) level display name produced by the server. */
+export function localizedTeacherLevelNameByName(
+  name: string,
+  t: (key: string) => string,
+) {
+  const match = teacherLevels.find((level) => level.name === name) ?? teacherLevels[0]!;
+  return localizedTeacherLevelName(match.level, t);
+}
+
+/** Returns the level with its display name translated. */
+export function localizedTeacherLevel(
+  level: TeacherLevel,
+  t: (key: string) => string,
+): TeacherLevel {
+  return { ...level, name: localizedTeacherLevelName(level.level, t) };
+}
+
+/** Translates a badge list that was computed on the server. */
+export function localizedTeacherBadgeList(
+  badges: TeacherBadge[],
+  t: (key: string) => string,
+): TeacherBadge[] {
+  return badges.map((badge) => {
+    const key = badgeKeys[badge.id];
+    if (!key) return badge;
+    return {
+      ...badge,
+      label: t(`levels.badge.${key}`),
+      description: t(`levels.badge.${key}Description`),
+    };
+  });
+}
+
+/** Returns badges with their label and description translated. */
+export function localizedTeacherBadges(
+  stats: TeacherStats,
+  t: (key: string) => string,
+): TeacherBadge[] {
+  return localizedTeacherBadgeList(teacherBadges(stats), t);
+}

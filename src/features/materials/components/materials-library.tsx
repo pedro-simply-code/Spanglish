@@ -7,11 +7,9 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { MaterialCard } from "@/features/materials/components/material-card";
-import {
-  materialKindLabels,
-  materialKindOptions,
-} from "@/features/materials/data";
+import { materialKindOptions } from "@/features/materials/data";
 import type { Material } from "@/features/materials/types";
 
 type LibraryEntry = {
@@ -29,9 +27,10 @@ type MaterialsLibraryProps = {
 export function MaterialsLibrary({
   entries,
   basePath,
-  emptyMessage = "No materials match these filters yet.",
+  emptyMessage,
   showVisibility = false,
 }: MaterialsLibraryProps) {
+  const t = useTranslations("educator.materials");
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState<"all" | Material["kind"]>("all");
 
@@ -56,7 +55,7 @@ export function MaterialsLibrary({
       >
         <TextField
           size="small"
-          label="Search materials"
+          label={t("library.search")}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           sx={{ minWidth: { sm: 280 } }}
@@ -64,23 +63,23 @@ export function MaterialsLibrary({
         <TextField
           select
           size="small"
-          label="Type"
+          label={t("library.type")}
           value={kind}
           onChange={(event) =>
             setKind(event.target.value as "all" | Material["kind"])
           }
           sx={{ minWidth: 180 }}
         >
-          <MenuItem value="all">All types</MenuItem>
+          <MenuItem value="all">{t("library.allTypes")}</MenuItem>
           {materialKindOptions.map((option) => (
             <MenuItem key={option} value={option}>
-              {materialKindLabels[option]}
+              {t(`kind.${option}`)}
             </MenuItem>
           ))}
         </TextField>
         <Box flexGrow={1} />
         <Typography variant="body2" color="text.secondary">
-          {visible.length} of {entries.length} items
+          {t("library.items", { shown: visible.length, total: entries.length })}
         </Typography>
       </Stack>
 
@@ -99,7 +98,7 @@ export function MaterialsLibrary({
         </Grid>
       ) : (
         <Box sx={{ p: 4, bgcolor: "grey.100", textAlign: "center" }}>
-          <Typography color="text.secondary">{emptyMessage}</Typography>
+          <Typography color="text.secondary">{emptyMessage ?? t("library.empty")}</Typography>
         </Box>
       )}
     </Stack>

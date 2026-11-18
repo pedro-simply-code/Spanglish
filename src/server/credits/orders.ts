@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AuthSession } from "@/lib/auth-types";
 import { normalizePricingPackageId } from "@/lib/pricing-package-schema";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -35,6 +36,7 @@ export async function purchasePackage(
   actor: AuthSession,
   packageId: string,
 ): Promise<PurchaseResult> {
+  const t = await getTranslations("ops.credits");
   const [pkg] = await db
     .select()
     .from(pricingPackages)
@@ -43,7 +45,7 @@ export async function purchasePackage(
     )
     .limit(1);
   if (!pkg) {
-    return { ok: false, code: "PACKAGE_NOT_FOUND", message: "That package is not on sale." };
+    return { ok: false, code: "PACKAGE_NOT_FOUND", message: t("packageNotOnSale") };
   }
 
   const pair = pkg.classType === "paired" ? await getActivePairForUser(actor.userId) : null;
@@ -51,7 +53,7 @@ export async function purchasePackage(
     return {
       ok: false,
       code: "NOT_PAIRED",
-      message: "Paired packages are shared by two students. Ask the academy to pair you first.",
+      message: t("pairedPackageNeedsPair"),
     };
   }
 
@@ -126,8 +128,9 @@ export async function grantCredits(input: {
   amount: number;
   note: string;
 }): Promise<{ ok: true; balance: number } | { ok: false; code: GrantErrorCode; message: string }> {
+  const t = await getTranslations("ops.credits");
   if (!Number.isInteger(input.amount) || input.amount === 0 || Math.abs(input.amount) > 500) {
-    return { ok: false, code: "INVALID_AMOUNT", message: "Use a whole number between -500 and 500 (not 0)." };
+    return { ok: false, code: "INVALID_AMOUNT", message: t("invalidGrantAmount") };
   }
 
   const [student] = await db
@@ -136,14 +139,14 @@ export async function grantCredits(input: {
     .where(eq(users.email, input.studentEmail.trim().toLowerCase()))
     .limit(1);
   if (!student) {
-    return { ok: false, code: "STUDENT_NOT_FOUND", message: "No account with that email." };
+    return { ok: false, code: "STUDENT_NOT_FOUND", message: t("studentNotFound") };
   }
 
   let holder = userHolder(student.id);
   if (input.kind.classType === "paired") {
     const pair = await getActivePairForUser(student.id);
     if (!pair) {
-      return { ok: false, code: "NOT_PAIRED", message: "Paired credits go to a pair; this student has none." };
+      return { ok: false, code: "NOT_PAIRED", message: t("pairedCreditsNeedPair") };
     }
     holder = pairHolder(pair.id);
   }
@@ -170,7 +173,7 @@ export async function grantCredits(input: {
     return { ok: true, balance: result.balance };
   } catch (error) {
     if (error instanceof InsufficientCreditsError) {
-      return { ok: false, code: "INSUFFICIENT", message: "That would leave a negative balance." };
+      return { ok: false, code: "INSUFFICIENT", message: t("negativeBalance") };
     }
     throw error;
   }
@@ -203,6 +206,39 @@ export async function listRecentOrders(limit = 50): Promise<OrderSummary[]> {
     })
     .from(orders)
     .innerJoin(users, eq(users.id, orders.buyerUserId))
+    .orderBy(desc(orders.createdAt))
+    .limit(limit);
+  return rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() }));
+}
+
+export type StudentOrder = {
+  id: string;
+  classType: ClassType;
+  durationMinutes: number;
+  credits: number;
+  totalCents: number;
+  currency: string;
+  provider: string;
+  status: string;
+  createdAt: string;
+};
+
+/** The student's own package purchases, newest first. */
+export async function listOrdersForStudent(userId: string, limit = 50): Promise<StudentOrder[]> {
+  const rows = await db
+    .select({
+      id: orders.id,
+      classType: orders.classType,
+      durationMinutes: orders.durationMinutes,
+      credits: orders.credits,
+      totalCents: orders.totalCents,
+      currency: orders.currency,
+      provider: orders.provider,
+      status: orders.status,
+      createdAt: orders.createdAt,
+    })
+    .from(orders)
+    .where(eq(orders.buyerUserId, userId))
     .orderBy(desc(orders.createdAt))
     .limit(limit);
   return rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() }));

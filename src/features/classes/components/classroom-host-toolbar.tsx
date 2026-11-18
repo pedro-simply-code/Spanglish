@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { LabeledToolbarTool } from "@/features/classes/components/classroom-toolbar-labeled-tool";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Badge from "@mui/material/Badge";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -74,6 +75,7 @@ export function ClassroomHostToolbar({
   onReleaseAudienceMics,
 }: ClassroomHostToolbarProps) {
   const router = useRouter();
+  const t = useTranslations("classroom");
   const { showError, showSuccess } = useAppToast();
   const [pending, setPending] = useState<{ userId: string; name: string }[]>([]);
   const [caps, setCaps] = useState({ egressReady: false, rtmpReady: false });
@@ -132,8 +134,8 @@ export function ClassroomHostToolbar({
   return (
     <Stack direction="row" spacing={0.5} alignItems="flex-start" flexWrap="wrap" useFlexGap>
       <LabeledToolbarTool
-        label="Speaker"
-        tooltip="Sync speaker view for the whole class (one main video + filmstrip)"
+        label={t("toolbar.speaker")}
+        tooltip={t("toolbar.hostSpeakerTooltip")}
       >
         <IconButton
           size="small"
@@ -144,8 +146,8 @@ export function ClassroomHostToolbar({
         </IconButton>
       </LabeledToolbarTool>
       <LabeledToolbarTool
-        label="Gallery"
-        tooltip="Sync gallery view for the whole class (grid of everyone)"
+        label={t("toolbar.gallery")}
+        tooltip={t("toolbar.hostGalleryTooltip")}
       >
         <IconButton
           size="small"
@@ -159,11 +161,9 @@ export function ClassroomHostToolbar({
       {vDivider}
 
       <LabeledToolbarTool
-        label={audienceMicLocked ? "Allow mic" : "Mute all"}
+        label={audienceMicLocked ? t("toolbar.allowMic") : t("toolbar.muteAll")}
         tooltip={
-          audienceMicLocked
-            ? "Let students turn their microphones back on"
-            : "Mute every student microphone on the server (teachers stay unmuted)"
+          audienceMicLocked ? t("toolbar.allowMicTooltip") : t("toolbar.muteAllTooltip")
         }
       >
         <IconButton
@@ -171,7 +171,7 @@ export function ClassroomHostToolbar({
           onClick={() => {
             if (audienceMicLocked) {
               onReleaseAudienceMics?.();
-              showSuccess({ message: "Students can turn their microphones on again." });
+              showSuccess({ message: t("signals.micUnlocked") });
               return;
             }
             void (async () => {
@@ -199,8 +199,8 @@ export function ClassroomHostToolbar({
           {vDivider}
           {cloudRecordingActive ? (
             <LabeledToolbarTool
-              label="Stop cloud"
-              tooltip="Stop server recording; the MP4 will finish uploading to Backblaze B2"
+              label={t("toolbar.stopCloud")}
+              tooltip={t("toolbar.stopCloudTooltip")}
             >
               <IconButton
                 size="small"
@@ -214,8 +214,8 @@ export function ClassroomHostToolbar({
             </LabeledToolbarTool>
           ) : (
             <LabeledToolbarTool
-              label="Cloud rec"
-              tooltip="Start full-room recording on LiveKit (saved as MP4 in B2)"
+              label={t("toolbar.cloudRec")}
+              tooltip={t("toolbar.cloudRecTooltip")}
             >
               <IconButton
                 size="small"
@@ -234,7 +234,10 @@ export function ClassroomHostToolbar({
 
       {caps.rtmpReady ? (
         rtmpActive ? (
-          <LabeledToolbarTool label="Stop RTMP" tooltip="Stop streaming the class layout to your RTMP URL">
+          <LabeledToolbarTool
+            label={t("toolbar.stopRtmp")}
+            tooltip={t("toolbar.stopRtmpTooltip")}
+          >
             <IconButton
               size="small"
               onClick={() => {
@@ -247,8 +250,8 @@ export function ClassroomHostToolbar({
           </LabeledToolbarTool>
         ) : (
           <LabeledToolbarTool
-            label="RTMP"
-            tooltip="Stream the composite class layout to LIVEKIT_RTMP_URL (e.g. YouTube)"
+            label={t("toolbar.rtmp")}
+            tooltip={t("toolbar.rtmpTooltip")}
           >
             <IconButton
               size="small"
@@ -268,8 +271,8 @@ export function ClassroomHostToolbar({
         <>
           {vDivider}
           <LabeledToolbarTool
-            label="Share ask"
-            tooltip="Students waiting for permission to share their screen"
+            label={t("toolbar.shareAsk")}
+            tooltip={t("toolbar.shareAskTooltip")}
           >
             <IconButton
               size="small"
@@ -304,7 +307,7 @@ export function ClassroomHostToolbar({
                     sx={{ color: "primary.main", border: 0, bgcolor: "transparent", cursor: "pointer" }}
                     onClick={() => onApproveScreenShare?.(person.identity)}
                   >
-                    Allow
+                    {t("toolbar.allow")}
                   </Typography>
                   <Typography
                     component="button"
@@ -312,7 +315,7 @@ export function ClassroomHostToolbar({
                     sx={{ color: "text.secondary", border: 0, bgcolor: "transparent", cursor: "pointer" }}
                     onClick={() => onDenyScreenShare?.(person.identity)}
                   >
-                    Deny
+                    {t("toolbar.deny")}
                   </Typography>
                 </Stack>
               </MenuItem>
@@ -324,8 +327,8 @@ export function ClassroomHostToolbar({
       {localRecordingRequests.length ? (
         <>
           <LabeledToolbarTool
-            label="Rec ask"
-            tooltip="Students asking to record on their device (not cloud)"
+            label={t("toolbar.recAsk")}
+            tooltip={t("toolbar.recAskTooltip")}
           >
             <IconButton
               size="small"
@@ -360,7 +363,7 @@ export function ClassroomHostToolbar({
                     sx={{ color: "primary.main", border: 0, bgcolor: "transparent", cursor: "pointer" }}
                     onClick={() => onApproveLocalRecording?.(person.identity)}
                   >
-                    Allow
+                    {t("toolbar.allow")}
                   </Typography>
                   <Typography
                     component="button"
@@ -368,7 +371,7 @@ export function ClassroomHostToolbar({
                     sx={{ color: "text.secondary", border: 0, bgcolor: "transparent", cursor: "pointer" }}
                     onClick={() => onDenyLocalRecording?.(person.identity)}
                   >
-                    Deny
+                    {t("toolbar.deny")}
                   </Typography>
                 </Stack>
               </MenuItem>
@@ -378,7 +381,10 @@ export function ClassroomHostToolbar({
       ) : null}
 
       {pending.length ? (
-        <LabeledToolbarTool label="Lobby" tooltip="People in the waiting room — admit or deny">
+        <LabeledToolbarTool
+          label={t("toolbar.lobby")}
+          tooltip={t("toolbar.lobbyTooltip")}
+        >
           <IconButton
             size="small"
             onClick={(event) => setWaitingAnchor(event.currentTarget)}
@@ -418,7 +424,7 @@ export function ClassroomHostToolbar({
                   });
                 }}
               >
-                Admit
+                {t("toolbar.admit")}
               </Typography>
               <Typography
                 component="button"
@@ -428,7 +434,7 @@ export function ClassroomHostToolbar({
                   void denyClassroomAdmissionAction(classId, person.userId).then(refreshWaiting);
                 }}
               >
-                Deny
+                {t("toolbar.deny")}
               </Typography>
             </Stack>
           </MenuItem>
@@ -439,8 +445,8 @@ export function ClassroomHostToolbar({
         <>
           {vDivider}
           <LabeledToolbarTool
-            label="End class"
-            tooltip="End the live session so students can no longer join the call"
+            label={t("toolbar.endClass")}
+            tooltip={t("toolbar.endClassTooltip")}
           >
             <IconButton
               size="small"

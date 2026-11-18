@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -19,11 +20,17 @@ export function CheckoutResult({
   state: "paid" | "processing" | "failed";
   credits?: number;
 }) {
+  const t = useTranslations("student");
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={state === "paid" ? "Enrollment confirmed" : "Payment"}
-        subtitle={state === "paid" ? "Your class package is ready to use." : "Stripe checkout"}
+        title={t(state === "paid" ? "checkout.result.titlePaid" : "checkout.result.titleDefault")}
+        subtitle={
+          state === "paid"
+            ? t("checkout.result.subtitlePaid")
+            : t("checkout.result.subtitleDefault")
+        }
       />
       <Card elevation={9}>
         <CardContent sx={{ p: { xs: "30px", md: "50px" }, textAlign: "center" }}>
@@ -33,26 +40,28 @@ export function CheckoutResult({
                 <IconCircleCheck size={42} />
               </Avatar>
               <Typography variant="h3" fontWeight={700} mt={3}>
-                Payment received
+                {t("checkout.result.paymentReceived")}
               </Typography>
               <Typography color="text.secondary" mt={1} mx="auto" maxWidth={560}>
-                {credits ? `${credits} credits were added to your account.` : "Your credits were added."} Schedule
-                your next live class whenever you are ready.
+                {credits
+                  ? t("checkout.result.creditsAddedCount", { count: credits })
+                  : t("checkout.result.creditsAddedGeneric")}{" "}
+                {t("checkout.result.scheduleNext")}
               </Typography>
             </>
           ) : (
             <Alert severity={state === "processing" ? "info" : "error"} sx={{ textAlign: "left" }}>
               {state === "processing"
-                ? "Stripe has not confirmed the payment yet. Your credits appear as soon as it does; refresh in a minute."
-                : "We could not find this payment. If you were charged, contact the academy with your receipt."}
+                ? t("checkout.result.processing")
+                : t("checkout.result.failed")}
             </Alert>
           )}
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center" mt={4}>
             <LinkButton href="/schedule" variant="contained" size="large" startIcon={<IconCalendarEvent size={18} />}>
-              Schedule a class
+              {t("actions.scheduleClass")}
             </LinkButton>
             <LinkButton href="/home" variant="outlined" size="large">
-              Back to overview
+              {t("actions.backToOverview")}
             </LinkButton>
           </Stack>
         </CardContent>

@@ -12,13 +12,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { IconShare } from "@tabler/icons-react";
-import { shareMaterialAction } from "@/features/materials/actions";
-import { useAppToast } from "@/lib/use-app-toast";
+import { useTranslations } from "next-intl";
 import { liveClasses } from "@/features/classes/data";
+import { shareMaterialAction } from "@/features/materials/actions";
+import { localizeDemoClassTopic } from "@/features/materials/data";
 import type {
   MaterialActionResult,
   MaterialAudience,
 } from "@/features/materials/types";
+import { useAppToast } from "@/lib/use-app-toast";
 
 type ShareMaterialDialogProps = {
   materialId: string;
@@ -29,6 +31,8 @@ export function ShareMaterialDialog({
   materialId,
   materialTitle,
 }: ShareMaterialDialogProps) {
+  const t = useTranslations("educator.materials");
+  const commonT = useTranslations("educator.common");
   const [open, setOpen] = useState(false);
   const [audience, setAudience] = useState<MaterialAudience>("class");
   const [classId, setClassId] = useState(liveClasses[0]?.id ?? "");
@@ -72,42 +76,41 @@ export function ShareMaterialDialog({
         startIcon={<IconShare size={15} />}
         onClick={() => setOpen(true)}
       >
-        Share
+        {t("share.button")}
       </Button>
 
       <Dialog open={open} onClose={close} fullWidth maxWidth="xs">
-        <DialogTitle>Share “{materialTitle}”</DialogTitle>
+        <DialogTitle>{t("share.title", { title: materialTitle })}</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Choose who receives this material. The demo validates the audience;
-            persistence is the next step.
+            {t("share.help")}
           </DialogContentText>
           <Stack spacing={2}>
             <TextField
               select
-              label="Audience"
+              label={t("composer.audience")}
               value={audience}
               onChange={(event) =>
                 setAudience(event.target.value as MaterialAudience)
               }
               fullWidth
             >
-              <MenuItem value="class">A class</MenuItem>
-              <MenuItem value="student">One student</MenuItem>
-              <MenuItem value="cohort">A cohort</MenuItem>
+              <MenuItem value="class">{t("audience.class")}</MenuItem>
+              <MenuItem value="student">{t("audience.student")}</MenuItem>
+              <MenuItem value="cohort">{t("audience.cohort")}</MenuItem>
             </TextField>
 
             {audience === "class" ? (
               <TextField
                 select
-                label="Class"
+                label={t("share.class")}
                 value={classId}
                 onChange={(event) => setClassId(event.target.value)}
                 fullWidth
               >
                 {liveClasses.map((item) => (
                   <MenuItem key={item.id} value={item.id}>
-                    {item.topic}
+                    {localizeDemoClassTopic(item.id, item.topic, t)}
                   </MenuItem>
                 ))}
               </TextField>
@@ -115,7 +118,7 @@ export function ShareMaterialDialog({
 
             {audience === "student" ? (
               <TextField
-                label="Student name"
+                label={t("share.studentName")}
                 value={studentName}
                 onChange={(event) => setStudentName(event.target.value)}
                 fullWidth
@@ -123,7 +126,7 @@ export function ShareMaterialDialog({
             ) : null}
 
             <TextField
-              label="Due date (optional)"
+              label={t("composer.dueDate")}
               type="date"
               value={dueAt}
               onChange={(event) => setDueAt(event.target.value)}
@@ -138,10 +141,10 @@ export function ShareMaterialDialog({
         </DialogContent>
         <DialogActions>
           <Button onClick={close} disabled={pending}>
-            Cancel
+            {commonT("cancel")}
           </Button>
           <Button variant="contained" onClick={share} disabled={pending}>
-            {pending ? "Sharing…" : "Share material"}
+            {pending ? t("share.sharing") : t("share.shareMaterial")}
           </Button>
         </DialogActions>
       </Dialog>

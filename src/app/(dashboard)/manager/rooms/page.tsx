@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { educatorStaticMetadata } from "@/i18n/static-page-metadata";
 import { appNowDate } from "@/lib/app-clock";
 import { RoomsOverview } from "@/features/management";
 import {
@@ -10,10 +11,7 @@ import {
   parseAcademyDayKey,
 } from "@/server/classes/manager-rooms";
 
-export const metadata: Metadata = {
-  title: "Rooms",
-  description: "Live class rooms and provider status",
-};
+export const metadata: Metadata = educatorStaticMetadata("managerRooms");
 
 type ManagerRoomsPageProps = {
   searchParams: Promise<{ date?: string }>;

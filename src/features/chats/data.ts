@@ -1,6 +1,9 @@
 import { sub } from "date-fns";
+import type { useTranslations } from "next-intl";
 import type { Chat, ChatAttachment, ChatMessage } from "@/features/chats/types";
 import { demoClock } from "@/lib/demo-clock";
+
+type AppsTranslator = ReturnType<typeof useTranslations<"apps">>;
 
 const adobeAttachment: ChatAttachment = {
   icon: "/images/chat/icon-adobe.svg",
@@ -55,7 +58,7 @@ function imageMessage(
  * Builds the static chat list with timestamps relative to the frozen demo
  * clock, so the server render and the client render stay consistent.
  */
-export function createChats(): Chat[] {
+export function createChats(t: AppsTranslator): Chat[] {
   return [
     {
       id: 1,
@@ -63,12 +66,12 @@ export function createChats(): Chat[] {
       status: "online",
       thumb: "/images/profile/user-10.jpg",
       recent: false,
-      excerpt: "Theme Developer",
+      excerpt: t("chat.excerpts.themeDeveloper"),
       messages: [
         message(
           "c1-m1",
           1,
-          "Hey Mathew, can you take a look at the new theme tokens?",
+          t("chat.messages.c1m1"),
           sub(demoClock(), { hours: 1 }),
           [
             adobeAttachment,
@@ -81,13 +84,13 @@ export function createChats(): Chat[] {
         message(
           "c1-m2",
           1,
-          "I pushed the updated palette to the shared branch.",
+          t("chat.messages.c1m2"),
           sub(demoClock(), { minutes: 30 }),
         ),
         message(
           "c1-m3",
           "me",
-          "Nice, I will review it before lunch.",
+          t("chat.messages.c1m3"),
           sub(demoClock(), { minutes: 6 }),
         ),
         imageMessage(
@@ -99,7 +102,7 @@ export function createChats(): Chat[] {
         message(
           "c1-m5",
           1,
-          "Looks great, let us ship it today.",
+          t("chat.messages.c1m5"),
           sub(demoClock(), { minutes: 4 }),
         ),
       ],
@@ -110,25 +113,25 @@ export function createChats(): Chat[] {
       status: "away",
       thumb: "/images/profile/user-9.jpg",
       recent: true,
-      excerpt: "Doctor",
+      excerpt: t("chat.excerpts.doctor"),
       messages: [
         message(
           "c2-m1",
           "me",
-          "Good morning! Are we still on for the checkup call?",
+          t("chat.messages.c2m1"),
           sub(demoClock(), { hours: 1 }),
           [adobeAttachment, chromeAttachment, javascriptAttachment, zipAttachment],
         ),
         message(
           "c2-m2",
           "me",
-          "I can send over the notes from last session.",
+          t("chat.messages.c2m2"),
           sub(demoClock(), { minutes: 30 }),
         ),
         message(
           "c2-m3",
           2,
-          "Morning! Yes, same time works for me.",
+          t("chat.messages.c2m3"),
           sub(demoClock(), { minutes: 6 }),
         ),
         imageMessage(
@@ -140,7 +143,7 @@ export function createChats(): Chat[] {
         message(
           "c2-m5",
           "me",
-          "Perfect, see you then.",
+          t("chat.messages.c2m5"),
           sub(demoClock(), { minutes: 1 }),
         ),
       ],
@@ -151,31 +154,31 @@ export function createChats(): Chat[] {
       status: "busy",
       thumb: "/images/profile/user-3.jpg",
       recent: false,
-      excerpt: "Hacker",
+      excerpt: t("chat.excerpts.hacker"),
       messages: [
         message(
           "c3-m1",
           "me",
-          "The build pipeline is failing again on the staging job.",
+          t("chat.messages.c3m1"),
           sub(demoClock(), { hours: 10 }),
           [adobeAttachment, zipAttachment],
         ),
         message(
           "c3-m2",
           "me",
-          "I attached the log dump for you.",
+          t("chat.messages.c3m2"),
           sub(demoClock(), { hours: 9 }),
         ),
         message(
           "c3-m3",
           3,
-          "Found it, a missing environment variable.",
+          t("chat.messages.c3m3"),
           sub(demoClock(), { minutes: 30 }),
         ),
         message(
           "c3-m4",
           3,
-          "Adding it to the secrets manager now.",
+          t("chat.messages.c3m4"),
           sub(demoClock(), { minutes: 12 }),
         ),
       ],
@@ -186,18 +189,18 @@ export function createChats(): Chat[] {
       status: "offline",
       thumb: "/images/profile/user-2.jpg",
       recent: true,
-      excerpt: "Please wait outside of the house",
+      excerpt: t("chat.excerpts.house"),
       messages: [
         message(
           "c4-m1",
           "me",
-          "Are you home? I am around the corner.",
+          t("chat.messages.c4m1"),
           sub(demoClock(), { hours: 2 }),
         ),
         message(
           "c4-m2",
           4,
-          "Give me five minutes, I am wrapping up a call.",
+          t("chat.messages.c4m2"),
           sub(demoClock(), { hours: 1 }),
           [javascriptAttachment, zipAttachment],
         ),
@@ -210,13 +213,13 @@ export function createChats(): Chat[] {
         message(
           "c4-m4",
           4,
-          "Please wait outside of the house.",
+          t("chat.messages.c4m4"),
           sub(demoClock(), { minutes: 6 }),
         ),
         message(
           "c4-m5",
           "me",
-          "No problem, take your time.",
+          t("chat.messages.c4m5"),
           sub(demoClock(), { minutes: 1 }),
         ),
       ],
@@ -227,12 +230,12 @@ export function createChats(): Chat[] {
       status: "online",
       thumb: "/images/profile/user-5.jpg",
       recent: true,
-      excerpt: "Front End Developer",
+      excerpt: t("chat.excerpts.frontEnd"),
       messages: [
         message(
           "c5-m1",
           "me",
-          "The new lesson widgets are ready for review.",
+          t("chat.messages.c5m1"),
           sub(demoClock(), { hours: 1 }),
           [
             adobeAttachment,
@@ -245,13 +248,13 @@ export function createChats(): Chat[] {
         message(
           "c5-m2",
           "me",
-          "I kept the card radius consistent with the rest.",
+          t("chat.messages.c5m2"),
           sub(demoClock(), { minutes: 30 }),
         ),
         message(
           "c5-m3",
           5,
-          "Checking the pull request right now.",
+          t("chat.messages.c5m3"),
           sub(demoClock(), { minutes: 12 }),
         ),
         imageMessage(
@@ -263,7 +266,7 @@ export function createChats(): Chat[] {
         message(
           "c5-m5",
           5,
-          "Approving it, nice work!",
+          t("chat.messages.c5m5"),
           sub(demoClock(), { minutes: 5 }),
         ),
       ],
@@ -274,12 +277,12 @@ export function createChats(): Chat[] {
       status: "busy",
       thumb: "/images/profile/user-10.jpg",
       recent: false,
-      excerpt: "Graphics Designer",
+      excerpt: t("chat.excerpts.graphics"),
       messages: [
         message(
           "c6-m1",
           "me",
-          "Do you have the final illustrations for the course?",
+          t("chat.messages.c6m1"),
           sub(demoClock(), { hours: 10 }),
           [chromeAttachment, javascriptAttachment, zipAttachment],
         ),
@@ -292,13 +295,13 @@ export function createChats(): Chat[] {
         message(
           "c6-m3",
           6,
-          "Almost done, one export left.",
+          t("chat.messages.c6m3"),
           sub(demoClock(), { minutes: 5 }),
         ),
         message(
           "c6-m4",
           6,
-          "Sending everything in five.",
+          t("chat.messages.c6m4"),
           sub(demoClock(), { minutes: 2 }),
         ),
       ],
@@ -309,31 +312,31 @@ export function createChats(): Chat[] {
       status: "away",
       thumb: "/images/profile/user-8.jpg",
       recent: true,
-      excerpt: "Back End Developer",
+      excerpt: t("chat.excerpts.backEnd"),
       messages: [
         message(
           "c7-m1",
           "me",
-          "The lesson progress endpoint is returning stale data.",
+          t("chat.messages.c7m1"),
           sub(demoClock(), { hours: 10 }),
           [adobeAttachment, chromeAttachment],
         ),
         message(
           "c7-m2",
           "me",
-          "Cache headers look wrong to me.",
+          t("chat.messages.c7m2"),
           sub(demoClock(), { hours: 8 }),
         ),
         message(
           "c7-m3",
           7,
-          "Good catch, the CDN rule was missing.",
+          t("chat.messages.c7m3"),
           sub(demoClock(), { minutes: 15 }),
         ),
         message(
           "c7-m4",
           7,
-          "Fixed and deployed to staging.",
+          t("chat.messages.c7m4"),
           sub(demoClock(), { minutes: 10 }),
         ),
       ],
@@ -344,31 +347,31 @@ export function createChats(): Chat[] {
       status: "offline",
       thumb: "/images/profile/user-3.jpg",
       recent: false,
-      excerpt: "Theme Developer",
+      excerpt: t("chat.excerpts.themeDeveloper"),
       messages: [
         message(
           "c8-m1",
           "me",
-          "Here is the updated component inventory.",
+          t("chat.messages.c8m1"),
           sub(demoClock(), { hours: 10 }),
           [adobeAttachment, javascriptAttachment, zipAttachment],
         ),
         message(
           "c8-m2",
           "me",
-          "Page templates are included as well.",
+          t("chat.messages.c8m2"),
           sub(demoClock(), { hours: 6 }),
         ),
         message(
           "c8-m3",
           8,
-          "Thanks, downloading it now.",
+          t("chat.messages.c8m3"),
           sub(demoClock(), { minutes: 45 }),
         ),
         message(
           "c8-m4",
           8,
-          "I will add comments by tomorrow.",
+          t("chat.messages.c8m4"),
           sub(demoClock(), { minutes: 20 }),
         ),
       ],
@@ -379,31 +382,31 @@ export function createChats(): Chat[] {
       status: "online",
       thumb: "/images/profile/user-4.jpg",
       recent: false,
-      excerpt: "Administrator",
+      excerpt: t("chat.excerpts.administrator"),
       messages: [
         message(
           "c9-m1",
           "me",
-          "Access for the new students has been granted.",
+          t("chat.messages.c9m1"),
           sub(demoClock(), { hours: 10 }),
           [javascriptAttachment, zipAttachment],
         ),
         message(
           "c9-m2",
           "me",
-          "They can start with the placement quiz.",
+          t("chat.messages.c9m2"),
           sub(demoClock(), { hours: 8 }),
         ),
         message(
           "c9-m3",
           9,
-          "Perfect, I will welcome them in the group.",
+          t("chat.messages.c9m3"),
           sub(demoClock(), { minutes: 5 }),
         ),
         message(
           "c9-m4",
           9,
-          "Also, the weekly report is ready.",
+          t("chat.messages.c9m4"),
           sub(demoClock(), { minutes: 2 }),
         ),
       ],
@@ -414,31 +417,31 @@ export function createChats(): Chat[] {
       status: "online",
       thumb: "/images/profile/user-5.jpg",
       recent: false,
-      excerpt: "Doctor",
+      excerpt: t("chat.excerpts.doctor"),
       messages: [
         message(
           "c10-m1",
           "me",
-          "Reminder: the health workshop starts at six.",
+          t("chat.messages.c10m1"),
           sub(demoClock(), { hours: 10 }),
           [adobeAttachment, zipAttachment],
         ),
         message(
           "c10-m2",
           "me",
-          "I saved you a seat near the window.",
+          t("chat.messages.c10m2"),
           sub(demoClock(), { hours: 6 }),
         ),
         message(
           "c10-m3",
           10,
-          "Thank you, I will be there on time.",
+          t("chat.messages.c10m3"),
           sub(demoClock(), { minutes: 30 }),
         ),
         message(
           "c10-m4",
           10,
-          "See you tonight!",
+          t("chat.messages.c10m4"),
           sub(demoClock(), { minutes: 6 }),
         ),
       ],

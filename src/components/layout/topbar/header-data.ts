@@ -1,3 +1,4 @@
+import type { NavTranslator as HeaderTranslator } from "@/components/layout/nav-data";
 import type { RoleCode } from "@/lib/auth-roles";
 
 export type LanguageOption = {
@@ -6,21 +7,36 @@ export type LanguageOption = {
   value: string;
 };
 
-export const defaultLanguage: LanguageOption = {
-  label: "English",
-  icon: "/images/flag/icon-flag-us.svg",
-  value: "en",
-};
-
-/** UI languages (see src/i18n). */
-export const languages: LanguageOption[] = [
-  defaultLanguage,
+const languageDefinitions = [
   {
-    label: "Español",
+    labelKey: "language.en",
+    icon: "/images/flag/icon-flag-us.svg",
+    value: "en",
+  },
+  {
+    labelKey: "language.es",
     icon: "/images/flag/icon-flag-gt.svg",
     value: "es",
   },
-];
+] as const;
+
+export function getDefaultLanguage(t: HeaderTranslator): LanguageOption {
+  const definition = languageDefinitions[0]!;
+  return {
+    label: t(definition.labelKey),
+    icon: definition.icon,
+    value: definition.value,
+  };
+}
+
+/** UI languages (see src/i18n). */
+export function getLanguages(t: HeaderTranslator): LanguageOption[] {
+  return languageDefinitions.map((definition) => ({
+    label: t(definition.labelKey),
+    icon: definition.icon,
+    value: definition.value,
+  }));
+}
 
 export type NotificationIcon =
   | "trophy"
@@ -36,38 +52,57 @@ export type NotificationItem = {
   subtitle: string;
 };
 
-export const notifications: NotificationItem[] = [
+type NotificationDefinition = {
+  icon: NotificationIcon;
+  titleKey: string;
+  subtitleKey: string;
+  values?: Record<string, string | number>;
+};
+
+const notificationDefinitions: NotificationDefinition[] = [
   {
     icon: "calendar",
-    title: "Class reminder",
-    subtitle: "María González tomorrow at 18:00",
+    titleKey: "notifications.classReminder.title",
+    subtitleKey: "notifications.classReminder.subtitle",
   },
   {
     icon: "trophy",
-    title: "New badge unlocked",
-    subtitle: "You earned Word Collector",
+    titleKey: "notifications.badge.title",
+    subtitleKey: "notifications.badge.subtitle",
   },
   {
     icon: "flame",
-    title: "12-day streak",
-    subtitle: "Keep it alive with a quick review",
+    titleKey: "notifications.streak.title",
+    subtitleKey: "notifications.streak.subtitle",
+    values: { days: 12 },
   },
   {
     icon: "target",
-    title: "Daily goal almost there",
-    subtitle: "2 minutes left to hit your goal",
+    titleKey: "notifications.dailyGoal.title",
+    subtitleKey: "notifications.dailyGoal.subtitle",
+    values: { minutes: 2 },
   },
   {
     icon: "cards",
-    title: "Vocabulary review ready",
-    subtitle: "14 words are due today",
+    titleKey: "notifications.vocabulary.title",
+    subtitleKey: "notifications.vocabulary.subtitle",
+    values: { count: 14 },
   },
   {
     icon: "book",
-    title: "Lesson in progress",
-    subtitle: "Everyday Spanglish Phrases is 65% done",
+    titleKey: "notifications.lesson.title",
+    subtitleKey: "notifications.lesson.subtitle",
+    values: { percent: 65 },
   },
 ];
+
+export function getHeaderNotifications(t: HeaderTranslator): NotificationItem[] {
+  return notificationDefinitions.map((definition) => ({
+    icon: definition.icon,
+    title: t(definition.titleKey, definition.values),
+    subtitle: t(definition.subtitleKey, definition.values),
+  }));
+}
 
 export type ProfileLink = {
   href: string;
@@ -76,91 +111,107 @@ export type ProfileLink = {
   icon: string;
 };
 
-const profileLink = {
+type ProfileLinkDefinition = Omit<ProfileLink, "title" | "subtitle"> & {
+  titleKey: string;
+  subtitleKey: string;
+};
+
+const profileLinkDefinitions = {
   profile: {
     href: "/settings",
-    title: "My Profile",
-    subtitle: "Account settings",
+    titleKey: "profileMenu.links.profileTitle",
+    subtitleKey: "profileMenu.links.profileSubtitle",
     icon: "/images/svgs/icon-account.svg",
   },
   messages: {
     href: "/apps/email",
-    title: "Messages",
-    subtitle: "Your inbox",
+    titleKey: "profileMenu.links.messagesTitle",
+    subtitleKey: "profileMenu.links.messagesSubtitle",
     icon: "/images/svgs/icon-inbox.svg",
   },
-} satisfies Record<string, ProfileLink>;
+} satisfies Record<string, ProfileLinkDefinition>;
 
 /** Profile menu links for the active dashboard: only pages that role uses. */
-export const profileLinksByRole: Record<RoleCode, ProfileLink[]> = {
+const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = {
   student: [
-    profileLink.profile,
-    profileLink.messages,
+    profileLinkDefinitions.profile,
+    profileLinkDefinitions.messages,
     {
       href: "/progress",
-      title: "My Progress",
-      subtitle: "Streaks and milestones",
+      titleKey: "nav.progress",
+      subtitleKey: "profileMenu.links.progressSubtitle",
       icon: "/images/svgs/icon-tasks.svg",
     },
     {
       href: "/classes",
-      title: "My classes",
-      subtitle: "Join and manage live classes",
+      titleKey: "nav.myClasses",
+      subtitleKey: "profileMenu.links.classesStudentSubtitle",
       icon: "/images/svgs/icon-dd-date.svg",
     },
   ],
   teacher: [
-    profileLink.profile,
-    profileLink.messages,
+    profileLinkDefinitions.profile,
+    profileLinkDefinitions.messages,
     {
       href: "/classes",
-      title: "My classes",
-      subtitle: "Your schedule and classrooms",
+      titleKey: "nav.myClasses",
+      subtitleKey: "profileMenu.links.classesTeacherSubtitle",
       icon: "/images/svgs/icon-dd-date.svg",
     },
     {
       href: "/teacher/earnings",
-      title: "Earnings",
-      subtitle: "Pay per class and payouts",
+      titleKey: "nav.earnings",
+      subtitleKey: "profileMenu.links.earningsSubtitle",
       icon: "/images/svgs/icon-tasks.svg",
     },
   ],
   manager: [
-    profileLink.profile,
-    profileLink.messages,
+    profileLinkDefinitions.profile,
+    profileLinkDefinitions.messages,
     {
       href: "/apps/calendar",
-      title: "Academy schedule",
-      subtitle: "Filter by teacher — not your personal classes",
+      titleKey: "nav.academySchedule",
+      subtitleKey: "profileMenu.links.academyScheduleSubtitle",
       icon: "/images/svgs/icon-dd-date.svg",
     },
     {
       href: "/manager/payouts",
-      title: "Teacher payouts",
-      subtitle: "Prepare monthly payouts",
+      titleKey: "nav.teacherPayouts",
+      subtitleKey: "profileMenu.links.payoutsSubtitle",
       icon: "/images/svgs/icon-tasks.svg",
     },
   ],
   admin: [
-    profileLink.profile,
+    profileLinkDefinitions.profile,
     {
       href: "/admin/finance/payouts",
-      title: "Payout approvals",
-      subtitle: "Approve and send teacher pay",
+      titleKey: "nav.payoutApprovals",
+      subtitleKey: "profileMenu.links.payoutApprovalsSubtitle",
       icon: "/images/svgs/icon-tasks.svg",
     },
     {
       href: "/admin/audit",
-      title: "Audit log",
-      subtitle: "Security and governance events",
+      titleKey: "nav.auditLog",
+      subtitleKey: "profileMenu.links.auditSubtitle",
       icon: "/images/svgs/icon-inbox.svg",
     },
     {
       href: "/admin/platform/integrations",
-      title: "Integrations",
-      subtitle: "Email, Google, Stripe, LiveKit",
+      titleKey: "nav.integrations",
+      subtitleKey: "profileMenu.links.integrationsSubtitle",
       icon: "/images/svgs/icon-dd-date.svg",
     },
   ],
 };
 
+export function getProfileLinksByRole(
+  role: RoleCode,
+  t: HeaderTranslator,
+): ProfileLink[] {
+  return profileLinksDefinitionByRole[role].map((definition) => ({
+    href: definition.href,
+    icon: definition.icon,
+    title: t(definition.titleKey),
+    subtitle: t(definition.subtitleKey),
+  }));
+}

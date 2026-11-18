@@ -12,6 +12,7 @@ import {
   IconShield,
   IconUsersGroup,
 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { switchDashboardAction } from "@/features/auth";
 import type { DashboardOption, RoleCode } from "@/features/auth";
 
@@ -36,13 +37,14 @@ export function DashboardSwitcher({
   options,
   activeRole,
 }: DashboardSwitcherProps) {
+  const t = useTranslations("shell");
   const [pending, startTransition] = useTransition();
 
   return (
     <ButtonGroup
       size="small"
       variant="outlined"
-      aria-label="Switch dashboard"
+      aria-label={t("topbar.switchDashboard")}
       sx={{ flexShrink: 0 }}
     >
       {options.map((option) => {
@@ -54,7 +56,7 @@ export function DashboardSwitcher({
             key={option.role}
             variant={active ? "contained" : "outlined"}
             aria-pressed={active}
-            title={option.label}
+            title={t(`dashboards.${option.role}`)}
             disabled={pending}
             onClick={() => {
               if (active) return;
@@ -76,7 +78,7 @@ export function DashboardSwitcher({
               component="span"
               sx={{ display: { xs: "none", sm: "inline" } }}
             >
-              {option.role.charAt(0).toUpperCase() + option.role.slice(1)}
+              {t(`roles.${option.role}`)}
             </Box>
           </Button>
         );

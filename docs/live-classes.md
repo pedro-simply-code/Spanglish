@@ -144,6 +144,70 @@ Viewing goes through `/api/class-recordings/download?id=<recording id>`, which
 checks access (participants, the teacher, staff) and redirects to a 10-minute
 signed B2 link.
 
+## Recordings
+
+Two ways to record, both ending in Backblaze B2 when it is configured:
+
+1. **Browser recording** (teacher toolbar): the browser records the stage and
+   uploads the file straight to B2 with a presigned URL. Needs the `B2_*`
+   variables and a CORS rule on the bucket (below). With B2 configured the
+   default storage is B2; `RECORDING_STORAGE=local` keeps files on the server
+   disk instead (development only).
+2. **Cloud recording** (LiveKit egress, host panel): LiveKit records the room
+   and writes the MP4 to B2 itself. Needs LiveKit Cloud (or a self-hosted
+   egress service), the `B2_*` variables, and the LiveKit webhook
+   `https://<domain>/api/webhooks/livekit` to mark the file ready. Without the
+   webhook (for example on localhost) the Recordings page asks LiveKit for the
+   status when it loads.
+
+`pnpm check:recordings` tests the setup: B2 keys, a real presigned upload,
+the bucket CORS rule and the LiveKit keys. Failed recordings keep the reason
+(`recordings.error`), shown on the Recordings page.
+
+B2 notes:
+
+- The region comes from `B2_S3_ENDPOINT` (`s3.<region>.backblazeb2.com`); a
+  different `B2_REGION` is ignored.
+- The application key needs `listBuckets`, `readFiles`, `writeFiles` and
+  `deleteFiles` on the bucket. Keep the bucket private: downloads use
+  short-lived signed links.
+- CORS rule for browser uploads: `pnpm b2:cors` sets it (localhost:3000 and
+  `NEXT_PUBLIC_APP_URL`; extra origins as arguments). It needs a key that can
+  change bucket settings: put your Master Application Key in
+  `B2_ADMIN_KEY_ID` / `B2_ADMIN_APPLICATION_KEY` for that run, then remove
+  them. The rule it writes (also settable with the B2 CLI):
+
+```json
+[
+  {
+    "corsRuleName": "spanglish-uploads",
+    "allowedOrigins": ["http://localhost:3000", "https://your-domain.com"],
+    "allowedOperations": ["s3_put", "s3_get", "s3_head"],
+    "allowedHeaders": ["content-type"],
+    "exposeHeaders": ["ETag"],
+    "maxAgeSeconds": 3600
+  }
+]
+```
+
+## Live transcription (free tier)
+
+- The teacher starts it from the **Transcribir / Transcribe** button in the room toolbar and picks the language people will speak (`es-ES` or `en-US`). The switch is stored on `class_sessions.captions_enabled` / `captions_lang`, so people who join later see it too.
+- Each participant's browser transcribes **their own microphone** with the Web Speech API (Chrome, Edge, Safari; not Firefox or Brave). It prefers on-device recognition when the browser offers it (Chrome 139+), otherwise the browser's cloud service.
+- Lines go to the room on the `spanglish.captions` data topic and appear in the **Transcript** tab of the room sidebar, next to People and Chat (like Zoom). The line being spoken shows in italics until it is final.
+- Final lines are saved every few seconds by the speaker (`saveClassroomTranscriptAction`) into `class_transcript_segments` (speaker and name come from the session); people who join late load what was said so far (`getClassroomTranscriptAction`). Lines are rejected while transcription is off.
+- The class page shows the transcript next to the recording for people who may watch the class.
+- Limits: one language at a time, quality depends on the browser, and without headphones a speaker's mic can also pick up other voices.
+- Upgrade path: replace the in-browser recognizer with a LiveKit agent using a cloud STT model (e.g. AssemblyAI / Deepgram multilingual via LiveKit Inference). The data packets, panel and transcript table stay the same.
+
+## Camera and microphone
+
+The `Permissions-Policy` header allows camera, microphone and screen sharing
+for the site's own origin on every page. Next.js moves between pages without
+reloading, so the classroom keeps the policy of the first page opened; blocking
+them outside `/classes/:id/room` made the browser refuse the microphone without
+asking. Browsers only offer them on `https://` or `localhost`.
+
 ## After the class (phase 3)
 
 - Participants rate the class from its page (`class_ratings`, 1–5 stars, within

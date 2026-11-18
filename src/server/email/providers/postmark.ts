@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ServerClient } from "postmark";
 import { env } from "@/env";
 
@@ -6,10 +7,11 @@ export async function sendViaPostmark(input: {
   subject: string;
   text: string;
 }) {
+  const t = await getTranslations("ops.providers");
   if (!env.POSTMARK_SERVER_TOKEN || !env.EMAIL_FROM) {
     return {
       ok: false as const,
-      error: "Postmark is not fully configured.",
+      error: t("postmarkNotConfigured"),
     };
   }
 
@@ -26,7 +28,7 @@ export async function sendViaPostmark(input: {
     return { ok: true as const };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Postmark send failed.";
+      error instanceof Error ? error.message : t("postmarkSendFailed");
     return { ok: false as const, error: message };
   }
 }

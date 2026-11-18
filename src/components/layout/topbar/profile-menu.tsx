@@ -11,11 +11,14 @@ import Menu from "@mui/material/Menu";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconMail } from "@tabler/icons-react";
-import { profileLinksByRole } from "@/components/layout/topbar/header-data";
-import { roleDefinitions, signOutAction } from "@/features/auth";
+import { useTranslations } from "next-intl";
+import type { NavTranslator } from "@/components/layout/nav-data";
+import { getProfileLinksByRole } from "@/components/layout/topbar/header-data";
+import { signOutAction } from "@/features/auth";
 import type { AuthSession } from "@/features/auth";
 
 export function ProfileMenu({ actor }: { actor: AuthSession }) {
+  const t = useTranslations("shell");
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -24,17 +27,18 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
   };
 
   const roleLabel = actor.roles
-    .map((role) => roleDefinitions[role].name)
+    .map((role) => t(`roles.${role}`))
     .join(" · ");
 
-  const activeLabel = roleDefinitions[actor.activeRole].name;
+  const activeLabel = t(`roles.${actor.activeRole}`);
+  const profileLinks = getProfileLinksByRole(actor.activeRole, t as NavTranslator);
 
   return (
     <Box>
       <IconButton
         size="large"
         color="inherit"
-        aria-label="Profile"
+        aria-label={t("profileMenu.ariaLabel")}
         aria-haspopup="true"
         onClick={(event) => setAnchorEl(event.currentTarget)}
         sx={{ color: open ? "primary.main" : "inherit" }}
@@ -55,7 +59,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         slotProps={{ paper: { sx: { width: 360, p: 4 } } }}
       >
-        <Typography variant="h5">My account</Typography>
+        <Typography variant="h5">{t("profileMenu.heading")}</Typography>
 
         <Stack direction="row" py={3} spacing={2} alignItems="center">
           <Avatar
@@ -71,7 +75,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
               {roleLabel}
             </Typography>
             <Typography variant="subtitle2" color="primary" fontWeight={600}>
-              {activeLabel} dashboard active
+              {t("profileMenu.activeDashboard", { role: activeLabel })}
             </Typography>
             <Typography
               variant="subtitle2"
@@ -89,7 +93,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
 
         <Divider />
 
-        {profileLinksByRole[actor.activeRole].map((profileLink) => (
+        {profileLinks.map((profileLink) => (
           <Box key={profileLink.title} sx={{ py: 2 }} className="hover-text-primary">
             <Link href={profileLink.href}>
               <Stack direction="row" spacing={2}>
@@ -135,7 +139,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
 
         <Box mt={2} component="form" action={signOutAction}>
           <Button type="submit" variant="outlined" color="primary" fullWidth>
-            Sign out
+            {t("profileMenu.signOut")}
           </Button>
         </Box>
       </Menu>

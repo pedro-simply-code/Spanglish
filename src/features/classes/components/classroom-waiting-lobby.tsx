@@ -7,6 +7,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   getClassroomAdmissionStatusAction,
   requestClassroomAdmissionAction,
@@ -19,6 +20,7 @@ type ClassroomWaitingLobbyProps = {
 
 export function ClassroomWaitingLobby({ classId, topic }: ClassroomWaitingLobbyProps) {
   const router = useRouter();
+  const t = useTranslations("classroom");
   const [requested, setRequested] = useState(false);
   const [denied, setDenied] = useState(false);
 
@@ -58,18 +60,18 @@ export function ClassroomWaitingLobby({ classId, topic }: ClassroomWaitingLobbyP
       <Stack spacing={2} alignItems="center" maxWidth={420} textAlign="center">
         <Typography variant="h6">{topic}</Typography>
         <Typography variant="body2" color="rgba(255,255,255,0.7)">
-          Waiting room is on. The teacher will admit you before you join the LiveKit call.
+          {t("lobby.waiting.waitingRoomOn")}
         </Typography>
         {denied ? (
-          <Typography color="warning.light">The teacher declined this join request.</Typography>
+          <Typography color="warning.light">{t("lobby.waiting.declined")}</Typography>
         ) : requested ? (
           <Stack spacing={1} alignItems="center">
             <CircularProgress size={28} sx={{ color: "#fff" }} />
-            <Typography variant="body2">Waiting for admission…</Typography>
+            <Typography variant="body2">{t("lobby.waiting.waitingAdmission")}</Typography>
           </Stack>
         ) : (
           <Button variant="contained" onClick={() => void request()}>
-            Ask to join
+            {t("lobby.waiting.askToJoin")}
           </Button>
         )}
       </Stack>

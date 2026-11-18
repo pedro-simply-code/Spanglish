@@ -59,11 +59,16 @@ Admin and dashboard tables use **10 items per page** (`src/lib/pagination.ts`). 
 - `next-intl` without locale prefixes in URLs. The locale comes from the
   user's profile when signed in, otherwise the `NEXT_LOCALE` cookie or the
   browser's `Accept-Language` (`src/i18n/`).
-- Messages live in `src/i18n/messages/{en,es}.json`; add every key to both.
+- Base messages live in `src/i18n/messages/{en,es}.json`; area messages live
+  in per-area files such as `shell.{en,es}.json`, `student.{en,es}.json`,
+  `educator.{en,es}.json`, `admin.{en,es}.json`, `classroom.{en,es}.json`,
+  `marketing.{en,es}.json`, `apps.{en,es}.json`, and `ops.{en,es}.json`.
+  `src/i18n/messages.ts` merges them; add every key to both locales of the
+  same area file.
 - Server code returns stable error codes; the client translates them
   (`errors.*`). Emails are localized in `src/server/email/templates.ts`.
-- Auth, onboarding, profile and security screens are translated; dashboards
-  are still English only.
+- All user-facing areas are translated: auth, onboarding, profile, security,
+  dashboards, classroom, marketing, apps, and operational notices.
 
 ## Quality
 

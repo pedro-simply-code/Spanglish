@@ -13,11 +13,19 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
+import Badge from "@mui/material/Badge";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { IconHandStop, IconPin } from "@tabler/icons-react";
+import {
+  IconFileText,
+  IconHandStop,
+  IconMessageCircle,
+  IconPin,
+  IconUsers,
+} from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import {
   ConnectionState,
   Room,
@@ -52,6 +60,11 @@ import {
   sendClassroomChatMessageAction,
 } from "@/features/classes/classroom-actions";
 import { ClassroomChat } from "@/features/classes/components/classroom-chat";
+import {
+  ClassroomCaptionsButton,
+  ClassroomTranscriptPanel,
+} from "@/features/classes/components/classroom-captions";
+import { useClassroomCaptions } from "@/features/classes/components/use-classroom-captions";
 import { ClassroomHostToolbar } from "@/features/classes/components/classroom-host-toolbar";
 import { ClassroomMediaToolbar } from "@/features/classes/components/classroom-media-toolbar";
 import { LabeledToolbarTool } from "@/features/classes/components/classroom-toolbar-labeled-tool";
@@ -119,10 +132,10 @@ function participantMicLive(participant: Participant) {
   return !publication.isMuted;
 }
 
-function readRoster(room: Room): RosterPerson[] {
+function readRoster(room: Room, t: (key: string) => string): RosterPerson[] {
   const mapParticipant = (participant: Participant, isLocal: boolean): RosterPerson => ({
     identity: participant.identity,
-    name: participant.name || (isLocal ? "You" : "Participant"),
+    name: participant.name || (isLocal ? t("stage.youFallback") : t("stage.participantFallback")),
     isLocal,
     micOn: participantMicLive(participant),
     cameraOn: participant.isCameraEnabled,
@@ -265,6 +278,7 @@ export function ClassroomLiveKitStage({
   guestJoinToken = null,
 }: ClassroomLiveKitStageProps) {
   const { showError, showInfo, showSuccess } = useAppToast();
+  const t = useTranslations("classroom");
   const guestViewOnly = guestViewer && !guestSelfServeMedia;
   const showMediaDeviceControls = !guestViewOnly || guestSelfServeMedia;
   const mayPresentWithoutAsk = canModerate || guestSelfServeMedia;
@@ -273,6 +287,8 @@ export function ClassroomLiveKitStage({
   /** Local Speaker/Gallery toggles (students + staff audience, not host). */
   const audienceLayoutTools = !canModerate;
   const roomRef = useRef<Room | null>(null);
+  /** The connected room, as state, for hooks that attach their own listeners. */
+  const [liveRoom, setLiveRoom] = useState<Room | null>(null);
   const mainStageRef = useRef<HTMLDivElement>(null);
   const mainVideoSlotRef = useRef<HTMLDivElement>(null);
   const mainStageCoverRef = useRef<HTMLDivElement>(null);
@@ -299,7 +315,7 @@ export function ClassroomLiveKitStage({
   const [micOn, setMicOn] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const [roster, setRoster] = useState<RosterPerson[]>([]);
-  const [mainStageLabel, setMainStageLabel] = useState("Waiting for video");
+  const [mainStageLabel, setMainStageLabel] = useState(() => t("stage.waitingForVideo"));
   const [mainHasVideo, setMainHasVideo] = useState(false);
   const [viewMode, setViewMode] = useState<ClassroomLayoutMode>("speaker");
   const [hostLayout, setHostLayout] = useState<ClassroomLayoutMode>("speaker");
@@ -310,7 +326,9 @@ export function ClassroomLiveKitStage({
   const [activeSpeakerIdentity, setActiveSpeakerIdentity] = useState<string | null>(null);
   const [raisedHands, setRaisedHands] = useState<Set<string>>(() => new Set());
   const [chatMessages, setChatMessages] = useState<ClassroomChatMessage[]>([]);
-  const [sidebarTab, setSidebarTab] = useState<"participants" | "chat">("participants");
+  const [sidebarTab, setSidebarTab] = useState<"participants" | "chat" | "transcript">(
+    "participants",
+  );
   const [screenShareRequests, setScreenShareRequests] = useState<
     { identity: string; name: string }[]
   >([]);
@@ -364,11 +382,11 @@ export function ClassroomLiveKitStage({
   }, [focusedScreenShareIdentity]);
 
   const refreshRoster = useCallback((room: Room) => {
-    setRoster(readRoster(room));
+    setRoster(readRoster(room, t));
     setCameraOn(room.localParticipant.isCameraEnabled);
     setMicOn(participantMicLive(room.localParticipant));
     setSharingScreen(room.localParticipant.isScreenShareEnabled);
-  }, []);
+  }, [t]);
 
   const syncStream = useCallback(() => {
     const room = roomRef.current;
@@ -384,6 +402,17 @@ export function ClassroomLiveKitStage({
     recordingConfig,
     getMediaStream: () => syncStream(),
     localOnly: !canModerate && localRecordingGranted,
+  });
+
+  const captions = useClassroomCaptions({
+    room: liveRoom,
+    classId,
+    localName: viewerName,
+    canModerate: Boolean(canModerate),
+    micOn,
+    canSpeak: !guestViewOnly,
+    canSave: true,
+    guestJoinToken,
   });
 
   const resolveStageCameraIdentity = useCallback((layout: LayoutSnapshot) => {
@@ -509,10 +538,10 @@ export function ClassroomLiveKitStage({
         if (!focusId) return null;
 
         const person = roster.find((row) => row.identity === identity);
-        const labelName = isLocal ? viewerName : (person?.name ?? "Screen share");
+        const labelName = isLocal ? viewerName : (person?.name ?? t("stage.screenShare"));
 
         if (identity === focusId) {
-          setMainStageLabel(`${labelName} · screen`);
+          setMainStageLabel(t("stage.screenLabel", { name: labelName }));
           setMainHasVideo(true);
           return mainVideoSlotRef.current;
         }
@@ -535,7 +564,7 @@ export function ClassroomLiveKitStage({
         if (layout.galleryFocusIdentity) {
           if (identity === layout.galleryFocusIdentity) {
             const person = roster.find((row) => row.identity === identity);
-            setMainStageLabel(person?.name ?? "Speaker");
+            setMainStageLabel(person?.name ?? t("stage.speakerFallback"));
             setMainHasVideo(true);
             return mainVideoSlotRef.current;
           }
@@ -547,7 +576,7 @@ export function ClassroomLiveKitStage({
       const stageIdentity = resolveStageCameraIdentity(layout);
       if (!screenActive && stageIdentity === identity) {
         const person = roster.find((row) => row.identity === identity);
-        setMainStageLabel(person?.name ?? "Speaker");
+        setMainStageLabel(person?.name ?? t("stage.speakerFallback"));
         setMainHasVideo(true);
         return mainVideoSlotRef.current;
       }
@@ -561,6 +590,7 @@ export function ClassroomLiveKitStage({
       resolveFocusedScreenShareIdentity,
       resolveStageCameraIdentity,
       roster,
+      t,
       viewerName,
     ],
   );
@@ -1055,9 +1085,11 @@ export function ClassroomLiveKitStage({
           "position:absolute;bottom:0;left:0;right:0;z-index:2;padding:2px 6px;font-size:10px;line-height:1.2;color:#fff;background:rgba(0,0,0,0.72);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;";
         tile.appendChild(label);
       }
-      label.textContent = person?.isLocal ? "Your screen" : (person?.name ?? "Screen share");
+      label.textContent = person?.isLocal
+        ? t("stage.yourScreen")
+        : (person?.name ?? t("stage.screenShare"));
     });
-  }, [focusedScreenShareIdentity, roster]);
+  }, [focusedScreenShareIdentity, roster, t]);
 
   useEffect(() => {
     const room = roomRef.current;
@@ -1130,7 +1162,7 @@ export function ClassroomLiveKitStage({
         }
         if (mainVideoSlotRef.current) {
           mainVideoSlotRef.current.replaceChildren();
-          setMainStageLabel("Screen share ended");
+          setMainStageLabel(t("stage.screenShareEnded"));
           setMainHasVideo(false);
           relayoutAll();
         }
@@ -1183,11 +1215,9 @@ export function ClassroomLiveKitStage({
               setScreenShareGranted(signal.approved);
               setScreenShareRequestPending(false);
               if (signal.approved) {
-                showSuccess({
-                  message: "You can present once. Ask again after you stop sharing.",
-                });
+                showSuccess({ message: t("signals.screenShareApproved") });
               } else {
-                showError({ message: "The teacher declined your screen share request." });
+                showError({ message: t("signals.screenShareDenied") });
               }
             }
             return;
@@ -1198,12 +1228,10 @@ export function ClassroomLiveKitStage({
               setLocalRecordingGranted(signal.granted);
               setLocalRecordingRequestPending(false);
               if (signal.granted) {
-                showSuccess({
-                  message: "You may record on your device. The file is not uploaded to the cloud.",
-                });
+                showSuccess({ message: t("signals.recordingApproved") });
               } else {
                 setLocalRecordingGranted(false);
-                showError({ message: "The teacher declined your recording request." });
+                showError({ message: t("signals.recordingDenied") });
               }
             }
             return;
@@ -1217,10 +1245,7 @@ export function ClassroomLiveKitStage({
             const audienceStudent =
               !canModerateRef.current && !guestSelfServeMediaRef.current;
             if (audienceStudent) {
-              showInfo({
-                message:
-                  "The teacher muted all microphones. You cannot unmute until they allow it.",
-              });
+              showInfo({ message: t("signals.mutedAll") });
             }
             return;
           }
@@ -1254,14 +1279,14 @@ export function ClassroomLiveKitStage({
                 if (signal.decision === "accepted") {
                   setSpeakTurnGranted(true);
                   setRequireHostMicApproval(false);
-                  showSuccess({ message: "You may unmute and speak." });
+                  showSuccess({ message: t("signals.micApproved") });
                 } else {
                   setSpeakTurnGranted(false);
                   setRequireHostMicApproval(true);
                   if (signal.decision === "denied") {
-                    showInfo({ message: "The teacher dismissed your raised hand." });
+                    showInfo({ message: t("signals.handDismissed") });
                   } else if (signal.decision === "released") {
-                    showInfo({ message: "Your turn to speak ended." });
+                    showInfo({ message: t("signals.turnEnded") });
                   }
                 }
               }
@@ -1396,14 +1421,15 @@ export function ClassroomLiveKitStage({
           });
         }
         setConnecting(false);
+        setLiveRoom(room);
         syncStream();
       })
       .catch((cause) => {
         if (!cancelled) {
           showError({
-            title: "LiveKit connection failed",
+            title: t("errors.connectionTitle"),
             message:
-              cause instanceof Error ? cause.message : "Could not connect to LiveKit.",
+              cause instanceof Error ? cause.message : t("errors.connectionFallback"),
           });
           setConnecting(false);
         }
@@ -1411,6 +1437,7 @@ export function ClassroomLiveKitStage({
 
     return () => {
       cancelled = true;
+      setLiveRoom(null);
       room.removeAllListeners();
       filmstripTileRefs.current.forEach((tile) => tile.remove());
       filmstripTileRefs.current.clear();
@@ -1436,7 +1463,7 @@ export function ClassroomLiveKitStage({
       syncStream();
       relayoutAll();
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
@@ -1446,10 +1473,7 @@ export function ClassroomLiveKitStage({
     const enabling = !participantMicLive(room.localParticipant);
     if (enabling && !mayPresentWithoutAsk && !speakTurnGranted) {
       if (requireHostMicApproval || audienceMicLocked) {
-        showInfo({
-          message:
-            "Raise your hand to be called on, or wait until the teacher uses Allow unmute.",
-        });
+        showInfo({ message: t("signals.micLocked") });
         return;
       }
     }
@@ -1462,7 +1486,7 @@ export function ClassroomLiveKitStage({
       refreshRoster(room);
       syncStream();
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
@@ -1472,12 +1496,12 @@ export function ClassroomLiveKitStage({
     const enabling = !room.localParticipant.isScreenShareEnabled;
     if (enabling && !mayPresentWithoutAsk && !screenShareGranted) {
       if (screenShareRequestPending) {
-        showInfo({ message: "Waiting for the teacher to allow screen share." });
+        showInfo({ message: t("signals.shareWaiting") });
         return;
       }
       setScreenShareRequestPending(true);
       sendScreenShareRequest(true);
-      showInfo({ message: "Screen share request sent to the teacher." });
+      showInfo({ message: t("signals.shareRequested") });
       return;
     }
     try {
@@ -1496,19 +1520,19 @@ export function ClassroomLiveKitStage({
       syncStream();
       relayoutAll();
     } catch (cause) {
-      showError({ message: friendlyMediaError(cause) });
+      showError({ message: friendlyMediaError(cause, t) });
     }
   };
 
   const screenShareTooltip = sharingScreen
-    ? "Stop sharing"
+    ? t("toolbar.stopSharing")
     : mayPresentWithoutAsk
-      ? "Share screen (host)"
+      ? t("toolbar.shareScreenHost")
       : screenShareGranted
-        ? "Share screen (one-time)"
+        ? t("toolbar.shareScreenOneTime")
         : screenShareRequestPending
-          ? "Waiting for teacher approval"
-          : "Request permission to share screen";
+          ? t("toolbar.waitingApproval")
+          : t("toolbar.requestShare");
 
   const galleryParticipants = roster.filter((person) => !person.isLocal);
   const galleryCount = galleryParticipants.length;
@@ -1545,7 +1569,7 @@ export function ClassroomLiveKitStage({
         >
           <CircularProgress sx={{ color: "#fff" }} />
           <Typography variant="body2" color="#fff" mt={1}>
-            Connecting to LiveKit…
+            {t("stage.connecting")}
           </Typography>
         </Stack>
       ) : null}
@@ -1627,9 +1651,9 @@ export function ClassroomLiveKitStage({
               <Typography variant="caption">
                 {viewMode === "gallery"
                   ? galleryFocusIdentity
-                    ? "Gallery spotlight — click someone in the strip to switch"
-                    : "Gallery view — click a tile to spotlight them on the main stage"
-                  : "Share your screen or pin a speaker for the main stage"}
+                    ? t("stage.gallerySpotlightHint")
+                    : t("stage.galleryHint")
+                  : t("stage.speakerHint")}
               </Typography>
             </Stack>
 
@@ -1675,7 +1699,7 @@ export function ClassroomLiveKitStage({
             {showScreenShareDock ? (
               <Box
                 ref={screenShareStripRef}
-                title="Click a preview for the main stage"
+                title={t("stage.clickPreview")}
                 sx={{
                   display: "flex",
                   gap: 1,
@@ -1714,7 +1738,9 @@ export function ClassroomLiveKitStage({
                       <Chip
                         size="small"
                         icon={<IconHandStop size={14} />}
-                        label={person.isLocal ? `${person.name} (you)` : person.name}
+                        label={
+                          person.isLocal ? t("stage.you", { name: person.name }) : person.name
+                        }
                         sx={{
                           bgcolor: "rgba(0,0,0,0.55)",
                           color: "#fff",
@@ -1729,7 +1755,7 @@ export function ClassroomLiveKitStage({
                           onClick={() => toggleRaisedHand()}
                           sx={{ minWidth: 0, px: 1, color: "rgba(255,255,255,0.85)" }}
                         >
-                          Lower hand
+                          {t("stage.lowerHand")}
                         </Button>
                       ) : null}
                       {canModerate && !person.isLocal ? (
@@ -1741,7 +1767,7 @@ export function ClassroomLiveKitStage({
                               void callOnStudent(person.identity);
                             }}
                           >
-                            Accept
+                            {t("stage.accept")}
                           </Button>
                           <Button
                             size="small"
@@ -1749,7 +1775,7 @@ export function ClassroomLiveKitStage({
                             onClick={() => dismissRaisedHand(person.identity)}
                             sx={{ color: "rgba(255,255,255,0.75)" }}
                           >
-                            Dismiss
+                            {t("stage.dismiss")}
                           </Button>
                         </>
                       ) : null}
@@ -1787,7 +1813,9 @@ export function ClassroomLiveKitStage({
         >
           <Tabs
             value={sidebarTab}
-            onChange={(_event, value: "participants" | "chat") => setSidebarTab(value)}
+            onChange={(_event, value: "participants" | "chat" | "transcript") =>
+              setSidebarTab(value)
+            }
             variant="fullWidth"
             sx={{
               minHeight: 40,
@@ -1797,19 +1825,51 @@ export function ClassroomLiveKitStage({
               "& .MuiTabs-indicator": { bgcolor: "primary.main" },
             }}
           >
-            <Tab value="participants" label="People" />
-            <Tab value="chat" label="Chat" />
+            <Tab
+              value="participants"
+              icon={<IconUsers size={18} />}
+              aria-label={t("stage.peopleTab")}
+              title={t("stage.peopleTab")}
+            />
+            <Tab
+              value="chat"
+              icon={<IconMessageCircle size={18} />}
+              aria-label={t("stage.chatTab")}
+              title={t("stage.chatTab")}
+            />
+            <Tab
+              value="transcript"
+              icon={
+                <Badge
+                  variant="dot"
+                  color="primary"
+                  invisible={!captions.state.enabled || sidebarTab === "transcript"}
+                >
+                  <IconFileText size={18} />
+                </Badge>
+              }
+              aria-label={t("stage.transcriptTab")}
+              title={t("stage.transcriptTab")}
+            />
           </Tabs>
 
           {sidebarTab === "chat" ? (
             <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
               <ClassroomChat messages={chatMessages} onSend={sendChat} />
             </Box>
+          ) : sidebarTab === "transcript" ? (
+            <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+              <ClassroomTranscriptPanel
+                lines={captions.lines}
+                state={captions.state}
+                canModerate={Boolean(canModerate)}
+              />
+            </Box>
           ) : (
             <>
               <Box sx={{ px: 2, py: 1 }}>
                 <Typography variant="caption" color="rgba(255,255,255,0.55)">
-                  Pin someone to spotlight them on the main stage (speaker view).
+                  {t("stage.pinHint")}
                 </Typography>
               </Box>
               <List dense sx={{ flex: 1, overflow: "auto" }}>
@@ -1823,8 +1883,8 @@ export function ClassroomLiveKitStage({
                             (viewMode === "gallery"
                               ? galleryFocusIdentity
                               : pinnedIdentity) === person.identity
-                              ? "Unpin"
-                              : "Pin / spotlight"
+                              ? t("stage.unpin")
+                              : t("stage.pinSpotlight")
                           }
                         >
                           <IconButton
@@ -1870,16 +1930,18 @@ export function ClassroomLiveKitStage({
                     <ListItemText
                       primary={
                         <Stack direction="row" spacing={0.5} alignItems="center">
-                          <span>{person.isLocal ? `${person.name} (you)` : person.name}</span>
+                          <span>
+                            {person.isLocal ? t("stage.you", { name: person.name }) : person.name}
+                          </span>
                           {raisedHands.has(person.identity) ? (
                             <IconHandStop size={14} color="#f5c542" />
                           ) : null}
                         </Stack>
                       }
                       secondary={[
-                        person.micOn ? "Mic on" : "Mic off",
-                        person.cameraOn ? "Camera on" : "Camera off",
-                        person.screenSharing ? "Presenting" : null,
+                        person.micOn ? t("stage.micOn") : t("stage.micOff"),
+                        person.cameraOn ? t("stage.cameraOn") : t("stage.cameraOff"),
+                        person.screenSharing ? t("stage.presenting") : null,
                       ]
                         .filter(Boolean)
                         .join(" · ")}
@@ -1914,8 +1976,8 @@ export function ClassroomLiveKitStage({
       >
         {studentAudienceTools ? (
           <LabeledToolbarTool
-            label={handRaised ? "Lower" : "Hand up"}
-            tooltip={handRaised ? "Lower your hand" : "Raise your hand to speak"}
+            label={handRaised ? t("stage.lower") : t("stage.handUp")}
+            tooltip={handRaised ? t("stage.lowerYourHand") : t("stage.raiseHand")}
           >
             <IconButton
               size="small"
@@ -1966,6 +2028,15 @@ export function ClassroomLiveKitStage({
           followHostLayout={studentAudienceTools ? followHostLayout : undefined}
           onFollowHostLayout={studentAudienceTools ? followTeacherLayout : undefined}
         />
+        {canModerate ? (
+          <ClassroomCaptionsButton
+            state={captions.state}
+            busy={captions.busy}
+            onSetCaptions={(enabled, lang) => {
+              void captions.setCaptions(enabled, lang);
+            }}
+          />
+        ) : null}
         {canModerate ? (
           <>
             <Divider

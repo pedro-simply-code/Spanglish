@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { createStaffGuestJoinLinkAction } from "@/features/classes/classroom-actions";
 import { useAppToast } from "@/lib/use-app-toast";
 
@@ -19,6 +20,7 @@ type ClassroomStaffGuestLobbyProps = {
  */
 export function ClassroomStaffGuestLobby({ classId, topic }: ClassroomStaffGuestLobbyProps) {
   const { showError } = useAppToast();
+  const t = useTranslations("classroom");
   const [busy, setBusy] = useState(false);
 
   const join = async () => {
@@ -49,22 +51,19 @@ export function ClassroomStaffGuestLobby({ classId, topic }: ClassroomStaffGuest
     >
       <Stack spacing={2} maxWidth={440}>
         <Typography variant="h5" color="#fff">
-          Staff guest access
+          {t("lobby.staff.title")}
         </Typography>
         <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
           {topic}
         </Typography>
         <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.65)" }}>
-          Host controls are only for the teacher who runs this class. As manager or admin, join
-          with a staff guest link — the same toolbar and icons as a student (including raise hand).
-          You may use mic, camera, and screen share without asking; mute-all and audience mic lock do
-          not apply to you. To host a class, switch to the Teacher dashboard.
+          {t("lobby.staff.description")}
         </Typography>
         <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)" }}>
-          View-only visitors should use the guest link copied from the teacher.
+          {t("lobby.staff.viewOnlyHint")}
         </Typography>
         <Button variant="contained" onClick={() => void join()} disabled={busy}>
-          {busy ? "Preparing link…" : "Join as staff guest"}
+          {busy ? t("lobby.staff.preparing") : t("lobby.staff.join")}
         </Button>
       </Stack>
     </Box>

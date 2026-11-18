@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { useFormatter, useTranslations } from "next-intl";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -19,10 +20,9 @@ import {
   IconTrophy,
 } from "@tabler/icons-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
-import { achievements } from "@/features/achievements/data";
-import type { AchievementIcon } from "@/features/achievements/data";
+import type { StudentAchievement } from "@/lib/learning-types";
 
-const icons: Record<AchievementIcon, ComponentType<{ size?: number }>> = {
+const icons: Record<StudentAchievement["icon"], ComponentType<{ size?: number }>> = {
   trophy: IconTrophy,
   flame: IconFlame,
   star: IconStar,
@@ -31,12 +31,24 @@ const icons: Record<AchievementIcon, ComponentType<{ size?: number }>> = {
   medal: IconMedal,
 };
 
-export function AchievementsOverview() {
+type AchievementsOverviewProps = {
+  achievements: StudentAchievement[];
+  timeZone: string;
+};
+
+/** Badges earned from real activity: classes, weeks in a row, hours, words, practice. */
+export function AchievementsOverview({ achievements, timeZone }: AchievementsOverviewProps) {
+  const tLearn = useTranslations("student.learn.achievements");
+  const format = useFormatter();
+  const t = useTranslations("student");
   const unlocked = achievements.filter((item) => item.unlocked).length;
 
   return (
     <Box mt={3}>
-      <Breadcrumb title="Achievements" subtitle="Celebrate your milestones" />
+      <Breadcrumb
+        title={t("achievements.breadcrumbTitle")}
+        subtitle={t("achievements.breadcrumbSubtitle")}
+      />
 
       <Card elevation={9} sx={{ mb: 3 }}>
         <CardContent sx={{ p: "30px" }}>
@@ -47,9 +59,12 @@ export function AchievementsOverview() {
             justifyContent="space-between"
           >
             <Box>
-              <Typography variant="h5">Your trophy case</Typography>
+              <Typography variant="h5">{t("achievements.trophyCase")}</Typography>
               <Typography variant="subtitle2" color="text.secondary">
-                {unlocked} of {achievements.length} achievements unlocked
+                {t("achievements.unlocked", {
+                  unlocked,
+                  total: achievements.length,
+                })}
               </Typography>
             </Box>
             <Box flexGrow={1} maxWidth={{ sm: 360 }} width="100%">
@@ -94,22 +109,29 @@ export function AchievementsOverview() {
                       </Avatar>
                       {achievement.unlocked ? (
                         <Typography variant="body2" color="text.secondary">
-                          {achievement.unlockedOn}
+                          {achievement.unlockedAt
+                            ? format.dateTime(new Date(achievement.unlockedAt), {
+                                dateStyle: "medium",
+                                timeZone,
+                              })
+                            : t("achievements.unlockedLabel")}
                         </Typography>
                       ) : (
                         <Stack direction="row" spacing={0.5} alignItems="center">
                           <IconLock size={16} />
                           <Typography variant="body2" color="text.secondary">
-                            Locked
+                            {t("achievements.locked")}
                           </Typography>
                         </Stack>
                       )}
                     </Stack>
 
                     <Box>
-                      <Typography variant="h5">{achievement.title}</Typography>
+                      <Typography variant="h5">
+                        {tLearn(`${achievement.id}.title`)}
+                      </Typography>
                       <Typography variant="body2" color="text.secondary" mt={0.5}>
-                        {achievement.description}
+                        {tLearn(`${achievement.id}.description`)}
                       </Typography>
                     </Box>
 
@@ -117,10 +139,10 @@ export function AchievementsOverview() {
                       <Box>
                         <Stack direction="row" justifyContent="space-between" mb={0.5}>
                           <Typography variant="body2" color="text.secondary">
-                            Progress
+                            {t("common.progress")}
                           </Typography>
                           <Typography variant="body2" fontWeight={600}>
-                            {achievement.progress}%
+                            {achievement.current}/{achievement.goal}
                           </Typography>
                         </Stack>
                         <LinearProgress

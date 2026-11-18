@@ -5,12 +5,14 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import { IconPaperclip, IconPhoto, IconSend } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 
 type ChatMsgSentProps = {
   onSend: (message: string) => void;
 };
 
 export function ChatMsgSent({ onSend }: ChatMsgSentProps) {
+  const t = useTranslations("apps");
   const [msg, setMsg] = useState("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -34,27 +36,27 @@ export function ChatMsgSent({ onSend }: ChatMsgSentProps) {
           id="msg-sent"
           fullWidth
           value={msg}
-          placeholder="Type a Message"
+          placeholder={t("chat.composer.placeholder")}
           size="small"
           type="text"
-          inputProps={{ "aria-label": "Type a Message" }}
+          inputProps={{ "aria-label": t("chat.composer.placeholder") }}
           onChange={(event) => setMsg(event.target.value)}
         />
 
         <IconButton
           type="submit"
-          aria-label="Send message"
+          aria-label={t("chat.composer.send")}
           color="primary"
           disabled={!msg}
         >
           <IconSend stroke={1.5} size={20} />
         </IconButton>
 
-        <IconButton aria-label="Send a photo">
+        <IconButton aria-label={t("chat.composer.photo")}>
           <IconPhoto stroke={1.5} size={20} />
         </IconButton>
 
-        <IconButton aria-label="Attach a file">
+        <IconButton aria-label={t("chat.composer.attach")}>
           <IconPaperclip stroke={1.5} size={20} />
         </IconButton>
       </form>

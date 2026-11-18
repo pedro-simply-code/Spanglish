@@ -1,0 +1,1124 @@
+{
+  "educator": {
+    "shell": {
+      "roles": {
+        "student": "Student",
+        "teacher": "Teacher",
+        "manager": "Manager",
+        "admin": "Admin",
+        "studentDashboard": "Student dashboard",
+        "teacherDashboard": "Teacher dashboard",
+        "managerDashboard": "Manager dashboard",
+        "adminDashboard": "Admin dashboard"
+      }
+    },
+    "common": {
+      "teacher": "Teacher",
+      "manager": "Manager",
+      "admin": "Admin",
+      "student": "Student",
+      "students": "Students",
+      "classes": "Classes",
+      "earnings": "Earnings",
+      "payouts": "Payouts",
+      "materials": "Materials",
+      "applications": "Applications",
+      "billing": "Billing",
+      "all": "All",
+      "close": "Close",
+      "cancel": "Cancel",
+      "approve": "Approve",
+      "reject": "Reject",
+      "save": "Save",
+      "open": "Open",
+      "none": "—",
+      "level": "Level",
+      "status": "Status",
+      "amount": "Amount",
+      "type": "Type",
+      "date": "Date",
+      "note": "Note",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "friday": "Friday",
+      "allTracks": "All tracks",
+      "academy": "Academy",
+      "email": "Email",
+      "search": "Search",
+      "noResults": "No results."
+    },
+    "weekdays": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "levels": {
+      "new": "New teacher",
+      "established": "Established",
+      "senior": "Senior",
+      "top": "Top teacher",
+      "badge": {
+        "firstClass": "First class",
+        "firstClassDescription": "Taught a first class.",
+        "fifty": "50 classes",
+        "fiftyDescription": "Taught 50 classes.",
+        "twoHundred": "200 classes",
+        "twoHundredDescription": "Taught 200 classes.",
+        "pairedPro": "Paired pro",
+        "pairedProDescription": "Taught 20 paired classes.",
+        "topRated": "Top rated",
+        "topRatedDescription": "4.8★ or more from 10+ ratings.",
+        "studentFavorite": "Student favorite",
+        "studentFavoriteDescription": "Ten 5-star ratings."
+      }
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "canceled": "Canceled",
+      "awaitingApproval": "Awaiting approval",
+      "approved": "Approved",
+      "approvedToPay": "Approved · to pay",
+      "paid": "Paid",
+      "rejected": "Rejected",
+      "unpaid": "Unpaid",
+      "inPayout": "In payout",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low",
+      "sent": "Sent",
+      "failed": "Failed",
+      "ready": "Ready",
+      "noStripe": "No Stripe",
+      "readyToSend": "Ready to send",
+      "complete": "Complete",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "submitted": "Submitted",
+      "withdrawn": "Withdrawn"
+    },
+    "classType": {
+      "paired": "Paired",
+      "individual": "Individual"
+    },
+    "metadata": {
+      "teacherDashboard": {
+        "title": "Teacher dashboard",
+        "description": "Manage your live classes and students"
+      },
+      "managerDashboard": {
+        "title": "Manager dashboard",
+        "description": "Oversee classes, people, and billing"
+      },
+      "students": {
+        "title": "Students",
+        "description": "Teaching roster and learner goals"
+      },
+      "recordings": {
+        "title": "Recordings",
+        "description": "Class recordings and transcripts"
+      },
+      "availability": {
+        "title": "Availability",
+        "description": "Manage bookable teaching times"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "description": "Track forms, submissions, and grading"
+      },
+      "teacherMaterials": {
+        "title": "Materials",
+        "description": "Create and share teaching materials"
+      },
+      "newMaterial": {
+        "title": "New material",
+        "description": "Create a document, recording, or practice form"
+      },
+      "material": {
+        "title": "Material",
+        "description": "Material details, shares, and results"
+      },
+      "earnings": {
+        "title": "Earnings",
+        "description": "Your pay per delivered class"
+      },
+      "managerStudents": {
+        "title": "Students and credits",
+        "description": "Pairs, class credits and package purchases"
+      },
+      "managerPayouts": {
+        "title": "Teacher payouts",
+        "description": "Prepare teacher payouts for admin approval"
+      },
+      "managerBilling": {
+        "title": "Billing",
+        "description": "Academy invoices, plans, and refunds"
+      },
+      "managerMaterials": {
+        "title": "Material review",
+        "description": "Approve materials for the academy library"
+      },
+      "managerRooms": {
+        "title": "Rooms",
+        "description": "Live class rooms and provider status"
+      },
+      "managerStaff": {
+        "title": "Staff",
+        "description": "Teachers and teaching load"
+      },
+      "managerApplications": {
+        "title": "Teacher applications",
+        "description": "Review applications to teach"
+      },
+      "managerMaterialReview": {
+        "title": "Review material",
+        "description": "Preview and publish an academy library post"
+      },
+      "joinManager": {
+        "title": "Manager invitation",
+        "description": "Accept an operations manager invitation"
+      },
+      "materials": {
+        "title": "Materials",
+        "description": "Materials shared by your teachers"
+      },
+      "studentMaterial": {
+        "title": "Material",
+        "description": "Shared class material"
+      }
+    },
+    "teacher": {
+      "dashboard": {
+        "greeting": "Welcome, {firstName}",
+        "subtitle": "Here is your teaching rhythm for today. Student dashboards are paused while the Teacher dashboard is active.",
+        "classesToday": "Classes today",
+        "easternTime": "Eastern Time",
+        "upcomingClasses": "Upcoming classes",
+        "nextSevenDays": "Next seven days",
+        "earnedThisMonth": "Earned this month",
+        "notPaidYet": "{amount} not paid yet",
+        "teacherRating": "Teacher rating",
+        "ratings": "{count} ratings",
+        "noRatingsYet": "No ratings yet",
+        "nextLiveClasses": "Your next live classes",
+        "rosterTimeRoom": "Roster, time, and room status",
+        "allClasses": "All classes",
+        "open": "Open",
+        "minutes": "{count} min",
+        "noClassesScheduled": "No live classes scheduled. Keep your availability up to date so students can book you.",
+        "teacherShare": "Teacher share: {percent}% of each credit · {count} classes taught",
+        "nextLevel": "Next: {name} — {details}.",
+        "moreClasses": "{count} more classes",
+        "moreRatings": "{count} more ratings",
+        "averageRating": "an average of {rating}★",
+        "topLevel": "You are at the top level.",
+        "badgesAppear": "Badges appear as you teach and collect ratings.",
+        "latestRatings": "Latest ratings",
+        "studentRoster": "Student roster",
+        "studentsFromClasses": "Students from your classes",
+        "studentsCount": "{count} students",
+        "classesWithYou": "{count} class{plural} with you",
+        "next": "Next: {value}",
+        "last": "Last: {value}",
+        "notBooked": "not booked",
+        "studentsAppear": "Students appear here once they book a class with you.",
+        "newMaterialSubtitle": "Add a resource to the library, then choose who receives it."
+      },
+      "earnings": {
+        "subtitle": "What you earned per delivered class and what was already paid.",
+        "thisMonth": "This month",
+        "deliveredClasses": "Delivered classes",
+        "notPaidYet": "Not paid yet",
+        "requestWhenReady": "Request a payout when you are ready",
+        "paid": "Paid",
+        "allTime": "All time",
+        "rating": "Rating",
+        "ratingHelper": "{count} ratings · {classes} classes",
+        "classes": "Classes",
+        "class": "Class",
+        "noDeliveredClasses": "No delivered classes yet.",
+        "youKeep": "You keep {teacherPercent}% of each credit · platform take {platformPercent}%",
+        "exampleCredit": "On a {credit} credit you earn about {earned} per class delivered.",
+        "actualPay": "Actual pay follows the student’s credit value when they booked (package price ÷ credits).",
+        "nextLevel": "Next: {name} — {classes} more classes, {ratings} more ratings, {rating}★ average.",
+        "topLevel": "Top level reached.",
+        "badges": "Badges",
+        "firstBadge": "Teach your first class to earn a badge.",
+        "level": "level {level}",
+        "processingDayOne": "1 business day",
+        "processingDays": "{days} business days"
+      },
+      "availability": {
+        "title": "Availability",
+        "subtitle": "Weekly times students can book. Booked classes stay as they are when you change this.",
+        "change": "Change",
+        "timeZoneNote": "Times are in your time zone: {timeZone}. Students see them converted to theirs.",
+        "upcomingNote": " You have {count} upcoming classes.",
+        "useTimeFormat": "Use times like 09:00.",
+        "weeklySchedule": "Weekly schedule",
+        "scheduleSubtitle": "Classes start every 30 minutes inside these windows.",
+        "saving": "Saving…",
+        "saveAvailability": "Save availability",
+        "addWindow": "Add window",
+        "from": "From",
+        "to": "To",
+        "removeWindow": "Remove {day} window",
+        "notAvailable": "Not available.",
+        "publicProfile": "Public profile",
+        "profileSubtitle": "What students see when they book.",
+        "headline": "Headline",
+        "location": "Location",
+        "aboutYou": "About you",
+        "tags": "Tags",
+        "tagsHelper": "Separate with commas (up to 8).",
+        "saveProfile": "Save profile"
+      },
+      "students": {
+        "title": "Students",
+        "subtitle": "Your roster, their goals, and the materials they currently have.",
+        "level": "Level",
+        "goal": "Goal",
+        "nextClass": "Next class",
+        "progress": "Progress",
+        "email": "Email",
+        "openMaterials": "Open materials"
+      },
+      "recordings": {
+        "title": "Recordings",
+        "subtitle": "Recordings of your delivered classes, with links and status.",
+        "classRecordings": "Class recordings",
+        "noRecordings": "No recordings yet. Once a class is recorded, it will appear here.",
+        "download": "Download",
+        "viewClass": "View class",
+        "topic": "Topic",
+        "date": "Date",
+        "size": "Size",
+        "status": "Status",
+        "savedOnServer": "Saved on server",
+        "materialsLibrary": "Materials library",
+        "transcriptReady": "Transcript ready",
+        "standalone": "Standalone recording",
+        "views": "{count} views",
+        "details": "Details",
+        "preview": "Preview",
+        "share": "Share",
+        "onServerDisk": "On server disk",
+        "class": "Class",
+        "play": "Play",
+        "failed": "Failed",
+        "recordingNow": "Recording…",
+        "processing": "Processing…",
+        "inCloud": "In the cloud (B2)",
+        "parts": "{count, plural, one {# recording} other {# recordings}}",
+        "readyCount": "{count, plural, =0 {none ready yet} one {# ready to watch} other {# ready to watch}}",
+        "failedCount": "{count, plural, one {# failed} other {# failed}}",
+        "filters": {
+          "search": "Search class or student",
+          "student": "Student",
+          "allStudents": "All students",
+          "status": "Status",
+          "allStatuses": "All",
+          "ready": "Ready",
+          "from": "From",
+          "to": "To",
+          "clear": "Clear filters"
+        },
+        "columns": {
+          "class": "Class",
+          "teacher": "Teacher",
+          "students": "Students",
+          "recordings": "Recordings",
+          "storage": "Storage"
+        },
+        "noStudents": "No students",
+        "noMatches": "No recordings match these filters.",
+        "pagination": "{from}–{to} of {count}"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "subtitle": "Practice forms, submissions, and grading for your classes.",
+        "noAssignments": "No assignments yet.",
+        "submissions": "Submissions",
+        "graded": "Graded",
+        "pending": "Pending",
+        "due": "Due {date}"
+      },
+      "apply": {
+        "title": "Teach with us",
+        "subtitle": "Choose conversation practice or certified teaching — managers review every application.",
+        "withdraw": "Withdraw",
+        "statusOpen": "Your application from {date} is under review. We will email you.",
+        "statusRejected": "Your last application was not approved.{note} You can apply again.",
+        "statusWithdrawn": "You withdrew your last application. You can apply again.",
+        "statusApproved": "Your application was approved.",
+        "cardTitle": "Your application",
+        "cardSubtitle": "A manager reviews video, fluency, and credentials before approval.",
+        "fluency": "Spanish / English fluency",
+        "fluencyDetails": "Fluency details",
+        "fluencyDetailsHelper": "e.g. Bilingual since childhood, 10 years in a Spanish-speaking country.",
+        "yearsTeaching": "Years teaching (any context)",
+        "taughtOnline": "I have taught live online before",
+        "headlinePlaceholder": "e.g. Conversation and pronunciation for beginners",
+        "iTeach": "I teach",
+        "aboutYou": "About you",
+        "aboutHelper": "At least 40 characters: how you teach and who you help best.",
+        "experience": "Teaching experience",
+        "experienceHelper": "At least 20 characters: classrooms, tutoring, volunteer, etc.",
+        "location": "Where you live",
+        "locationPlaceholder": "City, country",
+        "videoRecommended": "Intro video (recommended)",
+        "videoRequired": "Intro video (required)",
+        "videoHelper": "2–3 minute sample: introduce yourself and simulate a short lesson. YouTube, Vimeo, or Loom.",
+        "credentialPrimary": "Primary credential",
+        "credentialName": "Certificate or degree name",
+        "credentialNamePlaceholder": "e.g. CELTA, DELE C2, BA in Education",
+        "yearOptional": "Year (optional)",
+        "scanLink": "Link to scan or registry (optional)",
+        "approvalNote": "If you are approved, this account becomes a teacher account: you will no longer book classes as a student.",
+        "sending": "Sending…",
+        "send": "Send application"
+      }
+    },
+    "manager": {
+      "dashboard": {
+        "title": "Welcome, {firstName}",
+        "subtitle": "Operations only — you do not teach or take classes. Review staff, students, billing, and schedules here.",
+        "academySchedule": "Academy schedule",
+        "studentsCredits": "Students & credits",
+        "teacherPayouts": "Teacher payouts",
+        "applications": "Applications",
+        "billing": "Billing",
+        "teachers": "Teachers",
+        "teachersSubtitle": "{count} on staff · by classes delivered",
+        "staff": "Staff",
+        "noTeachers": "No teachers on the roster yet.",
+        "profileNotCompleted": "Profile not completed",
+        "noRatings": "No ratings",
+        "classes": "{count} classes",
+        "yourQueue": "Your queue",
+        "queueSubtitle": "Items you can resolve as a manager",
+        "nothingWaiting": "Nothing waiting on you right now.",
+        "scheduleSubtitle": "Headline counts — open Calendar to filter by teacher",
+        "scheduleNote": "Reschedules inside the policy window are automatic. Paired class proposals appear under Rooms.",
+        "scheduledThisWeek": "Scheduled this week",
+        "upcomingAll": "Upcoming (all)",
+        "deliveredThisWeek": "Delivered this week",
+        "openPairedChanges": "Open paired change requests",
+        "openCalendar": "Open calendar",
+        "billingPayouts": "Billing & payouts",
+        "billingSubtitle": "Paid orders, credits, and teacher earnings you prepare",
+        "billingNote": "Revenue and teacher pay come from paid orders and delivered classes. Payout batches are sent to the admin for approval and payment.",
+        "paidCheckoutRevenue": "Paid checkout revenue",
+        "paidOrders": "Paid orders",
+        "creditsOutstanding": "Credits outstanding",
+        "teacherEarningsMonth": "Teacher earnings this month",
+        "notInBatch": "Not in a payout batch yet",
+        "preparePayouts": "Prepare payouts"
+      },
+      "staff": {
+        "title": "Staff",
+        "subtitle": "Teachers and teaching load"
+      },
+      "rooms": {
+        "title": "Rooms"
+      }
+    },
+    "materials": {
+      "library": {
+        "search": "Search materials",
+        "type": "Type",
+        "allTypes": "All types",
+        "items": "{shown} of {total} items",
+        "empty": "No materials match these filters yet."
+      },
+      "kind": {
+        "document": "Document",
+        "link": "Link",
+        "video": "Video",
+        "audio": "Audio",
+        "form": "Form",
+        "recording": "Recording"
+      },
+      "level": {
+        "all": "All levels",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "audience": {
+        "class": "A class",
+        "student": "One student",
+        "cohort": "A cohort"
+      },
+      "questionType": {
+        "multipleChoice": "Multiple choice",
+        "shortAnswer": "Short answer",
+        "speaking": "Speaking",
+        "listening": "Listening"
+      },
+      "visibility": {
+        "private": "Private",
+        "shared": "Shared with teachers",
+        "global": "Academy library (needs approval)",
+        "waitingReview": "Waiting for review",
+        "notApproved": "Not approved",
+        "academyLibrary": "Academy library",
+        "globalHelp": "Every student, after a manager approves it.",
+        "sharedHelp": "Every teacher can find and use it.",
+        "privateHelp": "Only you (and the classes you attach it to).",
+        "now": "Now: {label}",
+        "managerNote": "Manager note: {note}",
+        "label": "Visibility"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "card": {
+        "updated": "Updated {date}",
+        "due": "Due {date}",
+        "questions": "{count} questions · {minutes} min",
+        "openPractice": "Open practice",
+        "openMaterial": "Open material"
+      },
+      "composer": {
+        "type": "Type",
+        "level": "Level",
+        "audience": "Audience",
+        "whoCanSee": "Who can see it",
+        "title": "Title",
+        "titlePlaceholder": "Travel phrases deck",
+        "description": "Description",
+        "descriptionPlaceholder": "What will students do with this material?",
+        "dueDate": "Due date (optional)",
+        "questions": "Questions",
+        "questionsHelp": "The form runner grades multiple choice and collects the rest for teacher review.",
+        "addQuestion": "Add question",
+        "question": "Question {number}",
+        "answerType": "Answer type",
+        "removeQuestion": "Remove question {number}",
+        "creating": "Creating…",
+        "createAndShare": "Create and share",
+        "points": "Points",
+        "optionsHelp": "Write the options and mark the right one.",
+        "correctOption": "Correct answer",
+        "option": "Option {number}"
+      },
+      "detail": {
+        "title": "Material",
+        "subtitle": "Material details, shares, and results",
+        "backToLibrary": "Back to library",
+        "overview": "Overview",
+        "sharedWith": "Shared with",
+        "noShares": "Not shared yet.",
+        "questions": "Questions",
+        "results": "Results",
+        "noResults": "No results yet.",
+        "createdBy": "By {name}",
+        "duration": "{minutes} min",
+        "openLink": "Open link",
+        "downloadFile": "Download file",
+        "questionsMinutes": "{count} questions · {minutes} minutes",
+        "due": "Due {date}",
+        "point": "{count} pt",
+        "createdByUpdated": "By {name} · updated {date}",
+        "startPractice": "Start practice",
+        "linkedToClass": "Linked to a class",
+        "howToUse": "How to use this",
+        "sharedWithSubtitle": "Every class, student, or cohort that received this material",
+        "howToUseSubtitle": "This material is attached to your classes and practice plan",
+        "sharedBy": "Shared by {name} · {date}",
+        "notSharedTeacher": "This material has not been shared yet. Use Share to assign it to a class or student.",
+        "notSharedStudent": "Open the class page to see when this material is used.",
+        "assignmentsTitle": "Assignments and results",
+        "assignmentsSubtitle": "Who received the form and how far they are",
+        "dueAssignment": " · due {date}",
+        "submittedCount": "{submitted}/{total} submitted",
+        "practiceForm": "Practice form",
+        "media": "Media",
+        "transcriptPending": "Transcript will appear after the provider finishes processing.",
+        "views": "{count} views",
+        "play": "Play",
+        "resource": "Resource",
+        "openResource": "Open the resource in a new view",
+        "submission": {
+          "pending": "Pending",
+          "submitted": "Submitted",
+          "graded": "Graded"
+        },
+        "transcriptReady": "Transcript ready. Playback and captions use the meeting provider in production.",
+        "open": "Open"
+      },
+      "formRunner": {
+        "title": "Practice",
+        "submit": "Submit answers",
+        "submitting": "Submitting…",
+        "correct": "Correct",
+        "incorrect": "Review this answer",
+        "score": "Score: {points}",
+        "thankYou": "Your answers were submitted.",
+        "back": "Back",
+        "practice": "Practice",
+        "allPractice": "All practice",
+        "demoScore": "Demo score: {score} of {total} points.",
+        "writeAnswer": "Write what you would say",
+        "hearAnswer": "What did you hear?",
+        "yourAnswer": "Your answer",
+        "audioNote": "Audio capture connects to the storage provider in production; today the answer is reviewed as text.",
+        "listeningNote": "The audio clip is part of the class materials.",
+        "progress": "{answered} of {total} answered · {points} points total"
+      },
+      "teacherOverview": {
+        "title": "My materials",
+        "subtitle": "Create, share, and track the resources you use in class.",
+        "myLibrary": "My library",
+        "colleagues": "Shared by colleagues",
+        "publishedCount": "{count} published",
+        "draftsCount": "{count} drafts",
+        "newMaterial": "New material",
+        "noMaterials": "No materials yet.",
+        "library": "Library",
+        "materialsYouOwn": "Materials you own",
+        "publishedInReview": "{published} published · {review} in review",
+        "forms": "Forms",
+        "practiceActivities": "Practice activities",
+        "recordings": "Recordings",
+        "fromPastClasses": "From past classes",
+        "noSharedMaterials": "No shared materials from colleagues yet.",
+        "fromOtherTeachers": "From other teachers"
+      },
+      "studentOverview": {
+        "title": "My materials",
+        "subtitle": "The academy library and everything your teachers have shared with you.",
+        "dueSoon": "Due soon",
+        "upcomingDeadlines": "Upcoming deadlines",
+        "noDueDates": "No deadlines right now.",
+        "items": "{count} items",
+        "dueItem": "{title} · due {date}",
+        "runnerNote": "Forms open in the practice runner. Documents, audio, and recordings open from the material page.",
+        "empty": "Nothing shared with you yet. Your next class materials will appear here."
+      },
+      "moderation": {
+        "title": "Material review",
+        "subtitle": "Approve materials for the academy library",
+        "pending": "Waiting for review",
+        "published": "Published",
+        "rejected": "Rejected",
+        "approve": "Approve",
+        "reject": "Reject",
+        "review": "Review",
+        "noMaterials": "No materials to review.",
+        "applicant": "Author",
+        "submitted": "Submitted",
+        "note": "Review note",
+        "emptyNote": "Add a note before rejecting.",
+        "reviewSubtitle": "Preview this academy library post before you publish it for every student.",
+        "reviewHelp": "Read the post below (and open the external link if there is one). When it looks good, use Publish to add it to the student library.",
+        "alreadyPublished": "This post is already published in the academy library.",
+        "rejectedNote": "This post was rejected and is not visible to students.",
+        "noDescription": "No description provided.",
+        "resourceLink": "Resource link",
+        "openReview": "Open & review",
+        "formPreview": "Practice form preview ({count} questions)",
+        "moreQuestions": "+{count} more questions",
+        "textOnly": "No external link — this post is text-only in the library.",
+        "publishTitle": "Publish to the academy library",
+        "noteToAuthor": "Note to the author (optional)",
+        "backQueue": "Back to queue",
+        "publishStudents": "Publish for students",
+        "backReview": "Back to material review",
+        "detail": {
+          "createdByUpdated": "By {name} · submitted {date}"
+        },
+        "none": "None",
+        "approved": "Approved",
+        "updatedBy": "{name} · updated {date}",
+        "reviewed": " · reviewed {date}",
+        "fullPreview": "Full preview",
+        "openLink": "Open link",
+        "reviewerNote": "Reviewer note",
+        "close": "Close",
+        "publish": "Publish",
+        "awaitingCount": "Waiting for review ({count})",
+        "history": "History",
+        "openMaterials": "Open materials",
+        "reviewedMaterials": "Reviewed materials",
+        "filtered": "Filtered: {kind}",
+        "allKinds": "All kinds",
+        "author": "Author",
+        "reviewedDate": "Reviewed",
+        "view": "View",
+        "noMatches": "No materials match this view.",
+        "preview": "Preview",
+        "reviewMaterial": "Review {title}"
+      },
+      "actions": {
+        "notAllowedTitle": "Not allowed",
+        "notAllowedCreate": "Only teachers and managers can add material to the academy library.",
+        "missingTitleTitle": "Missing title",
+        "missingTitle": "Give the material a title of at least 3 characters.",
+        "unsupportedTypeTitle": "Unsupported type",
+        "unsupportedType": "Choose a supported material type.",
+        "addQuestionTitle": "Add a question",
+        "addQuestion": "A form needs at least one question before it can be shared.",
+        "chooseVisibilityTitle": "Choose who sees it",
+        "chooseVisibility": "Pick private, shared with teachers, or academy library.",
+        "savedTitle": "Material saved",
+        "savedPending": "“{title}” was saved and sent to a manager for the academy library.",
+        "savedPrivate": "“{title}” was saved to your library.",
+        "notAllowedManage": "Only teachers and staff manage materials.",
+        "saved": "Saved",
+        "notSaved": "Not saved",
+        "notAllowedReview": "Only managers review materials.",
+        "done": "Done",
+        "notAllowedShare": "Only teachers and managers can share material with students.",
+        "notFoundTitle": "Material not found",
+        "notFound": "Reload the library and try again.",
+        "chooseClassTitle": "Choose a class",
+        "chooseClass": "Select the class that should receive it.",
+        "chooseStudentTitle": "Choose a student",
+        "chooseStudent": "Select the student that should receive it.",
+        "cohort": "Cohort",
+        "sharedTitle": "Material shared",
+        "shared": "“{title}” is queued for {audience}.",
+        "signInPractice": "Sign in as a student to start this practice.",
+        "practiceNotFoundTitle": "Practice not found",
+        "practiceNotFound": "This activity is no longer available.",
+        "noQuestionsTitle": "No questions yet",
+        "noQuestions": "Your teacher has not added questions to this form.",
+        "finishQuestionsTitle": "Finish every question",
+        "finishQuestions": "You answered {answered} of {total} questions.",
+        "practiceSavedTitle": "Practice saved",
+        "practiceSaved": "Answers for “{title}” were saved ({points}/{total} points)."
+      },
+      "assignments": {
+        "openAssignments": "Open assignments",
+        "waitingStudents": "Waiting for students",
+        "toGrade": "To grade",
+        "submittedNotGraded": "Submitted, not graded",
+        "averageScore": "Average score",
+        "gradedSubmissions": "Graded submissions",
+        "title": "Assignments",
+        "subtitle": "Share forms, track completion, and review results.",
+        "assigned": "{audience} · assigned {date}",
+        "openForm": "Open form",
+        "progress": "{submitted} of {total} submitted · {graded} graded",
+        "due": "Due {date}",
+        "nothingAssigned": "Nothing assigned yet",
+        "nothingAssignedHelp": "Create a form from Materials and share it with a class to see results here.",
+        "submittedAt": "Submitted {date}",
+        "notSubmitted": "Not submitted yet",
+        "status": {
+          "open": "Open",
+          "grading": "Grading",
+          "closed": "Closed"
+        },
+        "submissionStatus": {
+          "pending": "Pending",
+          "submitted": "Submitted",
+          "graded": "Graded"
+        }
+      },
+      "demo": {
+        "material": {
+          "travelDeck": {
+            "title": "Travel phrases deck",
+            "description": "The 24 phrases we will use in the travel class, with a short pronunciation note for each one."
+          },
+          "airportDrill": {
+            "title": "Airport listening drill",
+            "description": "Five minutes of airport announcements and directions. Listen once without reading, then repeat with the transcript."
+          },
+          "pastTenseForm": {
+            "title": "Past tense check-in",
+            "description": "A short form to see which past tense endings still need work before the next class."
+          },
+          "businessIntro": {
+            "title": "Business introductions",
+            "description": "The frames and vocabulary from today's class. Use the three templates to introduce yourself in 60 seconds."
+          },
+          "restaurantRecap": {
+            "title": "Ordering food: class recording",
+            "description": "Full recording of the restaurant class, including the role-play and the correction round."
+          },
+          "pronunciationRecap": {
+            "title": "Pronunciation clinic: class recording",
+            "description": "Vowels, word stress, and the shadowing dialogue from the pronunciation clinic."
+          },
+          "restaurantVocab": {
+            "title": "Restaurant vocabulary",
+            "description": "Menu sections, polite requests, and the phrases that resolve a wrong order calmly."
+          },
+          "travelQuiz": {
+            "title": "Travel vocabulary quiz",
+            "description": "Six quick questions on airports, hotels, and restaurants. Your score tells us what to review first."
+          },
+          "interviewFrames": {
+            "title": "Interview answer frames",
+            "description": "Three answer structures for common interview questions, with a filler-phrase bank."
+          },
+          "pronunciationNotes": {
+            "title": "Pronunciation clinic notes",
+            "description": "The sounds and drills from class, plus a five-minute shadowing routine."
+          }
+        },
+        "tag": {
+          "travel": "Travel",
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "grammar": "Grammar",
+          "pastTense": "Past tense",
+          "business": "Business",
+          "pronunciation": "Pronunciation",
+          "vocabulary": "Vocabulary",
+          "interview": "Interview"
+        },
+        "audience": {
+          "travelWarmup": "Travel Spanish warm-up",
+          "businessIntroductions": "Business introductions",
+          "orderingFood": "Ordering food with confidence",
+          "pronunciationClinic": "Pronunciation clinic"
+        },
+        "assignment": {
+          "pastTense": {
+            "title": "Past tense check-in"
+          },
+          "travelQuiz": {
+            "title": "Travel vocabulary quiz",
+            "audience": "Travel Spanish warm-up · 4 students"
+          }
+        },
+        "submission": {
+          "pronunciationFeedback": "Clean pronunciation. Keep the hotel phrases active.",
+          "irregularVerbsFeedback": "Review the difference between llegar and ir."
+        },
+        "question": {
+          "pastTense": {
+            "q1": "Yesterday I ___ to the market.",
+            "q2": "We ___ dinner when you called.",
+            "q3": "Write one sentence about last weekend using an irregular verb.",
+            "q4": "Tell a 30-second story about a trip you took last year."
+          },
+          "travelQuiz": {
+            "q1": "How do you ask for the gate at an airport?",
+            "q2": "Which phrase asks for a room with two beds?",
+            "q3": "Listen to the announcement and write the gate number.",
+            "q4": "Order a coffee and ask for the bill in one sentence."
+          }
+        },
+        "class": {
+          "everyday": "Everyday conversation",
+          "pastTense": "Past tense review",
+          "travelWarmup": "Travel Spanish warm-up",
+          "businessIntroductions": "Business introductions",
+          "travelCulture": "Travel culture and slang",
+          "interviewPractice": "Interview practice",
+          "orderingFood": "Ordering food with confidence",
+          "pronunciationClinic": "Pronunciation clinic"
+        }
+      },
+      "share": {
+        "button": "Share",
+        "title": "Share “{title}”",
+        "help": "Choose who receives this material. The demo validates the audience; persistence is the next step.",
+        "class": "Class",
+        "studentName": "Student name",
+        "sharing": "Sharing…",
+        "shareMaterial": "Share material"
+      }
+    },
+    "payouts": {
+      "processingDayOne": "1 business day",
+      "processingDays": "{days} business days",
+      "unknownStripeError": "An unknown error occurred. Please try again.",
+      "actions": {
+        "onlyTeachersRequest": "Only teachers can request payouts.",
+        "onlyManagersPrepare": "Only managers and the admin prepare payouts.",
+        "onlyAdminApproves": "Only the admin approves payouts.",
+        "onlyAdminRejects": "Only the admin rejects payouts.",
+        "onlyAdminMarksPaid": "Only the admin marks payouts as paid.",
+        "manualTransfersOff": "Manual transfers are turned off in payment provider settings.",
+        "onlyAdminChangesRates": "Only the admin changes teacher rates.",
+        "onlyTeachersConnectStripe": "Only teachers connect Stripe.",
+        "stripeConnectOff": "Stripe Connect payouts are turned off.",
+        "stripeNotConfigured": "Stripe is not configured yet.",
+        "stripeNotConfiguredShort": "Stripe is not configured.",
+        "openingStripe": "Opening Stripe…",
+        "stripeUnavailable": "Stripe is not available.",
+        "finishConnectingStripe": "Finish connecting Stripe first.",
+        "onlyAdminSends": "Only the admin sends payouts."
+      },
+      "board": {
+        "approvalTitle": "Payout approvals",
+        "prepareTitle": "Teacher payouts",
+        "subtitle": "Browse by month, then open a row for the payout cycle, line items, and actions.",
+        "payouts": "Payouts",
+        "approvalQueue": "Approval queue",
+        "batches": "Payout batches",
+        "rowsForMonth": "Rows for the month selected above.",
+        "request": "Request",
+        "type": "Type",
+        "amount": "Amount",
+        "classes": "Classes",
+        "status": "Status",
+        "submitted": "Submitted",
+        "teacherRequest": "Teacher request",
+        "monthlyBatch": "Monthly batch",
+        "teachersCount": "{count} teachers",
+        "viewDetails": "View payout details",
+        "empty": "No payout requests in this month. Use the arrows to browse other months — open requests only appear in the month they were submitted (or the month they were paid).",
+        "adminStripeNote": "Open a row for the cycle stepper, teacher lines, and pay actions. Settlement may take up to {window}.",
+        "adminManualNote": "Open a row to approve, reject, or mark as paid after an off-platform transfer.",
+        "managerNote": "Teachers start payouts from Earnings when they are ready. Approve or reject each request in the table."
+      },
+      "monthNav": {
+        "title": "By month",
+        "subtitle": "Teachers request payouts when they are ready — browse months to see what was paid or is still open.",
+        "previous": "Previous month",
+        "next": "Next month",
+        "paidThisMonth": "Paid this month",
+        "awaitingPayment": "Awaiting payment"
+      },
+      "detail": {
+        "requestTitle": "Payout request · {teacher}",
+        "monthlyTitle": "Monthly payout · {period}",
+        "managerBatch": "Manager batch",
+        "total": "Total",
+        "amount": "Amount",
+        "classes": "Classes",
+        "requestedBy": "Requested by",
+        "preparedBy": "Prepared by",
+        "period": "Period",
+        "reviewedBy": "Reviewed by",
+        "paymentReference": "Payment reference",
+        "rejectedReason": "Rejected: {reason}",
+        "teachersInBatch": "Teachers in this batch",
+        "teacher": "Teacher",
+        "sent": "Sent",
+        "rejectReasonLabel": "Reason (required to reject)",
+        "transferReferenceLabel": "Transfer reference (e.g. Wise, bank wire)",
+        "noteStripeManual": "Approve does not move money. Use Pay with Stripe or Mark as paid for international transfers. Settlement may take {window}.",
+        "noteStripeOnly": "Approve does not move money. Use Pay with Stripe. Settlement may take {window}.",
+        "noteManualOnly": "Record international or bank transfers with Mark as paid. Teachers are emailed on approval and payment.",
+        "noteNoRails": "No payout rails enabled — turn on Stripe Connect or transfers under Finance → Providers.",
+        "close": "Close",
+        "reject": "Reject",
+        "approve": "Approve",
+        "payWithStripe": "Pay {amount} with Stripe",
+        "markPaid": "Mark as paid"
+      },
+      "stepper": {
+        "request": "Request",
+        "approved": "Approved",
+        "sent": "Sent",
+        "rejected": "Rejected",
+        "awaitingApproval": "Awaiting approval",
+        "readyToSend": "Ready to send",
+        "complete": "Complete",
+        "teacherPayout": "Teacher payout",
+        "requestFrom": "Request from {name}",
+        "payoutRequest": "Payout request"
+      },
+      "requestCard": {
+        "title": "Request a payout",
+        "subtitle": "You choose when to get paid — each request is reviewed individually.",
+        "approvedWaiting": "Approved · waiting to be sent",
+        "waitingApproval": "Waiting for approval",
+        "available": "Available to request: {amount} ({count, plural, one {# class} other {# classes}}). Minimum: {min}.",
+        "afterRequest": "After you request a payout, the academy reviews it, sends the payment {method}, and your bank may take up to {window} to show the funds. We email you when it is approved and when payment is sent.",
+        "methodStripe": "(Stripe or international transfer)",
+        "methodTransfer": "by international transfer",
+        "pendingRequest": "Your request for {amount} was submitted on {date}.",
+        "approvedSoon": " Approved — payment will be sent soon. Allow up to {window} after it is sent.",
+        "waitingEmail": " Waiting for approval — you will get an email at each step.",
+        "finishStripe": "Finish Stripe setup below before you can request a payout.",
+        "stripeNotSet": "Stripe is not set up yet — you can still request a payout; the academy may pay you by international transfer.",
+        "payoutsPaused": "Payouts are paused — contact the academy.",
+        "keepTeaching": "Keep teaching — you can request a payout once unpaid earnings reach {amount}.",
+        "requestButton": "Request payout · {amount}"
+      },
+      "stripeCard": {
+        "title": "Get paid with Stripe",
+        "subtitle": "Payouts arrive in your Stripe account, then in your bank.",
+        "ready": "Ready for payouts",
+        "setupNotFinished": "Setup not finished",
+        "notConnected": "Not connected",
+        "description": "Stripe asks for your identity and bank details; the academy never sees them. You only do this once.",
+        "testMode": "Test mode: use Stripe's test data (for example the test bank account and the \"000-000\" verification code). No real money moves.",
+        "openDashboard": "Open my Stripe dashboard",
+        "finishSetup": "Finish Stripe setup",
+        "connect": "Connect Stripe"
+      },
+      "rates": {
+        "title": "Teacher pay rates",
+        "subtitle": "Revenue share per delivered class: teachers keep the rest after the platform take.",
+        "admin": "Admin",
+        "finance": "Finance",
+        "revenueShare": "Revenue share",
+        "revenueSubtitle": "Take rate is a % of the credit's purchase value when the class is booked.",
+        "trialPayout": "Trial / demo payout",
+        "trialHelp": "% of the normal teacher share when no student credit is used.",
+        "trialReference25": "Trial reference (25′)",
+        "trialReference25Help": "Assumed credit value for trial math when no payment.",
+        "trialReference50": "Trial reference (50′)",
+        "example": "Example: a {credit} credit at level 1 ({take}% platform take) pays the teacher {pay}.",
+        "saveRates": "Save rates",
+        "platformTakeByLevel": "Platform take by level",
+        "platformTakeSubtitle": "Lower take rewards established teachers (student credit value unchanged).",
+        "level": "Level",
+        "needs": "Needs",
+        "platformTake": "Platform take",
+        "teacherOnCredit": "Teacher on {credit}",
+        "teachers": "Teachers",
+        "needsLevel": "{classes}+ classes, {rating}★ from {ratings}+ ratings",
+        "pairedNote": "Paired classes use the paired package's credit value (one credit from the shared pool)."
+      }
+    },
+    "join": {
+      "missingToken": "Missing invitation token. Open the link from your Spanglish inbox (Email in the app).",
+      "notFound": "This invitation was not found.",
+      "closed": "This invitation is no longer open (expired, revoked, or already accepted).",
+      "title": "Manager invitation",
+      "signInSubtitle": "Invitation for {email}",
+      "signInTitle": "Sign in to continue",
+      "signInHelp": "Create an account or sign in with {email}, then return here to submit your experience and accept the role.",
+      "signIn": "Sign in",
+      "acceptSubtitle": "Submit your experience and accept operations access",
+      "onboardingTitle": "Operations manager onboarding"
+    },
+    "applications": {
+      "title": "Teacher applications",
+      "subtitle": "Invite candidates via in-app Email, then review their application here.",
+      "applications": "Applications",
+      "invitations": "Teacher invitations",
+      "invitationsSubtitle": "Open invites expire after 14 days — message includes a clickable /apply link.",
+      "inviteToApply": "Invite to apply",
+      "inviteByEmail": "Invite teacher by email",
+      "promoteVerified": "Promote verified student to teacher",
+      "promoteUser": "Promote user to teacher",
+      "noInvitations": "No pending invitations. Use the mail icon to invite someone to apply as a teacher.",
+      "sentExpires": "Sent {sent} · expires {expires}",
+      "revoke": "Revoke",
+      "waitingForReview": "Waiting for review ({count})",
+      "history": "History",
+      "openApplications": "Open applications",
+      "reviewedApplications": "Reviewed applications",
+      "filtered": "Filtered: {track}",
+      "track": "Track",
+      "allTracks": "All tracks",
+      "applicant": "Applicant",
+      "languages": "Languages",
+      "headline": "Headline",
+      "applied": "Applied",
+      "noMatches": "No applications match this view.",
+      "yearsTeaching": "{count} yr{plural} teaching",
+      "onlineExperience": "Online experience",
+      "appliedOn": "Applied {date}",
+      "fluencyNote": "Fluency note",
+      "experience": "Experience",
+      "watchVideo": "Watch intro video",
+      "noVideo": "No video link — required for conversation track.",
+      "credentials": "Credentials",
+      "view": "View",
+      "reviewerNote": "Reviewer note",
+      "noteToApplicant": "Note to the applicant (optional)",
+      "close": "Close",
+      "reject": "Reject",
+      "approve": "Approve",
+      "promoteTitle": "Promote to teacher",
+      "promoteHelp": "Skips the application form. The account must be a verified student with no upcoming classes as a student.",
+      "accountEmail": "Account email",
+      "promote": "Promote",
+      "inviteTitle": "Invite to apply as teacher",
+      "inviteHelp": "If they already have a student account, the invite lands in Spanglish Email with a clickable link to /apply.",
+      "noteToInvitee": "Note to invitee (optional)",
+      "sendInvitation": "Send invitation",
+      "contactTopic": "teacher application",
+      "emailSubject": "Regarding your teacher application",
+      "emailBody": "Hello {name},\n\nI am writing about your teacher application. Let me know if you have any questions.\n\nBest,\n{fromName}",
+      "contactApplicant": "Contact applicant",
+      "contactApplicantNamed": "Email {name}",
+      "reviewApplicant": "Review application from {name}",
+      "language": {
+        "english": "English",
+        "spanish": "Spanish"
+      }
+    },
+    "teachingActions": {
+      "windowInvalid": "Each window needs a start before its end and at least 25 minutes.",
+      "windowOverlap": "Two windows on the same day overlap. Merge or move them.",
+      "onlyTeachersAvailability": "Only teachers can edit availability.",
+      "tooManyWindows": "Too many availability windows (maximum 70).",
+      "availabilitySaved": "Availability saved.",
+      "onlyTeachersProfile": "Only teachers can edit a teaching profile.",
+      "profileSaved": "Teaching profile saved.",
+      "signInStudentToApply": "Sign in as a student to apply.",
+      "signInManageApplication": "Sign in to manage your application.",
+      "applicationWithdrawn": "Application withdrawn.",
+      "noOpenApplication": "No open application to withdraw.",
+      "onlyManagersReview": "Only managers can review applications.",
+      "onlyManagersInvite": "Only managers can invite applicants.",
+      "onlyManagersRevoke": "Only managers can revoke invitations.",
+      "onlyAdminPromote": "Only an admin can promote accounts."
+    },
+    "application": {
+      "tracks": {
+        "conversation": {
+          "label": "Conversation & practice",
+          "description": "Live speaking classes. Video sample required; formal teaching credentials optional."
+        },
+        "certified": {
+          "label": "Certified / structured teaching",
+          "description": "Exam prep, grammar-heavy, or school-style lessons. At least one credential required."
+        }
+      },
+      "fluency": {
+        "native": "Native speaker",
+        "c2": "C2 / near-native",
+        "other": "Other (explain below)"
+      },
+      "credentials": {
+        "celta": "CELTA / TEFL",
+        "dele": "DELE / language diploma",
+        "degree": "University degree (education or language)",
+        "license": "Teaching license",
+        "other": "Other certificate"
+      }
+    },
+    "staff": {
+      "student": {
+        "level": {
+          "beginner": "Beginner",
+          "intermediate": "Intermediate",
+          "advanced": "Advanced"
+        },
+        "goal": {
+          "travel": "Travel conversations",
+          "business": "Business presentations",
+          "everyday": "Everyday conversation",
+          "interview": "Interview preparation"
+        }
+      },
+      "teacherStudents": {
+        "nextClass": "Next class: {date}",
+        "shareMaterial": "Share material",
+        "learningGoal": "Learning goal",
+        "courseProgress": "Course progress",
+        "personalMaterials": "{count, plural, one {# personal material} other {# personal materials}}",
+        "rosterActive": "Active in roster",
+        "message": "Message"
+      }
+    }
+  }
+}

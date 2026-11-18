@@ -1,5 +1,7 @@
+import { getRecordingStorageMode } from "@/server/storage/recordings";
 import { connection } from "next/server";
 import { and, count, desc, eq, gt, gte, isNotNull, ne, sql } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import type {
   AdminAlert,
   AdminStat,
@@ -25,6 +27,7 @@ import {
   economicsToPayoutBatches,
   getAcademyEconomicsSnapshot,
 } from "@/server/admin/class-economics";
+import type { AdminTranslator } from "@/server/admin/translator";
 import {
   countPricingPackages,
   listCommercePackagesFromDb,
@@ -44,8 +47,8 @@ export type AdminUserRow = {
   createdAt: string;
 };
 
-function formatInt(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+function formatInt(value: number, locale: string) {
+  return new Intl.NumberFormat(locale).format(value);
 }
 
 function integrationStatus(ready: boolean, partial: boolean): IntegrationStatus {
@@ -54,7 +57,8 @@ function integrationStatus(ready: boolean, partial: boolean): IntegrationStatus 
   return "not-configured";
 }
 
-export function buildIntegrationStatuses(): Integration[] {
+export async function buildIntegrationStatuses(): Promise<Integration[]> {
+  const t = await getTranslations("admin");
   const liveKitReady = Boolean(
     env.LIVEKIT_URL && env.LIVEKIT_API_KEY && env.LIVEKIT_API_SECRET,
   );
@@ -70,7 +74,7 @@ export function buildIntegrationStatuses(): Integration[] {
   const emailPartial = Boolean(env.EMAIL_FROM || env.SMTP_USER || env.POSTMARK_SERVER_TOKEN);
 
   const b2Ready =
-    env.RECORDING_STORAGE === "cloud" &&
+    getRecordingStorageMode() === "cloud" &&
     Boolean(env.B2_KEY_ID && env.B2_APPLICATION_KEY && env.B2_BUCKET_NAME && env.B2_S3_ENDPOINT);
   const b2Partial = Boolean(env.B2_KEY_ID || env.B2_BUCKET_NAME);
 
@@ -80,9 +84,9 @@ export function buildIntegrationStatuses(): Integration[] {
     {
       id: "integration-meet",
       name: "LiveKit",
-      description: `Meeting provider: ${env.MEETING_PROVIDER}. Keys: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET.`,
+      description: t("integration.description.meet", { provider: env.MEETING_PROVIDER }),
       status: integrationStatus(liveKitReady, liveKitPartial),
-      owner: "Platform",
+      owner: t("integration.owner.platform"),
       variables: [
         v("LIVEKIT_URL", env.LIVEKIT_URL),
         v("LIVEKIT_API_KEY", env.LIVEKIT_API_KEY),
@@ -93,9 +97,9 @@ export function buildIntegrationStatuses(): Integration[] {
     {
       id: "integration-email",
       name: env.EMAIL_PROVIDER === "postmark" ? "Postmark" : "Gmail SMTP",
-      description: "Verification codes, password reset, and security notices.",
+      description: t("integration.description.email"),
       status: integrationStatus(emailReady, emailPartial),
-      owner: "Platform",
+      owner: t("integration.owner.platform"),
       variables:
         env.EMAIL_PROVIDER === "postmark"
           ? [v("EMAIL_FROM", env.EMAIL_FROM), v("POSTMARK_SERVER_TOKEN", env.POSTMARK_SERVER_TOKEN)]
@@ -107,10 +111,10 @@ export function buildIntegrationStatuses(): Integration[] {
     },
     {
       id: "integration-google",
-      name: "Google sign-in",
-      description: "OAuth client for web (and Android client when configured).",
+      name: t("integration.name.googleSignIn"),
+      description: t("integration.description.google"),
       status: googleSignInEnabled ? "connected" : "not-configured",
-      owner: "Platform",
+      owner: t("integration.owner.platform"),
       variables: [
         v("GOOGLE_CLIENT_ID", env.GOOGLE_CLIENT_ID),
         v("GOOGLE_CLIENT_SECRET", env.GOOGLE_CLIENT_SECRET),
@@ -120,18 +124,18 @@ export function buildIntegrationStatuses(): Integration[] {
     },
     {
       id: "integration-storage",
-      name: env.RECORDING_STORAGE === "cloud" ? "Backblaze B2" : "Local recordings",
+      name: getRecordingStorageMode() === "cloud" ? "Backblaze B2" : t("integration.name.localRecordings"),
       description:
-        env.RECORDING_STORAGE === "cloud"
-          ? "Class recordings in B2 (B2_* variables)."
-          : "Files under storage/recordings until RECORDING_STORAGE=cloud.",
+        getRecordingStorageMode() === "cloud"
+          ? t("integration.description.storageCloud")
+          : t("integration.description.storageLocal"),
       status:
-        env.RECORDING_STORAGE === "local"
+        getRecordingStorageMode() === "local"
           ? "connected"
           : integrationStatus(b2Ready, b2Partial),
-      owner: "Platform",
+      owner: t("integration.owner.platform"),
       variables:
-        env.RECORDING_STORAGE === "cloud"
+        getRecordingStorageMode() === "cloud"
           ? [
               v("B2_KEY_ID", env.B2_KEY_ID),
               v("B2_APPLICATION_KEY", env.B2_APPLICATION_KEY),
@@ -143,11 +147,10 @@ export function buildIntegrationStatuses(): Integration[] {
     },
     {
       id: "integration-billing",
-      name: stripeTestMode ? "Stripe (test mode)" : "Stripe",
-      description:
-        "Package checkout (Stripe Checkout) and teacher payouts (Connect transfers). Webhook: /api/webhooks/stripe.",
+      name: stripeTestMode ? t("integration.name.stripeTest") : "Stripe",
+      description: t("integration.description.billing"),
       status: stripeWebhookEnabled ? "connected" : stripeEnabled || env.STRIPE_SECRET_KEY ? "action-needed" : "not-configured",
-      owner: "Finance",
+      owner: t("integration.owner.finance"),
       variables: [
         v("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY),
         v("STRIPE_WEBHOOK_SECRET", env.STRIPE_WEBHOOK_SECRET),
@@ -301,6 +304,7 @@ export async function listUsersForAdmin(options: {
 }
 
 export async function listManagers(): Promise<ManagerAccount[]> {
+  const locale = await getLocale();
   const rows = await db
     .select({
       id: users.id,
@@ -318,22 +322,29 @@ export async function listManagers(): Promise<ManagerAccount[]> {
     name: row.name,
     email: row.email,
     status: row.emailBouncedAt ? "Suspended" : "Active",
-    since: row.createdAt.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+    since: row.createdAt.toLocaleDateString(locale, { month: "short", year: "numeric" }),
   }));
 }
 
 export async function buildTeacherRateTiers(): Promise<TeacherRateTier[]> {
-  const groups = await countTeachersByLevel();
+  const t = await getTranslations("admin");
+  const groups = await countTeachersByLevel(t);
   return groups.map((group, index) => ({
     id: `level-${index}`,
     label: group.level,
     multiplier: 1,
-    description: "Teachers in the database at this learning level.",
+    description: t("teacherRates.description"),
     teachers: group.teachers,
   }));
 }
 
-async function countTeachersByLevel(): Promise<{ level: string; teachers: number }[]> {
+const teacherLevelKeys: Record<string, string> = {
+  beginner: "teacherRates.level.beginner",
+  intermediate: "teacherRates.level.intermediate",
+  advanced: "teacherRates.level.advanced",
+};
+
+async function countTeachersByLevel(t: AdminTranslator): Promise<{ level: string; teachers: number }[]> {
   const rows = await db
     .select({
       level: users.level,
@@ -343,16 +354,13 @@ async function countTeachersByLevel(): Promise<{ level: string; teachers: number
     .where(sql`'teacher' = ANY(${users.roles})`)
     .groupBy(users.level);
 
-  const labels: Record<string, string> = {
-    beginner: "Beginner cohort",
-    intermediate: "Intermediate cohort",
-    advanced: "Advanced cohort",
-  };
-
-  return rows.map((row) => ({
-    level: row.level ? (labels[row.level] ?? row.level) : "Level not set",
-    teachers: row.value,
-  }));
+  return rows.map((row) => {
+    const levelKey = row.level ? teacherLevelKeys[row.level] : undefined;
+    return {
+      level: levelKey ? t(levelKey) : row.level ?? t("teacherRates.level.notSet"),
+      teachers: row.value,
+    };
+  });
 }
 
 async function countTable(table: typeof users | typeof sessions) {
@@ -361,21 +369,31 @@ async function countTable(table: typeof users | typeof sessions) {
 }
 
 export async function getLedgerSnapshots(): Promise<LedgerSnapshot[]> {
-  const snapshot = await getAcademyEconomicsSnapshot();
-  return economicsToLedgerSnapshots(snapshot);
+  const [snapshot, t, locale] = await Promise.all([
+    getAcademyEconomicsSnapshot(),
+    getTranslations("admin"),
+    getLocale(),
+  ]);
+  return economicsToLedgerSnapshots(snapshot, t, locale);
 }
 
 export async function getOperationsStats(): Promise<AdminStat[]> {
-  const snapshot = await getAcademyEconomicsSnapshot();
-  return economicsToAdminStats(snapshot);
+  const [snapshot, t, locale] = await Promise.all([
+    getAcademyEconomicsSnapshot(),
+    getTranslations("admin"),
+    getLocale(),
+  ]);
+  return economicsToAdminStats(snapshot, t, locale);
 }
 
 export async function getManagerDashboardStats(): Promise<ManagerDashboardStat[]> {
-  const [snapshot, roles] = await Promise.all([
+  const [snapshot, roles, t, locale] = await Promise.all([
     getAcademyEconomicsSnapshot(),
     countUsersByRole(),
+    getTranslations("admin"),
+    getLocale(),
   ]);
-  return economicsToManagerStats(snapshot, roles.student, roles.teacher);
+  return economicsToManagerStats(snapshot, roles.student, roles.teacher, t, locale);
 }
 
 export async function getAcademyEconomicsForDashboard() {
@@ -383,12 +401,17 @@ export async function getAcademyEconomicsForDashboard() {
 }
 
 export async function getEstimatedPayoutBatches(): Promise<PayoutBatch[]> {
-  const snapshot = await getAcademyEconomicsSnapshot();
-  return economicsToPayoutBatches(snapshot);
+  const [snapshot, t, locale] = await Promise.all([
+    getAcademyEconomicsSnapshot(),
+    getTranslations("admin"),
+    getLocale(),
+  ]);
+  return economicsToPayoutBatches(snapshot, t, locale);
 }
 
 export async function getEmailHealthRows(): Promise<EmailHealthRow[]> {
   await connection(); // live data, read the clock at request time
+  const [t, locale] = await Promise.all([getTranslations("admin"), getLocale()]);
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const [totalUsers, verified, bounced, recentSignIns] = await Promise.all([
@@ -424,45 +447,52 @@ export async function getEmailHealthRows(): Promise<EmailHealthRow[]> {
   return [
     {
       id: "accounts",
-      metric: "Accounts with email",
-      value: formatInt(totalUsers),
+      metric: t("emailHealth.metric.accounts"),
+      value: formatInt(totalUsers, locale),
       status: "ok",
     },
     {
       id: "verified",
-      metric: "Verified inboxes",
-      value: `${formatInt(verified)} (${totalUsers ? Math.round((verified / totalUsers) * 100) : 0}%)`,
+      metric: t("emailHealth.metric.verified"),
+      value: t("emailHealth.value.verified", {
+        count: formatInt(verified, locale),
+        percent: totalUsers ? Math.round((verified / totalUsers) * 100) : 0,
+      }),
       status: verified === totalUsers ? "ok" : "watch",
     },
     {
       id: "bounced",
-      metric: "Bounced addresses",
-      value: formatInt(bounced),
+      metric: t("emailHealth.metric.bounced"),
+      value: formatInt(bounced, locale),
       status: bounced === 0 ? "ok" : "action",
     },
     {
       id: "signins",
-      metric: "Sign-ins (7 days)",
-      value: formatInt(recentSignIns),
+      metric: t("emailHealth.metric.signIns"),
+      value: formatInt(recentSignIns, locale),
       status: "ok",
     },
     {
       id: "delivery",
-      metric: "Email delivery configured",
-      value: emailConfigured ? "Yes" : "No",
+      metric: t("emailHealth.metric.delivery"),
+      value: emailConfigured ? t("common.yes") : t("common.no"),
       status: emailConfigured ? "ok" : "action",
     },
     {
       id: "webhook",
-      metric: "Postmark bounce webhook",
-      value: webhookOk ? "Configured" : "Missing secret",
+      metric: t("emailHealth.metric.webhook"),
+      value: webhookOk ? t("emailHealth.value.configured") : t("emailHealth.value.missingSecret"),
       status: webhookOk ? "ok" : env.EMAIL_PROVIDER === "postmark" ? "action" : "watch",
     },
   ];
 }
 
 export async function getExecutiveStats(): Promise<AdminStat[]> {
-  const integrations = buildIntegrationStatuses();
+  const [t, locale, integrations] = await Promise.all([
+    getTranslations("admin"),
+    getLocale(),
+    buildIntegrationStatuses(),
+  ]);
   const connected = integrations.filter((item) => item.status === "connected").length;
 
   await connection(); // live data, read the clock at request time
@@ -490,43 +520,44 @@ export async function getExecutiveStats(): Promise<AdminStat[]> {
   return [
     {
       id: "accounts",
-      label: "Total accounts",
-      value: formatInt(totalUsers),
-      helper: "Rows in users",
+      label: t("executiveStat.accounts.label"),
+      value: formatInt(totalUsers, locale),
+      helper: t("executiveStat.accounts.helper"),
       href: "/admin/organization/users",
     },
     {
       id: "sessions",
-      label: "Active sessions",
-      value: formatInt(activeSessions),
-      helper: "Current sign-ins",
+      label: t("executiveStat.sessions.label"),
+      value: formatInt(activeSessions, locale),
+      helper: t("executiveStat.sessions.helper"),
       href: "/admin/organization/users",
     },
     {
       id: "security",
-      label: "Security alerts (7d)",
-      value: formatInt(securityAlerts),
-      helper: "Warning or critical audit events",
+      label: t("executiveStat.security.label"),
+      value: formatInt(securityAlerts, locale),
+      helper: t("executiveStat.security.helper"),
       href: "/admin/audit",
     },
     {
       id: "integrations",
-      label: "Integrations healthy",
+      label: t("executiveStat.integrations.label"),
       value: `${connected} / ${integrations.length}`,
-      helper: "From environment configuration",
+      helper: t("executiveStat.integrations.helper"),
       href: "/admin/platform/integrations",
     },
   ];
 }
 
 export async function getPlatformHealthAlerts(): Promise<AdminAlert[]> {
+  const t = await getTranslations("admin");
   const alerts: AdminAlert[] = [];
 
-  const integrations = buildIntegrationStatuses();
+  const integrations = await buildIntegrationStatuses();
   for (const item of integrations.filter((row) => row.status !== "connected")) {
     alerts.push({
       id: `integration-${item.id}`,
-      title: `${item.name} not ready`,
+      title: t("alert.integrationNotReady", { name: item.name }),
       detail: item.description,
       severity: item.status === "not-configured" ? "warning" : "info",
       href: "/admin/platform/integrations",
@@ -547,8 +578,8 @@ export async function getPlatformHealthAlerts(): Promise<AdminAlert[]> {
   if (managersWithout2Fa > 0) {
     alerts.push({
       id: "manager-2fa",
-      title: `${managersWithout2Fa} manager account(s) without 2FA`,
-      detail: "Enable authenticator apps before handling payouts or role changes.",
+      title: t("alert.managerWithout2Fa", { count: managersWithout2Fa }),
+      detail: t("alert.managerWithout2FaDetail"),
       severity: "warning",
       href: "/admin/platform/security",
     });
@@ -563,8 +594,8 @@ export async function getPlatformHealthAlerts(): Promise<AdminAlert[]> {
   if (bounced > 0) {
     alerts.push({
       id: "email-bounce",
-      title: `${bounced} account(s) with bounced email`,
-      detail: "Transactional mail is suppressed for these addresses.",
+      title: t("alert.emailBounce", { count: bounced }),
+      detail: t("alert.emailBounceDetail"),
       severity: "warning",
       href: "/admin/platform/email",
     });
@@ -573,8 +604,8 @@ export async function getPlatformHealthAlerts(): Promise<AdminAlert[]> {
   if (!env.EMAIL_FROM) {
     alerts.push({
       id: "email-from",
-      title: "EMAIL_FROM is not set",
-      detail: "Auth codes and security emails cannot send until from-address is configured.",
+      title: t("alert.emailFromMissing"),
+      detail: t("alert.emailFromMissingDetail"),
       severity: "critical",
       href: "/admin/platform/email",
     });
@@ -583,8 +614,8 @@ export async function getPlatformHealthAlerts(): Promise<AdminAlert[]> {
   if (env.NODE_ENV === "production" && env.CLASS_RELAX_JOIN_WINDOW) {
     alerts.push({
       id: "join-window",
-      title: "CLASS_RELAX_JOIN_WINDOW is on",
-      detail: "Anyone can join classes outside the scheduled window in production.",
+      title: t("alert.joinWindowOn"),
+      detail: t("alert.joinWindowOnDetail"),
       severity: "critical",
       href: "/admin/platform/rooms",
     });
@@ -597,15 +628,16 @@ export async function getRecentAuditForDashboard(limit = 6): Promise<AuditListEn
   return listAuditEvents({ limit });
 }
 
-export function formatAuditActivity(entry: AuditListEntry) {
+export async function formatAuditActivity(entry: AuditListEntry) {
+  const [t, locale] = await Promise.all([getTranslations("admin"), getLocale()]);
   const when = new Date(entry.createdAt);
-  const at = when.toLocaleString("en-US", {
+  const at = when.toLocaleString(locale, {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
   });
-  const actor = entry.actorName || entry.actorEmail || "Unknown account";
+  const actor = entry.actorName || entry.actorEmail || t("audit.unknownAccount");
   return {
     id: entry.id,
     actor,

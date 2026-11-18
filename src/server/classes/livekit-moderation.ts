@@ -1,11 +1,13 @@
 import { TrackSource } from "@livekit/protocol";
+import { getTranslations } from "next-intl/server";
 import { isStaffGuestIdentity } from "@/lib/classroom-identities";
 import { getRoomServiceClient } from "@/server/classes/livekit-api";
 
 export async function muteAllRemoteTracks(roomName: string) {
+  const t = await getTranslations("classroom");
   const client = getRoomServiceClient();
   if (!client) {
-    return { ok: false as const, message: "LiveKit admin API is not configured." };
+    return { ok: false as const, message: t("moderation.apiNotConfigured") };
   }
 
   const participants = await client.listParticipants(roomName);
@@ -34,27 +36,30 @@ export async function muteAllRemoteTracks(roomName: string) {
 
   return {
     ok: true as const,
-    message: muted ? `Muted ${muted} audio track(s).` : "No active audio tracks to mute.",
+    message: muted
+      ? t("moderation.mutedCount", { count: muted })
+      : t("moderation.noActiveAudio"),
   };
 }
 
 export async function muteParticipantMicrophone(roomName: string, identity: string) {
+  const t = await getTranslations("classroom");
   const client = getRoomServiceClient();
   if (!client) {
-    return { ok: false as const, message: "LiveKit admin API is not configured." };
+    return { ok: false as const, message: t("moderation.apiNotConfigured") };
   }
 
   if (isStaffGuestIdentity(identity.trim())) {
     return {
       ok: false as const,
-      message: "Staff guest observers are not muted from the host controls.",
+      message: t("moderation.staffNotMuted"),
     };
   }
 
   const participants = await client.listParticipants(roomName);
   const participant = participants.find((row) => row.identity === identity);
   if (!participant) {
-    return { ok: false as const, message: "Participant is not in the room." };
+    return { ok: false as const, message: t("moderation.participantNotFound") };
   }
 
   let muted = 0;
@@ -68,6 +73,6 @@ export async function muteParticipantMicrophone(roomName: string, identity: stri
 
   return {
     ok: true as const,
-    message: muted ? "Participant microphone muted." : "Microphone was already muted.",
+    message: muted ? t("moderation.participantMuted") : t("moderation.alreadyMuted"),
   };
 }

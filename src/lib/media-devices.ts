@@ -1,6 +1,15 @@
-export function friendlyMediaError(cause: unknown) {
+/**
+ * Translate a browser media error into a message that is safe to show to the user.
+ * The translator is injected so this helper stays usable from client hooks.
+ */
+export function friendlyMediaError(cause: unknown, t: (key: string) => string) {
+  // Browsers only expose the camera and microphone on https:// or localhost.
+  if (typeof window !== "undefined" && (!window.isSecureContext || !navigator.mediaDevices)) {
+    return t("errors.mediaInsecure");
+  }
+
   if (!(cause instanceof Error)) {
-    return "Could not access camera or microphone.";
+    return t("errors.mediaGeneric");
   }
 
   const dom = cause as DOMException;
@@ -11,15 +20,20 @@ export function friendlyMediaError(cause: unknown) {
     text.includes("requested device not found") ||
     text.includes("device not found")
   ) {
-    return "No camera or microphone was found. Connect a device, close other apps using it, or allow access under Windows Settings → Privacy → Camera / Microphone.";
+    return t("errors.mediaNotFound");
+  }
+
+  // Blocked by the page's Permissions-Policy (the browser never asked).
+  if (text.includes("permissions policy") || text.includes("not allowed in this document")) {
+    return t("errors.mediaPolicy");
   }
 
   if (dom.name === "NotAllowedError" || text.includes("permission")) {
-    return "Camera or microphone permission was denied. Allow access in the browser prompt or system settings.";
+    return t("errors.mediaDenied");
   }
 
   if (dom.name === "NotReadableError" || text.includes("in use")) {
-    return "The camera or microphone is in use by another application.";
+    return t("errors.mediaInUse");
   }
 
   return cause.message;

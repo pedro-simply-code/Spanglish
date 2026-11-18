@@ -19,13 +19,13 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconCards, IconUserPlus } from "@tabler/icons-react";
-import { AcademyContactButton } from "@/components/ui/academy-contact-button";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { AcademyContactButton } from "@/components/ui/academy-contact-button";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { QueryPagination } from "@/components/ui/query-pagination";
 import { SectionCard } from "@/components/ui/section-card";
-import { roleDefinitions } from "@/features/auth";
 import type { PersonAccount } from "@/features/management/data";
 import { roleCodes, type RoleCode } from "@/lib/auth-roles";
 
@@ -39,8 +39,8 @@ type PeopleOverviewProps = {
   mailFromName?: string;
 };
 
-const joinedLabel = (iso: string) =>
-  new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(iso));
+const joinedLabel = (iso: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric" }).format(new Date(iso));
 
 const statusColor = {
   Active: "success" as const,
@@ -56,6 +56,8 @@ function UserListFilters({
   searchQuery: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("admin");
+  const roleT = useTranslations("shell");
   const [draft, setDraft] = useState(searchQuery);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ function UserListFilters({
     <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={2} useFlexGap>
       <TextField
         size="small"
-        label="Search name or email"
+        label={t("management.people.searchLabel")}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={(event) => {
@@ -84,27 +86,27 @@ function UserListFilters({
         sx={{ minWidth: { sm: 260 }, flex: 1 }}
       />
       <FormControl size="small" sx={{ minWidth: 160 }}>
-        <InputLabel id="users-role-filter">Role</InputLabel>
+        <InputLabel id="users-role-filter">{t("management.people.roleLabel")}</InputLabel>
         <Select
           labelId="users-role-filter"
-          label="Role"
+          label={t("management.people.roleLabel")}
           value={roleFilter}
           onChange={(event) => pushFilters(event.target.value as RoleCode | "", draft)}
         >
-          <MenuItem value="">All roles</MenuItem>
+          <MenuItem value="">{t("management.people.allRoles")}</MenuItem>
           {roleCodes.map((role) => (
             <MenuItem key={role} value={role}>
-              {roleDefinitions[role].badge}
+              {roleT(`roles.${role}`)}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       <Button variant="outlined" onClick={() => pushFilters(roleFilter, draft)}>
-        Search
+        {t("management.people.search")}
       </Button>
       {roleFilter || searchQuery ? (
         <Button variant="text" onClick={() => pushFilters("", "")}>
-          Clear filters
+          {t("management.people.clearFilters")}
         </Button>
       ) : null}
     </Stack>
@@ -120,42 +122,46 @@ export function PeopleOverview({
   searchQuery,
   mailFromName,
 }: PeopleOverviewProps) {
+  const t = useTranslations("admin");
+  const roleT = useTranslations("shell");
+  const locale = useLocale();
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Users"
-        subtitle="Accounts can hold multiple roles; status reflects email verification and delivery health."
+        title={t("common.page.users")}
+        subtitle={t("management.people.subtitle")}
         items={[
-          { title: "Admin", to: "/admin" },
-          { title: "Organization" },
-          { title: "Users" },
+          { title: t("common.admin"), to: "/admin" },
+          { title: t("common.section.organization") },
+          { title: t("common.page.users") },
         ]}
       >
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <LinkButton href="/admin/organization/students" variant="outlined" startIcon={<IconCards size={16} />}>
-            Students & pairs
+            {t("management.people.studentsAndPairs")}
           </LinkButton>
           <LinkButton href="/admin/organization/roles" variant="contained" startIcon={<IconUserPlus size={16} />}>
-            Manage roles
+            {t("management.people.manageRoles")}
           </LinkButton>
         </Stack>
       </Breadcrumb>
 
       <SectionCard
-        title="Accounts"
-        subtitle="Suspended means email bounced — transactional mail is suppressed until the address is fixed."
+        title={t("management.people.accounts")}
+        subtitle={t("management.people.accountsSubtitle")}
       >
         <UserListFilters roleFilter={roleFilter} searchQuery={searchQuery} />
 
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Roles</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>2FA</TableCell>
-              <TableCell>Joined</TableCell>
-              <TableCell align="right">Links</TableCell>
+              <TableCell>{t("management.people.column.name")}</TableCell>
+              <TableCell>{t("management.people.column.roles")}</TableCell>
+              <TableCell>{t("management.people.column.status")}</TableCell>
+              <TableCell>{t("management.people.column.twoFactor")}</TableCell>
+              <TableCell>{t("management.people.column.joined")}</TableCell>
+              <TableCell align="right">{t("management.people.column.links")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -164,8 +170,8 @@ export function PeopleOverview({
                 <TableCell colSpan={6}>
                   <Typography variant="body2" color="text.secondary">
                     {roleFilter || searchQuery
-                      ? "No accounts match these filters."
-                      : "No accounts yet. Run db:seed or sign up on the site."}
+                      ? t("management.people.empty.filtered")
+                      : t("management.people.empty.none")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -185,7 +191,7 @@ export function PeopleOverview({
                     {person.roles.map((role) => (
                       <Chip
                         key={role}
-                        label={roleDefinitions[role].badge}
+                        label={roleT(`roles.${role}`)}
                         size="small"
                         variant="outlined"
                       />
@@ -194,16 +200,10 @@ export function PeopleOverview({
                 </TableCell>
                 <TableCell>
                   <Tooltip
-                    title={
-                      person.status === "Suspended"
-                        ? "Email bounced — not a manual ban"
-                        : person.status === "Invited"
-                          ? "Email not verified yet"
-                          : "Verified and deliverable"
-                    }
+                    title={t(`management.people.statusHint.${person.status.toLowerCase()}`)}
                   >
                     <Chip
-                      label={person.status}
+                      label={t(`management.people.status.${person.status.toLowerCase()}`)}
                       size="small"
                       color={statusColor[person.status]}
                       variant="outlined"
@@ -212,7 +212,9 @@ export function PeopleOverview({
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={person.twoFactorEnabled ? "On" : "Off"}
+                    label={person.twoFactorEnabled
+                      ? t("management.people.twoFactor.on")
+                      : t("management.people.twoFactor.off")}
                     size="small"
                     color={person.twoFactorEnabled ? "success" : "default"}
                     variant={person.twoFactorEnabled ? "filled" : "outlined"}
@@ -220,7 +222,7 @@ export function PeopleOverview({
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2" color="text.secondary">
-                    {joinedLabel(person.createdAt)}
+                    {joinedLabel(person.createdAt, locale)}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
@@ -229,15 +231,17 @@ export function PeopleOverview({
                       to={person.email}
                       recipientName={person.name}
                       fromName={mailFromName}
-                      topic={`message for ${person.roles[0] ?? "member"}`}
+                      topic={t("management.people.contactTopic", {
+                        role: roleT(person.roles[0] ? `roles.${person.roles[0]}` : "roles.student"),
+                      })}
                     />
                     {person.roles.includes("student") ? (
-                      <Tooltip title="Students, pairs, and credit balances">
+                      <Tooltip title={t("management.people.studentsTooltip")}>
                         <IconButton
                           component="a"
                           href="/admin/organization/students"
                           size="small"
-                          aria-label={`Open students directory for ${person.name}`}
+                          aria-label={t("management.people.studentsAriaLabel", { name: person.name })}
                         >
                           <IconCards size={18} />
                         </IconButton>

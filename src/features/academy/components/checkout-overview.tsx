@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -34,6 +35,22 @@ import { formatMoney, findPlanById, defaultPlan } from "@/features/academy/data"
 import type { AcademyPlan } from "@/features/academy/data";
 
 type PaymentMethod = "card" | "paypal";
+
+type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
+type StudentKey = Parameters<StudentTranslator>[0];
+
+const planNameKeys: Record<string, string> = {
+  "paired-30": "pricing.plan.name.pairedStarter",
+  "paired-60": "pricing.plan.name.pairedProgress",
+  "paired-90": "pricing.plan.name.pairedFluency",
+  "one-on-one-30": "pricing.plan.name.starterSupport",
+  "one-on-one-60": "pricing.plan.name.steadyProgress",
+  "one-on-one-90": "pricing.plan.name.fluencyBuilder",
+};
+
+function planName(t: StudentTranslator, plan: AcademyPlan) {
+  return t(planNameKeys[`${plan.type}-${plan.classes}`] as StudentKey);
+}
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
@@ -112,6 +129,7 @@ type CheckoutOverviewProps = {
 };
 
 export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: false } }: CheckoutOverviewProps) {
+  const t = useTranslations("student");
   const searchParams = useSearchParams();
   const plan = findPlanById(plans, searchParams.get("plan")) ?? plans[0] ?? defaultPlan;
   const [method, setMethod] = useState<PaymentMethod>("card");
@@ -139,8 +157,8 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
     return (
       <Box mt={3}>
         <Breadcrumb
-          title="Enrollment confirmed"
-          subtitle="Your class package is ready to use."
+          title={t("checkout.result.titlePaid")}
+          subtitle={t("checkout.result.subtitlePaid")}
         />
 
         <Card elevation={9}>
@@ -163,12 +181,13 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
             </Avatar>
 
             <Typography variant="h3" fontWeight={700} mt={3}>
-              You&apos;re all set!
+              {t("checkout.result.allSet")}
             </Typography>
             <Typography color="text.secondary" mt={1} mx="auto" maxWidth={560}>
-              {plan.classes} credits were added
-              {plan.type === "paired" ? " to the pool you share with your partner" : ""}. Schedule
-              your first live class whenever you are ready.
+              {t("checkout.result.creditsAdded", {
+                count: plan.classes,
+                suffix: plan.type === "paired" ? t("checkout.result.pairedSuffix") : "",
+              })}
             </Typography>
 
             <Stack
@@ -183,10 +202,10 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                 size="large"
                 startIcon={<IconCalendarEvent size={18} />}
               >
-                Schedule first class
+                {t("actions.scheduleFirstClass")}
               </LinkButton>
               <LinkButton href="/home" variant="outlined" size="large">
-                Back to overview
+                {t("actions.backToOverview")}
               </LinkButton>
             </Stack>
           </CardContent>
@@ -198,19 +217,19 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Checkout"
-        subtitle="Review your package and payment details."
+        title={t("checkout.breadcrumbTitle")}
+        subtitle={t("checkout.breadcrumbSubtitle")}
       />
 
       {searchParams.get("canceled") ? (
         <Alert severity="info" sx={{ mb: 3 }}>
-          The payment was canceled on Stripe. Nothing was charged; you can try again.
+          {t("checkout.canceledNotice")}
         </Alert>
       ) : null}
 
       {stripe.enabled ? null : (
         <Alert severity="info" sx={{ mb: 3 }}>
-          Demo checkout: no card will be charged and no payment is processed.
+          {t("checkout.demoNotice")}
         </Alert>
       )}
 
@@ -218,11 +237,11 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
         <Grid size={{ xs: 12, lg: 7 }}>
           <Stack spacing={3}>
             <SectionCard
-              title="Order summary"
-              subtitle="Live classes with a certified teacher"
+              title={t("checkout.orderTitle")}
+              subtitle={t("checkout.orderSubtitle")}
               action={
                 <Chip
-                  label="Live classes"
+                  label={t("checkout.liveClassesChip")}
                   color="primary"
                   size="small"
                   variant="outlined"
@@ -241,10 +260,13 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                   <IconCalendarEvent size={26} />
                 </Avatar>
                 <Box minWidth={0}>
-                  <Typography variant="h5">{plan.name}</Typography>
+                  <Typography variant="h5">{planName(t, plan)}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {plan.classes} live classes · {plan.duration} min ·{" "}
-                    {classTypeLabel(plan.type)}
+                    {t("checkout.planDetails", {
+                      count: plan.classes,
+                      duration: plan.duration,
+                      type: classTypeLabel(plan.type, t),
+                    })}
                   </Typography>
                 </Box>
               </Stack>
@@ -253,11 +275,14 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
 
               <Stack spacing={1.5}>
                 <SummaryRow
-                  label={`${plan.classes} classes × ${formatMoney(plan.pricePerClass)}`}
+                  label={t("checkout.classesTimesPrice", {
+                    count: plan.classes,
+                    amount: formatMoney(plan.pricePerClass),
+                  })}
                   value={formatMoney(plan.total)}
                 />
-                <SummaryRow label="Taxes" value="Calculated at payment" />
-                <SummaryRow label="Credits valid for" value="12 months" />
+                <SummaryRow label={t("checkout.taxes")} value={t("checkout.calculatedAtPayment")} />
+                <SummaryRow label={t("checkout.creditsValid")} value={t("checkout.twelveMonths")} />
               </Stack>
 
               <Divider sx={{ my: 2.5 }} />
@@ -267,7 +292,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                 justifyContent="space-between"
                 alignItems="baseline"
               >
-                <Typography variant="h5">Total due today</Typography>
+                <Typography variant="h5">{t("checkout.totalDueToday")}</Typography>
                 <Typography
                   variant="h3"
                   fontWeight={700}
@@ -283,68 +308,66 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                   color="text.secondary"
                   textAlign="right"
                 >
-                  {formatMoney(plan.perStudentTotal)} per student
+                  {t("pricing.perStudentTotal", { amount: formatMoney(plan.perStudentTotal) })}
                 </Typography>
               ) : null}
             </SectionCard>
 
             <SectionCard
-              title="Billing details"
-              subtitle="Where we send your receipt and class links"
+              title={t("checkout.billingTitle")}
+              subtitle={t("checkout.billingSubtitle")}
             >
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    label="First name"
+                    label={t("checkout.firstName")}
                     defaultValue="Alex"
                     fullWidth
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    label="Last name"
+                    label={t("checkout.lastName")}
                     defaultValue="Rivera"
                     fullWidth
                   />
                 </Grid>
                 <Grid size={12}>
                   <TextField
-                    label="Email"
+                    label={t("common.email")}
                     type="email"
                     defaultValue="alex@spanglish.app"
                     fullWidth
-                    helperText="Your class links and receipts go here."
+                    helperText={t("checkout.emailHelper")}
                   />
                 </Grid>
               </Grid>
             </SectionCard>
 
             {stripe.enabled ? (
-              <SectionCard title="Payment method" subtitle="Card payment on Stripe's secure page">
+              <SectionCard title={t("checkout.paymentTitle")} subtitle={t("checkout.stripeSubtitle")}>
                 <Stack spacing={2}>
                   <Typography variant="body2" color="text.secondary">
-                    When you press Pay you go to Stripe to enter your card. Spanglish never sees
-                    your card details. Your credits are added as soon as the payment is confirmed.
+                    {t("checkout.stripeBody")}
                   </Typography>
                   {stripe.testMode ? (
                     <Alert severity="warning">
-                      Test mode: no real money is charged. Use the card 4242 4242 4242 4242, any
-                      future date and any CVC.
+                      {t("checkout.testMode")}
                     </Alert>
                   ) : null}
                 </Stack>
               </SectionCard>
             ) : (
             <SectionCard
-                title="Payment method"
-                subtitle="Monthly payment options available at checkout"
+                title={t("checkout.paymentTitle")}
+                subtitle={t("checkout.demoSubtitle")}
               >
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <PaymentOption
                       selected={method === "card"}
-                      title="Credit or debit card"
-                      subtitle="Visa, Mastercard, American Express"
+                      title={t("checkout.card")}
+                      subtitle={t("checkout.cardSubtitle")}
                       icon={<IconCreditCard size={22} />}
                       onClick={() => setMethod("card")}
                     />
@@ -352,8 +375,8 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <PaymentOption
                       selected={method === "paypal"}
-                      title="PayPal"
-                      subtitle="Pay with your PayPal balance"
+                      title={t("checkout.paypal")}
+                      subtitle={t("checkout.paypalSubtitle")}
                       icon={<IconBrandPaypal size={22} />}
                       onClick={() => setMethod("paypal")}
                     />
@@ -364,25 +387,25 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                   <Grid container spacing={2} mt={2}>
                     <Grid size={12}>
                       <TextField
-                        label="Card number"
+                        label={t("checkout.cardNumber")}
                         placeholder="4242 4242 4242 4242"
                         fullWidth
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <TextField
-                        label="Expiry date"
+                        label={t("checkout.expiry")}
                         placeholder="MM / YY"
                         fullWidth
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField label="CVC" placeholder="123" fullWidth />
+                      <TextField label={t("checkout.cvc")} placeholder="123" fullWidth />
                     </Grid>
                   </Grid>
                 ) : (
                   <Alert severity="info" sx={{ mt: 2 }}>
-                    You will be redirected to PayPal to finish the payment.
+                    {t("checkout.paypalRedirect")}
                   </Alert>
                 )}
               </SectionCard>
@@ -396,21 +419,24 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
             sx={{ position: { lg: "sticky" }, top: { lg: 96 } }}
           >
             <CardContent sx={{ p: "30px" }}>
-              <Typography variant="h5">Payment summary</Typography>
+              <Typography variant="h5">{t("checkout.paymentSummary")}</Typography>
               <Typography variant="body2" color="text.secondary">
-                {plan.classes} classes · {plan.duration} min ·{" "}
-                {classTypeLabel(plan.type)}
+                {t("checkout.planDetails", {
+                  count: plan.classes,
+                  duration: plan.duration,
+                  type: classTypeLabel(plan.type, t),
+                })}
               </Typography>
 
               <Divider sx={{ my: 2.5 }} />
 
               <Stack spacing={1.5}>
                 <SummaryRow
-                  label="Package"
+                  label={t("common.package")}
                   value={formatMoney(plan.total)}
                 />
-                <SummaryRow label="Taxes" value="Calculated at payment" />
-                <SummaryRow label="Due today" value={formatMoney(plan.total)} />
+                <SummaryRow label={t("checkout.taxes")} value={t("checkout.calculatedAtPayment")} />
+                <SummaryRow label={t("checkout.dueToday")} value={formatMoney(plan.total)} />
               </Stack>
 
               <Divider sx={{ my: 2.5 }} />
@@ -420,7 +446,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                 justifyContent="space-between"
                 alignItems="baseline"
               >
-                <Typography variant="h5">Total</Typography>
+                <Typography variant="h5">{t("pricing.total")}</Typography>
                 <Typography
                   variant="h3"
                   fontWeight={700}
@@ -431,7 +457,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
               </Stack>
 
               <Typography variant="body2" color="text.secondary" mt={0.5}>
-                Monthly payment options available at checkout.
+                {t("pricing.monthlyNote")}
               </Typography>
 
               {error ? (
@@ -449,15 +475,19 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                 onClick={pay}
                 disabled={paying}
               >
-                {paying ? (stripe.enabled ? "Opening Stripe…" : "Processing…") : `Pay ${formatMoney(plan.total)}`}
+                {paying
+                  ? stripe.enabled
+                    ? t("checkout.openingStripe")
+                    : t("checkout.processing")
+                  : t("checkout.pay", { amount: formatMoney(plan.total) })}
               </Button>
 
               <Typography variant="caption" color="text.secondary" display="block" mt={1}>
                 {stripe.enabled
                   ? stripe.testMode
-                    ? "Stripe test mode: no real charge."
-                    : "You will finish the payment on Stripe."
-                  : "Demo checkout: no payment is taken; the credits are added to your account."}
+                    ? t("checkout.stripeTestHint")
+                    : t("checkout.stripeFinishHint")
+                  : t("checkout.demoHint")}
               </Typography>
 
               <Stack direction="row" spacing={1} alignItems="flex-start" mt={2}>
@@ -465,8 +495,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                   <IconShieldCheck size={18} />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  Secure checkout. Cancel or reschedule any class up to 12 hours
-                  before it starts.
+                  {t("checkout.secureNotice")}
                 </Typography>
               </Stack>
 
@@ -478,7 +507,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
                 fullWidth
                 startIcon={<IconArrowLeft size={18} />}
               >
-                Back to pricing
+                {t("actions.backToPricing")}
               </LinkButton>
             </CardContent>
           </Card>

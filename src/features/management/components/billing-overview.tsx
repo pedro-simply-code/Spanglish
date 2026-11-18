@@ -9,16 +9,18 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconCreditCard, IconReceipt2 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
 import {
   billingStats,
   invoices,
+  type InvoiceStatus,
 } from "@/features/management/data";
 
 const invoiceStatusColor: Record<
-  (typeof invoices)[number]["status"],
+  InvoiceStatus,
   "success" | "warning" | "default"
 > = {
   paid: "success",
@@ -27,24 +29,27 @@ const invoiceStatusColor: Record<
 };
 
 export function BillingOverview() {
+  const t = useTranslations("admin");
+  const stats = billingStats(t);
+  const invoiceRows = invoices(t);
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Billing"
-        subtitle="Plans, invoices, and refunds for the academy."
+        title={t("management.billing.title")}
+        subtitle={t("management.billing.subtitle")}
         items={[
-          { title: "Manager", to: "/manager" },
-          { title: "Billing" },
+          { title: t("management.breadcrumb.manager"), to: "/manager" },
+          { title: t("management.billing.title") },
         ]}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Checkout is a clearly labeled static demo. Invoice actions validate
-        permissions but do not charge a card or write to a payments provider.
+        {t("management.billing.demoNotice")}
       </Alert>
 
       <Grid container spacing={3}>
-        {billingStats.map((stat) => (
+        {stats.map((stat) => (
           <Grid key={stat.id} size={{ xs: 12, sm: 6, lg: 3 }}>
             <Card elevation={9} sx={{ height: "100%" }}>
               <CardContent sx={{ p: "30px" }}>
@@ -69,8 +74,8 @@ export function BillingOverview() {
 
         <Grid size={12}>
           <SectionCard
-            title="Recent invoices"
-            subtitle="The last five plans issued to students"
+            title={t("management.billing.recentInvoices")}
+            subtitle={t("management.billing.recentInvoicesSubtitle")}
             action={
               <LinkButton
                 href="/pricing"
@@ -78,12 +83,12 @@ export function BillingOverview() {
                 variant="outlined"
                 startIcon={<IconCreditCard size={15} />}
               >
-                Plan catalog
+                {t("management.billing.planCatalog")}
               </LinkButton>
             }
           >
             <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
-              {invoices.map((invoice) => (
+              {invoiceRows.map((invoice) => (
                 <Stack
                   key={invoice.id}
                   direction={{ xs: "column", sm: "row" }}
@@ -114,7 +119,7 @@ export function BillingOverview() {
                         {invoice.plan}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {invoice.id} · issued {invoice.issuedAt}
+                        {invoice.id} · {t("management.billing.issued", { date: invoice.issuedAt })}
                       </Typography>
                     </Box>
                   </Stack>
@@ -123,7 +128,7 @@ export function BillingOverview() {
                       {invoice.amount}
                     </Typography>
                     <Chip
-                      label={invoice.status}
+                      label={t(`management.billing.status.${invoice.status}`)}
                       size="small"
                       color={invoiceStatusColor[invoice.status]}
                       variant="outlined"

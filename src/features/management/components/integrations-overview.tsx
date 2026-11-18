@@ -9,6 +9,7 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconCheck, IconExternalLink, IconPlugConnected, IconX } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import type { Integration, IntegrationStatus } from "@/features/management/data";
 
@@ -21,29 +22,23 @@ const statusColor: Record<
   "not-configured": "default",
 };
 
-const statusLabels: Record<IntegrationStatus, string> = {
-  connected: "Connected",
-  "action-needed": "Action needed",
-  "not-configured": "Not configured",
-};
-
 export function IntegrationsOverview({ integrations }: { integrations: Integration[] }) {
+  const t = useTranslations("admin");
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Integrations"
-        subtitle="External services the academy depends on."
+        title={t("management.integrations.title")}
+        subtitle={t("management.integrations.subtitle")}
         items={[
-          { title: "Admin", to: "/admin" },
-          { title: "Platform" },
-          { title: "Integrations" },
+          { title: t("common.admin"), to: "/admin" },
+          { title: t("common.section.platform") },
+          { title: t("management.integrations.title") },
         ]}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Keys live in the server&apos;s <code>.env</code>, never in the database or the browser: edit
-        them there and restart the server. This page only shows which variables are set, not
-        their values.
+        {t("management.integrations.keysNotice")}
       </Alert>
 
       <Grid container spacing={3}>
@@ -70,11 +65,11 @@ export function IntegrationsOverview({ integrations }: { integrations: Integrati
                     <Box flexGrow={1} minWidth={0}>
                       <Typography variant="h5">{integration.name}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Owner: {integration.owner}
+                        {t("management.integrations.owner", { owner: integration.owner })}
                       </Typography>
                     </Box>
                     <Chip
-                      label={statusLabels[integration.status]}
+                      label={t(`management.integrations.status.${integration.status}`)}
                       size="small"
                       color={statusColor[integration.status]}
                       variant="outlined"
@@ -99,7 +94,11 @@ export function IntegrationsOverview({ integrations }: { integrations: Integrati
                             {variable.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {variable.set ? "set" : variable.optional ? "optional" : "missing"}
+                            {variable.set
+                              ? t("management.integrations.variable.set")
+                              : variable.optional
+                                ? t("management.integrations.variable.optional")
+                                : t("management.integrations.variable.missing")}
                           </Typography>
                         </Stack>
                       ))}
@@ -115,7 +114,7 @@ export function IntegrationsOverview({ integrations }: { integrations: Integrati
                       rel="noreferrer noopener"
                       sx={{ color: "primary.main", display: "inline-flex", alignItems: "center", gap: 0.5, alignSelf: "flex-start" }}
                     >
-                      Provider docs <IconExternalLink size={14} />
+                      {t("management.integrations.providerDocs")} <IconExternalLink size={14} />
                     </Typography>
                   ) : null}
                 </Stack>

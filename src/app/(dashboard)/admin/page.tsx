@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { AdminTwoFactorNotice } from "@/features/auth";
 import { ExecutiveOverview } from "@/features/admin";
 import {
@@ -13,10 +14,7 @@ import { getAdminDashboardCharts } from "@/server/admin/dashboard-charts";
 import { requireDashboard } from "@/server/auth/session";
 import { getAdminFinanceOverview } from "@/server/teaching/dashboards";
 
-export const metadata: Metadata = {
-  title: "Admin dashboard",
-  description: "Platform access and academy governance",
-};
+export const metadata: Metadata = adminStaticMetadata("dashboard");
 
 export default function AdminDashboardPage() {
   return (
@@ -35,7 +33,7 @@ async function AdminDashboardContent() {
     getAdminFinanceOverview(),
     getAdminDashboardCharts(),
   ]);
-  const activity = recent.map(formatAuditActivity);
+  const activity = await Promise.all(recent.map((entry) => formatAuditActivity(entry)));
   const nameParts = actor.name.trim().split(/\s+/).filter(Boolean);
   const firstName = nameParts[0] ?? actor.name;
   const lastName = nameParts.slice(1).join(" ");

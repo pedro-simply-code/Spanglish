@@ -594,3 +594,223 @@ export function getPendingSubmissions(ownerName: string): Submission[] {
 }
 
 export const materialLibraryUpdatedAt = demoNow;
+
+/** Translator scoped to the `educator.materials` message section. */
+type MaterialTranslator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
+
+const materialContentKeys: Record<
+  string,
+  { title: string; description: string; tags: readonly string[] }
+> = {
+  "mat-travel-deck": {
+    title: "demo.material.travelDeck.title",
+    description: "demo.material.travelDeck.description",
+    tags: ["demo.tag.travel", "demo.tag.speaking"],
+  },
+  "mat-airport-drill": {
+    title: "demo.material.airportDrill.title",
+    description: "demo.material.airportDrill.description",
+    tags: ["demo.tag.travel", "demo.tag.listening"],
+  },
+  "mat-past-tense-form": {
+    title: "demo.material.pastTenseForm.title",
+    description: "demo.material.pastTenseForm.description",
+    tags: ["demo.tag.grammar", "demo.tag.pastTense"],
+  },
+  "mat-business-intro": {
+    title: "demo.material.businessIntro.title",
+    description: "demo.material.businessIntro.description",
+    tags: ["demo.tag.business", "demo.tag.speaking"],
+  },
+  "mat-restaurant-recap": {
+    title: "demo.material.restaurantRecap.title",
+    description: "demo.material.restaurantRecap.description",
+    tags: ["demo.tag.travel", "demo.tag.speaking"],
+  },
+  "mat-pronunciation-recap": {
+    title: "demo.material.pronunciationRecap.title",
+    description: "demo.material.pronunciationRecap.description",
+    tags: ["demo.tag.pronunciation", "demo.tag.listening"],
+  },
+  "mat-restaurant-vocab": {
+    title: "demo.material.restaurantVocab.title",
+    description: "demo.material.restaurantVocab.description",
+    tags: ["demo.tag.travel", "demo.tag.vocabulary"],
+  },
+  "mat-travel-quiz": {
+    title: "demo.material.travelQuiz.title",
+    description: "demo.material.travelQuiz.description",
+    tags: ["demo.tag.travel", "demo.tag.vocabulary"],
+  },
+  "mat-interview-frames": {
+    title: "demo.material.interviewFrames.title",
+    description: "demo.material.interviewFrames.description",
+    tags: ["demo.tag.business", "demo.tag.interview"],
+  },
+  "mat-pronunciation-notes": {
+    title: "demo.material.pronunciationNotes.title",
+    description: "demo.material.pronunciationNotes.description",
+    tags: ["demo.tag.pronunciation"],
+  },
+};
+
+const audienceLabelKeys: Record<string, string> = {
+  "Travel Spanish warm-up": "demo.audience.travelWarmup",
+  "Business introductions": "demo.audience.businessIntroductions",
+  "Ordering food with confidence": "demo.audience.orderingFood",
+  "Pronunciation clinic": "demo.audience.pronunciationClinic",
+};
+
+const assignmentContentKeys: Record<
+  string,
+  { title: string; audience?: string }
+> = {
+  "asg-past-tense": { title: "demo.assignment.pastTense.title" },
+  "asg-travel-quiz": {
+    title: "demo.assignment.travelQuiz.title",
+    audience: "demo.assignment.travelQuiz.audience",
+  },
+};
+
+const submissionFeedbackKeys: Record<string, string> = {
+  "sub-02": "demo.submission.pronunciationFeedback",
+  "sub-03": "demo.submission.irregularVerbsFeedback",
+};
+
+const questionPromptKeys: Record<string, Record<string, string>> = {
+  "mat-past-tense-form": {
+    q1: "demo.question.pastTense.q1",
+    q2: "demo.question.pastTense.q2",
+    q3: "demo.question.pastTense.q3",
+    q4: "demo.question.pastTense.q4",
+  },
+  "mat-travel-quiz": {
+    q1: "demo.question.travelQuiz.q1",
+    q2: "demo.question.travelQuiz.q2",
+    q3: "demo.question.travelQuiz.q3",
+    q4: "demo.question.travelQuiz.q4",
+  },
+};
+
+const classTopicKeys: Record<string, string> = {
+  "class-1001": "demo.class.everyday",
+  "class-1002": "demo.class.pastTense",
+  "class-1003": "demo.class.travelWarmup",
+  "class-1004": "demo.class.businessIntroductions",
+  "class-0801": "demo.class.travelCulture",
+  "class-0802": "demo.class.interviewPractice",
+  "class-0901": "demo.class.orderingFood",
+  "class-0902": "demo.class.pronunciationClinic",
+};
+
+/** Demo title, description, and tags follow the active locale. */
+export function localizeMaterial(
+  material: Material | undefined,
+  t: MaterialTranslator,
+): Material | undefined {
+  if (!material) return undefined;
+  const keys = materialContentKeys[material.id];
+  if (!keys) return material;
+
+  return {
+    ...material,
+    title: t(keys.title),
+    description: t(keys.description),
+    tags: keys.tags.map((key) => t(key)),
+  };
+}
+
+export function localizeMaterials(
+  source: readonly Material[],
+  t: MaterialTranslator,
+): Material[] {
+  return source
+    .map((material) => localizeMaterial(material, t))
+    .filter((material): material is Material => Boolean(material));
+}
+
+/** Localize the seeded demo labels while leaving real user content untouched. */
+export function localizeMaterialGrant(
+  grant: MaterialGrant,
+  t: MaterialTranslator,
+): MaterialGrant {
+  const key = audienceLabelKeys[grant.audienceLabel];
+  return key ? { ...grant, audienceLabel: t(key) } : grant;
+}
+
+export function localizeMaterialGrants(
+  source: readonly MaterialGrant[],
+  t: MaterialTranslator,
+): MaterialGrant[] {
+  return source.map((grant) => localizeMaterialGrant(grant, t));
+}
+
+export function localizeAssignment(
+  assignment: Assignment,
+  t: MaterialTranslator,
+): Assignment {
+  const keys = assignmentContentKeys[assignment.id];
+  if (!keys) return assignment;
+
+  return {
+    ...assignment,
+    title: t(keys.title),
+    audienceLabel: keys.audience
+      ? t(keys.audience)
+      : assignment.audienceLabel,
+  };
+}
+
+export function localizeAssignments(
+  source: readonly Assignment[],
+  t: MaterialTranslator,
+): Assignment[] {
+  return source.map((assignment) => localizeAssignment(assignment, t));
+}
+
+export function localizeSubmission(
+  submission: Submission,
+  t: MaterialTranslator,
+): Submission {
+  const key = submissionFeedbackKeys[submission.id];
+  return key && submission.feedback
+    ? { ...submission, feedback: t(key) }
+    : submission;
+}
+
+export function localizeSubmissions(
+  source: readonly Submission[],
+  t: MaterialTranslator,
+): Submission[] {
+  return source.map((submission) => localizeSubmission(submission, t));
+}
+
+export function localizeFormQuestion(
+  question: FormQuestion,
+  materialId: string,
+  t: MaterialTranslator,
+): FormQuestion {
+  const key = questionPromptKeys[materialId]?.[question.id];
+  return key ? { ...question, prompt: t(key) } : question;
+}
+
+export function localizeFormQuestions(
+  source: readonly FormQuestion[],
+  materialId: string,
+  t: MaterialTranslator,
+): FormQuestion[] {
+  return source.map((question) => localizeFormQuestion(question, materialId, t));
+}
+
+/** Shared class topics shown in materials, recordings, and review screens. */
+export function localizeDemoClassTopic(
+  classId: string,
+  fallback: string,
+  t: MaterialTranslator,
+): string {
+  const key = classTopicKeys[classId];
+  return key ? t(key) : fallback;
+}

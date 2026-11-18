@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -88,6 +89,8 @@ export function ClassroomMediaToolbar({
   onRequestLocalRecording,
   localRecordingOnly = false,
 }: ClassroomMediaToolbarProps) {
+  const t = useTranslations("classroom");
+
   const downloadLocal = () => {
     if (!localUrl) return;
     const anchor = document.createElement("a");
@@ -96,12 +99,13 @@ export function ClassroomMediaToolbar({
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
     anchor.href = localUrl;
-    anchor.download = `spanglish-${slug || "recording"}.webm`;
+    anchor.download = `spanglish-${slug || t("recording.fallbackFileSlug")}.webm`;
     anchor.click();
   };
 
   const screenTip =
-    screenShareTooltip ?? (sharingScreen ? "Stop sharing your screen" : "Share your screen");
+    screenShareTooltip ??
+    (sharingScreen ? t("toolbar.stopSharingScreen") : t("toolbar.shareYourScreen"));
 
   return (
     <Stack
@@ -137,8 +141,8 @@ export function ClassroomMediaToolbar({
     >
       {canControlDevices ? (
         <LabeledToolbarTool
-          label={cameraOn ? "Cam off" : "Camera"}
-          tooltip={cameraOn ? "Turn camera off" : "Turn camera on"}
+          label={cameraOn ? t("toolbar.cameraOff") : t("toolbar.camera")}
+          tooltip={cameraOn ? t("toolbar.turnCameraOff") : t("toolbar.turnCameraOn")}
         >
           <IconButton
             size="small"
@@ -151,8 +155,8 @@ export function ClassroomMediaToolbar({
       ) : null}
       {canControlDevices ? (
         <LabeledToolbarTool
-          label={micOn ? "Mute" : "Mic on"}
-          tooltip={micOn ? "Mute microphone" : "Turn microphone on"}
+          label={micOn ? t("toolbar.mute") : t("toolbar.micOn")}
+          tooltip={micOn ? t("toolbar.muteMicrophone") : t("toolbar.turnMicrophoneOn")}
         >
           <IconButton
             size="small"
@@ -167,7 +171,7 @@ export function ClassroomMediaToolbar({
         <>
           {vDivider}
           <LabeledToolbarTool
-            label={sharingScreen ? "Stop share" : "Share"}
+            label={sharingScreen ? t("toolbar.stopShare") : t("toolbar.share")}
             tooltip={screenTip}
           >
             <IconButton
@@ -188,8 +192,8 @@ export function ClassroomMediaToolbar({
         <>
           {vDivider}
           <LabeledToolbarTool
-            label="Speaker"
-            tooltip="Speaker view for you only (does not change the class)"
+            label={t("toolbar.speaker")}
+            tooltip={t("toolbar.speakerLocalTooltip")}
           >
             <IconButton
               size="small"
@@ -200,8 +204,8 @@ export function ClassroomMediaToolbar({
             </IconButton>
           </LabeledToolbarTool>
           <LabeledToolbarTool
-            label="Gallery"
-            tooltip="Gallery view for you only — click a tile to spotlight someone on the main stage"
+            label={t("toolbar.gallery")}
+            tooltip={t("toolbar.galleryLocalTooltip")}
           >
             <IconButton
               size="small"
@@ -213,8 +217,8 @@ export function ClassroomMediaToolbar({
           </LabeledToolbarTool>
           {!followHostLayout && onFollowHostLayout ? (
             <LabeledToolbarTool
-              label="Follow"
-              tooltip="Use the teacher's layout again when they change view"
+              label={t("toolbar.follow")}
+              tooltip={t("toolbar.followTooltip")}
             >
               <IconButton size="small" onClick={onFollowHostLayout} sx={{ color: "warning.main" }}>
                 <IconRefresh size={20} />
@@ -227,11 +231,13 @@ export function ClassroomMediaToolbar({
         <>
           {vDivider}
           <LabeledToolbarTool
-            label={localRecordingRequestPending ? "Waiting" : "Ask rec"}
+            label={
+              localRecordingRequestPending ? t("toolbar.waiting") : t("toolbar.askRec")
+            }
             tooltip={
               localRecordingRequestPending
-                ? "Waiting for the teacher to allow personal recording"
-                : "Ask the teacher for permission to record on your device (not cloud)"
+                ? t("toolbar.waitingRecTooltip")
+                : t("toolbar.askRecTooltip")
             }
           >
             <IconButton
@@ -250,11 +256,11 @@ export function ClassroomMediaToolbar({
           {vDivider}
           {!recording ? (
             <LabeledToolbarTool
-              label="Record"
+              label={t("toolbar.record")}
               tooltip={
                 localRecordingOnly
-                  ? "Record on your device only (WebM). Not uploaded to the cloud."
-                  : "Record what you see in this browser (WebM file)"
+                  ? t("toolbar.recordLocalTooltip")
+                  : t("toolbar.recordBrowserTooltip")
               }
             >
               <IconButton
@@ -267,7 +273,10 @@ export function ClassroomMediaToolbar({
               </IconButton>
             </LabeledToolbarTool>
           ) : (
-            <LabeledToolbarTool label="Stop rec" tooltip="Stop browser recording">
+            <LabeledToolbarTool
+              label={t("toolbar.stopRec")}
+              tooltip={t("toolbar.stopBrowserRec")}
+            >
               <IconButton
                 size="small"
                 onClick={onToggleRecord}
@@ -284,14 +293,20 @@ export function ClassroomMediaToolbar({
             </Stack>
           ) : null}
           {localUrl ? (
-            <LabeledToolbarTool label="Download" tooltip="Download recording to your device">
+            <LabeledToolbarTool
+              label={t("toolbar.download")}
+              tooltip={t("toolbar.downloadTooltip")}
+            >
               <IconButton size="small" onClick={downloadLocal} sx={{ color: "#fff" }}>
                 <IconDownload size={20} />
               </IconButton>
             </LabeledToolbarTool>
           ) : null}
           {localUrl && canUploadToCloud && !cloudUrl ? (
-            <LabeledToolbarTool label="Upload" tooltip="Upload recording to Backblaze B2">
+            <LabeledToolbarTool
+              label={t("toolbar.upload")}
+              tooltip={t("toolbar.uploadTooltip")}
+            >
               <IconButton
                 size="small"
                 onClick={onUploadCloud}
@@ -303,7 +318,10 @@ export function ClassroomMediaToolbar({
             </LabeledToolbarTool>
           ) : null}
           {cloudUrl ? (
-            <LabeledToolbarTool label="Cloud" tooltip="Open uploaded copy in a new tab">
+            <LabeledToolbarTool
+              label={t("toolbar.cloud")}
+              tooltip={t("toolbar.cloudTooltip")}
+            >
               <IconButton
                 component="a"
                 href={cloudUrl}

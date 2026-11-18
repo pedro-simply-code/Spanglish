@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -203,6 +204,7 @@ export async function stripeLinesForBatch(
  * teacher is paid; otherwise it stays approved and can be retried.
  */
 export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
+  const t = await getTranslations("ops.payments");
   const [batch] = await db
     .select()
     .from(payoutBatches)
@@ -211,7 +213,7 @@ export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
   if (!batch || batch.status !== "approved") {
     return {
       ok: false as const,
-      message: "Only approved batches can be paid.",
+      message: t("onlyApprovedBatches"),
     };
   }
 
@@ -243,7 +245,7 @@ export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
   if (missing.length) {
     return {
       ok: false as const,
-      message: `These teachers have not finished connecting Stripe: ${missing.join(", ")}. Nothing was sent.`,
+      message: t("teachersNotConnected", { names: missing.join(", ") }),
     };
   }
 
@@ -287,7 +289,7 @@ export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
         });
       sentCents += amount;
     } catch (error) {
-      const message = stripeErrorMessage(error);
+      const message = stripeErrorMessage(error, t("unknownStripeError"));
       failures.push(`${line.teacherName}: ${message}`);
       await db
         .insert(payoutTransfers)
@@ -322,7 +324,7 @@ export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
   if (failures.length) {
     return {
       ok: false as const,
-      message: `Some transfers failed (retry is safe, paid teachers are skipped): ${failures.join(" · ")}`,
+      message: t("transfersFailed", { failures: failures.join(" · ") }),
     };
   }
 
@@ -342,7 +344,7 @@ export async function payBatchWithStripe(actor: AuthSession, batchId: string) {
   return paid.ok
     ? {
         ok: true as const,
-        message: "Sent with Stripe. Teachers were notified.",
+        message: t("sentWithStripe"),
       }
     : paid;
 }

@@ -11,10 +11,10 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { SectionCard } from "@/components/ui/section-card";
-import { classTypeLabel } from "@/lib/class-type-label";
 import { DEFAULT_PAGE_SIZE, sliceForPage } from "@/lib/pagination";
 
 export type EarningRow = {
@@ -43,16 +43,6 @@ type Props = {
   monthStart: string;
 };
 
-const money = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
-
-const statusChip = {
-  unpaid: { label: "Unpaid", color: "default" },
-  "in-batch": { label: "In payout", color: "warning" },
-  paid: { label: "Paid", color: "success" },
-} as const;
-
 function Stat({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
     <Box sx={{ p: "24px", bgcolor: "background.paper", borderRadius: 1.75, height: "100%" }}>
@@ -70,11 +60,28 @@ function Stat({ label, value, helper }: { label: string; value: string; helper: 
 }
 
 export function TeacherEarnings(props: Props) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
   const [listPage, setListPage] = useState(1);
   const pagedEarnings = useMemo(
     () => sliceForPage(props.earnings, listPage, DEFAULT_PAGE_SIZE),
     [props.earnings, listPage],
   );
+  const money = useMemo(
+    () => (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100),
+    [locale],
+  );
+  const dateFormat = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }),
+    [locale],
+  );
+
+  const statusChip = useMemo(() => ({
+    unpaid: { label: t("status.unpaid"), color: "default" as const },
+    "in-batch": { label: t("status.inPayout"), color: "warning" as const },
+    paid: { label: t("status.paid"), color: "success" as const },
+  }), [t]);
+
   const monthStart = new Date(props.monthStart).getTime();
   const thisMonth = props.earnings
     .filter((item) => new Date(item.classEndedAt).getTime() >= monthStart)
@@ -85,42 +92,42 @@ export function TeacherEarnings(props: Props) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Earnings"
-        subtitle="What you earned per delivered class and what was already paid."
-        items={[{ title: "Teacher", to: "/teacher" }, { title: "Earnings" }]}
+        title={t("common.earnings")}
+        subtitle={t("teacher.earnings.subtitle")}
+        items={[{ title: t("shell.roles.teacher"), to: "/teacher" }, { title: t("common.earnings") }]}
       />
 
       <Grid container spacing={3} mb={3}>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Stat label="This month" value={money(thisMonth)} helper="Delivered classes" />
+          <Stat label={t("teacher.earnings.thisMonth")} value={money(thisMonth)} helper={t("teacher.earnings.deliveredClasses")} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Stat label="Not paid yet" value={money(unpaid)} helper="Request a payout when you are ready" />
+          <Stat label={t("teacher.earnings.notPaidYet")} value={money(unpaid)} helper={t("teacher.earnings.requestWhenReady")} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Stat label="Paid" value={money(paid)} helper="All time" />
+          <Stat label={t("teacher.earnings.paid")} value={money(paid)} helper={t("teacher.earnings.allTime")} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <Stat
-            label="Rating"
+            label={t("teacher.earnings.rating")}
             value={props.ratingCount ? `${props.ratingAverage.toFixed(1)}★` : "—"}
-            helper={`${props.ratingCount} ratings · ${props.classesTaught} classes`}
+            helper={t("teacher.earnings.ratingHelper", { count: props.ratingCount, classes: props.classesTaught })}
           />
         </Grid>
       </Grid>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
-          <SectionCard title="Classes">
+          <SectionCard title={t("teacher.earnings.classes")}>
             {props.earnings.length ? (
               <Box sx={{ overflowX: "auto" }}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Class</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                      <TableCell>Status</TableCell>
+                      <TableCell>{t("common.date")}</TableCell>
+                      <TableCell>{t("teacher.earnings.class")}</TableCell>
+                      <TableCell align="right">{t("common.amount")}</TableCell>
+                      <TableCell>{t("common.status")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -130,7 +137,9 @@ export function TeacherEarnings(props: Props) {
                         <TableCell>
                           <Typography variant="body2">{item.topic}</Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {item.durationMinutes} min · {classTypeLabel(item.classType)} · level {item.level}
+                            {t("teacher.dashboard.minutes", { count: item.durationMinutes })} ·{" "}
+                            {t(`classType.${item.classType === "paired" ? "paired" : "individual"}`)} ·{" "}
+                            {t("teacher.earnings.level", { level: item.level })}
                           </Typography>
                         </TableCell>
                         <TableCell align="right">{money(item.amountCents)}</TableCell>
@@ -144,7 +153,7 @@ export function TeacherEarnings(props: Props) {
                 <ListPagination page={listPage} total={props.earnings.length} onPageChange={setListPage} />
               </Box>
             ) : (
-              <Typography color="text.secondary">No delivered classes yet.</Typography>
+              <Typography color="text.secondary">{t("teacher.earnings.noDeliveredClasses")}</Typography>
             )}
           </SectionCard>
         </Grid>
@@ -152,29 +161,38 @@ export function TeacherEarnings(props: Props) {
           <Stack spacing={3}>
             <SectionCard
               title={props.levelName}
-              subtitle={`You keep ${props.teacherSharePercent}% of each credit · platform take ${props.platformTakePercent}%`}
+              subtitle={t("teacher.earnings.youKeep", {
+                teacherPercent: props.teacherSharePercent,
+                platformPercent: props.platformTakePercent,
+              })}
             >
               <Stack spacing={1}>
                 <Typography variant="body2">
-                  On a {money(props.exampleCreditCents)} credit you earn about{" "}
-                  {money(Math.round((props.exampleCreditCents * props.teacherSharePercent) / 100))} per class delivered.
+                  {t("teacher.earnings.exampleCredit", {
+                    credit: money(props.exampleCreditCents),
+                    earned: money(Math.round((props.exampleCreditCents * props.teacherSharePercent) / 100)),
+                  })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Actual pay follows the student’s credit value when they booked (package price ÷ credits).
+                  {t("teacher.earnings.actualPay")}
                 </Typography>
                 {props.nextLevel ? (
                   <Typography variant="body2" color="text.secondary">
-                    Next: {props.nextLevel.name} — {props.nextLevel.classes} more classes,{" "}
-                    {props.nextLevel.ratings} more ratings, {props.nextLevel.rating}★ average.
+                    {t("teacher.earnings.nextLevel", {
+                      name: props.nextLevel.name,
+                      classes: props.nextLevel.classes,
+                      ratings: props.nextLevel.ratings,
+                      rating: props.nextLevel.rating,
+                    })}
                   </Typography>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    Top level reached.
+                    {t("teacher.earnings.topLevel")}
                   </Typography>
                 )}
               </Stack>
             </SectionCard>
-            <SectionCard title="Badges">
+            <SectionCard title={t("teacher.earnings.badges")}>
               {props.badges.length ? (
                 <Stack direction="row" gap={1} flexWrap="wrap">
                   {props.badges.map((badge) => (
@@ -183,7 +201,7 @@ export function TeacherEarnings(props: Props) {
                 </Stack>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  Teach your first class to earn a badge.
+                  {t("teacher.earnings.firstBadge")}
                 </Typography>
               )}
             </SectionCard>

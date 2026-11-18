@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { bookClassForActor, bookTrialClassForActor, studentTrialLessonAvailable } from "@/features/classes";
 import { getActorWithPermission } from "@/server/auth/session";
 import { listFreeSlots } from "@/server/classes/availability";
@@ -54,9 +55,12 @@ export async function getTrialLessonAvailabilityAction(): Promise<{ eligible: bo
 export async function bookTrialClassAction(
   input: { teacherId: string; startsAt: string; durationMinutes: 25 | 50; topic: string },
 ): Promise<BookClassResult> {
-  const actor = await getActorWithPermission("classes:book");
+  const [actor, t] = await Promise.all([
+    getActorWithPermission("classes:book"),
+    getTranslations("ops.academy"),
+  ]);
   if (!actor) {
-    return { ok: false, title: "Not allowed", message: "Sign in as a student to book a trial lesson." };
+    return { ok: false, title: t("notAllowedTitle"), message: t("notAllowedTrial") };
   }
   const result = await bookTrialClassForActor(actor, input);
   if (!result.ok) {
@@ -71,12 +75,15 @@ export async function bookTrialClassAction(
 export async function bookClassAction(
   input: KindInput & { teacherId: string; startsAt: string; topic: string },
 ): Promise<BookClassResult> {
-  const actor = await getActorWithPermission("classes:book");
+  const [actor, t] = await Promise.all([
+    getActorWithPermission("classes:book"),
+    getTranslations("ops.academy"),
+  ]);
   if (!actor) {
-    return { ok: false, title: "Not allowed", message: "Sign in as a student to book a live class." };
+    return { ok: false, title: t("notAllowedTitle"), message: t("notAllowedClass") };
   }
   if (!validKind(input)) {
-    return { ok: false, title: "Choose a class type", message: "Pick a class type and length." };
+    return { ok: false, title: t("chooseClassTypeTitle"), message: t("chooseClassType") };
   }
 
   const result = await bookClassForActor(actor, {
@@ -108,25 +115,28 @@ export type PurchaseActionResult = {
 
 /** Buys a package: Stripe Checkout when configured, otherwise a demo purchase. */
 export async function purchasePackageAction(packageId: string): Promise<PurchaseActionResult> {
-  const actor = await getActorWithPermission("classes:book");
-  if (!actor) return { ok: false, message: "Sign in as a student to buy a package." };
+  const [actor, t] = await Promise.all([
+    getActorWithPermission("classes:book"),
+    getTranslations("ops.academy"),
+  ]);
+  if (!actor) return { ok: false, message: t("notAllowedPackage") };
 
   let result;
   try {
     result = await purchasePackage(actor, packageId);
   } catch (error) {
     console.error("[checkout]", error);
-    return { ok: false, message: "The payment page could not be opened. Try again in a moment." };
+    return { ok: false, message: t("paymentOpenFailed") };
   }
   if (!result.ok) return { ok: false, message: result.message };
-  if ("redirectUrl" in result) return { ok: true, message: "Redirecting to Stripe…", redirectUrl: result.redirectUrl };
+  if ("redirectUrl" in result) return { ok: true, message: t("redirectingToStripe"), redirectUrl: result.redirectUrl };
 
   revalidatePath("/schedule");
   revalidatePath("/home");
   revalidatePath("/classes");
   return {
     ok: true,
-    message: `${result.credits} credits added.`,
+    message: t("creditsAdded", { count: result.credits }),
     credits: result.credits,
     balance: result.balance,
     shared: result.shared,

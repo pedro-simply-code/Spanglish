@@ -28,10 +28,10 @@ import {
   IconShieldCheck,
   IconUsersGroup,
 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SectionCard } from "@/components/ui/section-card";
 import {
-  dashboardByRole,
   getPermissions,
   roleCodes,
   roleDefinitions,
@@ -43,23 +43,10 @@ import {
 import type { AuthSession, EditableProfile, RoleCode } from "@/features/auth";
 import { getAccountAvatarUrl } from "@/lib/account-avatar";
 
-const notificationOptions = [
-  {
-    id: "daily",
-    title: "Daily reminders",
-    description: "Get a nudge to practice every day.",
-  },
-  {
-    id: "weekly",
-    title: "Weekly summary",
-    description: "Receive a recap of your progress each week.",
-  },
-  {
-    id: "achievements",
-    title: "Achievement alerts",
-    description: "Know as soon as you unlock a new badge.",
-  },
-];
+/** Converts a permission identifier such as `classes:view-own` into a catalog key. */
+function permissionKey(permission: string) {
+  return `permissions.${permission.replace(/[:_-]([a-z])/g, (_, letter: string) => letter.toUpperCase())}`;
+}
 
 const roleIcons: Record<RoleCode, ComponentType<{ size?: number }>> = {
   student: IconSchool,
@@ -85,6 +72,8 @@ export function SettingsOverview({
   profile,
   initialTab,
 }: SettingsOverviewProps) {
+  const t = useTranslations("shell");
+  const dynamicT = t as (key: string, values?: Record<string, string | number>) => string;
   const [tab, setTab] = useState(initialTab === "security" ? securityTab : 0);
   const [pending, startTransition] = useTransition();
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -96,6 +85,24 @@ export function SettingsOverview({
 
   const grantedPermissions = getPermissions(actor.roles);
 
+  const notificationOptions = [
+    {
+      id: "daily",
+      title: t("settings.notifications.daily.title"),
+      description: t("settings.notifications.daily.description"),
+    },
+    {
+      id: "weekly",
+      title: t("settings.notifications.weekly.title"),
+      description: t("settings.notifications.weekly.description"),
+    },
+    {
+      id: "achievements",
+      title: t("settings.notifications.achievements.title"),
+      description: t("settings.notifications.achievements.description"),
+    },
+  ];
+
   const switchDashboard = (role: RoleCode) => {
     startTransition(() => {
       void switchDashboardAction(role);
@@ -104,22 +111,25 @@ export function SettingsOverview({
 
   return (
     <Box mt={3}>
-      <Breadcrumb title="Settings" subtitle="Make Spanglish yours" />
+      <Breadcrumb
+        title={t("settings.breadcrumb.title")}
+        subtitle={t("settings.breadcrumb.subtitle")}
+      />
 
       <Card elevation={9}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", px: "30px" }}>
           <Tabs
             value={tab}
             onChange={(_, value: number) => setTab(value)}
-            aria-label="Settings sections"
+            aria-label={t("settings.tabs.ariaLabel")}
             variant="scrollable"
             allowScrollButtonsMobile
           >
-            <Tab label="Profile" />
-            <Tab label="Notifications" />
-            <Tab label="Preferences" />
-            <Tab label="Roles & access" />
-            <Tab label="Security" />
+            <Tab label={t("settings.tabs.profile")} />
+            <Tab label={t("settings.tabs.notifications")} />
+            <Tab label={t("settings.tabs.preferences")} />
+            <Tab label={t("settings.tabs.rolesAccess")} />
+            <Tab label={t("settings.tabs.security")} />
           </Tabs>
         </Box>
 
@@ -147,7 +157,7 @@ export function SettingsOverview({
                     {actor.roles.map((role) => (
                       <Chip
                         key={role}
-                        label={roleDefinitions[role].name}
+                        label={t(`roles.${role}`)}
                         size="small"
                         color={role === actor.activeRole ? "primary" : "default"}
                         variant={
@@ -172,14 +182,14 @@ export function SettingsOverview({
                 alignItems={{ xs: "flex-start", sm: "center" }}
               >
                 <Box>
-                  <Typography variant="h6">Sign out</Typography>
+                  <Typography variant="h6">{t("settings.profile.signOutTitle")}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Your dashboard choice is remembered for the next sign-in.
+                    {t("settings.profile.signOutHelp")}
                   </Typography>
                 </Box>
                 <Box component="form" action={signOutAction}>
                   <Button type="submit" variant="outlined" color="primary">
-                    Sign out
+                    {t("settings.profile.signOut")}
                   </Button>
                 </Box>
               </Stack>
@@ -221,39 +231,38 @@ export function SettingsOverview({
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel id="level-label">Spanish level</InputLabel>
+                  <InputLabel id="level-label">{t("settings.preferences.levelLabel")}</InputLabel>
                   <Select
                     labelId="level-label"
-                    label="Spanish level"
+                    label={t("settings.preferences.levelLabel")}
                     defaultValue="intermediate"
                   >
-                    <MenuItem value="beginner">Beginner</MenuItem>
-                    <MenuItem value="intermediate">Intermediate</MenuItem>
-                    <MenuItem value="advanced">Advanced</MenuItem>
+                    <MenuItem value="beginner">{t("settings.preferences.beginner")}</MenuItem>
+                    <MenuItem value="intermediate">{t("settings.preferences.intermediate")}</MenuItem>
+                    <MenuItem value="advanced">{t("settings.preferences.advanced")}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel id="goal-label">Daily goal</InputLabel>
+                  <InputLabel id="goal-label">{t("settings.preferences.goalLabel")}</InputLabel>
                   <Select
                     labelId="goal-label"
-                    label="Daily goal"
+                    label={t("settings.preferences.goalLabel")}
                     defaultValue="20"
                   >
-                    <MenuItem value="10">10 minutes</MenuItem>
-                    <MenuItem value="20">20 minutes</MenuItem>
-                    <MenuItem value="30">30 minutes</MenuItem>
+                    <MenuItem value="10">{t("settings.preferences.minutes10")}</MenuItem>
+                    <MenuItem value="20">{t("settings.preferences.minutes20")}</MenuItem>
+                    <MenuItem value="30">{t("settings.preferences.minutes30")}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid size={12}>
                 <Typography variant="h6" mb={1}>
-                  Theme
+                  {t("settings.preferences.theme")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Spanglish uses a single orange theme for the whole app. There
-                  is no theme switcher.
+                  {t("settings.preferences.themeHelp")}
                 </Typography>
               </Grid>
             </Grid>
@@ -262,9 +271,7 @@ export function SettingsOverview({
           {tab === 3 ? (
             <Stack spacing={3}>
               <Alert severity="info" icon={<IconLayoutDashboard size={20} />}>
-                One dashboard is visible at a time. Switching role changes the
-                sidebar, the topbar, and the whole dashboard content. The server
-                redirects you away from any dashboard that is not active.
+                {t("settings.rolesAccess.notice")}
               </Alert>
 
               <Stack direction="row" spacing={3} alignItems="center">
@@ -279,27 +286,25 @@ export function SettingsOverview({
                   <IconShieldCheck size={28} />
                 </Avatar>
                 <Box>
-                  <Typography variant="h5">Roles & access</Typography>
+                  <Typography variant="h5">{t("settings.rolesAccess.heading")}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Permissions are cumulative. Every role you hold adds to your
-                    access, but only the active role decides the visible
-                    dashboard.
+                    {t("settings.rolesAccess.description")}
                   </Typography>
                 </Box>
               </Stack>
 
               <Grid container spacing={3}>
                 {roleCodes.map((role) => {
-                  const definition = roleDefinitions[role];
                   const owned = actor.roles.includes(role);
                   const active = actor.activeRole === role;
                   const Icon = roleIcons[role];
+                  const roleLabel = t(`roles.${role}`);
 
                   return (
                     <Grid key={role} size={{ xs: 12, md: 6 }}>
                       <SectionCard
-                        title={definition.name}
-                        subtitle={definition.description}
+                        title={roleLabel}
+                        subtitle={dynamicT(`roles.descriptions.${role}`)}
                         action={
                           <Avatar
                             sx={{
@@ -321,25 +326,27 @@ export function SettingsOverview({
                             gap={0.75}
                           >
                             <Chip
-                              label={definition.badge}
+                              label={dynamicT(`roles.badges.${role}`)}
                               size="small"
                               variant="outlined"
                             />
                             <Chip
-                              label={`Priority ${definition.priority}`}
+                              label={t("settings.rolesAccess.priority", {
+                                priority: roleDefinitions[role].priority,
+                              })}
                               size="small"
                               variant="outlined"
                             />
                             {owned ? (
                               <Chip
-                                label="Granted"
+                                label={t("settings.rolesAccess.granted")}
                                 size="small"
                                 color="success"
                                 variant="outlined"
                               />
                             ) : (
                               <Chip
-                                label="Not granted"
+                                label={t("settings.rolesAccess.notGranted")}
                                 size="small"
                                 color="default"
                                 variant="outlined"
@@ -359,7 +366,7 @@ export function SettingsOverview({
                                 fontWeight: 600,
                               }}
                             >
-                              Adds permissions
+                              {t("settings.rolesAccess.addsPermissions")}
                             </Typography>
                             <Stack
                               direction="row"
@@ -368,10 +375,10 @@ export function SettingsOverview({
                               gap={0.75}
                               mt={1}
                             >
-                              {definition.permissions.map((permission) => (
+                              {roleDefinitions[role].permissions.map((permission) => (
                                 <Chip
                                   key={permission}
-                                  label={permission}
+                                  label={dynamicT(permissionKey(permission))}
                                   size="small"
                                   variant="outlined"
                                 />
@@ -381,7 +388,7 @@ export function SettingsOverview({
 
                           {active ? (
                             <Alert severity="success">
-                              This dashboard is active right now.
+                              {t("settings.rolesAccess.activeNow")}
                             </Alert>
                           ) : owned ? (
                             <Button
@@ -391,14 +398,13 @@ export function SettingsOverview({
                               onClick={() => switchDashboard(role)}
                               sx={{ alignSelf: "flex-start" }}
                             >
-                              Switch to {definition.name.toLowerCase()}{" "}
-                              dashboard
+                              {t("settings.rolesAccess.switch", {
+                                role: roleLabel.toLowerCase(),
+                              })}
                             </Button>
                           ) : (
                             <Typography variant="body2" color="text.secondary">
-                              This role is not assigned to your account. An
-                              administrator can grant it from the admin
-                              role-management tools.
+                              {t("settings.rolesAccess.notAssigned")}
                             </Typography>
                           )}
                         </Stack>
@@ -409,15 +415,18 @@ export function SettingsOverview({
               </Grid>
 
               <SectionCard
-                title="Your effective permissions"
-                subtitle={`${grantedPermissions.length} permissions from ${actor.roles.length} role${actor.roles.length === 1 ? "" : "s"}`}
+                title={t("settings.rolesAccess.effectiveTitle")}
+                subtitle={t("settings.rolesAccess.effectiveSubtitle", {
+                  permissions: grantedPermissions.length,
+                  roles: actor.roles.length,
+                })}
               >
                 <Stack spacing={2}>
                   <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.75}>
                     {grantedPermissions.map((permission) => (
                       <Chip
                         key={permission}
-                        label={permission}
+                        label={dynamicT(permissionKey(permission))}
                         size="small"
                         color="primary"
                         variant="outlined"
@@ -431,15 +440,14 @@ export function SettingsOverview({
                     justifyContent="space-between"
                   >
                     <Typography variant="body2" color="text.secondary">
-                      Active dashboard
+                      {t("settings.rolesAccess.activeDashboard")}
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {dashboardByRole[actor.activeRole].label}
+                      {dynamicT(`dashboards.${actor.activeRole}`)}
                     </Typography>
                   </Stack>
                   <Typography variant="caption" color="text.secondary">
-                    The Student role is the account default and cannot be
-                    removed. The academy always keeps at least one administrator.
+                    {t("settings.rolesAccess.defaultNote")}
                   </Typography>
                 </Stack>
               </SectionCard>

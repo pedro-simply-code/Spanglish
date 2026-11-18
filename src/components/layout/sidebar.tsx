@@ -14,13 +14,13 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { IconDots, IconPower } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { SpanglishLogo } from "@/components/brand/spanglish-logo";
 import { Scrollbar } from "@/components/custom-scroll/scrollbar";
-import { getNavSections } from "@/components/layout/nav-data";
+import { getNavSections, type NavTranslator } from "@/components/layout/nav-data";
 import { MINI_SIDEBAR_WIDTH, SIDEBAR_WIDTH } from "@/components/layout/layout-config";
 import {
   dashboardByRole,
-  roleDefinitions,
   signOutAction,
 } from "@/features/auth";
 import type { AuthSession } from "@/features/auth";
@@ -40,9 +40,10 @@ type SidebarContentProps = {
 
 function SidebarContent({ actor, compact, onNavigate }: SidebarContentProps) {
   const pathname = usePathname();
+  const t = useTranslations("shell");
   const homePath = dashboardByRole[actor.activeRole].path;
-  const activeRoleLabel = roleDefinitions[actor.activeRole].name;
-  const navSections = getNavSections(actor.activeRole);
+  const activeRoleLabel = t(`roles.${actor.activeRole}`);
+  const navSections = getNavSections(actor.activeRole, t as NavTranslator);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -184,15 +185,15 @@ function SidebarContent({ actor, compact, onNavigate }: SidebarContentProps) {
                 {actor.name}
               </Typography>
               <Typography variant="caption" color="text.secondary" noWrap>
-                {activeRoleLabel} dashboard
+                {t("sidebar.dashboardSuffix", { role: activeRoleLabel })}
               </Typography>
             </Box>
             <Box component="form" action={signOutAction} sx={{ ml: "auto" }}>
-              <Tooltip title="Sign out" placement="top">
+              <Tooltip title={t("sidebar.signOut")} placement="top">
                 <IconButton
                   type="submit"
                   size="small"
-                  aria-label="Sign out"
+                  aria-label={t("sidebar.signOut")}
                   sx={{ color: "primary.main" }}
                 >
                   <IconPower size={20} />

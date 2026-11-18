@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import Box from "@mui/material/Box";
 import { StripeConnectCard, TeacherEarnings, TeacherRequestPayoutCard } from "@/features/payouts";
 import {
+  localizedTeacherBadges,
+  localizedTeacherLevelName,
   nextLevelGap,
-  teacherBadges,
   teacherLevelFor,
 } from "@/lib/teacher-levels";
 import { requireDashboard } from "@/server/auth/session";
@@ -26,10 +28,10 @@ import {
 } from "@/server/payments/provider-settings";
 import { stripeEnabled, stripeTestMode } from "@/server/payments/stripe";
 
-export const metadata: Metadata = {
-  title: "Earnings",
-  description: "Your pay per delivered class",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.earnings");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function TeacherEarningsPage() {
   return (
@@ -40,6 +42,7 @@ export default function TeacherEarningsPage() {
 }
 
 async function Content() {
+  const t = await getTranslations("educator");
   const actor = await requireDashboard("teacher");
   const providerSettings = await getPaymentProviderSettings();
   const [earnings, rates, stats, stripeStatus, payoutRequest] = await Promise.all([
@@ -61,13 +64,13 @@ async function Content() {
     <>
       <TeacherEarnings
         earnings={earnings}
-        levelName={level.name}
+        levelName={localizedTeacherLevelName(level.level, t)}
         teacherSharePercent={share}
         platformTakePercent={platformTake}
         nextLevel={
           gap
             ? {
-                name: gap.level.name,
+                name: localizedTeacherLevelName(gap.level.level, t),
                 classes: gap.classes,
                 ratings: gap.ratings,
                 rating: gap.rating,
@@ -77,7 +80,7 @@ async function Content() {
         ratingAverage={mine.ratingAverage}
         ratingCount={mine.ratingCount}
         classesTaught={mine.classesTaught}
-        badges={teacherBadges(mine)}
+        badges={localizedTeacherBadges(mine, t)}
         exampleCreditCents={2_000}
         monthStart={startOfMonth().toISOString()}
       />
@@ -90,7 +93,10 @@ async function Content() {
           manualPayoutEnabled={manualPayoutAllowed(providerSettings)}
           minRequestCents={payoutRequest.minRequestCents}
           pendingBatch={payoutRequest.pendingBatch}
-          processingWindow={payoutProcessingWindowPhrase()}
+          processingWindow={payoutProcessingWindowPhrase(undefined, {
+            one: t("payouts.processingDayOne"),
+            other: t("payouts.processingDays", { days: "{days}" }),
+          })}
         />
       </Box>
       {stripeStatus ? (

@@ -245,5 +245,21 @@
     "body": "Esta cuenta tiene acceso total a la academia. Activa la verificación en dos pasos para que una contraseña o un correo robados no basten para entrar.",
     "action": "Activar 2FA",
     "skip": "Omitir por ahora"
+  },
+  "metadata": {
+    "siteDescription": "Aprende español en vivo con profesores nativos de Guatemala — Spanglish Academy",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundDescription": "La página que buscas no existe o se ha movido.",
+    "backHome": "Volver al inicio",
+    "loginTitle": "Iniciar sesión",
+    "loginDescription": "Entra en tu cuenta de Spanglish",
+    "registerTitle": "Crear cuenta",
+    "registerDescription": "Crea tu cuenta de Spanglish",
+    "recoverTitle": "Restablecer contraseña",
+    "recoverDescription": "Restablece tu contraseña con un código por correo",
+    "twoFactorTitle": "Verificación en dos pasos",
+    "twoFactorDescription": "Escribe el código de tu app de autenticación",
+    "onboardingTitle": "Completa tu perfil",
+    "onboardingDescription": "Cuéntanos un poco sobre ti para empezar"
   }
 }

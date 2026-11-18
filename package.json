@@ -12,11 +12,13 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx --env-file=.env scripts/seed.ts",
-    "db:reset": "tsx --env-file=.env scripts/reset-db.ts",
-    "admin:promote": "tsx --env-file=.env scripts/promote-admin.ts",
+    "db:seed": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/seed.ts",
+    "db:reset": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/reset-db.ts",
+    "admin:promote": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/promote-admin.ts",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:recordings": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/check-recordings.ts",
+    "b2:cors": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/b2-cors.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1169.0",

@@ -7,6 +7,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconSend } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import type { ClassroomChatMessage } from "@/features/classes/classroom-protocol";
 
 type ClassroomChatProps = {
@@ -20,6 +21,7 @@ export function ClassroomChat({
   disabled,
   onSend,
 }: ClassroomChatProps) {
+  const t = useTranslations("classroom");
   const [draft, setDraft] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +54,7 @@ export function ClassroomChat({
           ))
         ) : (
           <Typography variant="body2" color="rgba(255,255,255,0.45)">
-            No messages yet. Say hello to the class.
+            {t("chat.empty")}
           </Typography>
         )}
       </Box>
@@ -60,7 +62,7 @@ export function ClassroomChat({
         <TextField
           size="small"
           fullWidth
-          placeholder="Message everyone"
+          placeholder={t("chat.placeholder")}
           value={draft}
           disabled={disabled}
           onChange={(event) => setDraft(event.target.value)}
@@ -81,7 +83,7 @@ export function ClassroomChat({
           type="button"
           onClick={submit}
           disabled={disabled}
-          aria-label="Send message"
+          aria-label={t("chat.send")}
           sx={{
             color: "#fff",
             flexShrink: 0,

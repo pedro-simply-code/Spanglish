@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
 import { useAppToast } from "@/lib/use-app-toast";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
@@ -25,7 +27,6 @@ import Typography from "@mui/material/Typography";
 import {
   IconArrowLeft,
   IconCalendarEvent,
-  IconChecklist,
   IconClock,
   IconExternalLink,
   IconFileText,
@@ -37,6 +38,12 @@ import {
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
+import {
+  ClassRecordings,
+  type ClassRecordingItem,
+} from "@/features/classes/components/class-recordings";
+import { ClassTranscript } from "@/features/classes/components/class-transcript";
+import type { ClassTranscriptLine } from "@/lib/class-captions";
 import {
   cancelClassAction,
   listRescheduleSlotsAction,
@@ -51,6 +58,7 @@ import {
   formatClassDateTime,
   formatClassTimeRange,
   formatClassType,
+  formatDuration,
   formatRelativeStart,
   getClassDateParts,
 } from "@/features/classes/format";
@@ -63,15 +71,13 @@ import type { ClassPolicy } from "@/features/classes/policy";
 import type {
   ClassActionResult,
   LiveClass,
+  LiveClassCancellation,
 } from "@/features/classes/types";
-import { MaterialKindChip } from "@/features/materials/components/material-kind-chip";
 import {
-  getAssignmentsByIds,
-  getAssignmentsForClass,
-  getMaterialById,
-  getMaterialsByIds,
-} from "@/features/materials/data";
-import { formatMaterialDateTime } from "@/features/materials/format";
+  ClassLearningPanel,
+  type LibraryOption,
+} from "@/features/learning/components/class-learning-panel";
+import type { ClassLearning } from "@/lib/learning-types";
 
 type ClassDetailProps = {
   item: LiveClass;
@@ -83,9 +89,130 @@ type ClassDetailProps = {
   viewerTimeZone: string;
   /** The viewer's rating, when they already rated this class. */
   myRating?: { stars: number; comment: string | null } | null;
+  /** This class's recordings (only for people who may watch it). */
+  recordings?: ClassRecordingItem[];
+  /** Saved live captions (only for people who may watch the class). */
+  transcript?: ClassTranscriptLine[];
+  /** Materials, vocabulary and practice of the class (null when not visible). */
+  learning?: ClassLearning | null;
+  /** Teacher's library for attaching materials and assigning forms. */
+  library?: LibraryOption[];
 };
 
 type DialogKind = "cancel" | "reschedule" | null;
+
+type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
+type StudentKey = Parameters<StudentTranslator>[0];
+
+const fixtureTopics: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.topic",
+  "class-1004": "fixtures.classes.class1004.topic",
+  "class-1001": "fixtures.classes.class1001.topic",
+  "class-1002": "fixtures.classes.class1002.topic",
+  "class-0901": "fixtures.classes.class0901.topic",
+  "class-0902": "fixtures.classes.class0902.topic",
+  "class-0801": "fixtures.classes.class0801.topic",
+  "class-0802": "fixtures.classes.class0802.topic",
+};
+
+const fixtureDescriptions: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.description",
+  "class-1004": "fixtures.classes.class1004.description",
+  "class-1001": "fixtures.classes.class1001.description",
+  "class-1002": "fixtures.classes.class1002.description",
+  "class-0901": "fixtures.classes.class0901.description",
+  "class-0902": "fixtures.classes.class0902.description",
+  "class-0801": "fixtures.classes.class0801.description",
+  "class-0802": "fixtures.classes.class0802.description",
+};
+
+const fixtureAgenda: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.agenda",
+  "class-1004": "fixtures.classes.class1004.agenda",
+  "class-1001": "fixtures.classes.class1001.agenda",
+  "class-1002": "fixtures.classes.class1002.agenda",
+  "class-0901": "fixtures.classes.class0901.agenda",
+  "class-0902": "fixtures.classes.class0902.agenda",
+  "class-0801": "fixtures.classes.class0801.agenda",
+  "class-0802": "fixtures.classes.class0802.agenda",
+};
+
+const fixtureOutcomes: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.outcomes",
+  "class-1004": "fixtures.classes.class1004.outcomes",
+  "class-1001": "fixtures.classes.class1001.outcomes",
+  "class-1002": "fixtures.classes.class1002.outcomes",
+  "class-0901": "fixtures.classes.class0901.outcomes",
+  "class-0902": "fixtures.classes.class0902.outcomes",
+  "class-0801": "fixtures.classes.class0801.outcomes",
+  "class-0802": "fixtures.classes.class0802.outcomes",
+};
+
+const fixtureMaterialTitles: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.materialTitles",
+  "class-1004": "fixtures.classes.class1004.materialTitles",
+  "class-1001": "fixtures.classes.class1001.materialTitles",
+  "class-1002": "fixtures.classes.class1002.materialTitles",
+  "class-0901": "fixtures.classes.class0901.materialTitles",
+  "class-0902": "fixtures.classes.class0902.materialTitles",
+  "class-0801": "fixtures.classes.class0801.materialTitles",
+  "class-0802": "fixtures.classes.class0802.materialTitles",
+};
+
+const fixtureMaterialDescriptions: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.materialDescriptions",
+  "class-1004": "fixtures.classes.class1004.materialDescriptions",
+  "class-1001": "fixtures.classes.class1001.materialDescriptions",
+  "class-1002": "fixtures.classes.class1002.materialDescriptions",
+  "class-0901": "fixtures.classes.class0901.materialDescriptions",
+  "class-0902": "fixtures.classes.class0902.materialDescriptions",
+  "class-0801": "fixtures.classes.class0801.materialDescriptions",
+  "class-0802": "fixtures.classes.class0802.materialDescriptions",
+};
+
+const fixtureTeacherNotes: Record<string, StudentKey> = {
+  "class-1003": "fixtures.classes.class1003.teacherNote",
+  "class-1004": "fixtures.classes.class1004.teacherNote",
+  "class-1001": "fixtures.classes.class1001.teacherNote",
+  "class-0901": "fixtures.classes.class0901.teacherNote",
+  "class-0902": "fixtures.classes.class0902.teacherNote",
+};
+
+const fixtureHomework: Record<string, StudentKey> = {
+  "class-1002": "fixtures.classes.class1002.homework",
+  "class-0901": "fixtures.classes.class0901.homework",
+  "class-0902": "fixtures.classes.class0902.homework",
+};
+
+const fixtureRecaps: Record<string, StudentKey> = {
+  "class-0901": "fixtures.classes.class0901.recap",
+  "class-0902": "fixtures.classes.class0902.recap",
+};
+
+const fixtureCancellationReasons: Record<string, StudentKey> = {
+  "class-0801": "fixtures.classes.class0801.cancellationReason",
+  "class-0802": "fixtures.classes.class0802.cancellationReason",
+};
+
+function fixtureText(
+  t: StudentTranslator,
+  keys: Record<string, StudentKey>,
+  id: string,
+  fallback: string,
+) {
+  const key = keys[id];
+  return key ? t(key) : fallback;
+}
+
+function fixtureList(
+  t: StudentTranslator,
+  keys: Record<string, StudentKey>,
+  id: string,
+  fallback: string[],
+) {
+  const key = keys[id];
+  return key ? (t.raw(key) as string[]) : fallback;
+}
 
 export function ClassDetail({
   item,
@@ -95,8 +222,30 @@ export function ClassDetail({
   viewerId,
   viewerTimeZone,
   myRating = null,
+  recordings = [],
+  transcript = [],
+  learning = null,
+  library = [],
 }: ClassDetailProps) {
   const router = useRouter();
+  const t = useTranslations("student");
+  const topic = fixtureText(t, fixtureTopics, item.id, item.topic);
+  const description = fixtureText(t, fixtureDescriptions, item.id, item.description);
+  const agenda = fixtureList(t, fixtureAgenda, item.id, item.agenda);
+  const outcomes = fixtureList(t, fixtureOutcomes, item.id, item.outcomes);
+  const materialTitles = fixtureList(t, fixtureMaterialTitles, item.id, [
+    ...item.materials.map((material) => material.title),
+  ]);
+  const materialDescriptions = fixtureList(t, fixtureMaterialDescriptions, item.id, [
+    ...item.materials.map((material) => material.description),
+  ]);
+  const teacherNote = fixtureText(t, fixtureTeacherNotes, item.id, item.teacherNote ?? "");
+  const homework = fixtureText(t, fixtureHomework, item.id, item.homework ?? "");
+  const recap = fixtureText(t, fixtureRecaps, item.id, item.recap ?? "");
+  const rootT = useTranslations();
+  const locale = useLocale();
+  const appLocale = isAppLocale(locale) ? locale : defaultLocale;
+  const intlLocale = appLocale === "es" ? "es-ES" : "en-US";
   const { showError, showSuccess } = useAppToast();
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [reason, setReason] = useState("");
@@ -108,15 +257,17 @@ export function ClassDetail({
   const [startsAt, setStartsAt] = useState("");
 
   const status = getClassStatus(item, now);
-  const join = getJoinState(item, now, policy);
-  const cancelDecision = decideClassChange(item, "cancel", now, policy);
+  const join = getJoinState(item, now, policy, t);
+  const cancelDecision = decideClassChange(item, "cancel", now, policy, t, appLocale);
   const rescheduleDecision = decideClassChange(
     item,
     "reschedule",
     now,
     policy,
+    t,
+    appLocale,
   );
-  const date = getClassDateParts(item.startsAt);
+  const date = getClassDateParts(item.startsAt, appLocale);
   const isParticipant = relation === "participant";
   const isPaired = (item.participants?.length ?? 0) > 1;
   const partners = (item.participants ?? []).filter((person) => person.userId !== viewerId);
@@ -144,30 +295,35 @@ export function ClassDetail({
     });
   };
   const proposalIsMine = proposal?.requestedByUserId === viewerId;
+  const cancellationBy: Record<LiveClassCancellation["by"], string> = {
+    student: rootT("shell.roles.student"),
+    teacher: rootT("shell.roles.teacher"),
+    staff: t("classes.list.byStaff"),
+  };
 
   const dayFormatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("en-US", {
+      new Intl.DateTimeFormat(intlLocale, {
         timeZone: viewerTimeZone,
         weekday: "short",
         month: "short",
         day: "numeric",
       }),
-    [viewerTimeZone],
+    [viewerTimeZone, intlLocale],
   );
   const timeFormatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("en-US", {
+      new Intl.DateTimeFormat(intlLocale, {
         timeZone: viewerTimeZone,
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
       }),
-    [viewerTimeZone],
+    [viewerTimeZone, intlLocale],
   );
   const fullFormatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("en-US", {
+      new Intl.DateTimeFormat(intlLocale, {
         timeZone: viewerTimeZone,
         weekday: "long",
         month: "long",
@@ -176,7 +332,7 @@ export function ClassDetail({
         minute: "2-digit",
         timeZoneName: "short",
       }),
-    [viewerTimeZone],
+    [viewerTimeZone, intlLocale],
   );
   const slotDays = useMemo(() => {
     const groups = new Map<string, string[]>();
@@ -214,14 +370,7 @@ export function ClassDetail({
       }
     });
   };
-  const libraryMaterials = getMaterialsByIds(item.materialIds ?? []);
-  const classAssignments =
-    item.assignmentIds && item.assignmentIds.length
-      ? getAssignmentsByIds(item.assignmentIds)
-      : getAssignmentsForClass(item.id);
-  const recording = item.recordingId
-    ? getMaterialById(item.recordingId)
-    : undefined;
+  const hasRecording = recordings.some((entry) => entry.status === "ready");
 
   const closeDialog = () => {
     if (pending) return;
@@ -271,11 +420,11 @@ export function ClassDetail({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={item.topic}
-        subtitle={`${formatClassDate(item.startsAt)} · ${formatClassTimeRange(item)}`}
+        title={topic}
+        subtitle={`${formatClassDate(item.startsAt, appLocale)} · ${formatClassTimeRange(item, appLocale)}`}
         items={[
-          { title: "My classes", to: "/classes" },
-          { title: item.topic },
+          { title: t("actions.myClasses"), to: "/classes" },
+          { title: topic },
         ]}
       />
 
@@ -287,22 +436,28 @@ export function ClassDetail({
             proposalIsMine ? undefined : (
               <Stack direction="row" spacing={1}>
                 <Button color="inherit" size="small" disabled={pending} onClick={() => answerProposal(false)}>
-                  Decline
+                  {t("classes.detail.decline")}
                 </Button>
                 <Button variant="contained" size="small" disabled={pending} onClick={() => answerProposal(true)}>
-                  Accept
+                  {t("classes.detail.accept")}
                 </Button>
               </Stack>
             )
           }
         >
           <Typography variant="subtitle2" fontWeight={600}>
-            {proposalIsMine ? "Waiting for your partner" : `${proposal.requestedByName} proposed a new time`}
+            {proposalIsMine
+              ? t("classes.detail.waitingPartner")
+              : t("classes.detail.proposedTime", { name: proposal.requestedByName })}
           </Typography>
-          Move to {fullFormatter.format(new Date(proposal.newStartsAt))}.{" "}
+          {t("classes.detail.moveTo", {
+            date: fullFormatter.format(new Date(proposal.newStartsAt)),
+          })}{" "}
           {proposalIsMine
-            ? "If they do not answer within 24 hours, the class keeps its current time."
-            : `Answer before ${fullFormatter.format(new Date(proposal.expiresAt))}; otherwise the class keeps its time.`}
+            ? t("classes.detail.waitingAnswer")
+            : t("classes.detail.answerBefore", {
+                date: fullFormatter.format(new Date(proposal.expiresAt)),
+              })}
         </Alert>
       ) : null}
 
@@ -369,27 +524,27 @@ export function ClassDetail({
                     >
                       <ClassStatusChip status={status} />
                       <Chip
-                        label={formatClassType(item.type)}
+                        label={formatClassType(item.type, t)}
                         size="small"
                         variant="outlined"
                       />
                       <Chip
-                        label={`${item.duration} min`}
+                        label={formatDuration(item.duration, t)}
                         size="small"
                         variant="outlined"
                       />
                       <Chip
-                        label={`${item.creditCost} credit`}
+                        label={t("classes.detail.creditChip", { count: item.creditCost })}
                         size="small"
                         variant="outlined"
                       />
                     </Stack>
 
                     <Typography variant="h4" mt={1.5}>
-                      {item.topic}
+                      {topic}
                     </Typography>
                     <Typography color="text.secondary" mt={1}>
-                      {item.description}
+                      {description}
                     </Typography>
 
                     <Stack
@@ -410,13 +565,13 @@ export function ClassDetail({
                       <Stack direction="row" spacing={0.75} alignItems="center">
                         <IconCalendarEvent size={15} />
                         <Typography variant="body2" color="text.secondary">
-                          {formatClassDate(item.startsAt)}
+                          {formatClassDate(item.startsAt, appLocale)}
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={0.75} alignItems="center">
                         <IconClock size={15} />
                         <Typography variant="body2" color="text.secondary">
-                          {formatClassTimeRange(item)}
+                          {formatClassTimeRange(item, appLocale)}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -427,18 +582,22 @@ export function ClassDetail({
                       fontWeight={600}
                       color={join.canJoin ? "success.main" : "text.secondary"}
                     >
-                      {formatRelativeStart(item, now)} · {join.message}
+                      {formatRelativeStart(item, now, t)} · {join.message}
                     </Typography>
 
                     {partners.length ? (
                       <Typography variant="body2" color="text.secondary" mt={1}>
-                        {isParticipant ? "With" : "Students"}: {partners.map((person) => person.name).join(", ")}
+                        {t(isParticipant ? "classes.detail.with" : "classes.detail.students", {
+                          names: partners.map((person) => person.name).join(", "),
+                        })}
                       </Typography>
                     ) : null}
 
                     {item.rescheduledFrom ? (
                       <Typography variant="body2" color="text.secondary" mt={1}>
-                        Rescheduled from {formatClassDateTime(item.rescheduledFrom)}.
+                        {t("classes.detail.rescheduledFrom", {
+                          date: formatClassDateTime(item.rescheduledFrom, appLocale, t),
+                        })}
                       </Typography>
                     ) : null}
                   </Box>
@@ -456,7 +615,7 @@ export function ClassDetail({
                         color="success"
                         startIcon={<IconVideo size={16} />}
                       >
-                        Join class
+                        {t("classes.detail.joinClass")}
                       </LinkButton>
                     ) : null}
                     <LinkButton
@@ -464,7 +623,7 @@ export function ClassDetail({
                       variant="outlined"
                       startIcon={<IconArrowLeft size={16} />}
                     >
-                      All classes
+                      {t("classes.detail.allClasses")}
                     </LinkButton>
                   </Stack>
                 </Stack>
@@ -472,16 +631,16 @@ export function ClassDetail({
             </Card>
 
             <SectionCard
-              title="What we will cover"
-              subtitle="Agenda and learning outcomes"
+              title={t("classes.detail.coverTitle")}
+              subtitle={t("classes.detail.coverSubtitle")}
             >
               <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="subtitle1" fontWeight={600} mb={1.5}>
-                    Agenda
+                    {t("classes.detail.agenda")}
                   </Typography>
                   <Stack spacing={1.5}>
-                    {item.agenda.map((entry, index) => (
+                    {agenda.map((entry, index) => (
                       <Stack
                         key={entry}
                         direction="row"
@@ -509,10 +668,10 @@ export function ClassDetail({
 
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="subtitle1" fontWeight={600} mb={1.5}>
-                    You will be able to
+                    {t("classes.detail.outcomes")}
                   </Typography>
                   <Stack spacing={1.5}>
-                    {item.outcomes.map((outcome) => (
+                    {outcomes.map((outcome) => (
                       <Stack
                         key={outcome}
                         direction="row"
@@ -530,12 +689,13 @@ export function ClassDetail({
               </Grid>
             </SectionCard>
 
+            {item.materials.length || item.teacherNote || item.homework || (item.recordingUrl && !recordings.length) ? (
             <SectionCard
-              title="Prepare for class"
-              subtitle="Materials and notes from your teacher"
+              title={t("classes.detail.prepareTitle")}
+              subtitle={t("classes.detail.prepareSubtitle")}
             >
               <Stack spacing={2.5} divider={<Divider />}>
-                {item.materials.map((material) => (
+                {item.materials.map((material, index) => (
                   <Stack
                     key={material.title}
                     direction={{ xs: "column", sm: "row" }}
@@ -554,10 +714,10 @@ export function ClassDetail({
                     </Avatar>
                     <Box flexGrow={1} minWidth={0}>
                       <Typography variant="subtitle1" fontWeight={600}>
-                        {material.title}
+                        {materialTitles[index] ?? material.title}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {material.description}
+                        {materialDescriptions[index] ?? material.description}
                       </Typography>
                     </Box>
                     <LinkButton
@@ -566,116 +726,18 @@ export function ClassDetail({
                       variant="outlined"
                       endIcon={<IconExternalLink size={14} />}
                     >
-                      Open
+                      {t("classes.detail.open")}
                     </LinkButton>
                   </Stack>
                 ))}
-
-                {libraryMaterials.map((material) => (
-                  <Stack
-                    key={material.id}
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={2}
-                    alignItems={{ xs: "flex-start", sm: "center" }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: 42,
-                        height: 42,
-                        bgcolor: "primary.light",
-                        color: "primary.main",
-                      }}
-                    >
-                      <IconFileText size={20} />
-                    </Avatar>
-                    <Box flexGrow={1} minWidth={0}>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        flexWrap="wrap"
-                        alignItems="center"
-                      >
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {material.title}
-                        </Typography>
-                        <MaterialKindChip kind={material.kind} />
-                      </Stack>
-                      <Typography variant="body2" color="text.secondary">
-                        {material.description}
-                      </Typography>
-                    </Box>
-                    <LinkButton
-                      href={`/materials/${material.id}`}
-                      size="small"
-                      variant="outlined"
-                      endIcon={<IconExternalLink size={14} />}
-                    >
-                      Open
-                    </LinkButton>
-                  </Stack>
-                ))}
-
-                {classAssignments.length ? (
-                  <Box>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <IconChecklist size={18} />
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        Assigned practice
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={1.5} mt={1.5}>
-                      {classAssignments.map((assignment) => {
-                        const material = getMaterialById(
-                          assignment.materialId,
-                        );
-
-                        return (
-                          <Stack
-                            key={assignment.id}
-                            direction={{ xs: "column", sm: "row" }}
-                            spacing={1}
-                            justifyContent="space-between"
-                            alignItems={{ xs: "flex-start", sm: "center" }}
-                            sx={{ p: 1.5, bgcolor: "grey.100" }}
-                          >
-                            <Box>
-                              <Typography variant="body2" fontWeight={600}>
-                                {assignment.title}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {assignment.submitted} of{" "}
-                                {assignment.totalStudents} submitted
-                                {assignment.dueAt
-                                  ? ` · due ${formatMaterialDateTime(assignment.dueAt)}`
-                                  : ""}
-                              </Typography>
-                            </Box>
-                            {material ? (
-                              <LinkButton
-                                href={`/practice/${material.id}`}
-                                size="small"
-                                variant="outlined"
-                              >
-                                Open form
-                              </LinkButton>
-                            ) : null}
-                          </Stack>
-                        );
-                      })}
-                    </Stack>
-                  </Box>
-                ) : null}
 
                 {item.teacherNote ? (
                   <Box>
                     <Typography variant="subtitle1" fontWeight={600}>
-                      Teacher note
+                      {t("classes.detail.teacherNote")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {item.teacherNote}
+                      {teacherNote}
                     </Typography>
                   </Box>
                 ) : null}
@@ -683,72 +745,80 @@ export function ClassDetail({
                 {item.homework ? (
                   <Box>
                     <Typography variant="subtitle1" fontWeight={600}>
-                      Homework
+                      {t("classes.detail.homework")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {item.homework}
+                      {homework}
                     </Typography>
                   </Box>
                 ) : null}
 
-                {recording || item.recordingUrl ? (
+                {item.recordingUrl && !recordings.length ? (
                   <Box>
                     <Typography variant="subtitle1" fontWeight={600}>
-                      Recording
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {recording
-                        ? `${recording.duration ?? "Full class"} · ${
-                            recording.transcriptReady
-                              ? "transcript ready"
-                              : "transcript processing"
-                          }`
-                        : "Watch the class recording."}
+                      {t("classes.detail.recording")}
                     </Typography>
                     <LinkButton
-                      href={
-                        recording
-                          ? `/materials/${recording.id}`
-                          : item.recordingUrl ?? "#"
-                      }
+                      href={item.recordingUrl}
                       size="small"
                       variant="outlined"
                       sx={{ mt: 1 }}
                       endIcon={<IconExternalLink size={14} />}
                     >
-                      {recording ? "Open recording" : "Watch the class"}
+                      {t("classes.detail.watchClass")}
                     </LinkButton>
                   </Box>
                 ) : null}
               </Stack>
             </SectionCard>
+            ) : null}
+
+            {learning ? (
+              <ClassLearningPanel
+                sessionId={item.id}
+                learning={learning}
+                canEdit={relation === "teacher" || relation === "staff"}
+                isParticipant={relation === "participant"}
+                notes={{
+                  recap: item.recap ?? "",
+                  homework: item.homework ?? "",
+                  teacherNote: item.teacherNote ?? "",
+                }}
+                library={library}
+                timeZone={viewerTimeZone}
+              />
+            ) : null}
+
+            <ClassRecordings recordings={recordings} timeZone={viewerTimeZone} />
+
+            <ClassTranscript lines={transcript} timeZone={viewerTimeZone} />
 
             {item.recap ? (
               <SectionCard
-                title="Class recap"
-                subtitle="What your teacher noticed and what to practice next"
+                title={t("classes.detail.recapTitle")}
+                subtitle={t("classes.detail.recapSubtitle")}
               >
                 <Stack spacing={2}>
-                  <Typography color="text.secondary">{item.recap}</Typography>
+                  <Typography color="text.secondary">{recap}</Typography>
                   {item.homework ? (
                     <Box sx={{ p: 2, bgcolor: "grey.100" }}>
                       <Typography variant="subtitle2" fontWeight={600}>
-                        Homework
+                        {t("classes.detail.homework")}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {item.homework}
+                        {homework}
                       </Typography>
                     </Box>
                   ) : null}
-                  {recording ? (
+                  {hasRecording ? (
                     <LinkButton
-                      href={`/materials/${recording.id}`}
+                      href="#class-recording"
                       size="small"
                       variant="outlined"
                       startIcon={<IconVideo size={15} />}
                       sx={{ alignSelf: "flex-start" }}
                     >
-                      Watch the class recording
+                      {t("classes.detail.watchRecording")}
                     </LinkButton>
                   ) : null}
                 </Stack>
@@ -760,8 +830,8 @@ export function ClassDetail({
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <SectionCard
-              title="Meeting room"
-              subtitle={`${item.duration}-minute live class`}
+              title={t("classes.detail.meetingTitle")}
+              subtitle={t("classes.detail.meetingSubtitle", { minutes: item.duration })}
               action={
                 <Avatar
                   sx={{
@@ -781,18 +851,18 @@ export function ClassDetail({
                 </Alert>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Opens
+                    {t("classes.detail.opens")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {formatClassDateTime(join.opensAt)}
+                    {formatClassDateTime(join.opensAt, appLocale, t)}
                   </Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Closes
+                    {t("classes.detail.closes")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {formatClassDateTime(join.closesAt)}
+                    {formatClassDateTime(join.closesAt, appLocale, t)}
                   </Typography>
                 </Stack>
                 {join.canJoin ? (
@@ -803,15 +873,15 @@ export function ClassDetail({
                     fullWidth
                     startIcon={<IconVideo size={16} />}
                   >
-                    Enter classroom
+                    {t("classes.detail.enterClassroom")}
                   </LinkButton>
                 ) : null}
               </Stack>
             </SectionCard>
 
             <SectionCard
-              title="Manage this class"
-              subtitle="Server-enforced policy"
+              title={t("classes.detail.manageTitle")}
+              subtitle={t("classes.detail.manageSubtitle")}
               action={
                 <Avatar
                   sx={{
@@ -828,7 +898,7 @@ export function ClassDetail({
               <Stack spacing={2.5}>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Cancel
+                    {t("classes.detail.cancelSection")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {cancelDecision.message}
@@ -842,7 +912,7 @@ export function ClassDetail({
                     startIcon={<IconX size={15} />}
                     onClick={() => setDialog("cancel")}
                   >
-                    Cancel class
+                    {t("classes.detail.cancelClass")}
                   </Button>
                 </Box>
 
@@ -852,11 +922,11 @@ export function ClassDetail({
 
                     <Box>
                       <Typography variant="subtitle1" fontWeight={600}>
-                        Reschedule
+                        {t("classes.detail.rescheduleSection")}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {rescheduleDecision.message}
-                        {isPaired ? " Your partner has to accept the new time." : ""}
+                        {isPaired ? t("classes.detail.partnerAccept") : ""}
                       </Typography>
                       <Button
                         variant="outlined"
@@ -866,33 +936,32 @@ export function ClassDetail({
                         startIcon={<IconRefresh size={15} />}
                         onClick={openReschedule}
                       >
-                        Choose a new time
+                        {t("classes.detail.chooseNewTime")}
                       </Button>
                     </Box>
                   </>
                 ) : null}
 
                 <Typography variant="caption" color="text.secondary">
-                  Changes need at least {policy.cancelCutoffHours} hours of
-                  notice. The server checks the cutoff again when you confirm.
+                  {t("classes.detail.changeNotice", { hours: policy.cancelCutoffHours })}
                 </Typography>
               </Stack>
             </SectionCard>
 
             {canRate ? (
               <SectionCard
-                title={myRating ? "Your rating" : "Rate this class"}
-                subtitle="Your rating helps your teacher grow and other students choose."
+                title={myRating ? t("classes.detail.yourRating") : t("classes.detail.rateTitle")}
+                subtitle={t("classes.detail.ratingSubtitle")}
               >
                 <Stack spacing={1.5}>
                   <Rating
                     value={stars}
                     onChange={(_, value) => setStars(value)}
                     size="large"
-                    aria-label="Stars"
+                    aria-label={t("classes.detail.stars")}
                   />
                   <TextField
-                    label="Comment (optional)"
+                    label={t("classes.detail.commentOptional")}
                     value={ratingComment}
                     onChange={(event) => setRatingComment(event.target.value)}
                     multiline
@@ -906,27 +975,39 @@ export function ClassDetail({
                     disabled={!stars || pending}
                     onClick={submitRating}
                   >
-                    {myRating ? "Update rating" : "Send rating"}
+                    {myRating ? t("classes.detail.updateRating") : t("classes.detail.sendRating")}
                   </Button>
                 </Stack>
               </SectionCard>
             ) : null}
 
             {item.cancellation ? (
-              <SectionCard title="Cancellation" subtitle="What happened">
+              <SectionCard
+                title={t("classes.detail.cancellationTitle")}
+                subtitle={t("classes.detail.cancellationSubtitle")}
+              >
                 <Stack spacing={1}>
                   <Typography variant="body2" color="text.secondary">
-                    Canceled by {item.cancellation.by} on{" "}
-                    {formatClassDateTime(item.cancellation.at)}.
+                    {t("classes.detail.canceledByOn", {
+                      by: cancellationBy[item.cancellation.by],
+                      date: formatClassDateTime(item.cancellation.at, appLocale, t),
+                    })}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Reason: {item.cancellation.reason}
+                    {t("classes.detail.reason", {
+                      reason: fixtureText(
+                        t,
+                        fixtureCancellationReasons,
+                        item.id,
+                        item.cancellation.reason,
+                      ),
+                    })}
                   </Typography>
                   <Chip
                     label={
                       item.cancellation.creditRefunded
-                        ? "Credit returned"
-                        : "Credit not returned"
+                        ? t("classes.detail.creditReturned")
+                        : t("classes.detail.creditNotReturned")
                     }
                     color={
                       item.cancellation.creditRefunded ? "success" : "default"
@@ -943,17 +1024,22 @@ export function ClassDetail({
       </Grid>
 
       <Dialog open={dialog === "cancel"} onClose={closeDialog} fullWidth maxWidth="xs">
-        <DialogTitle>Cancel this class?</DialogTitle>
+        <DialogTitle>{t("classes.detail.cancelDialogTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {item.topic} with {item.teacherName} on{" "}
-            {formatClassDateTime(item.startsAt)}.{" "}
-            {isParticipant
-              ? `The credit goes back to the package${isPaired ? " and the class is canceled for both of you" : ""}.`
-              : "The students get their credit back and an email."}
+            {t("classes.detail.cancelDialogBody", {
+              topic,
+              teacher: item.teacherName,
+              date: formatClassDateTime(item.startsAt, appLocale, t),
+              detail: isParticipant
+                ? t("classes.detail.cancelParticipant", {
+                    paired: isPaired ? t("classes.detail.cancelPaired") : "",
+                  })
+                : t("classes.detail.cancelStaff"),
+            })}
           </DialogContentText>
           <TextField
-            label="Reason (optional)"
+            label={t("common.reasonOptional")}
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             fullWidth
@@ -970,7 +1056,7 @@ export function ClassDetail({
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDialog} disabled={pending}>
-            Keep class
+            {t("classes.detail.keepClass")}
           </Button>
           <Button
             variant="contained"
@@ -978,7 +1064,7 @@ export function ClassDetail({
             onClick={submitCancel}
             disabled={pending}
           >
-            {pending ? "Canceling…" : "Cancel class"}
+            {pending ? t("classes.detail.canceling") : t("classes.detail.confirmCancel")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -989,23 +1075,23 @@ export function ClassDetail({
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>Choose a new time</DialogTitle>
+        <DialogTitle>{t("classes.detail.rescheduleDialogTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {isPaired
-              ? "Pick a time when the teacher and both of you are free. Your partner has 24 hours to accept."
-              : "Pick an open time. The class keeps its current time until you confirm."}
+              ? t("classes.detail.pairedHelp")
+              : t("classes.detail.singleHelp")}
           </DialogContentText>
           <Stack spacing={2} mt={2}>
             {slots === null ? (
-              <Typography color="text.secondary">Loading open times…</Typography>
+              <Typography color="text.secondary">{t("classes.detail.loadingTimes")}</Typography>
             ) : !slotDays.length ? (
-              <Typography color="text.secondary">No open times in the next three weeks.</Typography>
+              <Typography color="text.secondary">{t("classes.detail.noTimes")}</Typography>
             ) : (
               <>
                 <TextField
                   select
-                  label="Day"
+                  label={t("classes.detail.day")}
                   value={activeDay?.label ?? ""}
                   onChange={(event) => {
                     setDayKey(event.target.value);
@@ -1022,12 +1108,12 @@ export function ClassDetail({
                 </TextField>
                 <TextField
                   select
-                  label="Time"
+                  label={t("classes.detail.time")}
                   value={startsAt}
                   onChange={(event) => setStartsAt(event.target.value)}
                   fullWidth
                   disabled={pending}
-                  helperText={`Times in your time zone (${viewerTimeZone}).`}
+                  helperText={t("classes.detail.timesInZone", { zone: viewerTimeZone })}
                 >
                   {(activeDay?.times ?? []).map((slot) => (
                     <MenuItem key={slot} value={slot}>
@@ -1046,14 +1132,18 @@ export function ClassDetail({
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDialog} disabled={pending}>
-            Keep current time
+            {t("classes.detail.keepCurrentTime")}
           </Button>
           <Button
             variant="contained"
             onClick={submitReschedule}
             disabled={pending || !startsAt}
           >
-            {pending ? "Saving…" : isPaired ? "Propose new time" : "Confirm new time"}
+            {pending
+              ? t("classes.detail.saving")
+              : isPaired
+                ? t("classes.detail.proposeTime")
+                : t("classes.detail.confirmTime")}
           </Button>
         </DialogActions>
       </Dialog>

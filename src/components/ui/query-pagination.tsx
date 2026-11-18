@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import Typography from "@mui/material/Typography";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { DEFAULT_PAGE_SIZE, totalPages } from "@/lib/pagination";
 
 type QueryPaginationProps = {
@@ -23,6 +24,8 @@ export function QueryPagination({
   pageSize = DEFAULT_PAGE_SIZE,
   paramName = "page",
 }: QueryPaginationProps) {
+  const t = useTranslations("shell");
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,7 +48,11 @@ export function QueryPagination({
       }}
     >
       <Typography variant="body2" color="text.secondary">
-        Showing {from}–{to} of {total.toLocaleString("en-US")}
+        {t("pagination.showing", {
+          from: from.toLocaleString(locale),
+          to: to.toLocaleString(locale),
+          total: total.toLocaleString(locale),
+        })}
       </Typography>
       <Pagination
         color="primary"

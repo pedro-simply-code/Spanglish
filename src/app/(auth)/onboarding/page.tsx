@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AuthShell, OnboardingForm } from "@/features/auth";
 import { getActorAllowIncompleteProfile } from "@/server/auth/session";
 
-export const metadata: Metadata = {
-  title: "Complete your profile",
-  description: "Tell us a little about you to get started",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("onboardingTitle"),
+    description: t("onboardingDescription"),
+  };
+}
 
 export default function OnboardingPage() {
   return (

@@ -9,12 +9,15 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { createMaterialAction } from "@/features/materials/actions";
-import { materialKindLabels, materialKindOptions } from "@/features/materials/data";
+import { materialKindOptions } from "@/features/materials/data";
 import type {
   FormQuestionType,
   MaterialActionResult,
@@ -30,6 +33,13 @@ const levels: MaterialLevel[] = [
   "Advanced",
 ];
 
+const levelKeys: Record<MaterialLevel, string> = {
+  "All levels": "all",
+  Beginner: "beginner",
+  Intermediate: "intermediate",
+  Advanced: "advanced",
+};
+
 const questionTypes: FormQuestionType[] = [
   "multiple-choice",
   "short-answer",
@@ -37,12 +47,32 @@ const questionTypes: FormQuestionType[] = [
   "listening",
 ];
 
+const questionTypeKeys: Record<FormQuestionType, string> = {
+  "multiple-choice": "multipleChoice",
+  "short-answer": "shortAnswer",
+  speaking: "speaking",
+  listening: "listening",
+};
+
 type DraftQuestion = {
   prompt: string;
   type: FormQuestionType;
+  /** Multiple choice: up to four options and the right one. */
+  options: string[];
+  correctOption: number;
+  points: number;
 };
 
+const blankQuestion = (): DraftQuestion => ({
+  prompt: "",
+  type: "multiple-choice",
+  options: ["", "", "", ""],
+  correctOption: 0,
+  points: 1,
+});
+
 export function MaterialComposer() {
+  const t = useTranslations("educator.materials");
   const [kind, setKind] = useState<MaterialKind>("document");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -50,9 +80,7 @@ export function MaterialComposer() {
   const [audience, setAudience] = useState<MaterialAudience>("class");
   const [visibility, setVisibility] = useState<"private" | "shared" | "global">("private");
   const [dueAt, setDueAt] = useState("");
-  const [questions, setQuestions] = useState<DraftQuestion[]>([
-    { prompt: "", type: "multiple-choice" },
-  ]);
+  const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion()]);
   const [result, setResult] = useState<MaterialActionResult | null>(null);
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -106,13 +134,13 @@ export function MaterialComposer() {
           <TextField
             select
             fullWidth
-            label="Type"
+            label={t("composer.type")}
             value={kind}
             onChange={(event) => setKind(event.target.value as MaterialKind)}
           >
             {materialKindOptions.map((option) => (
               <MenuItem key={option} value={option}>
-                {materialKindLabels[option]}
+                {t(`kind.${option}`)}
               </MenuItem>
             ))}
           </TextField>
@@ -121,13 +149,13 @@ export function MaterialComposer() {
           <TextField
             select
             fullWidth
-            label="Level"
+            label={t("composer.level")}
             value={level}
             onChange={(event) => setLevel(event.target.value as MaterialLevel)}
           >
             {levels.map((option) => (
               <MenuItem key={option} value={option}>
-                {option}
+                {t(`level.${levelKeys[option]}`)}
               </MenuItem>
             ))}
           </TextField>
@@ -136,44 +164,44 @@ export function MaterialComposer() {
           <TextField
             select
             fullWidth
-            label="Audience"
+            label={t("composer.audience")}
             value={audience}
             onChange={(event) =>
               setAudience(event.target.value as MaterialAudience)
             }
           >
-            <MenuItem value="class">A class</MenuItem>
-            <MenuItem value="student">One student</MenuItem>
-            <MenuItem value="cohort">A cohort</MenuItem>
+            <MenuItem value="class">{t("audience.class")}</MenuItem>
+            <MenuItem value="student">{t("audience.student")}</MenuItem>
+            <MenuItem value="cohort">{t("audience.cohort")}</MenuItem>
           </TextField>
         </Grid>
         <Grid size={12}>
           <TextField
             select
             fullWidth
-            label="Who can see it"
+            label={t("composer.whoCanSee")}
             value={visibility}
             onChange={(event) => setVisibility(event.target.value as typeof visibility)}
             helperText={
               visibility === "global"
-                ? "Every student, after a manager approves it."
+                ? t("visibility.globalHelp")
                 : visibility === "shared"
-                  ? "Every teacher can find and use it."
-                  : "Only you (and the classes you attach it to)."
+                  ? t("visibility.sharedHelp")
+                  : t("visibility.privateHelp")
             }
           >
-            <MenuItem value="private">Private</MenuItem>
-            <MenuItem value="shared">Shared with teachers</MenuItem>
-            <MenuItem value="global">Academy library (needs approval)</MenuItem>
+            <MenuItem value="private">{t("visibility.private")}</MenuItem>
+            <MenuItem value="shared">{t("visibility.shared")}</MenuItem>
+            <MenuItem value="global">{t("visibility.global")}</MenuItem>
           </TextField>
         </Grid>
         <Grid size={12}>
           <TextField
             fullWidth
-            label="Title"
+            label={t("composer.title")}
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Travel phrases deck"
+            placeholder={t("composer.titlePlaceholder")}
           />
         </Grid>
         <Grid size={12}>
@@ -181,16 +209,16 @@ export function MaterialComposer() {
             fullWidth
             multiline
             minRows={3}
-            label="Description"
+            label={t("composer.description")}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="What will students do with this material?"
+            placeholder={t("composer.descriptionPlaceholder")}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <TextField
             fullWidth
-            label="Due date (optional)"
+            label={t("composer.dueDate")}
             type="date"
             value={dueAt}
             onChange={(event) => setDueAt(event.target.value)}
@@ -208,37 +236,33 @@ export function MaterialComposer() {
             mb={2}
           >
             <Box>
-              <Typography variant="h6">Questions</Typography>
+              <Typography variant="h6">{t("composer.questions")}</Typography>
               <Typography variant="body2" color="text.secondary">
-                The form runner grades multiple choice and collects the rest for
-                teacher review.
+                {t("composer.questionsHelp")}
               </Typography>
             </Box>
             <Button
               size="small"
               startIcon={<IconPlus size={15} />}
               onClick={() =>
-                setQuestions((current) => [
-                  ...current,
-                  { prompt: "", type: "multiple-choice" },
-                ])
+                setQuestions((current) => [...current, blankQuestion()])
               }
             >
-              Add question
+              {t("composer.addQuestion")}
             </Button>
           </Stack>
 
           <Stack spacing={2} divider={<Divider />}>
             {questions.map((question, index) => (
+              <Stack key={index} spacing={1.5}>
               <Stack
-                key={index}
                 direction={{ xs: "column", sm: "row" }}
                 spacing={2}
                 alignItems={{ xs: "stretch", sm: "flex-start" }}
               >
                 <TextField
                   fullWidth
-                  label={`Question ${index + 1}`}
+                  label={t("composer.question", { number: index + 1 })}
                   value={question.prompt}
                   onChange={(event) =>
                     updateQuestion(index, { prompt: event.target.value })
@@ -246,7 +270,7 @@ export function MaterialComposer() {
                 />
                 <TextField
                   select
-                  label="Answer type"
+                  label={t("composer.answerType")}
                   value={question.type}
                   onChange={(event) =>
                     updateQuestion(index, {
@@ -257,12 +281,23 @@ export function MaterialComposer() {
                 >
                   {questionTypes.map((option) => (
                     <MenuItem key={option} value={option}>
-                      {option.replace("-", " ")}
+                      {t(`questionType.${questionTypeKeys[option]}`)}
                     </MenuItem>
                   ))}
                 </TextField>
+                <TextField
+                  type="number"
+                  label={t("composer.points")}
+                  value={question.points}
+                  onChange={(event) =>
+                    updateQuestion(index, {
+                      points: Math.max(1, Math.min(100, Number(event.target.value) || 1)),
+                    })
+                  }
+                  sx={{ width: 100 }}
+                />
                 <IconButton
-                  aria-label={`Remove question ${index + 1}`}
+                  aria-label={t("composer.removeQuestion", { number: index + 1 })}
                   onClick={() =>
                     setQuestions((current) =>
                       current.filter((_, position) => position !== index),
@@ -274,6 +309,45 @@ export function MaterialComposer() {
                   <IconTrash size={18} />
                 </IconButton>
               </Stack>
+              {question.type === "multiple-choice" ? (
+                <RadioGroup
+                  value={String(question.correctOption)}
+                  onChange={(event) =>
+                    updateQuestion(index, { correctOption: Number(event.target.value) })
+                  }
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    {t("composer.optionsHelp")}
+                  </Typography>
+                  <Grid container spacing={1} mt={0.5}>
+                    {question.options.map((option, optionIndex) => (
+                      <Grid key={optionIndex} size={{ xs: 12, sm: 6 }}>
+                        <Stack direction="row" alignItems="center">
+                          <Radio
+                            value={String(optionIndex)}
+                            size="small"
+                            inputProps={{ "aria-label": t("composer.correctOption") }}
+                          />
+                          <TextField
+                            size="small"
+                            fullWidth
+                            label={t("composer.option", { number: optionIndex + 1 })}
+                            value={option}
+                            onChange={(event) =>
+                              updateQuestion(index, {
+                                options: question.options.map((value, position) =>
+                                  position === optionIndex ? event.target.value : value,
+                                ),
+                              })
+                            }
+                          />
+                        </Stack>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </RadioGroup>
+              ) : null}
+              </Stack>
             ))}
           </Stack>
         </Box>
@@ -281,7 +355,7 @@ export function MaterialComposer() {
 
       <Stack direction="row" spacing={2} justifyContent="flex-end">
         <Button variant="contained" onClick={submit} disabled={pending}>
-          {pending ? "Creating…" : "Create and share"}
+          {pending ? t("composer.creating") : t("composer.createAndShare")}
         </Button>
       </Stack>
     </Stack>

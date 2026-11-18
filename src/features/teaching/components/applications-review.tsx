@@ -12,7 +12,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
-import Link from "@mui/material/Link";
+import MaterialLink from "@mui/material/Link";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
@@ -27,6 +27,8 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconEye, IconMail, IconUserPlus } from "@tabler/icons-react";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { SectionCard } from "@/components/ui/section-card";
@@ -38,15 +40,14 @@ import {
 } from "@/features/teaching/actions";
 import { DEFAULT_PAGE_SIZE, sliceForPage } from "@/lib/pagination";
 import {
-  credentialTypes,
-  fluencyLabel,
-  teacherApplicationTracks,
-  trackLabel,
+  localizedCredentialTypeLabel,
+  localizedFluencyLabel,
+  localizedTeacherApplicationTracks,
+  localizedTrackLabel,
   type TeacherApplicationCredential,
   type TeacherApplicationTrack,
   type TeacherFluencyLevel,
 } from "@/lib/teacher-application";
-import { AcademyContactButton } from "@/components/ui/academy-contact-button";
 import { useAppToast } from "@/lib/use-app-toast";
 
 export type TeacherInvitationListItem = {
@@ -78,9 +79,6 @@ export type ReviewApplication = {
   applicant: { name: string; email: string };
 };
 
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
-const inviteDate = dateFormat;
-
 const statusColor = {
   submitted: "warning",
   approved: "success",
@@ -89,14 +87,6 @@ const statusColor = {
 } as const;
 
 type StatusTab = "open" | "history";
-
-function credentialTypeLabel(type: string) {
-  return credentialTypes.find((item) => item.id === type)?.label ?? type;
-}
-
-function teachesLabel(teaches: string[]) {
-  return teaches.map((language) => (language === "spanish" ? "Spanish" : "English")).join(", ");
-}
 
 function ApplicationDetailDialog({
   open,
@@ -119,8 +109,21 @@ function ApplicationDetailDialog({
   onReject: () => void;
   mailFromName?: string;
 }) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
+  const dateFormat = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric" });
+
   if (!item) return null;
   const canReview = item.status === "submitted";
+  const composeHref = `/apps/email?${new URLSearchParams({
+    compose: "1",
+    to: item.applicant.email,
+    subject: t("applications.emailSubject"),
+    body: t("applications.emailBody", {
+      name: item.applicant.name,
+      fromName: mailFromName ?? "Spanglish Academy",
+    }),
+  }).toString()}`;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -132,40 +135,47 @@ function ApplicationDetailDialog({
               {item.applicant.email}
             </Typography>
           </Box>
-          <AcademyContactButton
-            to={item.applicant.email}
-            recipientName={item.applicant.name}
-            fromName={mailFromName}
-            topic="teacher application"
-          />
+          <Tooltip title={t("applications.contactApplicant")}>
+            <IconButton
+              component={Link}
+              href={composeHref}
+              size="small"
+              aria-label={t("applications.contactApplicantNamed", { name: item.applicant.name })}
+            >
+              <IconMail size={18} />
+            </IconButton>
+          </Tooltip>
         </Stack>
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2}>
           <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-            <Chip size="small" color="primary" variant="outlined" label={trackLabel(item.track)} />
-            <Chip size="small" variant="outlined" label={fluencyLabel(item.fluency)} />
+            <Chip size="small" color="primary" variant="outlined" label={localizedTrackLabel(item.track, t)} />
+            <Chip size="small" variant="outlined" label={localizedFluencyLabel(item.fluency, t)} />
             <Chip
               size="small"
               variant="outlined"
-              label={`${item.yearsTeaching} yr${item.yearsTeaching === 1 ? "" : "s"} teaching`}
+              label={t("applications.yearsTeaching", {
+                count: item.yearsTeaching,
+                plural: item.yearsTeaching === 1 ? "" : "s",
+              })}
             />
-            {item.taughtOnlineBefore ? <Chip size="small" color="info" label="Online experience" /> : null}
+            {item.taughtOnlineBefore ? <Chip size="small" color="info" label={t("applications.onlineExperience")} /> : null}
             {item.teaches.map((language) => (
-              <Chip key={language} size="small" label={language === "spanish" ? "Spanish" : "English"} />
+              <Chip key={language} size="small" label={t(`applications.language.${language}`)} />
             ))}
           </Stack>
 
           <Stack direction="row" spacing={2} flexWrap="wrap">
             <Typography variant="body2" color="text.secondary">
-              Applied {dateFormat.format(new Date(item.createdAt))}
+              {t("applications.appliedOn", { date: dateFormat.format(new Date(item.createdAt)) })}
             </Typography>
             {item.country ? (
               <Typography variant="body2" color="text.secondary">
                 · {item.country}
               </Typography>
             ) : null}
-            <Chip size="small" color={statusColor[item.status]} label={item.status.replace("_", " ")} />
+            <Chip size="small" color={statusColor[item.status]} label={t(`status.${item.status}`)} />
           </Stack>
 
           <Typography variant="subtitle1" fontWeight={600}>
@@ -177,7 +187,7 @@ function ApplicationDetailDialog({
 
           {item.fluency === "other" && item.fluencyNote ? (
             <Box>
-              <Typography variant="subtitle2">Fluency note</Typography>
+              <Typography variant="subtitle2">{t("applications.fluencyNote")}</Typography>
               <Typography variant="body2" color="text.secondary">
                 {item.fluencyNote}
               </Typography>
@@ -185,7 +195,7 @@ function ApplicationDetailDialog({
           ) : null}
 
           <Box>
-            <Typography variant="subtitle2">Experience</Typography>
+            <Typography variant="subtitle2">{t("applications.experience")}</Typography>
             <Typography variant="body2" color="text.secondary" whiteSpace="pre-line">
               {item.experience}
             </Typography>
@@ -201,7 +211,7 @@ function ApplicationDetailDialog({
                 variant="outlined"
                 size="small"
               >
-                Watch intro video
+                {t("applications.watchVideo")}
               </Button>
               <Typography variant="caption" color="text.secondary" sx={{ wordBreak: "break-all" }}>
                 {item.videoUrl}
@@ -209,24 +219,24 @@ function ApplicationDetailDialog({
             </Stack>
           ) : (
             <Typography variant="body2" color="warning.main">
-              No video link — required for conversation track.
+              {t("applications.noVideo")}
             </Typography>
           )}
 
           {item.credentials.length > 0 ? (
             <Box>
-              <Typography variant="subtitle2">Credentials</Typography>
+              <Typography variant="subtitle2">{t("applications.credentials")}</Typography>
               <Stack spacing={0.5} mt={0.5}>
                 {item.credentials.map((cred, index) => (
                   <Typography key={`${item.id}-cred-${index}`} variant="body2">
-                    {credentialTypeLabel(cred.type)} · {cred.label}
+                    {localizedCredentialTypeLabel(cred.type, t)} · {cred.label}
                     {cred.year ? ` (${cred.year})` : ""}
                     {cred.url ? (
                       <>
                         {" · "}
-                        <Link href={cred.url} target="_blank" rel="noreferrer noopener">
-                          View
-                        </Link>
+                        <MaterialLink href={cred.url} target="_blank" rel="noreferrer noopener">
+                          {t("applications.view")}
+                        </MaterialLink>
                       </>
                     ) : null}
                   </Typography>
@@ -237,7 +247,7 @@ function ApplicationDetailDialog({
 
           {item.reviewNote ? (
             <Box>
-              <Typography variant="subtitle2">Reviewer note</Typography>
+              <Typography variant="subtitle2">{t("applications.reviewerNote")}</Typography>
               <Typography variant="body2" color="text.secondary">
                 {item.reviewNote}
               </Typography>
@@ -248,7 +258,7 @@ function ApplicationDetailDialog({
             <TextField
               size="small"
               fullWidth
-              label="Note to the applicant (optional)"
+              label={t("applications.noteToApplicant")}
               value={note}
               onChange={(event) => onNoteChange(event.target.value)}
             />
@@ -257,15 +267,15 @@ function ApplicationDetailDialog({
       </DialogContent>
       <DialogActions sx={{ flexWrap: "wrap", gap: 1 }}>
         <Button onClick={onClose} disabled={pending}>
-          Close
+          {t("applications.close")}
         </Button>
         {canReview ? (
           <>
             <Button color="error" disabled={pending} onClick={onReject}>
-              Reject
+              {t("applications.reject")}
             </Button>
             <Button variant="contained" disabled={pending} onClick={onApprove}>
-              Approve
+              {t("applications.approve")}
             </Button>
           </>
         ) : null}
@@ -287,6 +297,8 @@ export function ApplicationsReview({
   breadcrumbRoot: { title: string; to: string };
   mailFromName?: string;
 }) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -301,6 +313,8 @@ export function ApplicationsReview({
   const [detailId, setDetailId] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
+  const dateFormat = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric" });
+  const tracks = localizedTeacherApplicationTracks(t);
   const openCount = applications.filter((item) => item.status === "submitted").length;
 
   const filtered = useMemo(() => {
@@ -354,26 +368,26 @@ export function ApplicationsReview({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Teacher applications"
-        subtitle="Invite candidates via in-app Email, then review their application here."
-        items={[breadcrumbRoot, { title: "Applications" }]}
+        title={t("applications.title")}
+        subtitle={t("applications.subtitle")}
+        items={[breadcrumbRoot, { title: t("applications.applications") }]}
       />
 
       <Box sx={{ mb: 3 }}>
         <SectionCard
-          title="Teacher invitations"
-          subtitle="Open invites expire after 14 days — message includes a clickable /apply link."
+          title={t("applications.invitations")}
+          subtitle={t("applications.invitationsSubtitle")}
           action={
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <Tooltip title="Invite to apply">
-                <IconButton aria-label="Invite teacher by email" color="primary" size="small" onClick={() => setInviteOpen(true)}>
+              <Tooltip title={t("applications.inviteToApply")}>
+                <IconButton aria-label={t("applications.inviteByEmail")} color="primary" size="small" onClick={() => setInviteOpen(true)}>
                   <IconMail size={18} />
                 </IconButton>
               </Tooltip>
               {canPromoteTeachers ? (
-                <Tooltip title="Promote verified student to teacher">
+                <Tooltip title={t("applications.promoteVerified")}>
                   <IconButton
-                    aria-label="Promote user to teacher"
+                    aria-label={t("applications.promoteUser")}
                     color="primary"
                     size="small"
                     onClick={() => setPromoteOpen(true)}
@@ -388,7 +402,7 @@ export function ApplicationsReview({
           <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
             {invitations.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
-                No pending invitations. Use the mail icon to invite someone to apply as a teacher.
+                {t("applications.noInvitations")}
               </Typography>
             ) : null}
             {invitations.map((invite) => (
@@ -404,8 +418,10 @@ export function ApplicationsReview({
                     {invite.email}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Sent {inviteDate.format(new Date(invite.createdAt))} · expires{" "}
-                    {inviteDate.format(new Date(invite.expiresAt))}
+                    {t("applications.sentExpires", {
+                      sent: dateFormat.format(new Date(invite.createdAt)),
+                      expires: dateFormat.format(new Date(invite.expiresAt)),
+                    })}
                   </Typography>
                   {invite.inviteNote ? (
                     <Typography variant="body2" color="text.secondary" mt={0.5}>
@@ -416,7 +432,7 @@ export function ApplicationsReview({
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Chip
                     size="small"
-                    label={invite.status}
+                    label={t(`status.${invite.status}`)}
                     color={invite.status === "pending" ? "warning" : "default"}
                   />
                   {invite.status === "pending" ? (
@@ -426,7 +442,7 @@ export function ApplicationsReview({
                       disabled={pending}
                       onClick={() => runInvite(() => revokeTeacherInvitationAction(invite.id))}
                     >
-                      Revoke
+                      {t("applications.revoke")}
                     </Button>
                   ) : null}
                 </Stack>
@@ -444,31 +460,31 @@ export function ApplicationsReview({
         }}
         sx={{ mb: 2 }}
       >
-        <Tab value="open" label={`Waiting for review (${openCount})`} />
-        <Tab value="history" label="History" />
+        <Tab value="open" label={t("applications.waitingForReview", { count: openCount })} />
+        <Tab value="history" label={t("applications.history")} />
       </Tabs>
 
       <SectionCard
-        title={statusTab === "open" ? "Open applications" : "Reviewed applications"}
+        title={statusTab === "open" ? t("applications.openApplications") : t("applications.reviewedApplications")}
         subtitle={
           trackFilter
-            ? `Filtered: ${teacherApplicationTracks.find((t) => t.id === trackFilter)?.label ?? trackFilter}`
-            : "All tracks"
+            ? t("applications.filtered", { track: localizedTrackLabel(trackFilter, t) })
+            : t("applications.allTracks")
         }
         action={
           <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel id="applications-track-filter">Track</InputLabel>
+            <InputLabel id="applications-track-filter">{t("applications.track")}</InputLabel>
             <Select
               labelId="applications-track-filter"
-              label="Track"
+              label={t("applications.track")}
               value={trackFilter}
               onChange={(event) => {
                 setTrackFilter(event.target.value as "" | TeacherApplicationTrack);
                 setListPage(1);
               }}
             >
-              <MenuItem value="">All tracks</MenuItem>
-              {teacherApplicationTracks.map((track) => (
+              <MenuItem value="">{t("applications.allTracks")}</MenuItem>
+              {tracks.map((track) => (
                 <MenuItem key={track.id} value={track.id}>
                   {track.label}
                 </MenuItem>
@@ -481,12 +497,12 @@ export function ApplicationsReview({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Applicant</TableCell>
-                <TableCell>Track</TableCell>
-                <TableCell>Languages</TableCell>
-                <TableCell>Headline</TableCell>
-                <TableCell>Applied</TableCell>
-                {statusTab === "history" ? <TableCell>Status</TableCell> : null}
+                <TableCell>{t("applications.applicant")}</TableCell>
+                <TableCell>{t("applications.track")}</TableCell>
+                <TableCell>{t("applications.languages")}</TableCell>
+                <TableCell>{t("applications.headline")}</TableCell>
+                <TableCell>{t("applications.applied")}</TableCell>
+                {statusTab === "history" ? <TableCell>{t("common.status")}</TableCell> : null}
                 <TableCell align="right"> </TableCell>
               </TableRow>
             </TableHead>
@@ -495,7 +511,7 @@ export function ApplicationsReview({
                 <TableRow>
                   <TableCell colSpan={statusTab === "history" ? 7 : 6}>
                     <Typography variant="body2" color="text.secondary">
-                      No applications match this view.
+                      {t("applications.noMatches")}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -509,9 +525,11 @@ export function ApplicationsReview({
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Chip size="small" variant="outlined" label={trackLabel(item.track)} />
+                    <Chip size="small" variant="outlined" label={localizedTrackLabel(item.track, t)} />
                   </TableCell>
-                  <TableCell>{teachesLabel(item.teaches)}</TableCell>
+                  <TableCell>
+                    {item.teaches.map((language) => t(`applications.language.${language}`)).join(", ")}
+                  </TableCell>
                   <TableCell sx={{ maxWidth: 240 }}>
                     <Typography variant="body2" noWrap title={item.headline}>
                       {item.headline}
@@ -520,12 +538,12 @@ export function ApplicationsReview({
                   <TableCell>{dateFormat.format(new Date(item.createdAt))}</TableCell>
                   {statusTab === "history" ? (
                     <TableCell>
-                      <Chip size="small" color={statusColor[item.status]} label={item.status} />
+                      <Chip size="small" color={statusColor[item.status]} label={t(`status.${item.status}`)} />
                     </TableCell>
                   ) : null}
                   <TableCell align="right">
                     <IconButton
-                      aria-label={`Review ${item.applicant.name}`}
+                      aria-label={t("applications.reviewApplicant", { name: item.applicant.name })}
                       size="small"
                       onClick={() => openDetail(item.id, item.reviewNote)}
                     >
@@ -554,15 +572,15 @@ export function ApplicationsReview({
       />
 
       <Dialog open={promoteOpen} onClose={closePromote} fullWidth maxWidth="sm">
-        <DialogTitle>Promote to teacher</DialogTitle>
+        <DialogTitle>{t("applications.promoteTitle")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              Skips the application form. The account must be a verified student with no upcoming classes as a student.
+              {t("applications.promoteHelp")}
             </Typography>
             <TextField
               autoFocus
-              label="Account email"
+              label={t("applications.accountEmail")}
               type="email"
               fullWidth
               value={promoteEmail}
@@ -572,35 +590,35 @@ export function ApplicationsReview({
         </DialogContent>
         <DialogActions>
           <Button onClick={closePromote} disabled={pending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="contained"
             disabled={pending || !promoteEmail.trim()}
             onClick={() => runInvite(() => promoteTeacherByEmailAction(promoteEmail), closePromote)}
           >
-            Promote
+            {t("applications.promote")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={inviteOpen} onClose={closeInvite} fullWidth maxWidth="sm">
-        <DialogTitle>Invite to apply as teacher</DialogTitle>
+        <DialogTitle>{t("applications.inviteTitle")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              If they already have a student account, the invite lands in Spanglish Email with a clickable link to /apply.
+              {t("applications.inviteHelp")}
             </Typography>
             <TextField
               autoFocus
-              label="Email"
+              label={t("common.email")}
               type="email"
               fullWidth
               value={inviteEmail}
               onChange={(event) => setInviteEmail(event.target.value)}
             />
             <TextField
-              label="Note to invitee (optional)"
+              label={t("applications.noteToInvitee")}
               fullWidth
               multiline
               minRows={2}
@@ -611,7 +629,7 @@ export function ApplicationsReview({
         </DialogContent>
         <DialogActions>
           <Button onClick={closeInvite} disabled={pending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="contained"
@@ -623,7 +641,7 @@ export function ApplicationsReview({
               )
             }
           >
-            Send invitation
+            {t("applications.sendInvitation")}
           </Button>
         </DialogActions>
       </Dialog>

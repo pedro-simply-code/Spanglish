@@ -7,8 +7,8 @@ import Chip from "@mui/material/Chip";
 import FormHelperText from "@mui/material/FormHelperText";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { searchMessageRecipientsAction, verifyMessageRecipientAction } from "@/features/email/actions";
-import { roleDefinitions } from "@/features/auth";
 import type { MessageRecipient } from "@/server/messages/recipients";
 
 type RecipientEmailFieldProps = {
@@ -24,16 +24,24 @@ const filter = createFilterOptions<MessageRecipient>();
 
 export function RecipientEmailField({
   id = "compose-to",
-  label = "To (academy email)",
+  label,
   value,
   onChange,
   onValidityChange,
   disabled,
 }: RecipientEmailFieldProps) {
+  const t = useTranslations("apps");
   const [options, setOptions] = useState<MessageRecipient[]>([]);
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState<MessageRecipient | null>(null);
   const [unknown, setUnknown] = useState(false);
+
+  const roleLabels: Record<MessageRecipient["role"], string> = {
+    student: t("email.roles.student"),
+    teacher: t("email.roles.teacher"),
+    manager: t("email.roles.manager"),
+    admin: t("email.roles.admin"),
+  };
 
   useEffect(() => {
     const trimmed = value.trim();
@@ -100,7 +108,7 @@ export function RecipientEmailField({
             </Box>
             <Chip
               size="small"
-              label={roleDefinitions[option.role].badge}
+              label={roleLabels[option.role]}
               sx={{ ml: "auto" }}
               variant="outlined"
             />
@@ -110,25 +118,23 @@ export function RecipientEmailField({
           <TextField
             {...params}
             id={id}
-            label={label}
+            label={label ?? t("email.compose.to")}
             size="small"
-            placeholder="Search name or email in the academy"
+            placeholder={t("email.compose.toPlaceholder")}
             disabled={disabled}
           />
         )}
       />
       {unknown ? (
-        <FormHelperText error>No academy account matches this email.</FormHelperText>
+        <FormHelperText error>{t("email.compose.recipientUnknown")}</FormHelperText>
       ) : verified?.bounced ? (
-        <FormHelperText>
-          Account found (external mail bounced — Spanglish inbox still works in the app).
-        </FormHelperText>
+        <FormHelperText>{t("email.compose.recipientBounced")}</FormHelperText>
       ) : verified ? (
         <FormHelperText>
-          {verified.name} · {roleDefinitions[verified.role].badge}
+          {verified.name} · {roleLabels[verified.role]}
         </FormHelperText>
       ) : (
-        <FormHelperText>Type a name or email to search all roles in the academy.</FormHelperText>
+        <FormHelperText>{t("email.compose.recipientHint")}</FormHelperText>
       )}
     </Box>
   );

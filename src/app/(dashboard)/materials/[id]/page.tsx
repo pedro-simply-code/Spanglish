@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
-import { MaterialDetail, getFormQuestions, getMaterialGrants } from "@/features/materials";
+import { MaterialDetail, getFormQuestions } from "@/features/materials";
 import { getActorWithPermission } from "@/server/auth/session";
-import { getMaterialForViewer } from "@/server/materials/library";
+import { getMaterialForViewer, getMaterialQuestions } from "@/server/materials/library";
 
-export const metadata: Metadata = {
-  title: "Material",
-  description: "Shared class material",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.studentMaterial");
+  return { title: t("title"), description: t("description") };
+}
 
 type MaterialPageProps = {
   params: Promise<{ id: string }>;
@@ -35,8 +36,14 @@ async function MaterialContent({ params }: MaterialPageProps) {
     <MaterialDetail
       material={material}
       viewer="student"
-      grants={getMaterialGrants(id)}
-      questions={getFormQuestions(id)}
+      grants={[]}
+      questions={await questionsFor(id)}
     />
   );
+}
+
+/** Stored questions; demo materials fall back to their fixture questions. */
+async function questionsFor(id: string) {
+  const stored = await getMaterialQuestions(id);
+  return stored.length ? stored : getFormQuestions(id);
 }

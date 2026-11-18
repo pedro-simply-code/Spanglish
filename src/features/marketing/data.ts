@@ -9,23 +9,68 @@ export type MarketingLandingSnapshot = {
   publishedPlans: AcademyPlan[];
 };
 
-/** Public-facing schedule label (teachers are based in Guatemala). */
-export const marketingAcademyTimezoneLabel = "Guatemala (CST, UTC−6)";
+/** Translator callback accepted by the pure marketing data builders. */
+export type MarketingTranslator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
-export const marketingAcademyTimezoneShort = "Guatemala · CST (UTC−6)";
+/** Public-facing schedule label (teachers are based in Guatemala). */
+export function getMarketingAcademyTimezoneLabel(t: MarketingTranslator) {
+  return t("landing.timezoneLabel");
+}
+
+export function getMarketingAcademyTimezoneShort(t: MarketingTranslator) {
+  return t("landing.timezoneShort");
+}
 
 /** Hero — live online class (Pexels, free license). */
 export const marketingHeroImageSrc = "/images/landingpage/hero-student-online.jpg";
-export const marketingHeroImageAlt =
-  "Student taking notes during a live online language class";
+
+export function getMarketingHeroImageAlt(t: MarketingTranslator) {
+  return t("landing.hero.imageAlt");
+}
+
+export type MarketingAcademyHour = {
+  days: string;
+  hours: string;
+  closed: boolean;
+};
 
 /** Live booking window for public pages (local academy time). */
-export const marketingAcademyHours = [
-  { days: "Monday – Thursday", hours: "6:00 AM – 10:00 PM" },
-  { days: "Friday", hours: "6:00 AM – 8:00 PM" },
-  { days: "Saturday", hours: "8:00 AM – 12:00 PM" },
-  { days: "Sunday", hours: "Closed" },
-] as const;
+export function getMarketingAcademyHours(t: MarketingTranslator): MarketingAcademyHour[] {
+  return [
+    {
+      days: t("landing.hours.monThu"),
+      hours: t("landing.hours.monThuTime"),
+      closed: false,
+    },
+    {
+      days: t("landing.hours.friday"),
+      hours: t("landing.hours.fridayTime"),
+      closed: false,
+    },
+    {
+      days: t("landing.hours.saturday"),
+      hours: t("landing.hours.saturdayTime"),
+      closed: false,
+    },
+    {
+      days: t("landing.hours.sunday"),
+      hours: t("landing.hours.closed"),
+      closed: true,
+    },
+  ];
+}
+
+export function getMarketingHeaderNav(t: MarketingTranslator) {
+  return [
+    { label: t("header.programs"), href: "#programs" },
+    { label: t("header.whySpanglish"), href: "#features" },
+    { label: t("header.stories"), href: "#testimonials" },
+    { label: t("header.pricing"), href: "/packages" },
+  ];
+}
 
 export type MarketingTrack = {
   id: string;
@@ -35,115 +80,127 @@ export type MarketingTrack = {
   summary: string;
 };
 
-export const marketingTracks: MarketingTrack[] = [
-  {
-    id: "spanish",
-    title: "Live Spanish",
-    sessionLength: "25 or 50 min",
-    audience: "Teens & adults",
-    summary:
-      "Every class is in Spanish with a native teacher from Guatemala — real conversation, pronunciation, and grammar you can use the same day.",
-  },
-  {
-    id: "natives",
-    title: "Guatemalan teachers",
-    sessionLength: "25 or 50 min",
-    audience: "All levels",
-    summary:
-      "Learn from native speakers rooted in Guatemala: natural rhythm, local expressions, and cultural context you cannot get from recorded lessons.",
-  },
-  {
-    id: "beginners",
-    title: "First steps",
-    sessionLength: "25 min suggested",
-    audience: "New learners",
-    summary:
-      "Greetings, core verbs, and guided speaking from class one — friendly pace, instruction entirely in Spanish with support when you need it.",
-  },
-  {
-    id: "conversation",
-    title: "Conversation focus",
-    sessionLength: "50 min suggested",
-    audience: "Intermediate+",
-    summary:
-      "Less drill, more dialogue: storytelling, situational role-play, and corrections in context with your Guatemalan teacher.",
-  },
-  {
-    id: "paired",
-    title: "Paired classes",
-    sessionLength: "25 or 50 min",
-    audience: "Friends & families",
-    summary:
-      "Share a native teacher with a partner, split the package, and keep each other accountable — still 100% Spanish, still live.",
-  },
-  {
-    id: "teachers",
-    title: "Teach with us",
-    sessionLength: "Flexible",
-    audience: "Educators in Guatemala",
-    summary:
-      "Native Spanish educators join the roster, set weekly availability, and teach 1:1 or paired live classes on our classroom platform.",
-  },
-];
+export function getMarketingTracks(t: MarketingTranslator): MarketingTrack[] {
+  return [
+    {
+      id: "spanish",
+      title: t("landing.programs.tracks.spanish.title"),
+      sessionLength: t("landing.programs.tracks.spanish.length"),
+      audience: t("landing.programs.tracks.spanish.audience"),
+      summary: t("landing.programs.tracks.spanish.summary"),
+    },
+    {
+      id: "natives",
+      title: t("landing.programs.tracks.natives.title"),
+      sessionLength: t("landing.programs.tracks.natives.length"),
+      audience: t("landing.programs.tracks.natives.audience"),
+      summary: t("landing.programs.tracks.natives.summary"),
+    },
+    {
+      id: "beginners",
+      title: t("landing.programs.tracks.beginners.title"),
+      sessionLength: t("landing.programs.tracks.beginners.length"),
+      audience: t("landing.programs.tracks.beginners.audience"),
+      summary: t("landing.programs.tracks.beginners.summary"),
+    },
+    {
+      id: "conversation",
+      title: t("landing.programs.tracks.conversation.title"),
+      sessionLength: t("landing.programs.tracks.conversation.length"),
+      audience: t("landing.programs.tracks.conversation.audience"),
+      summary: t("landing.programs.tracks.conversation.summary"),
+    },
+    {
+      id: "paired",
+      title: t("landing.programs.tracks.paired.title"),
+      sessionLength: t("landing.programs.tracks.paired.length"),
+      audience: t("landing.programs.tracks.paired.audience"),
+      summary: t("landing.programs.tracks.paired.summary"),
+    },
+    {
+      id: "teachers",
+      title: t("landing.programs.tracks.teachers.title"),
+      sessionLength: t("landing.programs.tracks.teachers.length"),
+      audience: t("landing.programs.tracks.teachers.audience"),
+      summary: t("landing.programs.tracks.teachers.summary"),
+    },
+  ];
+}
 
-export const marketingTestimonials = [
-  {
-    quote:
-      "I book 25-minute classes between meetings. My teacher from Guatemala catches my mistakes every week — it finally feels natural when I speak.",
-    name: "Alex R.",
-    role: "Spanish learner",
-  },
-  {
-    quote:
-      "The paired option let my sister and I practice Spanish together with one native teacher. We split the cost and still get personal feedback.",
-    name: "Priya S.",
-    role: "Spanish learner",
-  },
-  {
-    quote:
-      "As a teacher based in Guatemala, the schedule tools and payout visibility are straightforward — I focus on conversation, not admin.",
-    name: "María G.",
-    role: "Academy teacher · Guatemala",
-  },
-] as const;
+export type MarketingTestimonial = {
+  quote: string;
+  name: string;
+  role: string;
+};
 
-export const marketingFooterExplore = [
-  { label: "Programs", href: "#programs" },
-  { label: "Why Spanglish", href: "#features" },
-  { label: "Learner stories", href: "#testimonials" },
-  { label: "Pricing", href: "/packages" },
-] as const;
+export function getMarketingTestimonials(t: MarketingTranslator): MarketingTestimonial[] {
+  return [
+    {
+      quote: t("landing.testimonials.items.alex"),
+      name: "Alex R.",
+      role: t("landing.testimonials.roleLearner"),
+    },
+    {
+      quote: t("landing.testimonials.items.priya"),
+      name: "Priya S.",
+      role: t("landing.testimonials.roleLearner"),
+    },
+    {
+      quote: t("landing.testimonials.items.maria"),
+      name: "María G.",
+      role: t("landing.testimonials.roleTeacher"),
+    },
+  ];
+}
 
-export const marketingFooterAcademy = [
-  { label: "Create account", href: "/register" },
-  { label: "Sign in", href: "/login" },
-  { label: "Teacher application", href: "/login?next=%2Fapply" },
-  { label: "Book a class", href: "/login?next=%2Fschedule" },
-] as const;
+export function getMarketingFooterExplore(t: MarketingTranslator) {
+  return [
+    { label: t("footer.explore.programs"), href: "#programs" },
+    { label: t("footer.explore.whySpanglish"), href: "#features" },
+    { label: t("footer.explore.learnerStories"), href: "#testimonials" },
+    { label: t("footer.explore.pricing"), href: "/packages" },
+  ];
+}
 
-export const marketingPillars = [
-  {
-    title: "Spanish only",
-    description: "All live instruction is in Spanish — built for learners who want immersion, not translation drills.",
-  },
-  {
-    title: "Native teachers",
-    description: "Teachers on the roster are native speakers from Guatemala, with real classroom experience.",
-  },
-  {
-    title: "Individual or paired",
-    description: "Study solo or bring a partner and split the package.",
-  },
-  {
-    title: "Flexible scheduling",
-    description: "Book, move, or cancel within academy policy from your dashboard.",
-  },
-  {
-    title: "Classroom recordings",
-    description: "Review sessions afterward and keep momentum between lessons.",
-  },
-  {
-    title: "Secure & private",
-    description: "Signed join links, role-based access, and platform-managed classrooms.",
-  },
-] as const;
+export function getMarketingFooterAcademy(t: MarketingTranslator) {
+  return [
+    { label: t("footer.academy.createAccount"), href: "/register" },
+    { label: t("footer.academy.signIn"), href: "/login" },
+    { label: t("footer.academy.teacherApplication"), href: "/login?next=%2Fapply" },
+    { label: t("footer.academy.bookAClass"), href: "/login?next=%2Fschedule" },
+  ];
+}
+
+export type MarketingPillar = {
+  title: string;
+  description: string;
+};
+
+export function getMarketingPillars(t: MarketingTranslator): MarketingPillar[] {
+  return [
+    {
+      title: t("landing.features.pillars.spanishOnly.title"),
+      description: t("landing.features.pillars.spanishOnly.description"),
+    },
+    {
+      title: t("landing.features.pillars.nativeTeachers.title"),
+      description: t("landing.features.pillars.nativeTeachers.description"),
+    },
+    {
+      title: t("landing.features.pillars.individualOrPaired.title"),
+      description: t("landing.features.pillars.individualOrPaired.description"),
+    },
+    {
+      title: t("landing.features.pillars.flexibleScheduling.title"),
+      description: t("landing.features.pillars.flexibleScheduling.description"),
+    },
+    {
+      title: t("landing.features.pillars.recordings.title"),
+      description: t("landing.features.pillars.recordings.description"),
+    },
+    {
+      title: t("landing.features.pillars.secure.title"),
+      description: t("landing.features.pillars.secure.description"),
+    },
+  ];
+}

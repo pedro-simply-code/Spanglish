@@ -9,19 +9,22 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { defaultLanguage, languages } from "@/components/layout/topbar/header-data";
+import type { NavTranslator } from "@/components/layout/nav-data";
+import { getDefaultLanguage, getLanguages } from "@/components/layout/topbar/header-data";
 import { setLocaleAction } from "@/features/auth";
 
 /** Switches the UI language and saves it on the profile. */
 export function LanguageMenu() {
-  const t = useTranslations("language");
+  const t = useTranslations("shell");
   const locale = useLocale();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
+  const availableLanguages = getLanguages(t as NavTranslator);
   const currentLanguage =
-    languages.find((language) => language.value === locale) ?? defaultLanguage;
+    availableLanguages.find((language) => language.value === locale) ??
+    getDefaultLanguage(t as NavTranslator);
 
   const choose = (value: string) => {
     setAnchorEl(null);
@@ -35,7 +38,7 @@ export function LanguageMenu() {
   return (
     <>
       <IconButton
-        aria-label={t("label")}
+        aria-label={t("language.label")}
         aria-haspopup="true"
         disabled={pending}
         onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -56,7 +59,7 @@ export function LanguageMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         slotProps={{ paper: { sx: { width: 200 } } }}
       >
-        {languages.map((language) => (
+        {availableLanguages.map((language) => (
           <MenuItem
             key={language.value}
             selected={language.value === locale}

@@ -6,6 +6,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { getClassLiveSessionStatusAction } from "@/features/classes/classroom-actions";
 
 type ClassroomAwaitTeacherLobbyProps = {
@@ -20,6 +21,7 @@ export function ClassroomAwaitTeacherLobby({
   teacherName,
 }: ClassroomAwaitTeacherLobbyProps) {
   const router = useRouter();
+  const t = useTranslations("classroom");
 
   useEffect(() => {
     const check = () => {
@@ -48,12 +50,11 @@ export function ClassroomAwaitTeacherLobby({
       <Stack spacing={2} alignItems="center" maxWidth={420} textAlign="center">
         <Typography variant="h6">{topic}</Typography>
         <Typography variant="body2" color="rgba(255,255,255,0.7)">
-          {teacherName} has not started the live class yet. You can enter the classroom during
-          the join window, but the video call opens once the teacher starts it.
+          {t("lobby.await.teacherNotStarted", { teacherName })}
         </Typography>
         <Stack spacing={1} alignItems="center">
           <CircularProgress size={28} sx={{ color: "#fff" }} />
-          <Typography variant="body2">Waiting for the teacher to start…</Typography>
+          <Typography variant="body2">{t("lobby.await.waitingForTeacher")}</Typography>
         </Stack>
       </Stack>
     </Box>

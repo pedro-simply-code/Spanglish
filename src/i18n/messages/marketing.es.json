@@ -1,0 +1,189 @@
+{
+  "marketing": {
+    "metadata": {
+      "homeTitle": "Aprende español con profesores nativos en Guatemala",
+      "homeDescription": "Spanglish Academy — clases de español en vivo en línea con profesores nativos de Guatemala. Sesiones individuales o en pareja, horarios flexibles y grabaciones de clase.",
+      "packagesTitle": "Paquetes y precios",
+      "packagesDescription": "Compara los paquetes de clases de Spanglish Academy: individuales o en pareja, de 25 o 50 minutos, con profesores nativos de Guatemala."
+    },
+    "common": {
+      "loading": "Cargando…",
+      "signIn": "Iniciar sesión",
+      "register": "Registrarse",
+      "getStarted": "Comenzar",
+      "createAccount": "Crear cuenta",
+      "viewPricing": "Ver precios"
+    },
+    "header": {
+      "programs": "Programas",
+      "whySpanglish": "Por qué Spanglish",
+      "stories": "Historias",
+      "pricing": "Precios"
+    },
+    "footer": {
+      "description": "Clases de español en vivo con profesores nativos de Guatemala: sesiones individuales o en pareja, grabaciones de clase y materiales de aprendizaje en una sola plataforma académica.",
+      "timezone": "Profesores en · {timezone}",
+      "getStartedFree": "Comienza gratis",
+      "exploreTitle": "Explorar",
+      "academyTitle": "Academia",
+      "hoursTitle": "Horarios y soporte",
+      "supportQuestion": "¿Tienes preguntas después de iniciar sesión? Usa <email>Correo</email> en tu panel para contactar al equipo de la academia.",
+      "copyright": "© {year} Spanglish Academy. Todos los derechos reservados.",
+      "home": "Inicio",
+      "explore": {
+        "programs": "Programas",
+        "whySpanglish": "Por qué Spanglish",
+        "learnerStories": "Historias de estudiantes",
+        "pricing": "Precios"
+      },
+      "academy": {
+        "createAccount": "Crear cuenta",
+        "signIn": "Iniciar sesión",
+        "teacherApplication": "Solicitud de profesor",
+        "bookAClass": "Reservar una clase"
+      }
+    },
+    "landing": {
+      "timezoneLabel": "Guatemala (hora estándar central, UTC−6)",
+      "timezoneShort": "Guatemala · hora central (UTC−6)",
+      "hero": {
+        "eyebrow": "Español con profesores nativos de Guatemala",
+        "title": "Aprende <highlight>español</highlight> en vivo con nativos de Guatemala",
+        "subtitle": "Clases 100 % en español: sesiones individuales o en pareja, grabaciones de clase y materiales que siguen lo que practicas con tu profesor.",
+        "chipLive": "Clases en vivo",
+        "chipNative": "Nativos · Guatemala",
+        "chipSpanishOnly": "Solo español",
+        "primaryCta": "Crear cuenta gratis",
+        "imageAlt": "Estudiante tomando notas durante una clase de idiomas en línea en vivo"
+      },
+      "testimonials": {
+        "eyebrow": "Historias de estudiantes",
+        "title": "No te lo creas solo por nosotros: escucha a estudiantes y profesores",
+        "roleLearner": "Estudiante de español",
+        "roleTeacher": "Profesor de la academia · Guatemala",
+        "items": {
+          "alex": "Reservo clases de 25 minutos entre reuniones. Mi profesora de Guatemala corrige mis errores cada semana: por fin me sale natural hablar.",
+          "priya": "La opción en pareja nos permitió a mi hermana y a mí practicar español juntas con una profesora nativa. Compartimos el costo y seguimos recibiendo comentarios personalizados.",
+          "maria": "Como profesora que vive en Guatemala, las herramientas de horarios y la visibilidad de los pagos son muy claras: me enfoco en la conversación, no en la administración."
+        }
+      },
+      "programs": {
+        "eyebrow": "Programas",
+        "title": "Programas de español para tu nivel y tus objetivos",
+        "subtitle": "Rutas de inmersión con profesores nativos de Guatemala: conversación, principiantes o aprendizaje en pareja.",
+        "sessionsChip": "Sesiones: {length}",
+        "expectTitle": "Lo que puedes esperar",
+        "expectLive": "Aula de video en vivo en cada sesión",
+        "expectSchedule": "Reserva según tu semana",
+        "expectRecordings": "Grabaciones cuando estén disponibles",
+        "teacherCta": "Postularse como profesor",
+        "learnerCta": "Empieza con una cuenta gratis",
+        "tracks": {
+          "spanish": {
+            "title": "Español en vivo",
+            "length": "25 o 50 min",
+            "audience": "Adolescentes y adultos",
+            "summary": "Cada clase es en español con un profesor nativo de Guatemala: conversación real, pronunciación y gramática que puedes usar el mismo día."
+          },
+          "natives": {
+            "title": "Profesores guatemaltecos",
+            "length": "25 o 50 min",
+            "audience": "Todos los niveles",
+            "summary": "Aprende con hablantes nativos de Guatemala: ritmo natural, expresiones locales y contexto cultural que no encontrarás en lecciones grabadas."
+          },
+          "beginners": {
+            "title": "Primeros pasos",
+            "length": "25 min sugeridos",
+            "audience": "Quienes empiezan",
+            "summary": "Saludos, verbos esenciales y práctica hablada desde la primera clase: un ritmo amable, con instrucciones completamente en español y apoyo cuando lo necesites."
+          },
+          "conversation": {
+            "title": "Enfoque conversacional",
+            "length": "50 min sugeridos",
+            "audience": "Intermedio o superior",
+            "summary": "Menos repetición y más diálogo: relatos, juegos de roles situacionales y correcciones en contexto con tu profesor guatemalteco."
+          },
+          "paired": {
+            "title": "Clases en pareja",
+            "length": "25 o 50 min",
+            "audience": "Amigos y familias",
+            "summary": "Comparte un profesor nativo con otra persona, dividan el paquete y manténganse motivados: sigue siendo 100 % español y en vivo."
+          },
+          "teachers": {
+            "title": "Enseña con nosotros",
+            "length": "Flexible",
+            "audience": "Educadores en Guatemala",
+            "summary": "Los educadores nativos de español se unen al equipo, definen su disponibilidad semanal y enseñan clases individuales o en pareja en nuestra plataforma."
+          }
+        }
+      },
+      "features": {
+        "eyebrow": "Por qué Spanglish",
+        "title": "Todo lo que necesitas para dominar el español",
+        "subtitle": "Clases en vivo dirigidas por nativos y las mismas herramientas que los estudiantes usan en el panel de la academia.",
+        "pillars": {
+          "spanishOnly": {
+            "title": "Solo español",
+            "description": "Todas las clases en vivo son en español: diseñadas para quienes buscan inmersión, no ejercicios de traducción."
+          },
+          "nativeTeachers": {
+            "title": "Profesores nativos",
+            "description": "Los profesores del equipo son hablantes nativos de Guatemala, con experiencia real en el aula."
+          },
+          "individualOrPaired": {
+            "title": "Individual o en pareja",
+            "description": "Estudia solo o invita a otra persona para compartir el paquete."
+          },
+          "flexibleScheduling": {
+            "title": "Horarios flexibles",
+            "description": "Reserva, mueve o cancela según la política de la academia desde tu panel."
+          },
+          "recordings": {
+            "title": "Grabaciones de clase",
+            "description": "Vuelve a ver las sesiones y mantén el ritmo entre clases."
+          },
+          "secure": {
+            "title": "Seguro y privado",
+            "description": "Enlaces de acceso firmados, permisos por rol y aulas gestionadas por la plataforma."
+          }
+        }
+      },
+      "help": {
+        "title": "¿Necesitas ayuda para elegir un programa?",
+        "description": "Crea una cuenta gratis, compara paquetes y reserva clases en vivo cuando estés listo. No se requiere tarjeta de crédito para registrarte.",
+        "timezoneNote": "Los profesores trabajan en {timezone}: los horarios de abajo son hora local de Guatemala.",
+        "hoursTitle": "Horarios de la academia"
+      },
+      "hours": {
+        "monThu": "Lunes a jueves",
+        "monThuTime": "6:00 a. m. – 10:00 p. m.",
+        "friday": "Viernes",
+        "fridayTime": "6:00 a. m. – 8:00 p. m.",
+        "saturday": "Sábado",
+        "saturdayTime": "8:00 a. m. – 12:00 p. m.",
+        "sunday": "Domingo",
+        "closed": "Cerrado"
+      },
+      "finalCta": {
+        "title": "Aprende español con profesores nativos en vivo de Guatemala"
+      }
+    },
+    "packages": {
+      "eyebrow": "Paquetes",
+      "title": "Créditos de clase simples y transparentes",
+      "subtitle": "Elige la duración de la sesión y el formato de clase, y luego compara los tamaños de los paquetes",
+      "plan": {
+        "details": "{count} clases · {type} · {duration} min",
+        "individual": "Individual",
+        "paired": "En pareja",
+        "perClass": "/ clase",
+        "total": "{amount} en total",
+        "perStudent": "{amount} por estudiante",
+        "save": "Ahorra {savings} %"
+      },
+      "empty": "Todavía no hay paquetes publicados para esta combinación. Prueba otra opción o inicia sesión para ver todos los precios.",
+      "getStarted": "Comenzar",
+      "fullPricing": "Ver todos los precios (iniciar sesión)"
+    }
+  }
+}

@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { SettingsOverview } from "@/features/settings";
 import { getActor } from "@/server/auth/session";
 import { getUserProfile, userHasPassword } from "@/server/auth/user-repository";
 
-export const metadata: Metadata = {
-  title: "Settings",
-  description: "Spanglish settings, roles, access, and security",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("shell");
+  return {
+    title: t("settings.metadata.title"),
+    description: t("settings.metadata.description"),
+  };
+}
 
 type SettingsPageProps = {
   searchParams: Promise<{ tab?: string | string[] }>;

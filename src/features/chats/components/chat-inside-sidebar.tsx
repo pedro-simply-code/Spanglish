@@ -8,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { IconDownload } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import type { Chat } from "@/features/chats/types";
 
 const drawerWidth = 320;
@@ -31,6 +32,7 @@ type ChatInsideSidebarProps = {
 };
 
 export function ChatInsideSidebar({ chat }: ChatInsideSidebarProps) {
+  const t = useTranslations("apps");
   const media = chat.messages.filter((item) => item.type === "image");
 
   const attachments = chat.messages.flatMap((item) => item.attachment);
@@ -55,7 +57,7 @@ export function ChatInsideSidebar({ chat }: ChatInsideSidebarProps) {
       p={3}
     >
       <Typography variant="h6" mb={2}>
-        Media ({media.length})
+        {t("chat.details.media", { count: media.length })}
       </Typography>
 
       <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>
@@ -63,17 +65,19 @@ export function ChatInsideSidebar({ chat }: ChatInsideSidebarProps) {
           <Avatar
             key={item.id}
             src={item.msg}
-            alt="Shared media"
+            alt={t("chat.details.sharedMedia")}
             variant="rounded"
             sx={{ width: "72px", height: "72px" }}
           />
         ))}
       </Box>
 
-      {media.length === 0 ? <Alert severity="error">No Media Found!</Alert> : null}
+      {media.length === 0 ? (
+        <Alert severity="error">{t("chat.details.noMedia")}</Alert>
+      ) : null}
 
       <Typography variant="h6" mt={5} mb={2}>
-        Attachments ({uniqueAttachments.length})
+        {t("chat.details.attachments", { count: uniqueAttachments.length })}
       </Typography>
 
       <Stack spacing={2.5} direction="column">
@@ -104,7 +108,7 @@ export function ChatInsideSidebar({ chat }: ChatInsideSidebarProps) {
 
             <IconButton
               className="attachment-download"
-              aria-label={`Download ${attachment.file}`}
+              aria-label={t("chat.details.download", { file: attachment.file })}
               size="small"
             >
               <IconDownload stroke={1.5} size={20} />
@@ -114,7 +118,7 @@ export function ChatInsideSidebar({ chat }: ChatInsideSidebarProps) {
       </Stack>
 
       {uniqueAttachments.length === 0 ? (
-        <Alert severity="error">No Attachment Found!</Alert>
+        <Alert severity="error">{t("chat.details.noAttachments")}</Alert>
       ) : null}
     </Box>
   );

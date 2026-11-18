@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { PeopleOverview } from "@/features/management";
 import { DEFAULT_PAGE_SIZE, pageOffset, parsePageParam } from "@/lib/pagination";
 import { countUsersForAdmin, listUsersForAdmin, toPersonAccounts } from "@/server/admin/insights";
 import { requireDashboard } from "@/server/auth/session";
 import { roleCodes, type RoleCode } from "@/lib/auth-roles";
 
-export const metadata: Metadata = {
-  title: "Users",
-  description: "Academy accounts and access state",
-};
+export const metadata: Metadata = adminStaticMetadata("users");
 
 type PageProps = {
   searchParams: Promise<{ page?: string; q?: string; role?: string }>;

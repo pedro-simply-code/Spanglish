@@ -34,6 +34,12 @@ import type { RoleCode } from "@/lib/auth-roles";
 
 type NavIcon = ComponentType<{ size?: number | string; stroke?: number | string }>;
 
+/** Minimal translator shape used by data helpers that live outside components. */
+export type NavTranslator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
+
 export type NavItem = {
   title: string;
   href: string;
@@ -47,146 +53,161 @@ export type NavSection = {
   items: NavItem[];
 };
 
+type NavItemDefinition = Omit<NavItem, "title"> & { titleKey: string };
+
+type NavSectionDefinition = {
+  labelKey: string;
+  items: NavItemDefinition[];
+};
+
 /**
  * The sidebar follows the active dashboard, not the union of every role. Each
  * role gets the same four-section rhythm: Dashboard, Academy, the role
- * workspace, and Insights.
+ * workspace, and Insights. Labels are translation keys resolved by the caller.
  */
-const navigationByRole: Record<RoleCode, NavSection[]> = {
+const navigationByRole: Record<RoleCode, NavSectionDefinition[]> = {
   student: [
     {
-      label: "Dashboard",
-      items: [{ title: "Overview", href: "/home", icon: IconHome2 }],
+      labelKey: "nav.dashboard",
+      items: [{ titleKey: "nav.overview", href: "/home", icon: IconHome2 }],
     },
     {
-      label: "Academy",
+      labelKey: "nav.academy",
       items: [
-        { title: "My classes", href: "/classes", icon: IconVideo },
-        { title: "Book a class", href: "/schedule", icon: IconCalendarEvent },
-        { title: "Pricing", href: "/pricing", icon: IconCreditCard },
+        { titleKey: "nav.myClasses", href: "/classes", icon: IconVideo },
+        { titleKey: "nav.bookAClass", href: "/schedule", icon: IconCalendarEvent },
+        { titleKey: "nav.pricing", href: "/pricing", icon: IconCreditCard },
+        { titleKey: "nav.myCredits", href: "/credits", icon: IconWallet },
       ],
     },
     {
-      label: "Learning",
+      labelKey: "nav.learning",
       items: [
-        { title: "Lessons", href: "/lessons", icon: IconBook },
-        { title: "Practice", href: "/practice", icon: IconPencil },
-        { title: "Vocabulary", href: "/vocabulary", icon: IconCards },
-        { title: "Materials", href: "/materials", icon: IconFileText },
+        { titleKey: "nav.lessons", href: "/lessons", icon: IconBook },
+        { titleKey: "nav.practice", href: "/practice", icon: IconPencil },
+        { titleKey: "nav.vocabulary", href: "/vocabulary", icon: IconCards },
+        { titleKey: "nav.materials", href: "/materials", icon: IconFileText },
       ],
     },
     {
-      label: "Insights",
+      labelKey: "nav.insights",
       items: [
-        { title: "Progress", href: "/progress", icon: IconChartLine },
-        { title: "Achievements", href: "/achievements", icon: IconTrophy },
-        { title: "Teach with us", href: "/apply", icon: IconSchool },
-        { title: "Settings", href: "/settings", icon: IconSettings },
+        { titleKey: "nav.progress", href: "/progress", icon: IconChartLine },
+        { titleKey: "nav.achievements", href: "/achievements", icon: IconTrophy },
+        { titleKey: "nav.teachWithUs", href: "/apply", icon: IconSchool },
+        { titleKey: "nav.settings", href: "/settings", icon: IconSettings },
       ],
     },
   ],
   teacher: [
     {
-      label: "Dashboard",
-      items: [{ title: "Overview", href: "/teacher", icon: IconHome2 }],
+      labelKey: "nav.dashboard",
+      items: [{ titleKey: "nav.overview", href: "/teacher", icon: IconHome2 }],
     },
     {
-      label: "Academy",
+      labelKey: "nav.academy",
       items: [
-        { title: "My classes", href: "/classes", icon: IconVideo },
-        { title: "Availability", href: "/teacher/availability", icon: IconCalendarTime },
-        { title: "Earnings", href: "/teacher/earnings", icon: IconCash },
+        { titleKey: "nav.myClasses", href: "/classes", icon: IconVideo },
+        { titleKey: "nav.availability", href: "/teacher/availability", icon: IconCalendarTime },
+        { titleKey: "nav.earnings", href: "/teacher/earnings", icon: IconCash },
       ],
     },
     {
-      label: "Teaching",
+      labelKey: "nav.teaching",
       items: [
-        { title: "Materials", href: "/teacher/materials", icon: IconFileText },
-        { title: "Assignments", href: "/teacher/assignments", icon: IconClipboardList },
-        { title: "Recordings", href: "/teacher/recordings", icon: IconMovie },
+        { titleKey: "nav.materials", href: "/teacher/materials", icon: IconFileText },
+        { titleKey: "nav.assignments", href: "/teacher/assignments", icon: IconClipboardList },
+        { titleKey: "nav.recordings", href: "/teacher/recordings", icon: IconMovie },
       ],
     },
     {
-      label: "Insights",
+      labelKey: "nav.insights",
       items: [
-        { title: "Students", href: "/teacher/students", icon: IconUsers },
-        { title: "Settings", href: "/settings", icon: IconSettings },
+        { titleKey: "nav.students", href: "/teacher/students", icon: IconUsers },
+        { titleKey: "nav.settings", href: "/settings", icon: IconSettings },
       ],
     },
   ],
   manager: [
     {
-      label: "Dashboard",
-      items: [{ title: "Overview", href: "/manager", icon: IconHome2 }],
+      labelKey: "nav.dashboard",
+      items: [{ titleKey: "nav.overview", href: "/manager", icon: IconHome2 }],
     },
     {
-      label: "Operations",
+      labelKey: "nav.operations",
       items: [
-        { title: "Academy schedule", href: "/apps/calendar", icon: IconCalendarEvent },
-        { title: "Students & credits", href: "/manager/students", icon: IconCards },
-        { title: "Teacher applications", href: "/manager/applications", icon: IconSchool },
-        { title: "Material review", href: "/manager/materials", icon: IconChecklist },
-        { title: "Teacher payouts", href: "/manager/payouts", icon: IconCash },
-        { title: "Billing", href: "/manager/billing", icon: IconReceipt2 },
-        { title: "Staff", href: "/manager/staff", icon: IconUsers },
-        { title: "Rooms", href: "/manager/rooms", icon: IconVideo },
+        { titleKey: "nav.academySchedule", href: "/apps/calendar", icon: IconCalendarEvent },
+        { titleKey: "nav.studentsAndCredits", href: "/manager/students", icon: IconCards },
+        { titleKey: "nav.teacherApplications", href: "/manager/applications", icon: IconSchool },
+        { titleKey: "nav.materialReview", href: "/manager/materials", icon: IconChecklist },
+        { titleKey: "nav.teacherPayouts", href: "/manager/payouts", icon: IconCash },
+        { titleKey: "nav.billing", href: "/manager/billing", icon: IconReceipt2 },
+        { titleKey: "nav.staff", href: "/manager/staff", icon: IconUsers },
+        { titleKey: "nav.rooms", href: "/manager/rooms", icon: IconVideo },
       ],
     },
     {
-      label: "Account",
-      items: [{ title: "Settings", href: "/settings", icon: IconSettings }],
+      labelKey: "nav.account",
+      items: [{ titleKey: "nav.settings", href: "/settings", icon: IconSettings }],
     },
   ],
   admin: [
     {
-      label: "Dashboard",
-      items: [{ title: "Overview", href: "/admin", icon: IconHome2 }],
+      labelKey: "nav.dashboard",
+      items: [{ titleKey: "nav.overview", href: "/admin", icon: IconHome2 }],
     },
     {
-      label: "Commerce",
-      items: [{ title: "Packages", href: "/admin/commerce/packages", icon: IconBuildingStore }],
+      labelKey: "nav.commerce",
+      items: [{ titleKey: "nav.packages", href: "/admin/commerce/packages", icon: IconBuildingStore }],
     },
     {
-      label: "Finance",
+      labelKey: "nav.finance",
       items: [
-        { title: "Teacher pay rates", href: "/admin/finance/teacher-rates", icon: IconCoin },
-        { title: "Payout approvals", href: "/admin/finance/payouts", icon: IconReceipt2 },
-        { title: "Payment providers", href: "/admin/finance/providers", icon: IconWallet },
-        { title: "Credit ledger", href: "/admin/finance/ledger", icon: IconScale },
+        { titleKey: "nav.teacherPayRates", href: "/admin/finance/teacher-rates", icon: IconCoin },
+        { titleKey: "nav.payoutApprovals", href: "/admin/finance/payouts", icon: IconReceipt2 },
+        { titleKey: "nav.paymentProviders", href: "/admin/finance/providers", icon: IconWallet },
+        { titleKey: "nav.creditLedger", href: "/admin/finance/ledger", icon: IconScale },
       ],
     },
     {
-      label: "Organization",
+      labelKey: "nav.organization",
       items: [
-        { title: "Users", href: "/admin/organization/users", icon: IconUsers },
-        { title: "Students & credits", href: "/admin/organization/students", icon: IconCards },
-        { title: "Teacher applications", href: "/admin/organization/applications", icon: IconSchool },
-        { title: "Managers", href: "/admin/organization/managers", icon: IconUsersGroup },
-        { title: "Roles", href: "/admin/organization/roles", icon: IconUserShield },
+        { titleKey: "nav.users", href: "/admin/organization/users", icon: IconUsers },
+        { titleKey: "nav.studentsAndCredits", href: "/admin/organization/students", icon: IconCards },
+        { titleKey: "nav.teacherApplications", href: "/admin/organization/applications", icon: IconSchool },
+        { titleKey: "nav.managers", href: "/admin/organization/managers", icon: IconUsersGroup },
+        { titleKey: "nav.roles", href: "/admin/organization/roles", icon: IconUserShield },
       ],
     },
     {
-      label: "Platform",
+      labelKey: "nav.platform",
       items: [
-        { title: "Integrations", href: "/admin/platform/integrations", icon: IconPlugConnected },
-        { title: "Security policy", href: "/admin/platform/security", icon: IconShieldCheck },
-        { title: "Email deliverability", href: "/admin/platform/email", icon: IconMail },
-        { title: "Classroom defaults", href: "/admin/platform/rooms", icon: IconServer },
+        { titleKey: "nav.integrations", href: "/admin/platform/integrations", icon: IconPlugConnected },
+        { titleKey: "nav.securityPolicy", href: "/admin/platform/security", icon: IconShieldCheck },
+        { titleKey: "nav.emailDeliverability", href: "/admin/platform/email", icon: IconMail },
+        { titleKey: "nav.classroomDefaults", href: "/admin/platform/rooms", icon: IconServer },
       ],
     },
     {
-      label: "Compliance",
+      labelKey: "nav.compliance",
       items: [
-        { title: "Audit log", href: "/admin/audit", icon: IconShieldCheck },
-        { title: "Settings", href: "/settings", icon: IconSettings },
+        { titleKey: "nav.auditLog", href: "/admin/audit", icon: IconShieldCheck },
+        { titleKey: "nav.settings", href: "/settings", icon: IconSettings },
       ],
     },
   ],
 };
 
-export function getNavSections(role: RoleCode): NavSection[] {
-  return navigationByRole[role];
+export function getNavSections(role: RoleCode, t: NavTranslator): NavSection[] {
+  return navigationByRole[role].map((section) => ({
+    label: t(section.labelKey),
+    items: section.items.map(({ titleKey, ...item }) => ({
+      ...item,
+      title: t(titleKey),
+    })),
+  }));
 }
 
 /** Student navigation doubles as the fallback for global search. */
-export const navSections = navigationByRole.student;
+export const navSections = (t: NavTranslator): NavSection[] =>
+  getNavSections("student", t);

@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -6,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import { IconCircle } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export type BreadcrumbItem = {
   title: string;
@@ -27,12 +30,13 @@ export function Breadcrumb({
   image,
   children,
 }: BreadcrumbProps) {
+  const t = useTranslations("shell");
   const rightSlot =
     children ??
     (image ? (
       <Image
         src={image.src}
-        alt="Breadcrumb decoration"
+        alt={t("breadcrumb.decorationAlt")}
         width={image.width ?? 165}
         height={image.height ?? 165}
         priority
@@ -77,7 +81,7 @@ export function Breadcrumb({
               />
             }
             sx={{ alignItems: "center", mt: "10px" }}
-            aria-label="breadcrumb"
+            aria-label={t("breadcrumb.ariaLabel")}
           >
             {items.map((item) =>
               item.to ? (

@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import Typography from "@mui/material/Typography";
+import { useLocale, useTranslations } from "next-intl";
 import { DEFAULT_PAGE_SIZE, totalPages } from "@/lib/pagination";
 
 type ListPaginationProps = {
@@ -19,6 +20,8 @@ export function ListPagination({
   onPageChange,
   pageSize = DEFAULT_PAGE_SIZE,
 }: ListPaginationProps) {
+  const t = useTranslations("shell");
+  const locale = useLocale();
   const pages = totalPages(total, pageSize);
 
   if (total <= pageSize) return null;
@@ -38,7 +41,11 @@ export function ListPagination({
       }}
     >
       <Typography variant="body2" color="text.secondary">
-        Showing {from}–{to} of {total.toLocaleString("en-US")}
+        {t("pagination.showing", {
+          from: from.toLocaleString(locale),
+          to: to.toLocaleString(locale),
+          total: total.toLocaleString(locale),
+        })}
       </Typography>
       <Pagination
         color="primary"

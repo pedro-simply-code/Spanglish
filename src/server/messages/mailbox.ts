@@ -4,8 +4,9 @@ import { randomUUID } from "node:crypto";
 import { alias } from "drizzle-orm/pg-core";
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { connection } from "next/server";
-import type { Email } from "@/features/email/types";
+import type { Email } from "@/features/email";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent, requestContextFromHeaders } from "@/server/audit/audit-log";
 import { db } from "@/server/db";
@@ -13,6 +14,8 @@ import { academyMessages, users } from "@/server/db/schema";
 
 const MAX_SUBJECT = 200;
 const MAX_BODY = 20_000;
+
+type AppsTranslator = Awaited<ReturnType<typeof getTranslations<"apps">>>;
 
 /** Persists a message in /apps/email only (never SMTP/Postmark). */
 export async function insertPlatformMessage(input: {
@@ -113,7 +116,7 @@ async function fetchRowsForUser(userId: string): Promise<MessageRow[]> {
     .limit(250);
 }
 
-function rowToEmail(row: MessageRow, viewerId: string): Email {
+async function rowToEmail(row: MessageRow, viewerId: string, t: AppsTranslator): Promise<Email> {
   const isInbox = row.recipientId === viewerId;
   const isSent = row.senderId === viewerId;
   const trashed = isInbox
@@ -127,11 +130,11 @@ function rowToEmail(row: MessageRow, viewerId: string): Email {
 
   return {
     id: row.id,
-    from: isSent ? `To: ${row.recipientName}` : row.senderName,
+    from: isSent ? t("email.prefix.to", { name: row.recipientName }) : row.senderName,
     thumbnail: isInbox ? row.senderImage ?? "" : "",
     subject: row.subject,
     time: row.createdAt,
-    To: isInbox ? `From: ${row.senderEmail}` : row.recipientEmail,
+    To: isInbox ? t("email.prefix.from", { email: row.senderEmail }) : row.recipientEmail,
     emailExcerpt: row.body.slice(0, 120),
     emailContent: bodyToHtml(row.body),
     unread: isInbox && !row.readAt,
@@ -155,20 +158,22 @@ function rowToEmail(row: MessageRow, viewerId: string): Email {
 export async function listMailboxForUser(userId: string): Promise<Email[]> {
   await connection();
   const rows = await fetchRowsForUser(userId);
-  return rows.map((row) => rowToEmail(row, userId));
+  const t = await getTranslations("apps");
+  return Promise.all(rows.map((row) => rowToEmail(row, userId, t)));
 }
 
 export async function sendAcademyMessage(
   actor: AuthSession,
   input: { toEmail: string; subject: string; body: string },
 ) {
+  const t = await getTranslations("apps");
   const toEmail = input.toEmail.trim().toLowerCase();
   const subject = input.subject.trim().slice(0, MAX_SUBJECT);
   const body = input.body.trim().slice(0, MAX_BODY);
 
-  if (!toEmail.includes("@")) return { ok: false as const, message: "Enter a valid recipient email." };
-  if (subject.length < 1) return { ok: false as const, message: "Subject is required." };
-  if (body.length < 1) return { ok: false as const, message: "Message body is required." };
+  if (!toEmail.includes("@")) return { ok: false as const, message: t("email.errors.invalidRecipient") };
+  if (subject.length < 1) return { ok: false as const, message: t("email.errors.subjectRequired") };
+  if (body.length < 1) return { ok: false as const, message: t("email.errors.bodyRequired") };
 
   const recipient = await db
     .select()
@@ -177,10 +182,10 @@ export async function sendAcademyMessage(
     .limit(1);
   const recipientRow = recipient[0];
   if (!recipientRow) {
-    return { ok: false as const, message: "No academy account with that email." };
+    return { ok: false as const, message: t("email.errors.recipientNotFound") };
   }
   if (recipientRow.id === actor.userId) {
-    return { ok: false as const, message: "You cannot message yourself." };
+    return { ok: false as const, message: t("email.errors.selfMessage") };
   }
 
   const messageId = await insertPlatformMessage({
@@ -202,7 +207,7 @@ export async function sendAcademyMessage(
 
   return {
     ok: true as const,
-    message: "Message delivered to their Spanglish inbox (Email in the app).",
+    message: t("email.success.delivered"),
     messageId,
   };
 }

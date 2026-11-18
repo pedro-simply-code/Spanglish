@@ -1,0 +1,1124 @@
+{
+  "educator": {
+    "shell": {
+      "roles": {
+        "student": "Estudiante",
+        "teacher": "Profesor",
+        "manager": "Gerente",
+        "admin": "Administrador",
+        "studentDashboard": "Panel de estudiante",
+        "teacherDashboard": "Panel de profesor",
+        "managerDashboard": "Panel de gerente",
+        "adminDashboard": "Panel de administrador"
+      }
+    },
+    "common": {
+      "teacher": "Profesor",
+      "manager": "Gerente",
+      "admin": "Administrador",
+      "student": "Estudiante",
+      "students": "Estudiantes",
+      "classes": "Clases",
+      "earnings": "Ganancias",
+      "payouts": "Pagos",
+      "materials": "Materiales",
+      "applications": "Solicitudes",
+      "billing": "Facturación",
+      "all": "Todos",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "save": "Guardar",
+      "open": "Abrir",
+      "none": "—",
+      "level": "Nivel",
+      "status": "Estado",
+      "amount": "Importe",
+      "type": "Tipo",
+      "date": "Fecha",
+      "note": "Nota",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "friday": "Viernes",
+      "allTracks": "Todas las modalidades",
+      "academy": "Academia",
+      "email": "Correo",
+      "search": "Buscar",
+      "noResults": "Sin resultados."
+    },
+    "weekdays": {
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    },
+    "levels": {
+      "new": "Profesor nuevo",
+      "established": "Consolidado",
+      "senior": "Senior",
+      "top": "Profesor destacado",
+      "badge": {
+        "firstClass": "Primera clase",
+        "firstClassDescription": "Impartió una primera clase.",
+        "fifty": "50 clases",
+        "fiftyDescription": "Impartió 50 clases.",
+        "twoHundred": "200 clases",
+        "twoHundredDescription": "Impartió 200 clases.",
+        "pairedPro": "Experto en clases pareadas",
+        "pairedProDescription": "Impartió 20 clases pareadas.",
+        "topRated": "Mejor valorado",
+        "topRatedDescription": "4,8★ o más en 10+ valoraciones.",
+        "studentFavorite": "Favorito de los estudiantes",
+        "studentFavoriteDescription": "Diez valoraciones de 5 estrellas."
+      }
+    },
+    "status": {
+      "upcoming": "Próxima",
+      "inProgress": "En curso",
+      "completed": "Completada",
+      "canceled": "Cancelada",
+      "awaitingApproval": "Esperando aprobación",
+      "approved": "Aprobado",
+      "approvedToPay": "Aprobado · pendiente de pago",
+      "paid": "Pagado",
+      "rejected": "Rechazado",
+      "unpaid": "Sin pagar",
+      "inPayout": "En pago",
+      "draft": "Borrador",
+      "published": "Publicado",
+      "archived": "Archivado",
+      "high": "Alta",
+      "normal": "Normal",
+      "low": "Baja",
+      "sent": "Enviado",
+      "failed": "Fallido",
+      "ready": "Listo",
+      "noStripe": "Sin Stripe",
+      "readyToSend": "Listo para enviar",
+      "complete": "Completado",
+      "pending": "Pendiente",
+      "accepted": "Aceptada",
+      "revoked": "Revocada",
+      "expired": "Caducada",
+      "submitted": "Enviada",
+      "withdrawn": "Retirada"
+    },
+    "classType": {
+      "paired": "Pareada",
+      "individual": "Individual"
+    },
+    "metadata": {
+      "teacherDashboard": {
+        "title": "Panel del profesor",
+        "description": "Gestiona tus clases en vivo y tus estudiantes"
+      },
+      "managerDashboard": {
+        "title": "Panel del gerente",
+        "description": "Supervisa clases, personas y facturación"
+      },
+      "students": {
+        "title": "Estudiantes",
+        "description": "Listado de estudiantes y objetivos de aprendizaje"
+      },
+      "recordings": {
+        "title": "Grabaciones",
+        "description": "Grabaciones y transcripciones de clases"
+      },
+      "availability": {
+        "title": "Disponibilidad",
+        "description": "Gestiona los horarios reservables"
+      },
+      "assignments": {
+        "title": "Tareas",
+        "description": "Sigue formularios, entregas y calificaciones"
+      },
+      "teacherMaterials": {
+        "title": "Materiales",
+        "description": "Crea y comparte materiales de enseñanza"
+      },
+      "newMaterial": {
+        "title": "Nuevo material",
+        "description": "Crea un documento, grabación o formulario de práctica"
+      },
+      "material": {
+        "title": "Material",
+        "description": "Detalles, compartidos y resultados del material"
+      },
+      "earnings": {
+        "title": "Ganancias",
+        "description": "Tu pago por clase impartida"
+      },
+      "managerStudents": {
+        "title": "Estudiantes y créditos",
+        "description": "Parejas, créditos de clase y compra de paquetes"
+      },
+      "managerPayouts": {
+        "title": "Pagos a profesores",
+        "description": "Prepara los pagos para aprobación del administrador"
+      },
+      "managerBilling": {
+        "title": "Facturación",
+        "description": "Facturas, planes y reembolsos de la academia"
+      },
+      "managerMaterials": {
+        "title": "Revisión de materiales",
+        "description": "Aprueba materiales para la biblioteca de la academia"
+      },
+      "managerRooms": {
+        "title": "Salas",
+        "description": "Salas de clases en vivo y estado del proveedor"
+      },
+      "managerStaff": {
+        "title": "Equipo",
+        "description": "Profesores y carga de enseñanza"
+      },
+      "managerApplications": {
+        "title": "Solicitudes de profesor",
+        "description": "Revisa solicitudes para impartir clases"
+      },
+      "managerMaterialReview": {
+        "title": "Revisar material",
+        "description": "Previsualiza y publica una publicación de la biblioteca"
+      },
+      "joinManager": {
+        "title": "Invitación de gerente",
+        "description": "Acepta una invitación de gerente de operaciones"
+      },
+      "materials": {
+        "title": "Materiales",
+        "description": "Materiales compartidos por tus profesores"
+      },
+      "studentMaterial": {
+        "title": "Material",
+        "description": "Material de clase compartido"
+      }
+    },
+    "teacher": {
+      "dashboard": {
+        "greeting": "Bienvenido, {firstName}",
+        "subtitle": "Este es tu ritmo de enseñanza para hoy. Los paneles de estudiante están pausados mientras el panel de profesor está activo.",
+        "classesToday": "Clases hoy",
+        "easternTime": "Hora del Este",
+        "upcomingClasses": "Próximas clases",
+        "nextSevenDays": "Próximos siete días",
+        "earnedThisMonth": "Ganado este mes",
+        "notPaidYet": "{amount} aún sin pagar",
+        "teacherRating": "Valoración del profesor",
+        "ratings": "{count} valoraciones",
+        "noRatingsYet": "Aún sin valoraciones",
+        "nextLiveClasses": "Tus próximas clases en vivo",
+        "rosterTimeRoom": "Lista, hora y estado de la sala",
+        "allClasses": "Todas las clases",
+        "open": "Abrir",
+        "minutes": "{count} min",
+        "noClassesScheduled": "No hay clases en vivo programadas. Mantén tu disponibilidad actualizada para que los estudiantes puedan reservarte.",
+        "teacherShare": "Participación del profesor: {percent}% de cada crédito · {count} clases impartidas",
+        "nextLevel": "Siguiente: {name}: {details}.",
+        "moreClasses": "{count} clases más",
+        "moreRatings": "{count} valoraciones más",
+        "averageRating": "un promedio de {rating}★",
+        "topLevel": "Estás en el nivel más alto.",
+        "badgesAppear": "Las insignias aparecen a medida que impartes clases y recibes valoraciones.",
+        "latestRatings": "Últimas valoraciones",
+        "studentRoster": "Lista de estudiantes",
+        "studentsFromClasses": "Estudiantes de tus clases",
+        "studentsCount": "{count} estudiantes",
+        "classesWithYou": "{count} clase{plural} contigo",
+        "next": "Siguiente: {value}",
+        "last": "Última: {value}",
+        "notBooked": "sin reservar",
+        "studentsAppear": "Los estudiantes aparecen aquí cuando reservan una clase contigo.",
+        "newMaterialSubtitle": "Añade un recurso a la biblioteca y elige quién lo recibe."
+      },
+      "earnings": {
+        "subtitle": "Lo que ganaste por cada clase impartida y lo que ya se pagó.",
+        "thisMonth": "Este mes",
+        "deliveredClasses": "Clases impartidas",
+        "notPaidYet": "Aún sin pagar",
+        "requestWhenReady": "Solicita un pago cuando lo desees",
+        "paid": "Pagado",
+        "allTime": "Desde siempre",
+        "rating": "Valoración",
+        "ratingHelper": "{count} valoraciones · {classes} clases",
+        "classes": "Clases",
+        "class": "Clase",
+        "noDeliveredClasses": "Aún no hay clases impartidas.",
+        "youKeep": "Conservas el {teacherPercent}% de cada crédito · la plataforma se queda el {platformPercent}%",
+        "exampleCredit": "Con un crédito de {credit} ganas unos {earned} por clase impartida.",
+        "actualPay": "El pago real sigue el valor del crédito del estudiante cuando reservó (precio del paquete ÷ créditos).",
+        "nextLevel": "Siguiente: {name}: {classes} clases más, {ratings} valoraciones más, promedio de {rating}★.",
+        "topLevel": "Nivel máximo alcanzado.",
+        "badges": "Insignias",
+        "firstBadge": "Imparte tu primera clase para ganar una insignia.",
+        "level": "nivel {level}",
+        "processingDayOne": "1 día hábil",
+        "processingDays": "{days} días hábiles"
+      },
+      "availability": {
+        "title": "Disponibilidad",
+        "subtitle": "Horarios semanales que los estudiantes pueden reservar. Las clases reservadas no cambian cuando modificas esto.",
+        "change": "Cambiar",
+        "timeZoneNote": "Las horas están en tu zona horaria: {timeZone}. Los estudiantes las ven convertidas a la suya.",
+        "upcomingNote": " Tienes {count} clases próximas.",
+        "useTimeFormat": "Usa horarios como 09:00.",
+        "weeklySchedule": "Horario semanal",
+        "scheduleSubtitle": "Las clases empiezan cada 30 minutos dentro de estos intervalos.",
+        "saving": "Guardando…",
+        "saveAvailability": "Guardar disponibilidad",
+        "addWindow": "Añadir intervalo",
+        "from": "Desde",
+        "to": "Hasta",
+        "removeWindow": "Eliminar intervalo del {day}",
+        "notAvailable": "Sin disponibilidad.",
+        "publicProfile": "Perfil público",
+        "profileSubtitle": "Lo que ven los estudiantes cuando reservan.",
+        "headline": "Titular",
+        "location": "Ubicación",
+        "aboutYou": "Sobre ti",
+        "tags": "Etiquetas",
+        "tagsHelper": "Separa con comas (hasta 8).",
+        "saveProfile": "Guardar perfil"
+      },
+      "students": {
+        "title": "Estudiantes",
+        "subtitle": "Tu lista, sus objetivos y los materiales que tienen actualmente.",
+        "level": "Nivel",
+        "goal": "Objetivo",
+        "nextClass": "Próxima clase",
+        "progress": "Progreso",
+        "email": "Correo",
+        "openMaterials": "Ver materiales"
+      },
+      "recordings": {
+        "title": "Grabaciones",
+        "subtitle": "Grabaciones de tus clases impartidas, con enlaces y estado.",
+        "classRecordings": "Grabaciones de clases",
+        "noRecordings": "Aún no hay grabaciones. Cuando se grave una clase, aparecerá aquí.",
+        "download": "Descargar",
+        "viewClass": "Ver clase",
+        "topic": "Tema",
+        "date": "Fecha",
+        "size": "Tamaño",
+        "status": "Estado",
+        "savedOnServer": "Guardado en el servidor",
+        "materialsLibrary": "Biblioteca de materiales",
+        "transcriptReady": "Transcripción lista",
+        "standalone": "Grabación independiente",
+        "views": "{count} visitas",
+        "details": "Detalles",
+        "preview": "Vista previa",
+        "share": "Compartir",
+        "onServerDisk": "En el disco del servidor",
+        "class": "Clase",
+        "play": "Reproducir",
+        "failed": "Fallido",
+        "recordingNow": "Grabando…",
+        "processing": "Procesando…",
+        "inCloud": "En la nube (B2)",
+        "parts": "{count, plural, one {# grabación} other {# grabaciones}}",
+        "readyCount": "{count, plural, =0 {ninguna lista aún} one {# lista para ver} other {# listas para ver}}",
+        "failedCount": "{count, plural, one {# fallida} other {# fallidas}}",
+        "filters": {
+          "search": "Buscar clase o estudiante",
+          "student": "Estudiante",
+          "allStudents": "Todos los estudiantes",
+          "status": "Estado",
+          "allStatuses": "Todos",
+          "ready": "Lista",
+          "from": "Desde",
+          "to": "Hasta",
+          "clear": "Limpiar filtros"
+        },
+        "columns": {
+          "class": "Clase",
+          "teacher": "Maestro",
+          "students": "Estudiantes",
+          "recordings": "Grabaciones",
+          "storage": "Almacenamiento"
+        },
+        "noStudents": "Sin estudiantes",
+        "noMatches": "Ninguna grabación coincide con estos filtros.",
+        "pagination": "{from}–{to} de {count}"
+      },
+      "assignments": {
+        "title": "Tareas",
+        "subtitle": "Formularios de práctica, entregas y calificaciones de tus clases.",
+        "noAssignments": "Aún no hay tareas.",
+        "submissions": "Entregas",
+        "graded": "Calificado",
+        "pending": "Pendiente",
+        "due": "Entrega: {date}"
+      },
+      "apply": {
+        "title": "Enseña con nosotros",
+        "subtitle": "Elige práctica de conversación o enseñanza certificada; los gestores revisan todas las solicitudes.",
+        "withdraw": "Retirar solicitud",
+        "statusOpen": "Tu solicitud del {date} está en revisión. Te escribiremos por correo.",
+        "statusRejected": "No se aprobó tu última solicitud.{note} Puedes volver a postular.",
+        "statusWithdrawn": "Retiraste tu última solicitud. Puedes volver a postular.",
+        "statusApproved": "Tu solicitud fue aprobada.",
+        "cardTitle": "Tu solicitud",
+        "cardSubtitle": "Un gestor revisa el vídeo, la fluidez y las credenciales antes de aprobar.",
+        "fluency": "Fluidez en español / inglés",
+        "fluencyDetails": "Detalles de fluidez",
+        "fluencyDetailsHelper": "p. ej. bilingüe desde la infancia, 10 años en un país hispanohablante.",
+        "yearsTeaching": "Años impartiendo (en cualquier contexto)",
+        "taughtOnline": "He impartido clases en vivo en línea antes",
+        "headlinePlaceholder": "p. ej. conversación y pronunciación para principiantes",
+        "iTeach": "Imparto",
+        "aboutYou": "Sobre ti",
+        "aboutHelper": "Al menos 40 caracteres: cómo enseñas y a quién ayudas mejor.",
+        "experience": "Experiencia docente",
+        "experienceHelper": "Al menos 20 caracteres: aulas, tutorías, voluntariado, etc.",
+        "location": "Dónde vives",
+        "locationPlaceholder": "Ciudad, país",
+        "videoRecommended": "Vídeo de presentación (recomendado)",
+        "videoRequired": "Vídeo de presentación (obligatorio)",
+        "videoHelper": "Muestra de 2–3 minutos: preséntate y simula una clase breve. YouTube, Vimeo o Loom.",
+        "credentialPrimary": "Credencial principal",
+        "credentialName": "Nombre del certificado o título",
+        "credentialNamePlaceholder": "p. ej. CELTA, DELE C2, Grado en Educación",
+        "yearOptional": "Año (opcional)",
+        "scanLink": "Enlace a escaneo o registro (opcional)",
+        "approvalNote": "Si te aprueban, esta cuenta pasa a ser de profesor: ya no podrás reservar clases como estudiante.",
+        "sending": "Enviando…",
+        "send": "Enviar solicitud"
+      }
+    },
+    "manager": {
+      "dashboard": {
+        "title": "Bienvenido, {firstName}",
+        "subtitle": "Solo operaciones: no impartes ni tomas clases. Aquí revisas el equipo, los estudiantes, la facturación y los horarios.",
+        "academySchedule": "Calendario de la academia",
+        "studentsCredits": "Estudiantes y créditos",
+        "teacherPayouts": "Pagos a profesores",
+        "applications": "Solicitudes",
+        "billing": "Facturación",
+        "teachers": "Profesores",
+        "teachersSubtitle": "{count} en el equipo · por clases impartidas",
+        "staff": "Equipo",
+        "noTeachers": "Aún no hay profesores en el equipo.",
+        "profileNotCompleted": "Perfil sin completar",
+        "noRatings": "Sin valoraciones",
+        "classes": "{count} clases",
+        "yourQueue": "Tu cola",
+        "queueSubtitle": "Pendientes que puedes resolver como gerente",
+        "nothingWaiting": "Nada esperando por ti ahora mismo.",
+        "scheduleSubtitle": "Cifras generales — abre el Calendario para filtrar por profesor",
+        "scheduleNote": "Los reprogramaciones dentro del plazo son automáticas. Las propuestas de clases pareadas aparecen en Salas.",
+        "scheduledThisWeek": "Programadas esta semana",
+        "upcomingAll": "Próximas (todas)",
+        "deliveredThisWeek": "Impartidas esta semana",
+        "openPairedChanges": "Solicitudes de cambio pareadas abiertas",
+        "openCalendar": "Abrir calendario",
+        "billingPayouts": "Facturación y pagos",
+        "billingSubtitle": "Pedidos pagados, créditos y ganancias de profesores que preparas",
+        "billingNote": "Los ingresos y el pago a profesores provienen de pedidos pagados y clases impartidas. Los lotes de pago se envían al administrador para su aprobación y pago.",
+        "paidCheckoutRevenue": "Ingresos de pagos completados",
+        "paidOrders": "Pedidos pagados",
+        "creditsOutstanding": "Créditos pendientes",
+        "teacherEarningsMonth": "Ganancias de profesores este mes",
+        "notInBatch": "Aún sin lote de pago",
+        "preparePayouts": "Preparar pagos"
+      },
+      "staff": {
+        "title": "Equipo",
+        "subtitle": "Profesores y carga de enseñanza"
+      },
+      "rooms": {
+        "title": "Salas"
+      }
+    },
+    "materials": {
+      "library": {
+        "search": "Buscar materiales",
+        "type": "Tipo",
+        "allTypes": "Todos los tipos",
+        "items": "{shown} de {total} elementos",
+        "empty": "Aún no hay materiales que coincidan con estos filtros."
+      },
+      "kind": {
+        "document": "Documento",
+        "link": "Enlace",
+        "video": "Vídeo",
+        "audio": "Audio",
+        "form": "Formulario",
+        "recording": "Grabación"
+      },
+      "level": {
+        "all": "Todos los niveles",
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      },
+      "audience": {
+        "class": "Una clase",
+        "student": "Un estudiante",
+        "cohort": "Un grupo"
+      },
+      "questionType": {
+        "multipleChoice": "Opción múltiple",
+        "shortAnswer": "Respuesta corta",
+        "speaking": "Expresión oral",
+        "listening": "Comprensión auditiva"
+      },
+      "visibility": {
+        "private": "Privado",
+        "shared": "Compartido con profesores",
+        "global": "Biblioteca de la academia (requiere aprobación)",
+        "waitingReview": "Esperando revisión",
+        "notApproved": "No aprobado",
+        "academyLibrary": "Biblioteca de la academia",
+        "globalHelp": "Todos los estudiantes, después de que un gerente lo apruebe.",
+        "sharedHelp": "Todos los profesores pueden encontrarlo y usarlo.",
+        "privateHelp": "Solo tú (y las clases a las que lo adjuntes).",
+        "now": "Ahora: {label}",
+        "managerNote": "Nota del gerente: {note}",
+        "label": "Visibilidad"
+      },
+      "status": {
+        "draft": "Borrador",
+        "published": "Publicado",
+        "archived": "Archivado"
+      },
+      "card": {
+        "updated": "Actualizado {date}",
+        "due": "Entrega: {date}",
+        "questions": "{count} preguntas · {minutes} min",
+        "openPractice": "Abrir práctica",
+        "openMaterial": "Abrir material"
+      },
+      "composer": {
+        "type": "Tipo",
+        "level": "Nivel",
+        "audience": "Destinatarios",
+        "whoCanSee": "Quién puede verlo",
+        "title": "Título",
+        "titlePlaceholder": "Mazo de frases de viaje",
+        "description": "Descripción",
+        "descriptionPlaceholder": "¿Qué harán los estudiantes con este material?",
+        "dueDate": "Fecha de entrega (opcional)",
+        "questions": "Preguntas",
+        "questionsHelp": "El formulario califica las opciones múltiples y recoge el resto para revisión del profesor.",
+        "addQuestion": "Añadir pregunta",
+        "question": "Pregunta {number}",
+        "answerType": "Tipo de respuesta",
+        "removeQuestion": "Eliminar pregunta {number}",
+        "creating": "Creando…",
+        "createAndShare": "Crear y compartir",
+        "points": "Puntos",
+        "optionsHelp": "Escribe las opciones y marca la correcta.",
+        "correctOption": "Respuesta correcta",
+        "option": "Opción {number}"
+      },
+      "detail": {
+        "title": "Material",
+        "subtitle": "Detalles, compartidos y resultados del material",
+        "backToLibrary": "Volver a la biblioteca",
+        "overview": "Resumen",
+        "sharedWith": "Compartido con",
+        "noShares": "Aún no está compartido.",
+        "questions": "Preguntas",
+        "results": "Resultados",
+        "noResults": "Aún no hay resultados.",
+        "createdBy": "Por {name}",
+        "duration": "{minutes} min",
+        "openLink": "Abrir enlace",
+        "downloadFile": "Descargar archivo",
+        "questionsMinutes": "{count} preguntas · {minutes} minutos",
+        "due": "Vence {date}",
+        "point": "{count} pts",
+        "createdByUpdated": "Por {name} · actualizado el {date}",
+        "startPractice": "Comenzar práctica",
+        "linkedToClass": "Vinculado a una clase",
+        "howToUse": "Cómo usar este material",
+        "sharedWithSubtitle": "Cada clase, estudiante o grupo que recibió este material",
+        "howToUseSubtitle": "Este material está vinculado a tus clases y a tu plan de práctica",
+        "sharedBy": "Compartido por {name} · {date}",
+        "notSharedTeacher": "Este material aún no se ha compartido. Usa Compartir para asignarlo a una clase o a un estudiante.",
+        "notSharedStudent": "Abre la página de la clase para ver cuándo se usa este material.",
+        "assignmentsTitle": "Tareas y resultados",
+        "assignmentsSubtitle": "Quién recibió el formulario y cuánto ha avanzado",
+        "dueAssignment": " · vence el {date}",
+        "submittedCount": "{submitted}/{total} entregadas",
+        "practiceForm": "Formulario de práctica",
+        "media": "Multimedia",
+        "transcriptPending": "La transcripción aparecerá cuando el proveedor termine de procesarla.",
+        "views": "{count} visitas",
+        "play": "Reproducir",
+        "resource": "Recurso",
+        "openResource": "Abre el recurso en una nueva vista",
+        "submission": {
+          "pending": "Pendiente",
+          "submitted": "Enviada",
+          "graded": "Calificada"
+        },
+        "transcriptReady": "Transcripción lista. La reproducción y los subtítulos usan el proveedor de reuniones en producción.",
+        "open": "Abrir"
+      },
+      "formRunner": {
+        "title": "Práctica",
+        "submit": "Enviar respuestas",
+        "submitting": "Enviando…",
+        "correct": "Correcto",
+        "incorrect": "Revisa esta respuesta",
+        "score": "Puntuación: {points}",
+        "thankYou": "Tus respuestas se enviaron.",
+        "back": "Volver",
+        "practice": "Práctica",
+        "allPractice": "Todas las prácticas",
+        "demoScore": "Puntuación de demostración: {score} de {total} puntos.",
+        "writeAnswer": "Escribe lo que dirías",
+        "hearAnswer": "¿Qué escuchaste?",
+        "yourAnswer": "Tu respuesta",
+        "audioNote": "La captura de audio se conectará al proveedor de almacenamiento en producción; por ahora, la respuesta se revisa como texto.",
+        "listeningNote": "El clip de audio forma parte de los materiales de la clase.",
+        "progress": "{answered} de {total} respondidas · {points} puntos en total"
+      },
+      "teacherOverview": {
+        "title": "Mis materiales",
+        "subtitle": "Crea, comparte y sigue los recursos que usas en clase.",
+        "myLibrary": "Mi biblioteca",
+        "colleagues": "Compartidos por colegas",
+        "publishedCount": "{count} publicados",
+        "draftsCount": "{count} borradores",
+        "newMaterial": "Nuevo material",
+        "noMaterials": "Aún no hay materiales.",
+        "library": "Biblioteca",
+        "materialsYouOwn": "Materiales que te pertenecen",
+        "publishedInReview": "{published} publicados · {review} en revisión",
+        "forms": "Formularios",
+        "practiceActivities": "Actividades de práctica",
+        "recordings": "Grabaciones",
+        "fromPastClasses": "De clases anteriores",
+        "noSharedMaterials": "Aún no hay materiales compartidos por los colegas.",
+        "fromOtherTeachers": "De otros profesores"
+      },
+      "studentOverview": {
+        "title": "Mis materiales",
+        "subtitle": "La biblioteca de la academia y todo lo que tus profesores han compartido contigo.",
+        "dueSoon": "Próxima entrega",
+        "upcomingDeadlines": "Próximas fechas de entrega",
+        "noDueDates": "No hay fechas de entrega por ahora.",
+        "items": "{count} elementos",
+        "dueItem": "{title} · vence el {date}",
+        "runnerNote": "Los formularios se abren en la práctica. Los documentos, el audio y las grabaciones se abren desde la página del material.",
+        "empty": "Aún no se ha compartido nada contigo. Los materiales de tu próxima clase aparecerán aquí."
+      },
+      "moderation": {
+        "title": "Revisión de materiales",
+        "subtitle": "Aprueba materiales para la biblioteca de la academia",
+        "pending": "Esperando revisión",
+        "published": "Publicado",
+        "rejected": "Rechazado",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "review": "Revisar",
+        "noMaterials": "No hay materiales para revisar.",
+        "applicant": "Autor",
+        "submitted": "Enviado",
+        "note": "Nota de revisión",
+        "emptyNote": "Añade una nota antes de rechazar.",
+        "reviewSubtitle": "Revisa esta publicación de la biblioteca de la academia antes de publicarla para todos los estudiantes.",
+        "reviewHelp": "Lee la publicación siguiente (y abre el enlace externo si lo hay). Cuando todo se vea bien, usa Publicar para añadirla a la biblioteca estudiantil.",
+        "alreadyPublished": "Esta publicación ya está publicada en la biblioteca de la academia.",
+        "rejectedNote": "Esta publicación fue rechazada y no es visible para los estudiantes.",
+        "noDescription": "No se proporcionó una descripción.",
+        "resourceLink": "Enlace al recurso",
+        "openReview": "Abrir y revisar",
+        "formPreview": "Vista previa del formulario de práctica ({count} preguntas)",
+        "moreQuestions": "+{count} preguntas más",
+        "textOnly": "No hay un enlace externo; esta publicación solo contiene texto en la biblioteca.",
+        "publishTitle": "Publicar en la biblioteca de la academia",
+        "noteToAuthor": "Nota para el autor (opcional)",
+        "backQueue": "Volver a la cola",
+        "publishStudents": "Publicar para estudiantes",
+        "backReview": "Volver a la revisión de materiales",
+        "detail": {
+          "createdByUpdated": "Por {name} · enviado el {date}"
+        },
+        "none": "Ninguno",
+        "approved": "Aprobado",
+        "updatedBy": "{name} · actualizado el {date}",
+        "reviewed": " · revisado el {date}",
+        "fullPreview": "Vista completa",
+        "openLink": "Abrir enlace",
+        "reviewerNote": "Nota del revisor",
+        "close": "Cerrar",
+        "publish": "Publicar",
+        "awaitingCount": "Esperando revisión ({count})",
+        "history": "Historial",
+        "openMaterials": "Materiales abiertos",
+        "reviewedMaterials": "Materiales revisados",
+        "filtered": "Filtrado: {kind}",
+        "allKinds": "Todos los tipos",
+        "author": "Autor",
+        "reviewedDate": "Revisado",
+        "view": "Ver",
+        "noMatches": "Ningún material coincide con esta vista.",
+        "preview": "Vista previa",
+        "reviewMaterial": "Revisar {title}"
+      },
+      "actions": {
+        "notAllowedTitle": "No permitido",
+        "notAllowedCreate": "Solo los profesores y gerentes pueden añadir material a la biblioteca de la academia.",
+        "missingTitleTitle": "Falta el título",
+        "missingTitle": "Dale al material un título de al menos 3 caracteres.",
+        "unsupportedTypeTitle": "Tipo no compatible",
+        "unsupportedType": "Elige un tipo de material compatible.",
+        "addQuestionTitle": "Añade una pregunta",
+        "addQuestion": "Un formulario necesita al menos una pregunta antes de poder compartirse.",
+        "chooseVisibilityTitle": "Elige quién lo ve",
+        "chooseVisibility": "Elige privado, compartido con profesores o biblioteca de la academia.",
+        "savedTitle": "Material guardado",
+        "savedPending": "«{title}» se guardó y se envió a un gerente para la biblioteca de la academia.",
+        "savedPrivate": "«{title}» se guardó en tu biblioteca.",
+        "notAllowedManage": "Solo los profesores y el equipo gestionan los materiales.",
+        "saved": "Guardado",
+        "notSaved": "No guardado",
+        "notAllowedReview": "Solo los gerentes revisan los materiales.",
+        "done": "Hecho",
+        "notAllowedShare": "Solo los profesores y gerentes pueden compartir material con estudiantes.",
+        "notFoundTitle": "Material no encontrado",
+        "notFound": "Recarga la biblioteca e inténtalo de nuevo.",
+        "chooseClassTitle": "Elige una clase",
+        "chooseClass": "Selecciona la clase que debe recibirlo.",
+        "chooseStudentTitle": "Elige un estudiante",
+        "chooseStudent": "Selecciona el estudiante que debe recibirlo.",
+        "cohort": "Grupo",
+        "sharedTitle": "Material compartido",
+        "shared": "«{title}» está en cola para {audience}.",
+        "signInPractice": "Inicia sesión como estudiante para comenzar esta práctica.",
+        "practiceNotFoundTitle": "Práctica no encontrada",
+        "practiceNotFound": "Esta actividad ya no está disponible.",
+        "noQuestionsTitle": "Aún no hay preguntas",
+        "noQuestions": "Tu profesor aún no ha añadido preguntas a este formulario.",
+        "finishQuestionsTitle": "Responde todas las preguntas",
+        "finishQuestions": "Respondiste {answered} de {total} preguntas.",
+        "practiceSavedTitle": "Práctica guardada",
+        "practiceSaved": "Las respuestas de «{title}» se guardaron ({points}/{total} puntos)."
+      },
+      "assignments": {
+        "openAssignments": "Tareas abiertas",
+        "waitingStudents": "Esperando a los estudiantes",
+        "toGrade": "Por calificar",
+        "submittedNotGraded": "Enviadas, sin calificar",
+        "averageScore": "Calificación promedio",
+        "gradedSubmissions": "Entregas calificadas",
+        "title": "Tareas",
+        "subtitle": "Comparte formularios, sigue el progreso y revisa los resultados.",
+        "assigned": "{audience} · asignada el {date}",
+        "openForm": "Abrir formulario",
+        "progress": "{submitted} de {total} entregadas · {graded} calificadas",
+        "due": "Vence {date}",
+        "nothingAssigned": "Aún no hay tareas asignadas",
+        "nothingAssignedHelp": "Crea un formulario en Materiales y compártelo con una clase para ver los resultados aquí.",
+        "submittedAt": "Enviada el {date}",
+        "notSubmitted": "Aún no enviada",
+        "status": {
+          "open": "Abierta",
+          "grading": "En calificación",
+          "closed": "Cerrada"
+        },
+        "submissionStatus": {
+          "pending": "Pendiente",
+          "submitted": "Enviada",
+          "graded": "Calificada"
+        }
+      },
+      "demo": {
+        "material": {
+          "travelDeck": {
+            "title": "Mazo de frases de viaje",
+            "description": "Las 24 frases que usaremos en la clase de viajes, con una breve nota de pronunciación para cada una."
+          },
+          "airportDrill": {
+            "title": "Ejercicio de escucha en el aeropuerto",
+            "description": "Cinco minutos de anuncios e indicaciones del aeropuerto. Escucha una vez sin leer y luego repite con la transcripción."
+          },
+          "pastTenseForm": {
+            "title": "Repaso del pretérito",
+            "description": "Un formulario breve para ver qué terminaciones del pretérito aún necesitan práctica antes de la próxima clase."
+          },
+          "businessIntro": {
+            "title": "Presentaciones profesionales",
+            "description": "Las estructuras y el vocabulario de la clase de hoy. Usa las tres plantillas para presentarte en 60 segundos."
+          },
+          "restaurantRecap": {
+            "title": "Pedir comida: grabación de la clase",
+            "description": "Grabación completa de la clase de restaurante, incluido el juego de roles y la ronda de correcciones."
+          },
+          "pronunciationRecap": {
+            "title": "Clínica de pronunciación: grabación de la clase",
+            "description": "Vocales, acentuación y el diálogo de sombreado de la clínica de pronunciación."
+          },
+          "restaurantVocab": {
+            "title": "Vocabulario de restaurante",
+            "description": "Secciones del menú, peticiones educadas y las frases para resolver un pedido equivocado con calma."
+          },
+          "travelQuiz": {
+            "title": "Cuestionario de vocabulario de viaje",
+            "description": "Seis preguntas rápidas sobre aeropuertos, hoteles y restaurantes. Tu puntuación nos dice qué repasar primero."
+          },
+          "interviewFrames": {
+            "title": "Estructuras para respuestas de entrevista",
+            "description": "Tres estructuras de respuesta para preguntas comunes de entrevistas, con un banco de frases de relleno."
+          },
+          "pronunciationNotes": {
+            "title": "Notas de la clínica de pronunciación",
+            "description": "Los sonidos y ejercicios de clase, más una rutina de sombreado de cinco minutos."
+          }
+        },
+        "tag": {
+          "travel": "Viajes",
+          "speaking": "Expresión oral",
+          "listening": "Comprensión auditiva",
+          "grammar": "Gramática",
+          "pastTense": "Pretérito",
+          "business": "Negocios",
+          "pronunciation": "Pronunciación",
+          "vocabulary": "Vocabulario",
+          "interview": "Entrevistas"
+        },
+        "audience": {
+          "travelWarmup": "Calentamiento de español para viajes",
+          "businessIntroductions": "Presentaciones profesionales",
+          "orderingFood": "Pedir comida con confianza",
+          "pronunciationClinic": "Clínica de pronunciación"
+        },
+        "assignment": {
+          "pastTense": {
+            "title": "Repaso del pretérito"
+          },
+          "travelQuiz": {
+            "title": "Cuestionario de vocabulario de viaje",
+            "audience": "Calentamiento de español para viajes · 4 estudiantes"
+          }
+        },
+        "submission": {
+          "pronunciationFeedback": "Pronunciación impecable. Mantén activas las frases del hotel.",
+          "irregularVerbsFeedback": "Repasa la diferencia entre llegar e ir."
+        },
+        "question": {
+          "pastTense": {
+            "q1": "Ayer yo ___ al mercado.",
+            "q2": "___ la cena cuando llamaste.",
+            "q3": "Escribe una oración sobre el fin de semana pasado usando un verbo irregular.",
+            "q4": "Cuenta una historia de 30 segundos sobre un viaje que hiciste el año pasado."
+          },
+          "travelQuiz": {
+            "q1": "¿Cómo preguntas por la puerta de embarque en un aeropuerto?",
+            "q2": "¿Qué frase pide una habitación con dos camas?",
+            "q3": "Escucha el anuncio y escribe el número de puerta.",
+            "q4": "Pide un café y la cuenta en una sola oración."
+          }
+        },
+        "class": {
+          "everyday": "Conversación cotidiana",
+          "pastTense": "Repaso del pretérito",
+          "travelWarmup": "Calentamiento de español para viajes",
+          "businessIntroductions": "Presentaciones profesionales",
+          "travelCulture": "Cultura y jerga de viajes",
+          "interviewPractice": "Práctica de entrevistas",
+          "orderingFood": "Pedir comida con confianza",
+          "pronunciationClinic": "Clínica de pronunciación"
+        }
+      },
+      "share": {
+        "button": "Compartir",
+        "title": "Compartir «{title}»",
+        "help": "Elige quién recibirá este material. La demostración valida el público; la persistencia será el siguiente paso.",
+        "class": "Clase",
+        "studentName": "Nombre del estudiante",
+        "sharing": "Compartiendo…",
+        "shareMaterial": "Compartir material"
+      }
+    },
+    "payouts": {
+      "processingDayOne": "1 día hábil",
+      "processingDays": "{days} días hábiles",
+      "unknownStripeError": "Se produjo un error desconocido. Inténtalo de nuevo.",
+      "actions": {
+        "onlyTeachersRequest": "Solo los profesores pueden solicitar pagos.",
+        "onlyManagersPrepare": "Solo los gerentes y el administrador preparan pagos.",
+        "onlyAdminApproves": "Solo el administrador aprueba pagos.",
+        "onlyAdminRejects": "Solo el administrador rechaza pagos.",
+        "onlyAdminMarksPaid": "Solo el administrador marca pagos como pagados.",
+        "manualTransfersOff": "Las transferencias manuales están desactivadas en la configuración del proveedor de pagos.",
+        "onlyAdminChangesRates": "Solo el administrador cambia las tarifas de los profesores.",
+        "onlyTeachersConnectStripe": "Solo los profesores conectan Stripe.",
+        "stripeConnectOff": "Los pagos con Stripe Connect están desactivados.",
+        "stripeNotConfigured": "Stripe aún no está configurado.",
+        "stripeNotConfiguredShort": "Stripe no está configurado.",
+        "openingStripe": "Abriendo Stripe…",
+        "stripeUnavailable": "Stripe no está disponible.",
+        "finishConnectingStripe": "Primero termina de conectar Stripe.",
+        "onlyAdminSends": "Solo el administrador envía pagos."
+      },
+      "board": {
+        "approvalTitle": "Aprobaciones de pagos",
+        "prepareTitle": "Pagos a profesores",
+        "subtitle": "Explora por mes y abre una fila para ver el ciclo de pago, las líneas y las acciones.",
+        "payouts": "Pagos",
+        "approvalQueue": "Cola de aprobación",
+        "batches": "Lotes de pago",
+        "rowsForMonth": "Filas del mes seleccionado arriba.",
+        "request": "Solicitud",
+        "type": "Tipo",
+        "amount": "Importe",
+        "classes": "Clases",
+        "status": "Estado",
+        "submitted": "Enviado",
+        "teacherRequest": "Solicitud del profesor",
+        "monthlyBatch": "Lote mensual",
+        "teachersCount": "{count} profesores",
+        "viewDetails": "Ver detalles del pago",
+        "empty": "No hay solicitudes de pago en este mes. Usa las flechas para explorar otros meses: las solicitudes abiertas solo aparecen en el mes en que se enviaron (o en el que se pagaron).",
+        "adminStripeNote": "Abre una fila para ver el ciclo, las líneas de profesores y las acciones de pago. La liquidación puede tardar hasta {window}.",
+        "adminManualNote": "Abre una fila para aprobar, rechazar o marcar como pagado tras una transferencia externa.",
+        "managerNote": "Los profesores inician los pagos desde Ganancias cuando están listos. Aprueba o rechaza cada solicitud en la tabla."
+      },
+      "monthNav": {
+        "title": "Por mes",
+        "subtitle": "Los profesores solicitan pagos cuando están listos: explora los meses para ver qué se pagó o qué sigue abierto.",
+        "previous": "Mes anterior",
+        "next": "Mes siguiente",
+        "paidThisMonth": "Pagado este mes",
+        "awaitingPayment": "Esperando pago"
+      },
+      "detail": {
+        "requestTitle": "Solicitud de pago · {teacher}",
+        "monthlyTitle": "Pago mensual · {period}",
+        "managerBatch": "Lote del gerente",
+        "total": "Total",
+        "amount": "Importe",
+        "classes": "Clases",
+        "requestedBy": "Solicitado por",
+        "preparedBy": "Preparado por",
+        "period": "Período",
+        "reviewedBy": "Revisado por",
+        "paymentReference": "Referencia de pago",
+        "rejectedReason": "Rechazado: {reason}",
+        "teachersInBatch": "Profesores en este lote",
+        "teacher": "Profesor",
+        "sent": "Enviado",
+        "rejectReasonLabel": "Motivo (obligatorio para rechazar)",
+        "transferReferenceLabel": "Referencia de transferencia (p. ej., Wise, transferencia bancaria)",
+        "noteStripeManual": "Aprobar no mueve dinero. Usa Pagar con Stripe o Marcar como pagado para transferencias internacionales. La liquidación puede tardar {window}.",
+        "noteStripeOnly": "Aprobar no mueve dinero. Usa Pagar con Stripe. La liquidación puede tardar {window}.",
+        "noteManualOnly": "Registra transferencias internacionales o bancarias con Marcar como pagado. Se envía un correo a los profesores al aprobar y al pagar.",
+        "noteNoRails": "No hay métodos de pago activivos: activa Stripe Connect o las transferencias en Finanzas → Proveedores.",
+        "close": "Cerrar",
+        "reject": "Rechazar",
+        "approve": "Aprobar",
+        "payWithStripe": "Pagar {amount} con Stripe",
+        "markPaid": "Marcar como pagado"
+      },
+      "stepper": {
+        "request": "Solicitud",
+        "approved": "Aprobado",
+        "sent": "Enviado",
+        "rejected": "Rechazado",
+        "awaitingApproval": "Esperando aprobación",
+        "readyToSend": "Listo para enviar",
+        "complete": "Completado",
+        "teacherPayout": "Pago al profesor",
+        "requestFrom": "Solicitud de {name}",
+        "payoutRequest": "Solicitud de pago"
+      },
+      "requestCard": {
+        "title": "Solicitar un pago",
+        "subtitle": "Tú eliges cuándo cobrar: cada solicitud se revisa individualmente.",
+        "approvedWaiting": "Aprobado · esperando envío",
+        "waitingApproval": "Esperando aprobación",
+        "available": "Disponible para solicitar: {amount} ({count, plural, one {# clase} other {# clases}}). Mínimo: {min}.",
+        "afterRequest": "Después de solicitar un pago, la academia lo revisa y envía el dinero {method}, y tu banco puede tardar hasta {window} en mostrarlo. Te enviamos un correo cuando se aprueba y cuando se envía.",
+        "methodStripe": "(por Stripe o transferencia internacional)",
+        "methodTransfer": "por transferencia internacional",
+        "pendingRequest": "Tu solicitud de {amount} se envió el {date}.",
+        "approvedSoon": " Aprobado: el pago se enviará pronto. Permite hasta {window} después del envío.",
+        "waitingEmail": " Esperando aprobación: recibirás un correo en cada paso.",
+        "finishStripe": "Termina la configuración de Stripe abajo antes de solicitar un pago.",
+        "stripeNotSet": "Stripe aún no está configurado: puedes solicitar un pago de todos modos; la academia puede pagarte por transferencia internacional.",
+        "payoutsPaused": "Los pagos están pausados: contacta con la academia.",
+        "keepTeaching": "Sigue impartiendo clases: puedes solicitar un pago cuando las ganancias pendientes lleguen a {amount}.",
+        "requestButton": "Solicitar pago · {amount}"
+      },
+      "stripeCard": {
+        "title": "Cobra con Stripe",
+        "subtitle": "Los pagos llegan a tu cuenta de Stripe y después a tu banco.",
+        "ready": "Listo para pagos",
+        "setupNotFinished": "Configuración sin terminar",
+        "notConnected": "Sin conectar",
+        "description": "Stripe solicita tus datos de identidad y bancarios; la academia nunca los ve. Solo lo haces una vez.",
+        "testMode": "Modo de prueba: usa los datos de prueba de Stripe (por ejemplo, la cuenta bancaria de prueba y el código de verificación «000-000»). No se mueve dinero real.",
+        "openDashboard": "Abrir mi panel de Stripe",
+        "finishSetup": "Terminar configuración de Stripe",
+        "connect": "Conectar Stripe"
+      },
+      "rates": {
+        "title": "Tarifas de pago a profesores",
+        "subtitle": "Participación de ingresos por clase impartida: los profesores conservan el resto tras la parte de la plataforma.",
+        "admin": "Administración",
+        "finance": "Finanzas",
+        "revenueShare": "Participación de ingresos",
+        "revenueSubtitle": "La tarifa es un % del valor de compra del crédito cuando se reserva la clase.",
+        "trialPayout": "Pago de prueba / demo",
+        "trialHelp": "% de la participación normal del profesor cuando no se usa un crédito de estudiante.",
+        "trialReference25": "Referencia de prueba (25′)",
+        "trialReference25Help": "Valor de crédito supuesto para el cálculo de prueba cuando no hay pago.",
+        "trialReference50": "Referencia de prueba (50′)",
+        "example": "Ejemplo: un crédito de {credit} en nivel 1 ({take}% para la plataforma) paga al profesor {pay}.",
+        "saveRates": "Guardar tarifas",
+        "platformTakeByLevel": "Parte de la plataforma por nivel",
+        "platformTakeSubtitle": "Una parte menor recompensa a los profesores consolidados (el valor del crédito del estudiante no cambia).",
+        "level": "Nivel",
+        "needs": "Requisitos",
+        "platformTake": "Parte de la plataforma",
+        "teacherOnCredit": "Profesor con {credit}",
+        "teachers": "Profesores",
+        "needsLevel": "{classes}+ clases, {rating}★ en {ratings}+ valoraciones",
+        "pairedNote": "Las clases pareadas usan el valor de crédito del paquete pareado (un crédito del fondo compartido)."
+      }
+    },
+    "join": {
+      "missingToken": "Falta el token de invitación. Abre el enlace desde tu bandeja de Spanglish (Correo en la app).",
+      "notFound": "No se encontró esta invitación.",
+      "closed": "Esta invitación ya no está abierta (caducó, se revocó o ya se aceptó).",
+      "title": "Invitación de gerente",
+      "signInSubtitle": "Invitación para {email}",
+      "signInTitle": "Inicia sesión para continuar",
+      "signInHelp": "Crea una cuenta o inicia sesión con {email} y vuelve aquí para enviar tu experiencia y aceptar el rol.",
+      "signIn": "Iniciar sesión",
+      "acceptSubtitle": "Envía tu experiencia y acepta el acceso de operaciones",
+      "onboardingTitle": "Registro de gerente de operaciones"
+    },
+    "applications": {
+      "title": "Solicitudes de profesor",
+      "subtitle": "Invita a candidatos desde el Correo de la app y revisa aquí su solicitud.",
+      "applications": "Solicitudes",
+      "invitations": "Invitaciones de profesor",
+      "invitationsSubtitle": "Las invitaciones abiertas caducan a los 14 días: el mensaje incluye un enlace /apply.",
+      "inviteToApply": "Invitar a postular",
+      "inviteByEmail": "Invitar a profesor por correo",
+      "promoteVerified": "Ascender estudiante verificado a profesor",
+      "promoteUser": "Ascender usuario a profesor",
+      "noInvitations": "No hay invitaciones pendientes. Usa el icono de correo para invitar a alguien a postular como profesor.",
+      "sentExpires": "Enviada el {sent} · caduca el {expires}",
+      "revoke": "Revocar",
+      "waitingForReview": "Esperando revisión ({count})",
+      "history": "Historial",
+      "openApplications": "Solicitudes abiertas",
+      "reviewedApplications": "Solicitudes revisadas",
+      "filtered": "Filtrado: {track}",
+      "track": "Modalidad",
+      "allTracks": "Todas las modalidades",
+      "applicant": "Solicitante",
+      "languages": "Idiomas",
+      "headline": "Titular",
+      "applied": "Enviada",
+      "noMatches": "No hay solicitudes que coincidan con esta vista.",
+      "yearsTeaching": "{count} año{plural} impartiendo",
+      "onlineExperience": "Experiencia en línea",
+      "appliedOn": "Enviada el {date}",
+      "fluencyNote": "Nota de fluidez",
+      "experience": "Experiencia",
+      "watchVideo": "Ver vídeo de presentación",
+      "noVideo": "Sin enlace de vídeo: obligatorio para la modalidad de conversación.",
+      "credentials": "Credenciales",
+      "view": "Ver",
+      "reviewerNote": "Nota del revisor",
+      "noteToApplicant": "Nota para el solicitante (opcional)",
+      "close": "Cerrar",
+      "reject": "Rechazar",
+      "approve": "Aprobar",
+      "promoteTitle": "Ascender a profesor",
+      "promoteHelp": "Omite el formulario de solicitud. La cuenta debe ser un estudiante verificado sin clases próximas como estudiante.",
+      "accountEmail": "Correo de la cuenta",
+      "promote": "Ascender",
+      "inviteTitle": "Invitar a postular como profesor",
+      "inviteHelp": "Si ya tienen una cuenta de estudiante, la invitación llega al Correo de Spanglish con un enlace a /apply.",
+      "noteToInvitee": "Nota para el invitado (opcional)",
+      "sendInvitation": "Enviar invitación",
+      "contactTopic": "solicitud de profesor",
+      "emailSubject": "Sobre tu solicitud de profesor",
+      "emailBody": "Hola {name}:\n\nTe escribo sobre tu solicitud de profesor. Si tienes alguna pregunta, házmelo saber.\n\nSaludos,\n{fromName}",
+      "contactApplicant": "Contactar al solicitante",
+      "contactApplicantNamed": "Enviar correo a {name}",
+      "reviewApplicant": "Revisar la solicitud de {name}",
+      "language": {
+        "english": "Inglés",
+        "spanish": "Español"
+      }
+    },
+    "teachingActions": {
+      "windowInvalid": "Cada franja necesita una hora de inicio anterior a la de fin y al menos 25 minutos.",
+      "windowOverlap": "Dos franjas del mismo día se superponen. Combínalas o muévelas.",
+      "onlyTeachersAvailability": "Solo los profesores pueden editar su disponibilidad.",
+      "tooManyWindows": "Demasiadas franjas de disponibilidad (máximo 70).",
+      "availabilitySaved": "Disponibilidad guardada.",
+      "onlyTeachersProfile": "Solo los profesores pueden editar su perfil docente.",
+      "profileSaved": "Perfil docente guardado.",
+      "signInStudentToApply": "Inicia sesión como estudiante para postular.",
+      "signInManageApplication": "Inicia sesión para gestionar tu solicitud.",
+      "applicationWithdrawn": "Solicitud retirada.",
+      "noOpenApplication": "No hay ninguna solicitud abierta que retirar.",
+      "onlyManagersReview": "Solo los gestores pueden revisar solicitudes.",
+      "onlyManagersInvite": "Solo los gestores pueden invitar solicitantes.",
+      "onlyManagersRevoke": "Solo los gestores pueden revocar invitaciones.",
+      "onlyAdminPromote": "Solo un administrador puede ascender cuentas."
+    },
+    "application": {
+      "tracks": {
+        "conversation": {
+          "label": "Conversación y práctica",
+          "description": "Clases de conversación en vivo. Se requiere una muestra en vídeo; las credenciales docentes formales son opcionales."
+        },
+        "certified": {
+          "label": "Enseñanza certificada / estructurada",
+          "description": "Preparación de exámenes, clases centradas en gramática o estilo escolar. Se requiere al menos una credencial."
+        }
+      },
+      "fluency": {
+        "native": "Hablante nativo",
+        "c2": "C2 / casi nativo",
+        "other": "Otro (explica abajo)"
+      },
+      "credentials": {
+        "celta": "CELTA / TEFL",
+        "dele": "DELE / diploma de idioma",
+        "degree": "Título universitario (educación o idioma)",
+        "license": "Licencia docente",
+        "other": "Otro certificado"
+      }
+    },
+    "staff": {
+      "student": {
+        "level": {
+          "beginner": "Principiante",
+          "intermediate": "Intermedio",
+          "advanced": "Avanzado"
+        },
+        "goal": {
+          "travel": "Conversaciones de viaje",
+          "business": "Presentaciones profesionales",
+          "everyday": "Conversación cotidiana",
+          "interview": "Preparación de entrevistas"
+        }
+      },
+      "teacherStudents": {
+        "nextClass": "Próxima clase: {date}",
+        "shareMaterial": "Compartir material",
+        "learningGoal": "Objetivo de aprendizaje",
+        "courseProgress": "Progreso del curso",
+        "personalMaterials": "{count, plural, one {# material personal} other {# materiales personales}}",
+        "rosterActive": "Activo en la lista",
+        "message": "Mensaje"
+      }
+    }
+  }
+}

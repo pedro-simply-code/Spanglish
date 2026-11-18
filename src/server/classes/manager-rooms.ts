@@ -1,8 +1,10 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { connection } from "next/server";
 import { classRoomHref } from "@/features/classes/data";
 import { formatClassDateTime, formatClassTime, formatClassTimeRange } from "@/features/classes/format";
 import { getClassStatus, getJoinState } from "@/features/classes/policy";
 import type { ManagerClassroomRow } from "@/features/management/data";
+import { isAppLocale, type AppLocale } from "@/i18n/config";
 import { classTypeLabel } from "@/lib/class-type-label";
 import { appNow, appNowDate } from "@/lib/app-clock";
 import { classTimeZone } from "@/lib/class-policy";
@@ -45,10 +47,16 @@ function dayBoundsUtc(dayKey: string): { from: Date; to: Date } {
 /** All classes on an academy calendar day (America/New_York), with roster and live flags. */
 export async function listManagerClassroomsForDay(dayKey: string): Promise<ManagerClassroomRow[]> {
   await connection();
+  const [studentT, classroomT, rawLocale] = await Promise.all([
+    getTranslations("student"),
+    getTranslations("classroom"),
+    getLocale(),
+  ]);
+  const locale: AppLocale = isAppLocale(rawLocale) ? rawLocale : "en";
   const bounds = dayBoundsUtc(dayKey);
   const policy = getClassPolicy();
   const classes = await listClassesOverlapping({ ...bounds, limit: 200 });
-  const provider = getMeetingProviderLabel();
+  const provider = getMeetingProviderLabel((key) => classroomT(key as "meeting.customProvider"));
   const nowIso = appNow();
   const teacherStartsRequired = env.CLASS_TEACHER_STARTS_SESSION;
   const activeLiveIds = teacherStartsRequired
@@ -59,18 +67,18 @@ export async function listManagerClassroomsForDay(dayKey: string): Promise<Manag
 
   for (const item of classes) {
     const sessionStatus = getClassStatus(item, nowIso);
-    const join = getJoinState(item, nowIso, policy);
+    const join = getJoinState(item, nowIso, policy, studentT);
     const teacherSessionActive = activeLiveIds.has(item.id);
     const isLive = isClassBroadcastLiveSync(sessionStatus, teacherStartsRequired, teacherSessionActive);
     rows.push({
       id: item.id,
       topic: item.topic,
       classType: item.type,
-      classTypeLabel: classTypeLabel(item.type),
+      classTypeLabel: classTypeLabel(item.type, studentT),
       startsAt: item.startsAt,
-      timeLabel: formatClassTime(item.startsAt),
-      scheduleLabel: formatClassDateTime(item.startsAt),
-      timeRangeLabel: formatClassTimeRange(item),
+      timeLabel: formatClassTime(item.startsAt, locale),
+      scheduleLabel: formatClassDateTime(item.startsAt, locale, studentT),
+      timeRangeLabel: formatClassTimeRange(item, locale),
       durationMinutes: item.duration,
       teacherName: item.teacherName,
       students: (item.participants ?? []).map((participant) => ({

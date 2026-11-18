@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -29,6 +30,7 @@ export async function startStripeCheckout(
   pkg: PackageForSale,
   pairId: string | null,
 ): Promise<{ orderId: string; url: string }> {
+  const t = await getTranslations("ops.payments");
   const orderId = randomUUID();
   await db.insert(orders).values({
     id: orderId,
@@ -65,7 +67,11 @@ export async function startStripeCheckout(
               unit_amount: pkg.totalCents,
               product_data: {
                 name: pkg.name,
-                description: `${pkg.credits} ${pkg.durationMinutes}-minute ${pkg.classType === "paired" ? "paired" : "individual"} class credits`,
+                description: t("checkoutProductDescription", {
+                  credits: pkg.credits,
+                  minutes: pkg.durationMinutes,
+                  kind: t(pkg.classType === "paired" ? "kindPaired" : "kindIndividual"),
+                }),
               },
             },
           },
@@ -94,7 +100,7 @@ export async function startStripeCheckout(
     .update(orders)
     .set({ providerRef: session.id })
     .where(eq(orders.id, orderId));
-  if (!session.url) throw new Error("Stripe did not return a checkout URL.");
+  if (!session.url) throw new Error(t("stripeNoUrl"));
   return { orderId, url: session.url };
 }
 
@@ -111,6 +117,7 @@ export async function fulfillStripeOrder(input: {
   amountTotal: number | null | undefined;
   paymentIntentId?: string | null;
 }): Promise<FulfillResult> {
+  const t = await getTranslations("ops.payments");
   if (!input.orderId) return { status: "not-found" };
   const [order] = await db
     .select()
@@ -173,7 +180,7 @@ export async function fulfillStripeOrder(input: {
       RETURNING id, balance
     ), entry AS (
       INSERT INTO credit_transactions (id, account_id, delta, reason, order_id, actor_user_id, note)
-      SELECT ${randomUUID()}, account.id, paid.credits, 'purchase', paid.id, paid.buyer_user_id, 'Stripe payment'
+      SELECT ${randomUUID()}, account.id, paid.credits, 'purchase', paid.id, paid.buyer_user_id, ${t("stripePaymentNote")}
       FROM account, paid
       RETURNING id
     )

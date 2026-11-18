@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { appNowDate } from "@/lib/app-clock";
@@ -8,10 +9,10 @@ import { getTeacherTimeZone, listAvailability } from "@/server/classes/availabil
 import { listClassesForTeacher } from "@/server/classes/class-repository";
 import { getTeacherProfile } from "@/server/classes/teachers";
 
-export const metadata: Metadata = {
-  title: "Availability",
-  description: "Manage bookable teaching times",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.availability");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function TeacherAvailabilityPage() {
   return (

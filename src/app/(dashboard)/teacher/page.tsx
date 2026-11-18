@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { loadClassesForActor } from "@/features/classes";
@@ -8,11 +9,15 @@ import { getProfileCompletion } from "@/server/auth/profile-completion";
 import { appNow } from "@/lib/app-clock";
 import { requireDashboard } from "@/server/auth/session";
 import { getTeacherDashboardExtras } from "@/server/teaching/dashboards";
+import {
+  localizedTeacherBadgeList,
+  localizedTeacherLevelNameByName,
+} from "@/lib/teacher-levels";
 
-export const metadata: Metadata = {
-  title: "Teacher dashboard",
-  description: "Manage your live classes and students",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.teacherDashboard");
+  return { title: t("title"), description: t("description") };
+}
 
 export default function TeacherDashboardPage() {
   return (
@@ -23,6 +28,7 @@ export default function TeacherDashboardPage() {
 }
 
 async function TeacherDashboardContent() {
+  const t = await getTranslations("educator");
   const actor = await requireDashboard("teacher");
 
   const [ownClasses, completion, extras] = await Promise.all([
@@ -31,6 +37,18 @@ async function TeacherDashboardContent() {
     getTeacherDashboardExtras(actor.userId),
   ]);
 
+  const localizedExtras = {
+    ...extras,
+    levelName: localizedTeacherLevelNameByName(extras.levelName, t),
+    nextLevel: extras.nextLevel
+      ? {
+          ...extras.nextLevel,
+          name: localizedTeacherLevelNameByName(extras.nextLevel.name, t),
+        }
+      : null,
+    badges: localizedTeacherBadgeList(extras.badges, t),
+  };
+
   return (
     <>
       <ProfileCompletionCard completion={completion} />
@@ -38,7 +56,7 @@ async function TeacherDashboardContent() {
         firstName={actor.name.split(" ")[0] || actor.name}
         ownClasses={ownClasses}
         now={appNow()}
-        extras={extras}
+        extras={localizedExtras}
       />
     </>
   );

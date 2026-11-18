@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { requireDashboard } from "@/server/auth/session";
 
 /**
@@ -18,6 +19,7 @@ export default function TeacherLayout({
 }
 
 async function TeacherGuard({ children }: { children: React.ReactNode }) {
+  await connection();
   await requireDashboard("teacher");
   return children;
 }

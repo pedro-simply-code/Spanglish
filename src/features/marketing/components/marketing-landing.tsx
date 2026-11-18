@@ -13,6 +13,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   IconCalendarEvent,
   IconClock,
@@ -27,14 +28,14 @@ import {
 import { MarketingBlankCard } from "@/components/ui/marketing-blank-card";
 import { LinkButton } from "@/components/ui/link-button";
 import {
-  marketingAcademyHours,
-  marketingAcademyTimezoneLabel,
-  marketingAcademyTimezoneShort,
-  marketingHeroImageAlt,
+  getMarketingAcademyHours,
+  getMarketingAcademyTimezoneLabel,
+  getMarketingAcademyTimezoneShort,
+  getMarketingHeroImageAlt,
+  getMarketingPillars,
+  getMarketingTestimonials,
+  getMarketingTracks,
   marketingHeroImageSrc,
-  marketingPillars,
-  marketingTestimonials,
-  marketingTracks,
   type MarketingLandingSnapshot,
   type MarketingTrack,
 } from "@/features/marketing/data";
@@ -53,7 +54,7 @@ const pillarIcons = [
   <IconShieldCheck key="sec" size={40} strokeWidth={1.5} />,
 ];
 
-function HeroVisual() {
+function HeroVisual({ alt }: { alt: string }) {
   return (
     <Box
       sx={{
@@ -72,7 +73,7 @@ function HeroVisual() {
       <Image
         key={marketingHeroImageSrc}
         src={marketingHeroImageSrc}
-        alt={marketingHeroImageAlt}
+        alt={alt}
         fill
         priority
         sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 520px"
@@ -83,6 +84,8 @@ function HeroVisual() {
 }
 
 function TrackPanel({ track }: { track: MarketingTrack }) {
+  const t = useTranslations("marketing");
+
   return (
     <Box sx={{ pt: 3 }}>
       <Grid container spacing={3} alignItems="center">
@@ -91,7 +94,11 @@ function TrackPanel({ track }: { track: MarketingTrack }) {
             {track.title}
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
-            <Chip size="small" label={`Sessions: ${track.sessionLength}`} variant="outlined" />
+            <Chip
+              size="small"
+              label={t("landing.programs.sessionsChip", { length: track.sessionLength })}
+              variant="outlined"
+            />
             <Chip size="small" label={track.audience} variant="outlined" />
           </Stack>
           <Typography variant="body1" color="text.secondary" lineHeight={1.75}>
@@ -100,15 +107,15 @@ function TrackPanel({ track }: { track: MarketingTrack }) {
           {track.id === "teachers" ? (
             <Stack direction="row" spacing={1} sx={{ mt: 3 }} flexWrap="wrap" useFlexGap>
               <LinkButton href="/register" variant="contained" sx={ctaSx}>
-                Create account
+                {t("common.createAccount")}
               </LinkButton>
               <LinkButton href="/login?next=%2Fapply" variant="outlined" sx={ctaSx}>
-                Apply as a teacher
+                {t("landing.programs.teacherCta")}
               </LinkButton>
             </Stack>
           ) : (
             <LinkButton href="/register" variant="contained" sx={{ mt: 3, ...ctaSx }}>
-              Start with a free account
+              {t("landing.programs.learnerCta")}
             </LinkButton>
           )}
         </Grid>
@@ -116,20 +123,20 @@ function TrackPanel({ track }: { track: MarketingTrack }) {
           <MarketingBlankCard>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="overline" color="text.secondary">
-                You can expect
+                {t("landing.programs.expectTitle")}
               </Typography>
               <Stack spacing={1.5} sx={{ mt: 1 }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <IconVideo size={18} />
-                  <Typography variant="body2">Live video classroom every session</Typography>
+                  <Typography variant="body2">{t("landing.programs.expectLive")}</Typography>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <IconCalendarEvent size={18} />
-                  <Typography variant="body2">Book around your week</Typography>
+                  <Typography variant="body2">{t("landing.programs.expectSchedule")}</Typography>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <IconHeadset size={18} />
-                  <Typography variant="body2">Recordings when available</Typography>
+                  <Typography variant="body2">{t("landing.programs.expectRecordings")}</Typography>
                 </Stack>
               </Stack>
             </CardContent>
@@ -147,10 +154,18 @@ const testimonialAvatars = [
 ] as const;
 
 export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnapshot }) {
-  const [trackId, setTrackId] = useState(marketingTracks[0]!.id);
+  const t = useTranslations("marketing");
+  const tracks = getMarketingTracks(t);
+  const pillars = getMarketingPillars(t);
+  const testimonials = getMarketingTestimonials(t);
+  const academyHours = getMarketingAcademyHours(t);
+  const timezoneLabel = getMarketingAcademyTimezoneLabel(t);
+  const timezoneShort = getMarketingAcademyTimezoneShort(t);
+  const heroImageAlt = getMarketingHeroImageAlt(t);
+  const [trackId, setTrackId] = useState(tracks[0]!.id);
   const track = useMemo(
-    () => marketingTracks.find((item) => item.id === trackId) ?? marketingTracks[0]!,
-    [trackId],
+    () => tracks.find((item) => item.id === trackId) ?? tracks[0]!,
+    [tracks, trackId],
   );
 
   useEffect(() => {
@@ -170,7 +185,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                 <Box component="span" color="secondary.main" display="flex">
                   <IconRocket size={21} />
                 </Box>
-                Spanish with native teachers from Guatemala
+                {t("landing.hero.eyebrow")}
               </Typography>
               <Typography
                 variant="h1"
@@ -180,27 +195,28 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                   lineHeight: { xs: 1.15, md: 1.1 },
                 }}
               >
-                Learn{" "}
-                <Typography component="span" variant="inherit" color="primary">
-                  Spanish
-                </Typography>{" "}
-                live with Guatemalan natives
+                {t.rich("landing.hero.title", {
+                  highlight: (chunks) => (
+                    <Typography component="span" variant="inherit" color="primary">
+                      {chunks}
+                    </Typography>
+                  ),
+                })}
               </Typography>
               <Typography variant="h5" fontWeight={300} color="text.secondary" sx={{ mt: 2, maxWidth: 520 }}>
-                100% Spanish classes — individual or paired sessions, classroom recordings, and
-                materials that follow what you practice with your teacher.
+                {t("landing.hero.subtitle")}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 3 }}>
-                <Chip icon={<IconVideo size={16} />} label="Live classes" variant="outlined" />
-                <Chip icon={<IconUsers size={16} />} label="Native · Guatemala" variant="outlined" />
-                <Chip icon={<IconLanguage size={16} />} label="Spanish only" variant="outlined" />
+                <Chip icon={<IconVideo size={16} />} label={t("landing.hero.chipLive")} variant="outlined" />
+                <Chip icon={<IconUsers size={16} />} label={t("landing.hero.chipNative")} variant="outlined" />
+                <Chip icon={<IconLanguage size={16} />} label={t("landing.hero.chipSpanishOnly")} variant="outlined" />
               </Stack>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={4}>
                 <LinkButton href="/register" variant="contained" color="primary" sx={ctaSx}>
-                  Create free account
+                  {t("landing.hero.primaryCta")}
                 </LinkButton>
                 <LinkButton href="/#packages" variant="outlined" color="secondary" sx={ctaSx}>
-                  View pricing
+                  {t("common.viewPricing")}
                 </LinkButton>
               </Stack>
             </Grid>
@@ -213,7 +229,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                 mt: { xs: 2, lg: 0 },
               }}
             >
-              <HeroVisual />
+              <HeroVisual alt={heroImageAlt} />
             </Grid>
           </Grid>
         </Container>
@@ -222,11 +238,11 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
       <Box id="testimonials" sx={{ pt: { xs: 6, lg: 10 }, pb: { xs: 8, lg: 11 } }}>
         <Container maxWidth="lg">
           <MarketingSectionTitle
-            eyebrow="Learner stories"
-            title="Do not take our word for it — hear from students and teachers"
+            eyebrow={t("landing.testimonials.eyebrow")}
+            title={t("landing.testimonials.title")}
           />
           <Grid container spacing={3} sx={{ mt: 5 }}>
-            {marketingTestimonials.map((item, index) => (
+            {testimonials.map((item, index) => (
               <Grid key={item.name} size={{ xs: 12, md: 4 }}>
                 <MarketingBlankCard sx={{ height: "100%" }}>
                   <CardContent sx={{ p: 3, height: "100%" }}>
@@ -260,9 +276,9 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
       >
         <Container maxWidth="lg">
           <MarketingSectionTitle
-            eyebrow="Programs"
-            title="Spanish programs for your level and goals"
-            subtitle="Immersion tracks with native Guatemalan teachers — conversation, beginners, or paired learning."
+            eyebrow={t("landing.programs.eyebrow")}
+            title={t("landing.programs.title")}
+            subtitle={t("landing.programs.subtitle")}
           />
           <Tabs
             value={trackId}
@@ -272,7 +288,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
             allowScrollButtonsMobile
             sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}
           >
-            {marketingTracks.map((item) => (
+            {tracks.map((item) => (
               <Tab key={item.id} value={item.id} label={item.title} />
             ))}
           </Tabs>
@@ -283,12 +299,12 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
       <Box id="features" py={{ xs: 8, lg: 10 }}>
         <Container maxWidth="lg">
           <MarketingSectionTitle
-            eyebrow="Why Spanglish"
-            title="Everything you need for Spanish fluency"
-            subtitle="Native-led live classes and the same tools students use inside the academy dashboard."
+            eyebrow={t("landing.features.eyebrow")}
+            title={t("landing.features.title")}
+            subtitle={t("landing.features.subtitle")}
           />
           <Grid container spacing={3} sx={{ mt: 6 }}>
-            {marketingPillars.map((pillar, index) => (
+            {pillars.map((pillar, index) => (
               <Grid key={pillar.title} size={{ xs: 12, sm: 6, lg: 4 }} textAlign="center">
                 <Box color="primary.main">{pillarIcons[index] ?? pillarIcons[0]}</Box>
                 <Typography variant="h5" mt={2}>
@@ -319,15 +335,14 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
               <Grid container spacing={{ xs: 3, md: 0 }} alignItems="stretch">
                 <Grid size={{ xs: 12, md: 7 }}>
                   <Typography variant="h4" fontWeight={700}>
-                    Need help choosing a program?
+                    {t("landing.help.title")}
                   </Typography>
                   <Typography variant="body1" color="text.secondary" mt={1.5} lineHeight={1.75} maxWidth={480}>
-                    Create a free account, compare packages, and book live classes when you are ready. No credit
-                    card required to sign up.
+                    {t("landing.help.description")}
                   </Typography>
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} mt={3} useFlexGap>
                     <LinkButton href="/register" variant="contained" sx={ctaSx}>
-                      Create free account
+                      {t("landing.hero.primaryCta")}
                     </LinkButton>
                     <LinkButton
                       href="/#packages"
@@ -335,11 +350,11 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                       color="secondary"
                       sx={{ bgcolor: "background.paper", ...ctaSx }}
                     >
-                      View pricing
+                      {t("common.viewPricing")}
                     </LinkButton>
                   </Stack>
                   <Typography variant="caption" color="text.secondary" display="block" mt={2}>
-                    Teachers operate on {marketingAcademyTimezoneLabel} — times below are local to Guatemala.
+                    {t("landing.help.timezoneNote", { timezone: timezoneLabel })}
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 12, md: 5 }}>
@@ -377,10 +392,10 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                       </Box>
                       <Box>
                         <Typography variant="h6" fontWeight={700}>
-                          Academy hours
+                          {t("landing.help.hoursTitle")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {marketingAcademyTimezoneShort}
+                          {timezoneShort}
                         </Typography>
                       </Box>
                     </Stack>
@@ -389,7 +404,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                       spacing={1.25}
                       sx={{ m: 0, p: 0, listStyle: "none" }}
                     >
-                      {marketingAcademyHours.map((row) => (
+                      {academyHours.map((row) => (
                         <Stack
                           key={row.days}
                           component="li"
@@ -403,7 +418,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                           </Typography>
                           <Typography
                             variant="body2"
-                            color={row.hours === "Closed" ? "text.disabled" : "text.secondary"}
+                            color={row.closed ? "text.disabled" : "text.secondary"}
                             component="span"
                             textAlign="right"
                           >
@@ -425,7 +440,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
           <Grid container spacing={3} alignItems="center" justifyContent="space-between">
             <Grid size={{ xs: 12, lg: 6 }}>
               <Typography variant="h2" color="background.paper" fontWeight={700} sx={{ fontSize: { xs: "1.75rem", lg: "2.25rem" } }}>
-                Learn Spanish with live native teachers from Guatemala
+                {t("landing.finalCta.title")}
               </Typography>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={3}>
                 <LinkButton
@@ -434,7 +449,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                   color="inherit"
                   sx={{ bgcolor: "background.paper", color: "primary.main", "&:hover": { bgcolor: "grey.100" }, ...ctaSx }}
                 >
-                  Register
+                  {t("common.register")}
                 </LinkButton>
                 <LinkButton
                   href="/login"
@@ -446,7 +461,7 @@ export function MarketingLanding({ snapshot }: { snapshot: MarketingLandingSnaps
                     ...ctaSx,
                   }}
                 >
-                  Sign in
+                  {t("common.signIn")}
                 </LinkButton>
               </Stack>
             </Grid>

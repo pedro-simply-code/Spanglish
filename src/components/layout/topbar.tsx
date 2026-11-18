@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import { IconMenu2 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { DashboardSwitcher } from "@/components/layout/topbar/dashboard-switcher";
 import { LanguageMenu } from "@/components/layout/topbar/language-menu";
 import { Navigation } from "@/components/layout/topbar/navigation";
@@ -30,6 +31,8 @@ export function Topbar({
   unreadInboxCount,
   onMenuClick,
 }: TopbarProps) {
+  const t = useTranslations("shell");
+
   return (
     <Box
       component="header"
@@ -46,7 +49,7 @@ export function Topbar({
       <Toolbar sx={{ minHeight: { xs: 70 }, px: { xs: 2, sm: 3 }, gap: { xs: 1, sm: 1.5 } }}>
         <IconButton
           color="inherit"
-          aria-label="Toggle sidebar"
+          aria-label={t("topbar.toggleSidebar")}
           onClick={onMenuClick}
           edge="start"
         >

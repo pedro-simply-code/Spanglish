@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { AuthShell, RegisterForm } from "@/features/auth";
 import { googleSignInEnabled } from "@/server/auth/auth";
 
-export const metadata: Metadata = {
-  title: "Create account",
-  description: "Create your Spanglish account",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("registerTitle"),
+    description: t("registerDescription"),
+  };
+}
 
 export default function RegisterPage() {
   return (

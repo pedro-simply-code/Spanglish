@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { decideClassChange, type LiveClass } from "@/features/classes";
+import { isAppLocale } from "@/i18n/config";
 import type { AuthSession } from "@/lib/auth-types";
 import { hasRole, normalizeRoles } from "@/lib/auth-roles";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -106,24 +108,25 @@ export async function bookTrialClass(
   actor: AuthSession,
   input: { teacherId: string; startsAt: string; durationMinutes: 25 | 50; topic: string },
 ): Promise<BookingResult> {
+  const t = await getTranslations("ops.booking");
   if (!hasRole(actor.roles, "student")) {
-    return fail("NOT_STUDENT", "Students only", "Only students can book a trial lesson.");
+    return fail("NOT_STUDENT", t("notStudentTitle"), t("notStudentMessage"));
   }
   if (!(await studentTrialLessonAvailable(actor.userId))) {
-    return fail("TRIAL_USED", "Trial already used", "You already used your free trial lesson.");
+    return fail("TRIAL_USED", t("trialUsedTitle"), t("trialUsedMessage"));
   }
   if (input.durationMinutes !== 25 && input.durationMinutes !== 50) {
-    return fail("INVALID_DURATION", "Pick a length", "Trial lessons are 25 or 50 minutes.");
+    return fail("INVALID_DURATION", t("invalidDurationTitle"), t("invalidDurationMessage"));
   }
 
   const teacher = await bookableTeacher(input.teacherId);
   if (!teacher) {
-    return fail("TEACHER_NOT_FOUND", "Teacher not available", "Pick another teacher.");
+    return fail("TEACHER_NOT_FOUND", t("teacherNotFoundTitle"), t("teacherNotFoundMessage"));
   }
 
   const topic = input.topic.trim().slice(0, 140);
   if (topic.length < 3) {
-    return fail("TOPIC_TOO_SHORT", "Add a focus", "Describe what you want to practice (3+ characters).");
+    return fail("TOPIC_TOO_SHORT", t("topicTooShortTitle"), t("topicTooShortMessage"));
   }
 
   const startsAt = new Date(input.startsAt);
@@ -136,14 +139,14 @@ export async function bookTrialClass(
       studentIds: [actor.userId],
     }))
   ) {
-    return fail("SLOT_UNAVAILABLE", "Choose another time", "That time is no longer free.");
+    return fail("SLOT_UNAVAILABLE", t("slotUnavailableTitle"), t("slotUnavailableMessage"));
   }
 
   const endsAt = new Date(startsAt.getTime() + input.durationMinutes * 60_000);
   const sessionId = randomUUID();
-  const description = `${input.durationMinutes}-minute trial lesson with ${teacher.name}.`;
-  const agenda = JSON.stringify(["Goals for your trial", "Guided practice", "What to do next"]);
-  const outcomes = JSON.stringify(["Meet your teacher", "See if the academy fits your goals"]);
+  const description = t("trialDescription", { minutes: input.durationMinutes, teacher: teacher.name });
+  const agenda = JSON.stringify([t("trialAgenda1"), t("trialAgenda2"), t("trialAgenda3")]);
+  const outcomes = JSON.stringify([t("trialOutcome1"), t("trialOutcome2")]);
 
   try {
     await db.insert(classSessions).values({
@@ -164,7 +167,7 @@ export async function bookTrialClass(
     await db.insert(classParticipants).values({ sessionId, userId: actor.userId });
   } catch (error) {
     if (isExclusionViolation(error, TEACHER_OVERLAP)) {
-      return fail("SLOT_TAKEN", "Just taken", "Someone booked that time a moment ago. Pick another.");
+      return fail("SLOT_TAKEN", t("slotTakenTitle"), t("slotTakenMessage"));
     }
     throw error;
   }
@@ -188,8 +191,8 @@ export async function bookTrialClass(
   });
   return {
     ok: true,
-    title: "Trial booked",
-    message: "Your free trial is on the calendar. No credit was used.",
+    title: t("trialBookedTitle"),
+    message: t("trialBookedMessage"),
     liveClass: liveClass!,
   };
 }
@@ -198,19 +201,20 @@ export async function bookClass(
   actor: AuthSession,
   input: { teacherId: string; startsAt: string; kind: ClassKind; topic: string },
 ): Promise<BookingResult> {
+  const t = await getTranslations("ops.booking");
   const teacher = await bookableTeacher(input.teacherId);
   if (!teacher) {
-    return fail("TEACHER_NOT_FOUND", "Teacher not available", "Pick another teacher.");
+    return fail("TEACHER_NOT_FOUND", t("teacherNotFoundTitle"), t("teacherNotFoundMessage"));
   }
 
   const topic = input.topic.trim().slice(0, 140);
   if (topic.length < 3) {
-    return fail("TOPIC_TOO_SHORT", "Add a focus", "Describe what you want to practice (3+ characters).");
+    return fail("TOPIC_TOO_SHORT", t("topicTooShortTitle"), t("topicTooShortMessage"));
   }
 
   const pair = input.kind.classType === "paired" ? await getActivePairForUser(actor.userId) : null;
   if (input.kind.classType === "paired" && !pair) {
-    return fail("NOT_PAIRED", "No partner yet", "Paired classes need a partner. Ask the academy to pair you.");
+    return fail("NOT_PAIRED", t("notPairedTitle"), t("notPairedMessage"));
   }
 
   const studentIds = pair ? [actor.userId, pair.partnerId] : [actor.userId];
@@ -224,7 +228,7 @@ export async function bookClass(
       studentIds,
     }))
   ) {
-    return fail("SLOT_UNAVAILABLE", "Choose another time", "That time is no longer free.");
+    return fail("SLOT_UNAVAILABLE", t("slotUnavailableTitle"), t("slotUnavailableMessage"));
   }
 
   const holder = holderFor({ classType: input.kind.classType, userId: actor.userId, pairId: pair?.id })!;
@@ -232,10 +236,10 @@ export async function bookClass(
   const sessionId = randomUUID();
   const { referenceCreditValueCents } = await import("@/server/pricing/credit-value");
   const catalogFallbackCents = await referenceCreditValueCents(input.kind);
-  const label = input.kind.classType === "paired" ? "paired" : "individual";
-  const description = `${input.kind.durationMinutes}-minute ${label} class with ${teacher.name}.`;
-  const agenda = JSON.stringify(["Warm-up and goals", "Guided practice", "Feedback and next steps"]);
-  const outcomes = JSON.stringify(["Practice your focus topic with a teacher", "Leave with clear homework"]);
+  const label = t(input.kind.classType === "paired" ? "kindPaired" : "kindIndividual");
+  const description = t("classDescription", { minutes: input.kind.durationMinutes, kind: label, teacher: teacher.name });
+  const agenda = JSON.stringify([t("agenda1"), t("agenda2"), t("agenda3")]);
+  const outcomes = JSON.stringify([t("outcome1"), t("outcome2")]);
 
   let booked = 0;
   try {
@@ -283,13 +287,13 @@ export async function bookClass(
     booked = Number(rowsOf<{ booked: number }>(result)[0]?.booked ?? 0);
   } catch (error) {
     if (isExclusionViolation(error, TEACHER_OVERLAP)) {
-      return fail("SLOT_TAKEN", "Just taken", "Someone booked that time a moment ago. Pick another.");
+      return fail("SLOT_TAKEN", t("slotTakenTitle"), t("slotTakenMessage"));
     }
     throw error;
   }
 
   if (!booked) {
-    return fail("NO_CREDITS", "No credits left", `You have no ${input.kind.durationMinutes}-minute ${label} credits. Get a package first.`);
+    return fail("NO_CREDITS", t("noCreditsTitle"), t("noCreditsMessage", { minutes: input.kind.durationMinutes, kind: label }));
   }
 
   const liveClass = await getClassView(sessionId);
@@ -312,8 +316,8 @@ export async function bookClass(
 
   return {
     ok: true,
-    title: "Class booked",
-    message: `${topic} with ${teacher.name}. One credit was used.`,
+    title: t("classBookedTitle"),
+    message: t("classBookedMessage", { topic, teacher: teacher.name }),
     liveClass: liveClass!,
   };
 }
@@ -334,20 +338,29 @@ export async function cancelClass(
   actor: AuthSession,
   input: { classId: string; reason?: string },
 ): Promise<BookingResult> {
+  const t = await getTranslations("ops.booking");
   const access = await relationTo(actor, input.classId);
   const view = access ? await getClassView(input.classId) : null;
   if (!access || !view) {
-    return fail("CLASS_NOT_FOUND", "Class not found", "This class does not exist or is no longer available.");
+    return fail("CLASS_NOT_FOUND", t("classNotFoundTitle"), t("classNotFoundMessage"));
   }
   if (access.row.status !== "scheduled" || access.row.startsAt.getTime() <= Date.now()) {
-    return fail("CHANGE_NOT_ALLOWED", "Cancellation not available", "Only upcoming classes can be canceled.");
+    return fail("CHANGE_NOT_ALLOWED", t("cancelNotAvailableTitle"), t("cancelUpcomingOnly"));
   }
 
   // Students follow the cutoff; teachers and staff can cancel any upcoming class.
   if (access.relation === "participant") {
-    const decision = decideClassChange(view, "cancel", new Date().toISOString(), getClassPolicy());
+    const [tStudent, rawLocale] = await Promise.all([getTranslations("student"), getLocale()]);
+    const decision = decideClassChange(
+      view,
+      "cancel",
+      new Date().toISOString(),
+      getClassPolicy(),
+      tStudent,
+      isAppLocale(rawLocale) ? rawLocale : "en",
+    );
     if (!decision.allowed) {
-      return fail("CHANGE_NOT_ALLOWED", "Cancellation not available", decision.message);
+      return fail("CHANGE_NOT_ALLOWED", t("cancelNotAvailableTitle"), decision.message);
     }
   }
 
@@ -355,7 +368,7 @@ export async function cancelClass(
     access.relation === "participant" ? "student" : access.relation === "teacher" ? "teacher" : "staff";
   const reason =
     input.reason?.trim().slice(0, 500) ||
-    (by === "student" ? "Student canceled" : by === "teacher" ? "Teacher canceled" : "Canceled by the academy");
+    (by === "student" ? t("reasonStudent") : by === "teacher" ? t("reasonTeacher") : t("reasonStaff"));
   const cancellation: ClassCancellation = {
     by,
     byUserId: actor.userId,
@@ -388,7 +401,7 @@ export async function cancelClass(
     SELECT count(*)::int AS canceled FROM canceled
   `);
   if (!Number(rowsOf<{ canceled: number }>(result)[0]?.canceled ?? 0)) {
-    return fail("CHANGE_NOT_ALLOWED", "Cancellation not available", "This class was already canceled.");
+    return fail("CHANGE_NOT_ALLOWED", t("cancelNotAvailableTitle"), t("alreadyCanceled"));
   }
 
   await recordAuditEvent({
@@ -413,9 +426,9 @@ export async function cancelClass(
   const paired = access.participantIds.length > 1;
   return {
     ok: true,
-    title: "Class canceled",
-    message: `${access.row.topic} was canceled${paired ? " for both of you" : ""}. ${
-      cancellation.creditRefunded ? "The credit is back in the package." : ""
+    title: t("classCanceledTitle"),
+    message: `${t("canceledBase", { topic: access.row.topic, paired: paired ? t("canceledPaired") : "" })} ${
+      cancellation.creditRefunded ? t("creditReturned") : ""
     }`.trim(),
     liveClass: updated!,
   };
@@ -445,18 +458,27 @@ export async function rescheduleClass(
   actor: AuthSession,
   input: { classId: string; startsAt: string },
 ): Promise<BookingResult> {
+  const t = await getTranslations("ops.booking");
   const access = await relationTo(actor, input.classId);
   const view = access ? await getClassView(input.classId) : null;
   if (!access || !view || access.relation === "teacher") {
-    return fail("CLASS_NOT_FOUND", "Class not found", "This class does not exist or is no longer available.");
+    return fail("CLASS_NOT_FOUND", t("classNotFoundTitle"), t("classNotFoundMessage"));
   }
   if (access.row.status !== "scheduled") {
-    return fail("CHANGE_NOT_ALLOWED", "Reschedule not available", "Canceled classes cannot be moved.");
+    return fail("CHANGE_NOT_ALLOWED", t("rescheduleNotAvailableTitle"), t("canceledCannotMove"));
   }
   if (access.relation === "participant") {
-    const decision = decideClassChange(view, "reschedule", new Date().toISOString(), getClassPolicy());
+    const [tStudent, rawLocale] = await Promise.all([getTranslations("student"), getLocale()]);
+    const decision = decideClassChange(
+      view,
+      "reschedule",
+      new Date().toISOString(),
+      getClassPolicy(),
+      tStudent,
+      isAppLocale(rawLocale) ? rawLocale : "en",
+    );
     if (!decision.allowed) {
-      return fail("CHANGE_NOT_ALLOWED", "Reschedule not available", decision.message);
+      return fail("CHANGE_NOT_ALLOWED", t("rescheduleNotAvailableTitle"), decision.message);
     }
   }
 
@@ -471,7 +493,7 @@ export async function rescheduleClass(
       ignoreSessionId: access.row.id,
     }))
   ) {
-    return fail("SLOT_UNAVAILABLE", "Choose another time", "That time is no longer free.");
+    return fail("SLOT_UNAVAILABLE", t("slotUnavailableTitle"), t("slotUnavailableMessage"));
   }
 
   const needsPartner = access.relation === "participant" && access.participantIds.length > 1;
@@ -486,7 +508,7 @@ export async function rescheduleClass(
         expiresAt: new Date(Date.now() + CHANGE_REQUEST_HOURS * 3_600_000),
       });
     } catch {
-      return fail("REQUEST_PENDING", "Already proposed", "A new time is already waiting for your partner.");
+      return fail("REQUEST_PENDING", t("requestPendingTitle"), t("requestPendingMessage"));
     }
     sendClassNotice({
       type: "reschedule-requested",
@@ -501,18 +523,18 @@ export async function rescheduleClass(
     const updated = await getClassView(access.row.id);
     return {
       ok: true,
-      title: "New time proposed",
-      message: "Your partner has 24 hours to accept. Until then the class keeps its current time.",
+      title: t("newTimeProposedTitle"),
+      message: t("newTimeProposedMessage"),
       liveClass: updated!,
     };
   }
 
   const outcome = await moveSession(access.row.id, newStartsAt, access.row.durationMinutes);
   if (outcome === "taken") {
-    return fail("SLOT_TAKEN", "Just taken", "Someone booked that time a moment ago. Pick another.");
+    return fail("SLOT_TAKEN", t("slotTakenTitle"), t("slotTakenMessage"));
   }
   if (outcome === "gone") {
-    return fail("CHANGE_NOT_ALLOWED", "Reschedule not available", "This class can no longer be moved.");
+    return fail("CHANGE_NOT_ALLOWED", t("rescheduleNotAvailableTitle"), t("cannotMoveAnymore"));
   }
 
   await recordAuditEvent({
@@ -534,7 +556,7 @@ export async function rescheduleClass(
   });
 
   const updated = await getClassView(access.row.id);
-  return { ok: true, title: "Class rescheduled", message: "The class has a new time.", liveClass: updated! };
+  return { ok: true, title: t("classRescheduledTitle"), message: t("classRescheduledMessage"), liveClass: updated! };
 }
 
 /** The partner accepts or declines a proposed paired-class time. */
@@ -542,9 +564,10 @@ export async function respondToChangeRequest(
   actor: AuthSession,
   input: { classId: string; requestId: string; accept: boolean },
 ): Promise<BookingResult> {
+  const t = await getTranslations("ops.booking");
   const access = await relationTo(actor, input.classId);
   if (!access || access.relation !== "participant") {
-    return fail("CLASS_NOT_FOUND", "Class not found", "This class does not exist or is no longer available.");
+    return fail("CLASS_NOT_FOUND", t("classNotFoundTitle"), t("classNotFoundMessage"));
   }
 
   const [request] = await db
@@ -559,7 +582,7 @@ export async function respondToChangeRequest(
     )
     .limit(1);
   if (!request || request.requestedByUserId === actor.userId) {
-    return fail("REQUEST_NOT_FOUND", "Nothing to answer", "There is no proposal waiting for you.");
+    return fail("REQUEST_NOT_FOUND", t("nothingToAnswerTitle"), t("nothingToAnswerMessage"));
   }
 
   const close = (status: "accepted" | "declined" | "expired") =>
@@ -570,7 +593,7 @@ export async function respondToChangeRequest(
 
   if (request.expiresAt.getTime() <= Date.now()) {
     await close("expired");
-    return fail("REQUEST_NOT_FOUND", "Proposal expired", "The proposal lapsed; the class keeps its time.");
+    return fail("REQUEST_NOT_FOUND", t("proposalExpiredTitle"), t("proposalExpiredMessage"));
   }
 
   const notice = {
@@ -587,7 +610,7 @@ export async function respondToChangeRequest(
     await close("declined");
     sendClassNotice({ type: "reschedule-declined", ...notice });
     const updated = await getClassView(access.row.id);
-    return { ok: true, title: "Proposal declined", message: "The class keeps its current time.", liveClass: updated! };
+    return { ok: true, title: t("proposalDeclinedTitle"), message: t("proposalDeclinedMessage"), liveClass: updated! };
   }
 
   const stillFree = await isSlotFree({
@@ -602,7 +625,7 @@ export async function respondToChangeRequest(
     : "taken";
   if (outcome !== "moved") {
     await close("expired");
-    return fail("SLOT_TAKEN", "Time no longer free", "That time was taken meanwhile; the class keeps its current time.");
+    return fail("SLOT_TAKEN", t("timeNoLongerFreeTitle"), t("timeNoLongerFreeMessage"));
   }
 
   await close("accepted");
@@ -613,5 +636,5 @@ export async function respondToChangeRequest(
     recipientIds: [access.row.teacherId],
   });
   const updated = await getClassView(access.row.id);
-  return { ok: true, title: "Class moved", message: "Both of you agreed on the new time.", liveClass: updated! };
+  return { ok: true, title: t("classMovedTitle"), message: t("classMovedMessage"), liveClass: updated! };
 }

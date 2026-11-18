@@ -10,6 +10,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { acceptManagerInvitationAction } from "@/features/admin/actions/manager-access";
 import { useAppToast } from "@/lib/use-app-toast";
 
@@ -28,6 +29,7 @@ export function ManagerJoinForm({
   signedInEmail,
   emailMatches,
 }: ManagerJoinFormProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -47,8 +49,9 @@ export function ManagerJoinForm({
   if (!emailMatches) {
     return (
       <Alert severity="warning">
-        This invitation was sent to <strong>{inviteEmail}</strong>. You are signed in as {signedInEmail}. Sign out
-        and sign in with the invited email to continue.
+        {t("organization.managers.join.emailMismatchPrefix")} <strong>{inviteEmail}</strong>.{" "}
+        {t("organization.managers.join.emailMismatchMiddle", { email: signedInEmail })}{" "}
+        {t("organization.managers.join.emailMismatchSuffix")}
       </Alert>
     );
   }
@@ -56,29 +59,28 @@ export function ManagerJoinForm({
   return (
     <Stack spacing={2}>
       <Typography variant="body2" color="text.secondary">
-        Tell us about your operations experience (scheduling, billing, teacher support). The admin approved inviting
-        you to prepare payouts and run day-to-day academy work.
+        {t("organization.managers.join.intro")}
       </Typography>
       {inviteNote ? (
         <Alert severity="info">
-          <Typography variant="subtitle2">Note from the admin</Typography>
+          <Typography variant="subtitle2">{t("organization.managers.join.noteTitle")}</Typography>
           <Typography variant="body2" whiteSpace="pre-line">
             {inviteNote}
           </Typography>
         </Alert>
       ) : null}
       <TextField
-        label="Operations experience"
+        label={t("organization.managers.join.experienceLabel")}
         value={experience}
         onChange={(event) => setExperience(event.target.value)}
         multiline
         minRows={4}
         fullWidth
-        placeholder="Example: 3 years coordinating ESL teachers, monthly payroll, student support…"
+        placeholder={t("organization.managers.join.experiencePlaceholder")}
       />
       <FormControlLabel
         control={<Checkbox checked={agreed} onChange={(_, value) => setAgreed(value)} />}
-        label="I understand managers prepare payout batches and oversee teachers; only the admin approves transfers."
+        label={t("organization.managers.join.confirmation")}
       />
       <Box>
         <Button
@@ -86,7 +88,7 @@ export function ManagerJoinForm({
           disabled={pending || !agreed || experience.trim().length < 20}
           onClick={submit}
         >
-          Accept and open manager dashboard
+          {t("organization.managers.join.accept")}
         </Button>
       </Box>
     </Stack>

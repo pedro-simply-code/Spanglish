@@ -1,12 +1,13 @@
 "use client";
 
+import { useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useLocale, useTranslations } from "next-intl";
 import { SectionCard } from "@/components/ui/section-card";
 import { requestTeacherPayoutAction } from "@/features/payouts/actions";
 import { useAppToast } from "@/lib/use-app-toast";
@@ -23,14 +24,22 @@ type Props = {
   processingWindow: string;
 };
 
-const money = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-
 /** Teacher initiates an individual payout once Stripe is ready and balance meets the minimum. */
 export function TeacherRequestPayoutCard(props: Props) {
+  const t = useTranslations("educator.payouts.requestCard");
+  const locale = useLocale();
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
+
+  const money = useMemo(
+    () => (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100),
+    [locale],
+  );
+  const shortDate = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }),
+    [locale],
+  );
 
   const payoutReady =
     props.manualPayoutEnabled || (props.payoutViaStripe && props.stripeReady);
@@ -52,8 +61,8 @@ export function TeacherRequestPayoutCard(props: Props) {
 
   return (
     <SectionCard
-      title="Request a payout"
-      subtitle="You choose when to get paid — each request is reviewed individually."
+      title={t("title")}
+      subtitle={t("subtitle")}
       action={
         props.pendingBatch ? (
           <Chip
@@ -61,8 +70,8 @@ export function TeacherRequestPayoutCard(props: Props) {
             color={props.pendingBatch.status === "approved" ? "info" : "warning"}
             label={
               props.pendingBatch.status === "approved"
-                ? "Approved · waiting to be sent"
-                : "Waiting for approval"
+                ? t("approvedWaiting")
+                : t("waitingApproval")
             }
           />
         ) : null
@@ -70,43 +79,40 @@ export function TeacherRequestPayoutCard(props: Props) {
     >
       <Stack spacing={2}>
         <Typography variant="body2" color="text.secondary">
-          Available to request: <strong>{money(props.unpaidCents)}</strong> ({props.unpaidClasses} class
-          {props.unpaidClasses === 1 ? "" : "es"}). Minimum: {money(props.minRequestCents)}.
+          {t("available", {
+            amount: money(props.unpaidCents),
+            count: props.unpaidClasses,
+            min: money(props.minRequestCents),
+          })}
         </Typography>
         <Alert severity="info" icon={false}>
-          After you request a payout, the academy reviews it, sends the payment
-          {props.payoutViaStripe ? " (Stripe or international transfer)" : " by international transfer"},
-          and your bank may take up to <strong>{props.processingWindow}</strong> to show the funds. We
-          email you when it is approved and when payment is sent.
+          {t("afterRequest", {
+            method: t(props.payoutViaStripe ? "methodStripe" : "methodTransfer"),
+            window: props.processingWindow,
+          })}
         </Alert>
         {props.pendingBatch ? (
           <Alert severity="info">
-            Your request for {money(props.pendingBatch.amountCents)} was submitted on{" "}
-            {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(
-              new Date(props.pendingBatch.createdAt),
-            )}
-            .
+            {t("pendingRequest", {
+              amount: money(props.pendingBatch.amountCents),
+              date: shortDate.format(new Date(props.pendingBatch.createdAt)),
+            })}
             {props.pendingBatch.status === "approved"
-              ? ` Approved — payment will be sent soon. Allow up to ${props.processingWindow} after it is sent.`
-              : " Waiting for approval — you will get an email at each step."}
+              ? t("approvedSoon", { window: props.processingWindow })
+              : t("waitingEmail")}
           </Alert>
         ) : null}
         {props.payoutViaStripe && !props.manualPayoutEnabled && !props.stripeReady ? (
-          <Alert severity="warning">Finish Stripe setup below before you can request a payout.</Alert>
+          <Alert severity="warning">{t("finishStripe")}</Alert>
         ) : props.payoutViaStripe && props.manualPayoutEnabled && !props.stripeReady ? (
-          <Alert severity="info">
-            Stripe is not set up yet — you can still request a payout; the academy may pay you by international
-            transfer.
-          </Alert>
+          <Alert severity="info">{t("stripeNotSet")}</Alert>
         ) : !props.payoutViaStripe && !props.manualPayoutEnabled ? (
-          <Alert severity="warning">Payouts are paused — contact the academy.</Alert>
+          <Alert severity="warning">{t("payoutsPaused")}</Alert>
         ) : props.unpaidCents < props.minRequestCents ? (
-          <Alert severity="info">
-            Keep teaching — you can request a payout once unpaid earnings reach {money(props.minRequestCents)}.
-          </Alert>
+          <Alert severity="info">{t("keepTeaching", { amount: money(props.minRequestCents) })}</Alert>
         ) : null}
         <Button variant="contained" disabled={pending || !canRequest} onClick={run}>
-          Request payout · {money(props.unpaidCents)}
+          {t("requestButton", { amount: money(props.unpaidCents) })}
         </Button>
       </Stack>
     </SectionCard>

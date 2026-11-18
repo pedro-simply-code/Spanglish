@@ -12,8 +12,11 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { formatDistanceToNowStrict } from "date-fns";
+import enUS from "date-fns/locale/en-US";
+import es from "date-fns/locale/es";
 import { IconDotsVertical, IconMenu2, IconPhone, IconVideo } from "@tabler/icons-react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ChatInsideSidebar } from "@/features/chats/components/chat-inside-sidebar";
 import type { Chat, ChatMessage, ChatStatus } from "@/features/chats/types";
 
@@ -35,14 +38,24 @@ type ChatContentProps = {
 };
 
 function MessageTime({ chat, message }: { chat: Chat; message: ChatMessage }) {
+  const locale = useLocale();
+  const t = useTranslations("apps");
+
   if (!message.createdAt) {
     return null;
   }
 
+  const dateLocale = locale === "es" ? es : enUS;
+
   return (
     <Typography variant="body2" color="grey.400" mb={1}>
-      {chat.name},{" "}
-      {formatDistanceToNowStrict(message.createdAt, { addSuffix: false })} ago
+      {t("chat.content.messageTime", {
+        name: chat.name,
+        time: formatDistanceToNowStrict(message.createdAt, {
+          addSuffix: true,
+          locale: dateLocale,
+        }),
+      })}
     </Typography>
   );
 }
@@ -54,6 +67,7 @@ export function ChatContent({
   onToggleChatSidebar,
 }: ChatContentProps) {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const t = useTranslations("apps");
 
   if (!chat) {
     return (
@@ -64,15 +78,21 @@ export function ChatContent({
             mr: "10px",
           }}
         >
-          <IconButton aria-label="Open chat list" onClick={onToggleChatSidebar}>
+          <IconButton aria-label={t("chat.content.openChatList")} onClick={onToggleChatSidebar}>
             <IconMenu2 stroke={1.5} />
           </IconButton>
         </Box>
-        <Typography variant="h4">Select Chat</Typography>
+        <Typography variant="h4">{t("chat.content.selectChat")}</Typography>
       </Box>
     );
   }
 
+  const statusLabels: Record<ChatStatus, string> = {
+    online: t("chat.status.online"),
+    busy: t("chat.status.busy"),
+    away: t("chat.status.away"),
+    offline: t("chat.status.offline"),
+  };
   const isInsideSidebarVisible = lgUp ? showInsideSidebar : !showInsideSidebar;
 
   return (
@@ -82,7 +102,7 @@ export function ChatContent({
         <Box display="flex" alignItems="center" p={2}>
           <Box sx={{ display: { xs: "block", lg: "none" }, mr: "10px" }}>
             <IconButton
-              aria-label="Open chat list"
+              aria-label={t("chat.content.openChatList")}
               onClick={onToggleChatSidebar}
             >
               <IconMenu2 stroke={1.5} />
@@ -102,19 +122,19 @@ export function ChatContent({
             </ListItemAvatar>
             <ListItemText
               primary={<Typography variant="h5">{chat.name}</Typography>}
-              secondary={chat.status}
+              secondary={statusLabels[chat.status]}
             />
           </ListItem>
 
           <Stack direction="row">
-            <IconButton aria-label="Start voice call">
+            <IconButton aria-label={t("chat.content.startVoiceCall")}>
               <IconPhone stroke={1.5} />
             </IconButton>
-            <IconButton aria-label="Start video call">
+            <IconButton aria-label={t("chat.content.startVideoCall")}>
               <IconVideo stroke={1.5} />
             </IconButton>
             <IconButton
-              aria-label="Toggle chat details"
+              aria-label={t("chat.content.toggleDetails")}
               onClick={onToggleInsideSidebar}
             >
               <IconDotsVertical stroke={1.5} />
@@ -164,7 +184,7 @@ export function ChatContent({
                           <Box mb={1} sx={{ overflow: "hidden", lineHeight: "0px" }}>
                             <Image
                               src={message.msg}
-                              alt="Shared attachment"
+                              alt={t("chat.content.sharedAttachment")}
                               width={150}
                               height={150}
                             />
@@ -204,7 +224,7 @@ export function ChatContent({
                         <Box mb={1} sx={{ overflow: "hidden", lineHeight: "0px" }}>
                           <Image
                             src={message.msg}
-                            alt="Shared attachment"
+                            alt={t("chat.content.sharedAttachment")}
                             width={250}
                             height={165}
                           />

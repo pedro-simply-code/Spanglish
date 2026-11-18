@@ -19,12 +19,14 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
+/** Static defaults so child routes can prerender under Cache Components. */
 export const metadata: Metadata = {
   title: {
     default: "Spanglish",
     template: "%s · Spanglish",
   },
-  description: "Learn Spanish live with native teachers from Guatemala — Spanglish Academy",
+  description:
+    "Learn Spanish live with native teachers from Guatemala — Spanglish Academy",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

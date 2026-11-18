@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
@@ -15,29 +16,9 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useLocale, useTranslations } from "next-intl";
 import type { PayoutBatchItem } from "@/features/payouts/components/payouts-board";
 import { PayoutBatchCycleStepper } from "@/features/payouts/components/payout-batch-cycle-stepper";
-
-const money = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-const dateFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-const statusChip = {
-  awaiting_approval: { label: "Awaiting approval", color: "warning" as const },
-  approved: { label: "Approved · to pay", color: "info" as const },
-  paid: { label: "Paid", color: "success" as const },
-  rejected: { label: "Rejected", color: "default" as const },
-};
-
-const periodLabel = (batch: PayoutBatchItem) =>
-  `${dateFormat.format(new Date(batch.periodStart))} – ${dateFormat.format(
-    new Date(new Date(batch.periodEnd).getTime() - 1),
-  )}`;
 
 type Props = {
   open: boolean;
@@ -83,12 +64,33 @@ export function PayoutBatchDetailDialog({
   onPayStripe,
   onMarkPaid,
 }: Props) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
+  const money = useMemo(
+    () => (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100),
+    [locale],
+  );
+  const dateFormat = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }),
+    [locale],
+  );
+
+  const statusChip = useMemo(() => ({
+    awaiting_approval: { label: t("status.awaitingApproval"), color: "warning" as const },
+    approved: { label: t("status.approvedToPay"), color: "info" as const },
+    paid: { label: t("status.paid"), color: "success" as const },
+    rejected: { label: t("status.rejected"), color: "default" as const },
+  }), [t]);
+
   if (!batch) return null;
   const chip = statusChip[batch.status];
+  const periodLabel = `${dateFormat.format(new Date(batch.periodStart))} – ${dateFormat.format(
+    new Date(new Date(batch.periodEnd).getTime() - 1),
+  )}`;
   const title =
     batch.initiatedBy === "teacher"
-      ? `Payout request · ${batch.lines[0]?.teacherName ?? "Teacher"}`
-      : `Monthly payout · ${periodLabel(batch)}`;
+      ? t("payouts.detail.requestTitle", { teacher: batch.lines[0]?.teacherName ?? t("common.teacher") })
+      : t("payouts.detail.monthlyTitle", { period: periodLabel });
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -98,9 +100,9 @@ export function PayoutBatchDetailDialog({
             {title}
           </Typography>
           {batch.initiatedBy === "teacher" ? (
-            <Chip size="small" variant="outlined" color="secondary" label="Teacher request" />
+            <Chip size="small" variant="outlined" color="secondary" label={t("payouts.board.teacherRequest")} />
           ) : (
-            <Chip size="small" variant="outlined" label="Manager batch" />
+            <Chip size="small" variant="outlined" label={t("payouts.detail.managerBatch")} />
           )}
           <Chip size="small" color={chip.color} label={chip.label} />
         </Stack>
@@ -108,20 +110,20 @@ export function PayoutBatchDetailDialog({
       <DialogContent dividers>
         <Stack spacing={2.5}>
           <Stack spacing={1}>
-            <MetaRow label="Total" value={money(batch.totalCents)} />
-            <MetaRow label="Classes" value={String(batch.classCount)} />
+            <MetaRow label={t("payouts.detail.total")} value={money(batch.totalCents)} />
+            <MetaRow label={t("payouts.detail.classes")} value={String(batch.classCount)} />
             <MetaRow
-              label={batch.initiatedBy === "teacher" ? "Requested by" : "Prepared by"}
+              label={batch.initiatedBy === "teacher" ? t("payouts.detail.requestedBy") : t("payouts.detail.preparedBy")}
               value={batch.createdByName ?? "—"}
             />
             {batch.initiatedBy === "manager" ? (
-              <MetaRow label="Period" value={periodLabel(batch)} />
+              <MetaRow label={t("payouts.detail.period")} value={periodLabel} />
             ) : null}
-            {batch.approvedByName ? <MetaRow label="Reviewed by" value={batch.approvedByName} /> : null}
-            {batch.paidReference ? <MetaRow label="Payment reference" value={batch.paidReference} /> : null}
+            {batch.approvedByName ? <MetaRow label={t("payouts.detail.reviewedBy")} value={batch.approvedByName} /> : null}
+            {batch.paidReference ? <MetaRow label={t("payouts.detail.paymentReference")} value={batch.paidReference} /> : null}
             {batch.rejectedReason ? (
               <Typography variant="body2" color="error.main">
-                Rejected: {batch.rejectedReason}
+                {t("payouts.detail.rejectedReason", { reason: batch.rejectedReason })}
               </Typography>
             ) : null}
           </Stack>
@@ -130,13 +132,13 @@ export function PayoutBatchDetailDialog({
 
           <Divider />
 
-          <Typography variant="subtitle2">Teachers in this batch</Typography>
+          <Typography variant="subtitle2">{t("payouts.detail.teachersInBatch")}</Typography>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Teacher</TableCell>
-                <TableCell align="right">Classes</TableCell>
-                <TableCell align="right">Amount</TableCell>
+                <TableCell>{t("payouts.detail.teacher")}</TableCell>
+                <TableCell align="right">{t("payouts.detail.classes")}</TableCell>
+                <TableCell align="right">{t("payouts.detail.amount")}</TableCell>
                 {stripe.enabled ? <TableCell align="right">Stripe</TableCell> : null}
               </TableRow>
             </TableHead>
@@ -149,15 +151,15 @@ export function PayoutBatchDetailDialog({
                   {stripe.enabled ? (
                     <TableCell align="right">
                       {line.stripeTransfer?.status === "paid" ? (
-                        <Chip size="small" color="success" label="Sent" />
+                        <Chip size="small" color="success" label={t("payouts.detail.sent")} />
                       ) : line.stripeTransfer?.status === "failed" ? (
-                        <Chip size="small" color="error" label="Failed" title={line.stripeTransfer.error ?? ""} />
+                        <Chip size="small" color="error" label={t("status.failed")} title={line.stripeTransfer.error ?? ""} />
                       ) : (
                         <Chip
                           size="small"
                           variant="outlined"
                           color={line.stripeReady ? "success" : "warning"}
-                          label={line.stripeReady ? "Ready" : "No Stripe"}
+                          label={line.stripeReady ? t("status.ready") : t("status.noStripe")}
                         />
                       )}
                     </TableCell>
@@ -171,7 +173,7 @@ export function PayoutBatchDetailDialog({
             <TextField
               size="small"
               fullWidth
-              label="Reason (required to reject)"
+              label={t("payouts.detail.rejectReasonLabel")}
               value={note}
               onChange={(event) => onNoteChange(event.target.value)}
             />
@@ -181,7 +183,7 @@ export function PayoutBatchDetailDialog({
             <TextField
               size="small"
               fullWidth
-              label="Transfer reference (e.g. Wise, bank wire)"
+              label={t("payouts.detail.transferReferenceLabel")}
               value={note}
               onChange={(event) => onNoteChange(event.target.value)}
             />
@@ -190,38 +192,38 @@ export function PayoutBatchDetailDialog({
           {mode === "admin" ? (
             <Typography variant="body2" color="text.secondary">
               {stripe.enabled && (stripe.manualTransferEnabled ?? true)
-                ? `Approve does not move money. Use Pay with Stripe or Mark as paid for international transfers. Settlement may take ${processingWindow}.`
+                ? t("payouts.detail.noteStripeManual", { window: processingWindow })
                 : stripe.enabled
-                  ? `Approve does not move money. Use Pay with Stripe. Settlement may take ${processingWindow}.`
-                  : (stripe.manualTransferEnabled ?? true)
-                    ? `Record international or bank transfers with Mark as paid. Teachers are emailed on approval and payment.`
-                    : `No payout rails enabled — turn on Stripe Connect or transfers under Finance → Providers.`}
+                  ? t("payouts.detail.noteStripeOnly", { window: processingWindow })
+                  : stripe.manualTransferEnabled ?? true
+                    ? t("payouts.detail.noteManualOnly")
+                    : t("payouts.detail.noteNoRails")}
             </Typography>
           ) : null}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, py: 2, flexWrap: "wrap", gap: 1 }}>
         <Button onClick={onClose} disabled={pending}>
-          Close
+          {t("common.close")}
         </Button>
         {mode === "admin" && batch.status === "awaiting_approval" ? (
           <>
             <Button color="error" disabled={pending} onClick={onReject}>
-              Reject
+              {t("common.reject")}
             </Button>
             <Button variant="contained" disabled={pending} onClick={onApprove}>
-              Approve
+              {t("common.approve")}
             </Button>
           </>
         ) : null}
         {mode === "admin" && batch.status === "approved" && stripe.enabled ? (
           <Button variant="contained" disabled={pending} onClick={onPayStripe}>
-            Pay {money(batch.totalCents)} with Stripe
+            {t("payouts.detail.payWithStripe", { amount: money(batch.totalCents) })}
           </Button>
         ) : null}
         {mode === "admin" && batch.status === "approved" && (stripe.manualTransferEnabled ?? true) ? (
           <Button variant="contained" color="success" disabled={pending} onClick={onMarkPaid}>
-            Mark as paid
+            {t("payouts.detail.markPaid")}
           </Button>
         ) : null}
       </DialogActions>

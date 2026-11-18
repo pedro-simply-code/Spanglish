@@ -1,4 +1,7 @@
+"use client";
+
 import Chip from "@mui/material/Chip";
+import { useTranslations } from "next-intl";
 import type { LiveClassStatus } from "@/features/classes/types";
 
 type ChipColor =
@@ -12,20 +15,27 @@ type ChipColor =
 
 const statusMeta: Record<
   LiveClassStatus,
-  { label: string; color: ChipColor; variant: "filled" | "outlined" }
+  { color: ChipColor; variant: "filled" | "outlined" }
 > = {
-  upcoming: { label: "Upcoming", color: "primary", variant: "outlined" },
-  "in-progress": { label: "In progress", color: "success", variant: "filled" },
-  completed: { label: "Completed", color: "default", variant: "outlined" },
-  canceled: { label: "Canceled", color: "error", variant: "outlined" },
+  upcoming: { color: "primary", variant: "outlined" },
+  "in-progress": { color: "success", variant: "filled" },
+  completed: { color: "default", variant: "outlined" },
+  canceled: { color: "error", variant: "outlined" },
 };
 
 export function ClassStatusChip({ status }: { status: LiveClassStatus }) {
+  const t = useTranslations("student");
   const meta = statusMeta[status];
+  const labels: Record<LiveClassStatus, string> = {
+    upcoming: t("status.upcoming"),
+    "in-progress": t("status.inProgress"),
+    completed: t("status.completed"),
+    canceled: t("status.canceled"),
+  };
 
   return (
     <Chip
-      label={meta.label}
+      label={labels[status]}
       color={meta.color}
       variant={meta.variant}
       size="small"

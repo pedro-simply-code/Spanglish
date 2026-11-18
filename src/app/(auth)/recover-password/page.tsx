@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { AuthShell, RecoverPasswordForm } from "@/features/auth";
 
-export const metadata: Metadata = {
-  title: "Reset password",
-  description: "Reset your password with an email code",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("recoverTitle"),
+    description: t("recoverDescription"),
+  };
+}
 
 export default function RecoverPasswordPage() {
   return (

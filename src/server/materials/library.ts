@@ -1,4 +1,5 @@
 import { and, desc, eq, inArray, ne, or } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { Material } from "@/features/materials";
 import type { AuthSession } from "@/lib/auth-types";
 import { hasPermission, hasRole } from "@/lib/auth-roles";
@@ -13,6 +14,7 @@ import {
   type MaterialVisibility,
 } from "@/server/db/schema";
 import { notifyUsers } from "@/server/email/academy-notices";
+import { questionsFromPayload } from "@/server/learning/assignments";
 
 /*
  * The teaching library in the database.
@@ -56,12 +58,13 @@ function toMaterial(row: MaterialRow, ownerName: string): Material {
 }
 
 async function withOwners(rows: MaterialRow[]) {
+  const t = await getTranslations("ops.materials");
   const ids = [...new Set(rows.map((row) => row.authorUserId))];
   const owners = ids.length
     ? await db.select({ id: users.id, name: users.name }).from(users).where(inArray(users.id, ids))
     : [];
   const names = new Map(owners.map((owner) => [owner.id, owner.name]));
-  return rows.map((row) => toMaterial(row, names.get(row.authorUserId) ?? "Teacher"));
+  return rows.map((row) => toMaterial(row, names.get(row.authorUserId) ?? t("teacherFallback")));
 }
 
 const isStaff = (actor: AuthSession) => hasRole(actor.roles, "manager") || hasRole(actor.roles, "admin");
@@ -172,12 +175,13 @@ export async function insertMaterial(
 }
 
 export async function setMaterialVisibility(actor: AuthSession, id: string, visibility: MaterialVisibility) {
+  const t = await getTranslations("ops.materials");
   const [row] = await db.select().from(materials).where(eq(materials.id, id)).limit(1);
   if (!row || (row.authorUserId !== actor.userId && !isStaff(actor))) {
-    return { ok: false as const, message: "Only the author can change who sees this material." };
+    return { ok: false as const, message: t("authorOnly") };
   }
   if (!["private", "shared", "global"].includes(visibility)) {
-    return { ok: false as const, message: "Choose private, shared or global." };
+    return { ok: false as const, message: t("chooseVisibility") };
   }
   // An already approved global material stays approved; anything else re-enters review.
   const moderation =
@@ -194,9 +198,7 @@ export async function setMaterialVisibility(actor: AuthSession, id: string, visi
   return {
     ok: true as const,
     message:
-      moderation === "pending"
-        ? "Sent for review. Students see it once a manager approves it."
-        : "Visibility updated.",
+      moderation === "pending" ? t("sentForReview") : t("visibilityUpdated"),
   };
 }
 
@@ -216,6 +218,7 @@ export async function listModerationQueue() {
 }
 
 export async function reviewMaterial(actor: AuthSession, input: { id: string; approve: boolean; note?: string }) {
+  const t = await getTranslations("ops.materials");
   const note = input.note?.trim().slice(0, 500) || null;
   const [row] = await db
     .update(materials)
@@ -229,7 +232,7 @@ export async function reviewMaterial(actor: AuthSession, input: { id: string; ap
     })
     .where(and(eq(materials.id, input.id), eq(materials.moderation, "pending")))
     .returning();
-  if (!row) return { ok: false as const, message: "This material is not waiting for review." };
+  if (!row) return { ok: false as const, message: t("notWaitingForReview") };
 
   await recordAuditEvent({
     action: input.approve ? "material.approved" : "material.rejected",
@@ -244,9 +247,7 @@ export async function reviewMaterial(actor: AuthSession, input: { id: string; ap
   });
   return {
     ok: true as const,
-    message: input.approve
-      ? "Published: this post is live in the academy library for students."
-      : "Rejected. The author was told why.",
+    message: input.approve ? t("publishedMessage") : t("rejectedMessage"),
   };
 }
 
@@ -256,4 +257,19 @@ export async function countPendingMaterials() {
     .from(materials)
     .where(eq(materials.moderation, "pending"));
   return rows.length;
+}
+
+/** Materials by id, in the given order (missing ids are skipped). */
+export async function listMaterialsByIds(ids: readonly string[]) {
+  if (!ids.length) return [];
+  const rows = await db.select().from(materials).where(inArray(materials.id, [...ids]));
+  const found = await withOwners(rows);
+  const byId = new Map(found.map((item) => [item.id, item]));
+  return ids.map((id) => byId.get(id)).filter((item): item is Material => Boolean(item));
+}
+
+/** Questions of a form material, from its stored payload. */
+export async function getMaterialQuestions(id: string) {
+  const [row] = await db.select({ payload: materials.payload }).from(materials).where(eq(materials.id, id)).limit(1);
+  return row ? questionsFromPayload(row.payload) : [];
 }

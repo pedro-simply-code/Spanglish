@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -7,12 +9,13 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconMail, IconWorld } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { SpanglishLogo } from "@/components/brand/spanglish-logo";
 import { LinkButton } from "@/components/ui/link-button";
 import {
-  marketingAcademyTimezoneLabel,
-  marketingFooterAcademy,
-  marketingFooterExplore,
+  getMarketingAcademyTimezoneLabel,
+  getMarketingFooterAcademy,
+  getMarketingFooterExplore,
 } from "@/features/marketing/data";
 
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
@@ -48,6 +51,7 @@ function FooterLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 export function MarketingFooter() {
+  const t = useTranslations("marketing");
   const year = new Date().getFullYear();
 
   return (
@@ -67,23 +71,24 @@ export function MarketingFooter() {
             <Stack spacing={2} alignItems={{ xs: "center", md: "flex-start" }} textAlign={{ xs: "center", md: "left" }}>
               <SpanglishLogo href="/" size="lg" />
               <Typography fontSize={15} color="text.secondary" lineHeight={1.7} maxWidth={340}>
-                Live Spanish classes with native teachers from Guatemala — individual or paired sessions,
-                classroom recordings, and learning materials on one academy platform.
+                {t("footer.description")}
               </Typography>
               <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
                 <IconWorld size={18} stroke={1.5} />
-                <Typography variant="body2">Teachers in · {marketingAcademyTimezoneLabel}</Typography>
+                <Typography variant="body2">
+                  {t("footer.timezone", { timezone: getMarketingAcademyTimezoneLabel(t) })}
+                </Typography>
               </Stack>
               <LinkButton href="/register" variant="contained" size="small" sx={{ px: 3 }}>
-                Get started free
+                {t("footer.getStartedFree")}
               </LinkButton>
             </Stack>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-            <FooterColumn title="Explore">
+            <FooterColumn title={t("footer.exploreTitle")}>
               <Stack spacing={0.5}>
-                {marketingFooterExplore.map((item) => (
+                {getMarketingFooterExplore(t).map((item) => (
                   <FooterLink key={item.href} href={item.href}>
                     {item.label}
                   </FooterLink>
@@ -93,9 +98,9 @@ export function MarketingFooter() {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FooterColumn title="Academy">
+            <FooterColumn title={t("footer.academyTitle")}>
               <Stack spacing={0.5}>
-                {marketingFooterAcademy.map((item) => (
+                {getMarketingFooterAcademy(t).map((item) => (
                   <FooterLink key={item.href} href={item.href}>
                     {item.label}
                   </FooterLink>
@@ -105,20 +110,22 @@ export function MarketingFooter() {
           </Grid>
 
           <Grid size={{ xs: 12, md: 3 }}>
-            <FooterColumn title="Hours & support">
+            <FooterColumn title={t("footer.hoursTitle")}>
               <Typography variant="body2" color="text.secondary" lineHeight={1.75}>
-                <strong>Mon – Thu</strong> · 6:00 AM – 10:00 PM
+                <strong>{t("landing.hours.monThu")}</strong> · {t("landing.hours.monThuTime")}
                 <br />
-                <strong>Fri</strong> · 6:00 AM – 8:00 PM
+                <strong>{t("landing.hours.friday")}</strong> · {t("landing.hours.fridayTime")}
                 <br />
-                <strong>Sat</strong> · 8:00 AM – 12:00 PM
+                <strong>{t("landing.hours.saturday")}</strong> · {t("landing.hours.saturdayTime")}
               </Typography>
               <Stack direction="row" spacing={1} alignItems="flex-start" mt={1}>
                 <Box color="primary.main" pt={0.25}>
                   <IconMail size={18} stroke={1.5} />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  Questions after sign-in? Use <strong>Email</strong> in your dashboard to reach the academy team.
+                  {t.rich("footer.supportQuestion", {
+                    email: (chunks) => <strong>{chunks}</strong>,
+                  })}
                 </Typography>
               </Stack>
             </FooterColumn>
@@ -135,12 +142,12 @@ export function MarketingFooter() {
           textAlign={{ xs: "center", sm: "left" }}
         >
           <Typography fontSize={14} color="text.secondary">
-            © {year} Spanglish Academy. All rights reserved.
+            {t("footer.copyright", { year })}
           </Typography>
           <Stack direction="row" spacing={3} flexWrap="wrap" justifyContent="center" useFlexGap>
-            <FooterLink href="/">Home</FooterLink>
-            <FooterLink href="/login">Sign in</FooterLink>
-            <FooterLink href="/register">Register</FooterLink>
+            <FooterLink href="/">{t("footer.home")}</FooterLink>
+            <FooterLink href="/login">{t("common.signIn")}</FooterLink>
+            <FooterLink href="/register">{t("common.register")}</FooterLink>
           </Stack>
         </Stack>
       </Container>

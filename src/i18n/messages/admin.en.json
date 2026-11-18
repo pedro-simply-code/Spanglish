@@ -1,0 +1,962 @@
+{
+  "admin": {
+    "actions": {
+      "managers": {
+        "accessRemoved": "Manager access removed; account is a student again.",
+        "accountNotFound": "Account not found.",
+        "adminCannotBecomeManager": "The admin account cannot become a manager.",
+        "alreadyHasAccess": "This person already has manager or admin access.",
+        "alreadyManager": "This account is already a manager.",
+        "emailNotVerified": "The account must verify email before becoming a manager.",
+        "experienceTooShort": "Describe your operations experience (at least 20 characters).",
+        "invalidEmail": "Enter a valid email address.",
+        "inviteInboxSent": "Invitation saved and sent to their Spanglish inbox (Email in the app).",
+        "inviteRevoked": "Invitation revoked.",
+        "inviteSaved": "Invitation saved for {email}. When they register with that address, sign in and open Email or /join/manager with their token.",
+        "inviteUnavailable": "This invitation is missing, expired, or already used.",
+        "noAccountWithEmail": "No account with that email.",
+        "notAllowed": "Not allowed.",
+        "notManager": "This account is not a manager.",
+        "onlyAdminGrant": "Only the admin can grant the manager role.",
+        "onlyAdminInvite": "Only the admin can invite managers.",
+        "onlyAdminRemove": "Only the admin can remove manager access.",
+        "onlyAdminRevokeInvite": "Only the admin can revoke invitations.",
+        "roleChangeDenied": "Role change not allowed.",
+        "roleGranted": "Manager role granted.",
+        "signInWithInvitedEmail": "Sign in with the same email address that received the invitation.",
+        "welcomeManager": "Welcome to the manager dashboard. Switch your dashboard from the top bar."
+      },
+      "pricing": {
+        "created": "Package created.",
+        "forbidden": "Only the academy admin can change packages.",
+        "imported": "Default {scope} catalog imported ({count, plural, one {# package} other {# packages}}).",
+        "invalidData": "Invalid package data.",
+        "missingId": "Missing package id.",
+        "removed": "Package removed.",
+        "updated": "Package updated."
+      },
+      "providers": {
+        "forbidden": "Only the admin can change payment providers."
+      }
+    },
+    "adminStat": {
+      "margin": {
+        "helper": "Delivered revenue minus teacher share",
+        "label": "Academy margin (est.)"
+      },
+      "payouts": {
+        "helper": "{share}% of delivered tuition · unsettled",
+        "label": "Teacher payouts (est.)"
+      },
+      "revenue": {
+        "helper": "{pipeline} booked in upcoming / in progress",
+        "label": "Gross revenue (delivered)"
+      },
+      "taught": {
+        "helper": "{completed} completed · {attended}% marked attended",
+        "label": "Classes delivered"
+      }
+    },
+    "alert": {
+      "emailBounce": "{count} account(s) with bounced email",
+      "emailBounceDetail": "Transactional mail is suppressed for these addresses.",
+      "emailFromMissing": "EMAIL_FROM is not set",
+      "emailFromMissingDetail": "Auth codes and security emails cannot send until from-address is configured.",
+      "integrationNotReady": "{name} not ready",
+      "joinWindowOn": "CLASS_RELAX_JOIN_WINDOW is on",
+      "joinWindowOnDetail": "Anyone can join classes outside the scheduled window in production.",
+      "managerWithout2Fa": "{count} manager account(s) without 2FA",
+      "managerWithout2FaDetail": "Enable authenticator apps before handling payouts or role changes."
+    },
+    "audit": {
+      "action": {
+        "adminGranted": "Admin role granted",
+        "adminRevoked": "Admin role removed",
+        "availabilityUpdated": "Availability updated",
+        "classBooked": "Class booked",
+        "classCanceled": "Class canceled",
+        "classRated": "Class rated",
+        "classRescheduled": "Class rescheduled",
+        "creditsChangedByStaff": "Credits changed by staff",
+        "emailBounced": "Email bounced",
+        "emailVerified": "Email verified",
+        "managerInvited": "Manager invited",
+        "managerRoleGranted": "Manager role granted",
+        "managerRoleRevoked": "Manager role removed",
+        "materialApproved": "Material approved",
+        "materialRejected": "Material rejected",
+        "materialSentForReview": "Material sent for review",
+        "onboardingCompleted": "Onboarding completed",
+        "packagePurchased": "Package purchased",
+        "pairEnded": "Pair ended",
+        "passwordChanged": "Password changed",
+        "passwordCreated": "Password added",
+        "passwordReset": "Password reset by email code",
+        "payoutApproved": "Payout approved",
+        "payoutMarkedPaid": "Payout marked as paid",
+        "payoutPrepared": "Payout prepared",
+        "payoutRejected": "Payout rejected",
+        "payoutStripeSent": "Payout sent with Stripe",
+        "profileUpdated": "Profile updated",
+        "rateLimited": "Rate limit hit",
+        "recordingSaved": "Recording saved",
+        "sessionsRevoked": "Devices signed out",
+        "signIn": "Signed in",
+        "signInFailed": "Failed sign-in",
+        "signOut": "Signed out",
+        "signUp": "Account created",
+        "stripeAmountMismatch": "Stripe amount did not match the order",
+        "stripeTransferFailed": "Stripe transfer failed",
+        "studentsPaired": "Students paired",
+        "teacherApplicationApproved": "Teacher application approved",
+        "teacherApplicationRejected": "Teacher application rejected",
+        "teacherApplicationSent": "Teacher application sent",
+        "teacherRatesChanged": "Teacher rates changed",
+        "teacherStripeConnected": "Teacher connected Stripe",
+        "twoFactorBackupCodesRegenerated": "New 2FA backup codes",
+        "twoFactorDisabled": "2FA turned off",
+        "twoFactorEnabled": "2FA turned on",
+        "twoFactorLockout": "2FA locked after failed codes"
+      },
+      "unknownAccount": "Unknown account"
+    },
+    "classStatus": {
+      "canceled": "Canceled",
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "upcoming": "Upcoming"
+    },
+    "commerce": {
+      "editor": {
+        "addTitle": "Add package",
+        "confirmDelete": "Delete package {name}",
+        "editTitle": "Edit package",
+        "field": {
+          "badge": "Badge label",
+          "credits": "Credits (classes in package)",
+          "description": "Description",
+          "displayName": "Display name",
+          "id": "Package id",
+          "liveOnPricing": "Live on /pricing",
+          "packageTotal": "Package total (USD)",
+          "pricePerClass": "Price per class (USD)",
+          "savings": "Savings % vs. starter tier",
+          "suggested": "Suggested: {id}"
+        },
+        "newBadge": "New",
+        "newDescription": "Describe who this package is for.",
+        "newPackage": "New package",
+        "useSuggestedId": "Use suggested id"
+      },
+      "packages": {
+        "addPackage": "Add package",
+        "catalog": "Catalog",
+        "catalogSubtitle": "USD list prices · Live packages are visible on /pricing and checkout (no separate publish step)",
+        "column": {
+          "package": "Package"
+        },
+        "editPackage": "Edit {name}",
+        "empty": "No packages yet. Add one or import the default catalog.",
+        "importDefault": "Import default catalog",
+        "importDefaultKind": "Import default {kind} catalog",
+        "importDone": "Default catalog imported.",
+        "liveSince": "Live · {date}",
+        "subtitle": "Prices and credit bundles for English-speaking learners buying live Spanish.",
+        "subtitleForKind": "Credit bundles for this class type · teacher pay is revenue share on each credit (Finance → Teacher pay rates).",
+        "title": "Class packages"
+      },
+      "publish": {
+        "drafts": "Drafts",
+        "heldBack": "Held back",
+        "included": "Included",
+        "lastPublish": "Last publish (sample): Nov 12, 2026 · by admin",
+        "livePackages": "Live packages",
+        "notice": "The public /pricing page reads active rows from pricing_packages ({count} total). Toggle active and publishedAt here once the publish action is implemented.",
+        "publishButton": "Publish to /pricing",
+        "queued": "Queued changes",
+        "queuedSubtitle": "What students would see after the next publish",
+        "snapshot": "Snapshot",
+        "subtitle": "Push admin catalog changes to the public site English speakers see.",
+        "title": "Publish pricing"
+      },
+      "rules": {
+        "individual": {
+          "booking": {
+            "detail": "Only that student is on the class roster. Reschedules apply immediately.",
+            "title": "Student books alone"
+          },
+          "credits": {
+            "detail": "Credits belong to the student; each booked class spends one credit from their balance.",
+            "title": "Personal credit wallet"
+          },
+          "footnote": "Students buy and book on their own account.",
+          "subtitle": "One student per live class",
+          "title": "Individual class rules"
+        },
+        "paired": {
+          "booking": {
+            "detail": "The other receives email; reschedules need accept or 24h timeout keeps the slot.",
+            "title": "Either partner may book"
+          },
+          "credits": {
+            "detail": "One package pays for the pair; each booked class spends one credit from the pool.",
+            "title": "Shared credit pool"
+          },
+          "footnote": "Form pairs under Organization → Students (manager) before students can buy these packages.",
+          "payout": {
+            "detail": "One credit leaves the shared pool per paired class delivered. Pay = that credit’s average purchase value × the teacher’s share by level — same platform-take table as individual (Finance → Teacher pay rates). No separate paired multiplier."
+          },
+          "subtitle": "Two students share one credit pool",
+          "title": "Paired class rules"
+        },
+        "payout": {
+          "detail": "Per delivered class: credit purchase value × teacher share for their level. Platform take % falls as they level up — edit under Finance → Teacher pay rates. Trials use a reference credit value and trial %.",
+          "title": "Teacher pay (revenue share)"
+        }
+      },
+      "teacherRates": {
+        "adminOverride": "Admin override",
+        "autoAssign": "Auto-assign",
+        "empty": "No teacher accounts in the database yet.",
+        "levelCohort": "Level cohort",
+        "noticePrefix": "Pay is revenue share on each credit’s purchase value (individual and paired). Configure levels under",
+        "noticeSuffix": ". Counts below are teachers grouped by profile level.",
+        "subtitle": "Legacy view — edit platform take under Finance → Teacher pay rates.",
+        "teacherCount": "{count} teachers",
+        "title": "Teacher rate tiers"
+      }
+    },
+    "common": {
+      "action": "Action",
+      "actions": "Actions",
+      "active": "Active",
+      "admin": "Admin",
+      "all": "All",
+      "cancel": "Cancel",
+      "classType": {
+        "individual": "Individual",
+        "label": "Class type",
+        "paired": "Paired"
+      },
+      "close": "Close",
+      "credits": "Credits",
+      "delete": "Delete",
+      "disabled": "Disabled",
+      "draft": "Draft",
+      "duration": "Duration",
+      "email": "Email",
+      "emailInApp": "Email in the app",
+      "enabled": "Enabled",
+      "expired": "Expired",
+      "manager": "Manager",
+      "no": "No",
+      "now": "now",
+      "off": "Off",
+      "on": "On",
+      "open": "Open",
+      "page": {
+        "audit": "Audit log",
+        "classroom": "Classroom",
+        "classroomDefaults": "Classroom defaults",
+        "email": "Email deliverability",
+        "ledger": "Credit ledger",
+        "ledgerShort": "Ledger",
+        "managers": "Managers",
+        "packages": "Packages",
+        "payouts": "Payout approvals",
+        "payoutsShort": "Payouts",
+        "providers": "Payment providers",
+        "providersShort": "Providers",
+        "publish": "Publish",
+        "roles": "Roles",
+        "security": "Security policy",
+        "teacherRates": "Teacher rates",
+        "users": "Users"
+      },
+      "pending": "Pending",
+      "price": "Price",
+      "quickActions": {
+        "approvePayouts": "Approve payouts",
+        "editPackages": "Edit packages",
+        "reviewUsers": "Review users"
+      },
+      "save": "Save",
+      "section": {
+        "commerce": "Commerce",
+        "compliance": "Compliance",
+        "finance": "Finance",
+        "organization": "Organization",
+        "platform": "Platform"
+      },
+      "status": "Status",
+      "studentsPairs": "Students and credits",
+      "suspended": "Suspended",
+      "teacher": "Teacher",
+      "teacherPayRates": "Finance → Teacher pay rates",
+      "teachers": "Teachers",
+      "total": "Total",
+      "type": "Type",
+      "value": "Value",
+      "viewPublicPricing": "View public pricing",
+      "yes": "Yes",
+      "severity": {
+        "info": "info",
+        "warning": "warning",
+        "critical": "critical"
+      }
+    },
+    "emailHealth": {
+      "metric": {
+        "accounts": "Accounts with email",
+        "bounced": "Bounced addresses",
+        "delivery": "Email delivery configured",
+        "signIns": "Sign-ins (7 days)",
+        "verified": "Verified inboxes",
+        "webhook": "Postmark bounce webhook"
+      },
+      "value": {
+        "configured": "Configured",
+        "missingSecret": "Missing secret",
+        "verified": "{count} ({percent}%)"
+      }
+    },
+    "executiveStat": {
+      "accounts": {
+        "helper": "Rows in users",
+        "label": "Total accounts"
+      },
+      "integrations": {
+        "helper": "From environment configuration",
+        "label": "Integrations healthy"
+      },
+      "security": {
+        "helper": "Warning or critical audit events",
+        "label": "Security alerts (7d)"
+      },
+      "sessions": {
+        "helper": "Current sign-ins",
+        "label": "Active sessions"
+      }
+    },
+    "finance": {
+      "ledger": {
+        "chart": {
+          "delivered": "Delivered",
+          "earned": "Earned",
+          "orders": "Orders",
+          "paid": "Paid",
+          "revenue": "Revenue",
+          "unsettled": "Unsettled"
+        },
+        "charts": {
+          "cashCollected": "Cash collected from paid packages (USD per day)",
+          "deliveredClasses": "Classes marked delivered with earnings (count per day)",
+          "lifetimeTotals": "All-time revenue, earned, paid out, and unsettled teacher pay (USD)",
+          "paidCheckouts": "Package checkouts marked paid (count per day)",
+          "subtitle": "Revenue, orders, delivery, and lifetime totals from PostgreSQL.",
+          "teacherEarnings": "Teacher payout earned per delivered class (USD per day)",
+          "title": "Trends (7 days)"
+        },
+        "notice": "Outstanding credits, prepaid liability, and unsettled teacher earnings.",
+        "snapshot": {
+          "deferred": "Prepaid, not taught",
+          "deferredTrend": "{credits} credits in student accounts",
+          "earned": "Teacher pay earned",
+          "earnedTrend": "{classes} delivered classes · {thisMonth} this month",
+          "margin": "Academy margin (delivered)",
+          "marginTrend": "Revenue − prepaid − teacher pay",
+          "paid": "Teacher pay sent",
+          "paidTrend": "{amount} not in a payout yet",
+          "revenue": "Package revenue",
+          "revenueTrend": "{orders} orders · {credits} credits sold"
+        },
+        "subtitle": "Outstanding credits, prepaid liability, and unsettled teacher earnings."
+      },
+      "payouts": {
+        "approveAndPay": "Approve & pay",
+        "batches": "Batches",
+        "batchesSubtitle": "Biweekly or monthly teacher settlements",
+        "byTeacher": "By teacher",
+        "byTeacherSubtitle": "Delivered classes in the database",
+        "classes": "Classes",
+        "empty": "No payout batches in the database. Managers will submit drafts here once payout_batches exists.",
+        "notice": "{count} batch(es) waiting. Amounts are estimated from delivered classes (55% of tuition) until Stripe Connect and payout_batches ship. Approval still requires password or TOTP.",
+        "payoutEst": "Payout (est.)",
+        "period": "Period",
+        "subtitle": "Managers submit periods; admin approves and executes with re-authentication.",
+        "tuitionGross": "Tuition (gross)",
+        "status": {
+          "draft": "Draft",
+          "awaiting-approval": "Awaiting approval",
+          "paid": "Paid"
+        }
+      },
+      "providers": {
+        "configureStripe": "Configure Stripe",
+        "enabledForAcademy": "Enabled for academy",
+        "notice": "API keys stay in environment variables (see Platform → Integrations). Toggles here control which rails are active — no secrets in the browser.",
+        "saveSettings": "Save provider settings",
+        "subtitle": "Checkout for students and payout rails for teachers.",
+        "status": {
+          "connected": "connected",
+          "setup-needed": "setup needed",
+          "not-configured": "not configured",
+          "disabled": "disabled"
+        }
+      }
+    },
+    "integration": {
+      "description": {
+        "billing": "Package checkout (Stripe Checkout) and teacher payouts (Connect transfers). Webhook: /api/webhooks/stripe.",
+        "email": "Verification codes, password reset, and security notices.",
+        "google": "OAuth client for web (and Android client when configured).",
+        "meet": "Meeting provider: {provider}. Keys: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET.",
+        "storageCloud": "Class recordings in B2 (B2_* variables).",
+        "storageLocal": "Files under storage/recordings until RECORDING_STORAGE=cloud."
+      },
+      "name": {
+        "googleSignIn": "Google sign-in",
+        "localRecordings": "Local recordings",
+        "stripeTest": "Stripe (test mode)"
+      },
+      "owner": {
+        "finance": "Finance",
+        "platform": "Platform"
+      }
+    },
+    "ledgerSnapshot": {
+      "booked": {
+        "label": "Credits booked",
+        "trend": "{count} canceled (incl. refunds)"
+      },
+      "delivered": {
+        "label": "Classes delivered",
+        "trend": "{credits} credits consumed"
+      },
+      "gross": {
+        "label": "Gross revenue (delivered)",
+        "trend": "From catalog price × booked credits"
+      },
+      "margin": {
+        "label": "Academy margin (est.)",
+        "trend": "Delivered revenue − teacher share"
+      },
+      "payouts": {
+        "label": "Teacher earnings (unsettled)",
+        "trend": "{teachers} teachers with delivered classes"
+      },
+      "pipeline": {
+        "label": "Pipeline (not delivered)",
+        "trend": "{count} upcoming or live"
+      }
+    },
+    "management": {
+      "audit": {
+        "action": {
+          "accountSuspended": "Suspended an account",
+          "cancellationPolicyUpdated": "Updated the cancellation policy",
+          "creditRefundIssued": "Issued a credit refund",
+          "lateCancelationRejected": "Rejected a late cancellation",
+          "managerRoleGranted": "Granted the Manager role",
+          "signingKeyRotated": "Rotated the meeting provider signing key",
+          "teachersInvited": "Invited two teachers"
+        },
+        "at": {
+          "nov11": "Nov 11 · {time}",
+          "nov12": "Nov 12 · {time}",
+          "nov13": "Nov 13 · {time}",
+          "nov14": "Nov 14 · {time}",
+          "today": "Today · {time}",
+          "yesterday": "Yesterday · {time}"
+        },
+        "empty": "No events yet. Sign-ins and security changes appear here.",
+        "recentEvents": "Recent events",
+        "recentEventsSubtitle": "Latest {count} events · {warnings} warnings",
+        "subtitle": "Sign-ins, password and two-factor changes, rate limits, and other security events.",
+        "system": "System",
+        "target": {
+          "academySettings": "Academy settings",
+          "class": "Class {id}",
+          "invoice": "Invoice {id}",
+          "meetingProvider": "Meeting provider"
+        },
+        "via": "via {method}"
+      },
+      "billing": {
+        "date": {
+          "nov10": "Nov 10, 2026",
+          "nov12": "Nov 12, 2026",
+          "nov13": "Nov 13, 2026",
+          "nov14": "Nov 14, 2026",
+          "nov15": "Nov 15, 2026"
+        },
+        "demoNotice": "Checkout is a clearly labeled static demo. Invoice actions validate permissions but do not charge a card or write to a payments provider.",
+        "issued": "issued {date}",
+        "plan": {
+          "individual": "Individual · {minutes} min · {classes} classes",
+          "paired": "Paired · {minutes} min · {classes} classes"
+        },
+        "planCatalog": "Plan catalog",
+        "recentInvoices": "Recent invoices",
+        "recentInvoicesSubtitle": "The last five plans issued to students",
+        "stat": {
+          "mrr": {
+            "helper": "+8.4% vs. October",
+            "label": "Monthly recurring revenue"
+          },
+          "open": {
+            "helper": "2 awaiting payment",
+            "label": "Open invoices"
+          },
+          "refunds": {
+            "helper": "3 credited classes",
+            "label": "Refunds this month"
+          },
+          "renewal": {
+            "helper": "Target is 80%",
+            "label": "Renewal rate"
+          }
+        },
+        "subtitle": "Plans, invoices, and refunds for the academy.",
+        "title": "Billing",
+        "status": {
+          "paid": "paid",
+          "due": "due",
+          "refunded": "refunded"
+        }
+      },
+      "breadcrumb": {
+        "manager": "Manager"
+      },
+      "integration": {
+        "billing": {
+          "description": "Checkout is a static demo. Connect the provider before charging real cards.",
+          "name": "Payments"
+        },
+        "email": {
+          "description": "Verification codes and notifications via Gmail SMTP (default) or Postmark (EMAIL_PROVIDER).",
+          "name": "Transactional email"
+        },
+        "google": {
+          "description": "OAuth client for one-tap sign-in. Falls back to the sample session until keys exist.",
+          "name": "Google sign-in"
+        },
+        "meet": {
+          "description": "In-app video, screen share, and room tokens. Configure LIVEKIT_* in the environment."
+        },
+        "owner": {
+          "finance": "Finance",
+          "platform": "Platform"
+        },
+        "storage": {
+          "description": "S3-compatible bucket for class recordings and large material files (B2_* env vars)."
+        }
+      },
+      "integrations": {
+        "keysNotice": "Keys live in the server's .env, never in the database or the browser: edit them there and restart the server. This page only shows which variables are set, not their values.",
+        "owner": "Owner: {owner}",
+        "providerDocs": "Provider docs",
+        "subtitle": "External services the academy depends on.",
+        "title": "Integrations",
+        "variable": {
+          "missing": "missing",
+          "optional": "optional",
+          "set": "set"
+        },
+        "status": {
+          "connected": "Connected",
+          "action-needed": "Action needed",
+          "not-configured": "Not configured"
+        }
+      },
+      "people": {
+        "accounts": "Accounts",
+        "accountsSubtitle": "Suspended means email bounced — transactional mail is suppressed until the address is fixed.",
+        "allRoles": "All roles",
+        "clearFilters": "Clear filters",
+        "column": {
+          "joined": "Joined",
+          "links": "Links",
+          "name": "Name",
+          "roles": "Roles",
+          "status": "Status",
+          "twoFactor": "2FA"
+        },
+        "contactTopic": "message for {role}",
+        "empty": {
+          "filtered": "No accounts match these filters.",
+          "none": "No accounts yet. Run db:seed or sign up on the site."
+        },
+        "manageRoles": "Manage roles",
+        "roleLabel": "Role",
+        "search": "Search",
+        "searchLabel": "Search name or email",
+        "studentsAndPairs": "Students & pairs",
+        "studentsAriaLabel": "Open students directory for {name}",
+        "studentsTooltip": "Students, pairs, and credit balances",
+        "subtitle": "Accounts can hold multiple roles; status reflects email verification and delivery health.",
+        "twoFactor": {
+          "off": "Off",
+          "on": "On"
+        },
+        "status": {
+          "active": "Active",
+          "invited": "Invited",
+          "suspended": "Suspended"
+        },
+        "statusHint": {
+          "active": "Verified and deliverable",
+          "invited": "Email not verified yet",
+          "suspended": "Email bounced — not a manual ban"
+        }
+      },
+      "roles": {
+        "cardHelper": "accounts · priority {priority}",
+        "granted": "Granted",
+        "matrixSubtitle": "{permissions} permissions across {roles} roles",
+        "matrixTitle": "Permission matrix",
+        "openSettings": "Open access settings",
+        "permissionHeader": "Permission",
+        "serverRules": "Server rules: the Student role cannot be removed, and the academy must keep at least one administrator. Opening another role dashboard redirects to the active dashboard instead of rendering two at once.",
+        "subtitle": "Cumulative access: a higher role includes every permission below it.",
+        "title": "Roles and permissions"
+      },
+      "rooms": {
+        "classDetails": "Class details",
+        "classrooms": "Classrooms",
+        "close": "Close",
+        "column": {
+          "actions": "Actions",
+          "class": "Class",
+          "time": "Time"
+        },
+        "detail": {
+          "absent": "Absent",
+          "agenda": "Agenda",
+          "classroom": "Classroom",
+          "description": "Description",
+          "inRoom": "In room",
+          "joined": "Joined the classroom",
+          "notJoined": "Not joined yet",
+          "outcomes": "Outcomes",
+          "provider": "Provider: {provider} · Room id: {roomId}",
+          "schedule": "Schedule",
+          "sessionNotStarted": "not started.",
+          "sessionNotStartedWaiting": "not started yet — students wait for the teacher.",
+          "sessionStarted": "started — room is broadcasting.",
+          "startGateOff": "Teacher start gate is off — the room follows the schedule window only.",
+          "students": "Students",
+          "teacher": "Teacher",
+          "teacherLiveSession": "Teacher live session:"
+        },
+        "empty": {
+          "filtered": "No classes match the current filters.",
+          "noClasses": "No classes scheduled on this day. Pick another date or check the academy calendar."
+        },
+        "enter": "Enter",
+        "enterBlocked": {
+          "canceled": "This class was canceled.",
+          "ended": "This class has ended.",
+          "onlyLive": "You can enter only while the class is live.",
+          "waitingTeacher": "Waiting for the teacher to start the live session."
+        },
+        "enterRoom": "Enter room",
+        "filter": {
+          "any": "Any",
+          "canEnter": "Can enter",
+          "day": "Day",
+          "live": "Live",
+          "search": "Search",
+          "searchPlaceholder": "Topic, teacher, student…",
+          "status": "Status"
+        },
+        "live": "Live",
+        "liveNow": "Live now",
+        "liveOnly": "Live only",
+        "noStudentsEnrolled": "No students enrolled",
+        "noStudentsEnrolledYet": "No students enrolled yet.",
+        "notLive": "Not live",
+        "onSchedule": "On schedule",
+        "sessionStatus": {
+          "canceled": "Canceled",
+          "ended": "Ended",
+          "inProgress": "In progress",
+          "scheduled": "Scheduled"
+        },
+        "status": {
+          "live": "Live now",
+          "maintenance": "Maintenance",
+          "ready": "Ready"
+        },
+        "studentsCount": "{count} students",
+        "subtitle": "Scheduled classes for the day — you can enter the classroom only while it is live.",
+        "subtitleFiltered": "{shown} of {total} match filters",
+        "subtitleMany": "{count} classes on {day}",
+        "subtitleOne": "1 class on {day}",
+        "teacherSessionOpen": "Teacher session open",
+        "title": "Rooms",
+        "viewClassDetails": "View class details",
+        "waiting": "Waiting",
+        "waitingForTeacher": "Waiting for teacher"
+      },
+      "staff": {
+        "detail": {
+          "classes": "Classes",
+          "profileNotCompleted": "Profile not completed",
+          "rating": "Rating",
+          "teacher": "Teacher"
+        },
+        "empty": {
+          "filtered": "No teachers match the current filters.",
+          "none": "No teachers on the roster yet. Approve applications or promote a verified student."
+        },
+        "filter": {
+          "allCountries": "All countries",
+          "allLevels": "All levels",
+          "any": "Any",
+          "availability": "Availability",
+          "bookable": "Bookable",
+          "country": "Country",
+          "hasWindows": "Has windows",
+          "level": "Level",
+          "noWindows": "No windows",
+          "notBookable": "Not bookable",
+          "search": "Search",
+          "searchPlaceholder": "Name, headline, country…"
+        },
+        "matchFilters": "{shown} of {total} match filters",
+        "onRoster": "{count} on roster",
+        "schedule": "Schedule",
+        "specialty": {
+          "business": "Business and interview Spanish",
+          "conversation": "Beginner conversation",
+          "grammar": "Grammar and exam preparation",
+          "operations": "Academy operations and billing",
+          "pronunciation": "Pronunciation and travel Spanish"
+        },
+        "subtitle": "Teachers on the academy roster — filter and review teaching load and booking readiness.",
+        "teachers": "Teachers",
+        "title": "Staff",
+        "level": {
+          "1": "New teacher",
+          "2": "Established",
+          "3": "Senior",
+          "4": "Top teacher"
+        }
+      }
+    },
+    "managerStat": {
+      "classes": {
+        "helper": "{attended}% attended (completed)",
+        "label": "Classes this week"
+      },
+      "revenue": {
+        "helper": "{pipeline} in the pipeline",
+        "label": "Revenue delivered"
+      },
+      "students": {
+        "helper": "Accounts with student role",
+        "label": "Active students"
+      },
+      "utilization": {
+        "helper": "{classes} classes / {teachers} teachers",
+        "label": "Teacher utilization"
+      }
+    },
+    "meta": {
+      "applications": {
+        "description": "Review applications to teach",
+        "title": "Teacher applications"
+      },
+      "audit": {
+        "description": "Security and account events",
+        "title": "Audit log"
+      },
+      "dashboard": {
+        "description": "Platform access and academy governance",
+        "title": "Admin dashboard"
+      },
+      "email": {
+        "description": "Transactional email health and bounces",
+        "title": "Email deliverability"
+      },
+      "integrations": {
+        "description": "Meeting, email, storage, and payment providers",
+        "title": "Integrations"
+      },
+      "ledger": {
+        "description": "Revenue, prepaid credits and teacher pay from the database",
+        "title": "Credit ledger"
+      },
+      "managers": {
+        "description": "Operations managers for the academy",
+        "title": "Managers"
+      },
+      "packages": {
+        "description": "Admin catalog of class packages and prices",
+        "title": "Packages"
+      },
+      "payouts": {
+        "description": "Approve and record teacher payouts",
+        "title": "Payout approvals"
+      },
+      "providers": {
+        "description": "Checkout and payout provider status",
+        "title": "Payment providers"
+      },
+      "roles": {
+        "description": "Cumulative roles and permissions",
+        "title": "Roles"
+      },
+      "rooms": {
+        "description": "Live class policy from environment",
+        "title": "Classroom defaults"
+      },
+      "security": {
+        "description": "Platform authentication and access controls",
+        "title": "Security policy"
+      },
+      "students": {
+        "description": "Pairs, class credits and package purchases",
+        "title": "Students and credits"
+      },
+      "teacherRates": {
+        "description": "Pay per delivered class and teacher levels",
+        "title": "Teacher pay rates"
+      },
+      "users": {
+        "description": "Academy accounts and access state",
+        "title": "Users"
+      }
+    },
+    "organization": {
+      "managers": {
+        "active": "Active managers",
+        "activeEmpty": "No managers yet. Invite someone or promote an existing user.",
+        "activeSubtitle": "Remove access returns the account to student.",
+        "grantRole": "Grant manager role",
+        "inviteByEmail": "Invite by email",
+        "inviteDialogHelp": "If they already have an account, they get this in Email in the app. Otherwise they register with this address first.",
+        "inviteManagerByEmail": "Invite manager by email",
+        "join": {
+          "accept": "Accept and open manager dashboard",
+          "confirmation": "I understand managers prepare payout batches and oversee teachers; only the admin approves transfers.",
+          "emailMismatchMiddle": "You are signed in as {email}.",
+          "emailMismatchPrefix": "This invitation was sent to",
+          "emailMismatchSuffix": "Sign out and sign in with the invited email to continue.",
+          "experienceLabel": "Operations experience",
+          "experiencePlaceholder": "Example: 3 years coordinating ESL teachers, monthly payroll, student support…",
+          "intro": "Tell us about your operations experience (scheduling, billing, teacher support). The admin approved inviting you to prepare payouts and run day-to-day academy work.",
+          "noteTitle": "Note from the admin"
+        },
+        "managerSince": "Manager since {date}",
+        "noteLabel": "Note to invitee (optional)",
+        "notice": "Managers cannot self-serve: invite via the in-app Email inbox or promote an existing verified account. Teacher applications stay on the applications page — this flow is for operations leads only.",
+        "pending": "Pending invitations",
+        "pendingEmpty": "No pending invitations. Use the mail or user icon above to invite or promote.",
+        "pendingSubtitle": "Open invites expire after 14 days",
+        "promoteDialogHelp": "The account must already exist with a verified email. The manager role is granted immediately.",
+        "promoteExisting": "Promote existing user",
+        "promoteVerifiedUser": "Promote verified user to manager",
+        "removeAccess": "Remove access",
+        "revoke": "Revoke",
+        "sendInvitation": "Send invitation",
+        "sentExpires": "Sent {sent} · expires {expires}",
+        "subtitle": "Invitations notify the academy inbox inside the app — not Gmail. Invitees accept at /join/manager.",
+        "verifiedEmail": "Verified account email"
+      }
+    },
+    "overview": {
+      "activityEmpty": "No audit events yet.",
+      "chart": {
+        "bookings": "All bookings by lifecycle status (now)",
+        "cashCollected": "Cash collected (USD per day)",
+        "classes": "Classes",
+        "fullFinanceHint": "Revenue",
+        "individual": "Individual {percent}%",
+        "paired": "Paired {percent}%",
+        "revenue": "Revenue",
+        "sessions": "Sessions scheduled to start (daily)"
+      },
+      "dataNote": "Platform KPIs and operations charts load from PostgreSQL. Finance trends and margin detail are on Credit ledger.",
+      "healthEmpty": "No open alerts. Integrations, email, and security look clear from current data.",
+      "openAuditLog": "Open full audit log",
+      "operations": {
+        "subtitle": "Booking volume and a quick revenue pulse (last 7 days).",
+        "title": "Operations"
+      },
+      "subtitle": "Here's today's snapshot of Spanglish — revenue, enrollments, and anything that needs your attention.",
+      "toolbar": {
+        "latestActivity": "Latest activity",
+        "platformHealth": "Platform health",
+        "studentsCredits": "Students & credits"
+      },
+      "welcome": "Welcome, {name}"
+    },
+    "payoutBatch": {
+      "manager": "Estimated from live_classes",
+      "period": "Through {date}"
+    },
+    "platform": {
+      "email": {
+        "dnsHint": "Add the Postmark DKIM and SPF records in your DNS before sending production mail.",
+        "health": "Health",
+        "healthSubtitle": "From users and audit_logs",
+        "metric": "Metric",
+        "noticeMiddle": "SMTP/Postmark is for login verification codes only.",
+        "noticePrefix": "Class notices are delivered in",
+        "noticeSuffix": "Bounces update users.email_bounced_at via the Postmark webhook when configured.",
+        "subtitle": "SMTP/Postmark is for login verification codes only. Other notices go to in-app Email.",
+        "status": {
+          "ok": "ok",
+          "watch": "watch",
+          "action": "action"
+        }
+      },
+      "rooms": {
+        "policyFlags": "Policy flags",
+        "policyFlagsSubtitle": "Change via deployment env, then redeploy",
+        "relaxJoin": "Relax join window",
+        "relaxJoinDetail": "Allow joining outside the scheduled window (keep off in production).",
+        "subtitle": "Live session policy from environment (not per-class overrides yet).",
+        "teacherStarts": "Teacher starts session",
+        "teacherStartsDetail": "Classroom stays locked until the assigned teacher starts the live session.",
+        "waitingRoom": "Waiting room",
+        "waitingRoomDetail": "Students wait until the teacher admits them (when LiveKit supports it).",
+        "notice": "Meeting provider: {provider}. Operational room list for managers stays on the manager dashboard."
+      },
+      "security": {
+        "activePolicies": "Active policies",
+        "captchaDetail": "Sign-up, code requests, and password reset when TURNSTILE_SECRET_KEY is set.",
+        "demoAccounts": "Demo accounts on login",
+        "demoDetail": "Only development or ENABLE_DEMO_ACCOUNTS=true.",
+        "googleDetail": "OAuth with PKCE via Better Auth.",
+        "googleSignIn": "Google sign-in",
+        "notice": "Managed in src/env.ts and deployment environment.",
+        "singleAdmin": "Single academy admin",
+        "singleAdminDetail": "ADMIN_EMAIL or promote CLI; cannot change admin from the app.",
+        "status": {
+          "enforced": "Enforced",
+          "hidden": "Hidden",
+          "optional": "Optional",
+          "visible": "Visible"
+        },
+        "subtitle": "Platform-wide auth and access controls (read-only summary).",
+        "twoFactor": {
+          "detail": "Optional for all accounts today. Staff should enable before handling payouts.",
+          "title": "Two-factor authentication"
+        },
+        "your2fa": "Your 2FA"
+      }
+    },
+    "teacherRates": {
+      "description": "Teachers in the database at this learning level.",
+      "level": {
+        "advanced": "Advanced cohort",
+        "beginner": "Beginner cohort",
+        "intermediate": "Intermediate cohort",
+        "notSet": "Level not set"
+      }
+    }
+  }
+}

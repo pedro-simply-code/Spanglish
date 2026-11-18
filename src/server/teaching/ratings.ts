@@ -1,4 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent } from "@/server/audit/audit-log";
 import { getSessionAccess } from "@/server/classes/class-repository";
@@ -21,20 +22,21 @@ export async function rateClass(
   actor: AuthSession,
   input: { classId: string; stars: number; comment?: string },
 ) {
+  const t = await getTranslations("ops.teaching");
   const stars = Math.round(Number(input.stars));
   if (!Number.isFinite(stars) || stars < 1 || stars > 5) {
-    return { ok: false as const, message: "Choose 1 to 5 stars." };
+    return { ok: false as const, message: t("ratingStars") };
   }
   const access = await getSessionAccess(input.classId);
   if (!access || !access.participantIds.includes(actor.userId)) {
-    return { ok: false as const, message: "You can only rate classes you took." };
+    return { ok: false as const, message: t("ratingOnlyTaken") };
   }
   const ended = access.row.endsAt.getTime();
   if (access.row.status !== "scheduled" || ended > Date.now()) {
-    return { ok: false as const, message: "You can rate the class after it ends." };
+    return { ok: false as const, message: t("ratingAfterEnd") };
   }
   if (Date.now() - ended > RATING_WINDOW_DAYS * 86_400_000) {
-    return { ok: false as const, message: `Ratings close ${RATING_WINDOW_DAYS} days after the class.` };
+    return { ok: false as const, message: t("ratingClosed", { days: RATING_WINDOW_DAYS }) };
   }
 
   const comment = input.comment?.trim().slice(0, 1000) || null;
@@ -52,7 +54,7 @@ export async function rateClass(
     targetId: input.classId,
     metadata: { stars },
   });
-  return { ok: true as const, message: "Thanks for your rating." };
+  return { ok: true as const, message: t("ratingThanks") };
 }
 
 export type RecentRating = { stars: number; comment: string | null; studentName: string; createdAt: string };

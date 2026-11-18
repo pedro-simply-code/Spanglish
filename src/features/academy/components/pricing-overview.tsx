@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import Card from "@mui/material/Card";
@@ -32,36 +33,79 @@ import type {
   PackageSize,
 } from "@/features/academy/data";
 
+type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
+type StudentKey = Parameters<StudentTranslator>[0];
+
 const included = [
   {
-    title: "Certified teachers",
-    description: "Native speakers with real classroom experience.",
+    titleKey: "pricing.included.teachers.title",
+    descriptionKey: "pricing.included.teachers.description",
     icon: <IconUser size={22} />,
   },
   {
-    title: "Flexible scheduling",
-    description: "Book, move or cancel classes around your week.",
+    titleKey: "pricing.included.scheduling.title",
+    descriptionKey: "pricing.included.scheduling.description",
     icon: <IconCalendarEvent size={22} />,
   },
   {
-    title: "Progress reports",
-    description: "See what improved and what to practice next.",
+    titleKey: "pricing.included.reports.title",
+    descriptionKey: "pricing.included.reports.description",
     icon: <IconChartLine size={22} />,
   },
   {
-    title: "Class recordings",
-    description: "Review every lesson and keep the momentum.",
+    titleKey: "pricing.included.recordings.title",
+    descriptionKey: "pricing.included.recordings.description",
     icon: <IconHeadset size={22} />,
   },
 ];
+
+const planNameKeys: Record<string, string> = {
+  "paired-30": "pricing.plan.name.pairedStarter",
+  "paired-60": "pricing.plan.name.pairedProgress",
+  "paired-90": "pricing.plan.name.pairedFluency",
+  "one-on-one-30": "pricing.plan.name.starterSupport",
+  "one-on-one-60": "pricing.plan.name.steadyProgress",
+  "one-on-one-90": "pricing.plan.name.fluencyBuilder",
+};
+
+const planLabelKeys: Record<number, string> = {
+  30: "pricing.plan.label.starter",
+  60: "pricing.plan.label.popular",
+  90: "pricing.plan.label.value",
+};
+
+const planDescriptionKeys: Record<number, string> = {
+  30: "pricing.plan.description.light",
+  60: "pricing.plan.description.steady",
+  90: "pricing.plan.description.fluency",
+};
+
+function planName(t: StudentTranslator, plan: AcademyPlan) {
+  return t(planNameKeys[`${plan.type}-${plan.classes}`] as StudentKey);
+}
+
+function planLabel(t: StudentTranslator, plan: AcademyPlan) {
+  return t(planLabelKeys[plan.classes] as StudentKey);
+}
+
+function planDescription(t: StudentTranslator, plan: AcademyPlan) {
+  return t(planDescriptionKeys[plan.classes] as StudentKey, {
+    audience: t(
+      plan.type === "paired"
+        ? "pricing.plan.audience.eachStudent"
+        : "pricing.plan.audience.you",
+    ),
+  });
+}
 
 type PlanCardProps = {
   plan: AcademyPlan;
   selected: boolean;
   onSelect: () => void;
+  t: StudentTranslator;
 };
 
-function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
+function PlanCard({ plan, selected, onSelect, t }: PlanCardProps) {
   return (
     <ButtonBase
       onClick={onSelect}
@@ -88,13 +132,14 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
           alignItems="flex-start"
         >
           <Box minWidth={0}>
-            <Typography variant="h6">{plan.name}</Typography>
+            <Typography variant="h6">{planName(t, plan)}</Typography>
             <Typography variant="body2" color="text.secondary">
-              {plan.classes} classes · {plan.duration} min
+              {t("pricing.packageOption", { count: plan.classes })} ·{" "}
+              {t("common.minutes", { count: plan.duration })}
             </Typography>
           </Box>
           <Chip
-            label={plan.label}
+            label={planLabel(t, plan)}
             size="small"
             color={plan.classes === 60 ? "primary" : "default"}
             variant={plan.classes === 60 ? "filled" : "outlined"}
@@ -106,14 +151,14 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
             {formatMoney(plan.pricePerClass)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            / class
+            {t("pricing.perClass")}
           </Typography>
         </Stack>
 
         <Typography variant="body1" color="text.secondary" mt={0.5}>
-          {formatMoney(plan.total)} total
+          {formatMoney(plan.total)} {t("common.total").toLowerCase()}
           {plan.perStudentPerClass !== null
-            ? ` · ${formatMoney(plan.perStudentPerClass)} per student`
+            ? ` · ${t("pricing.perStudentTotal", { amount: formatMoney(plan.perStudentPerClass) })}`
             : ""}
         </Typography>
 
@@ -123,12 +168,12 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
           mt={2}
           flexGrow={1}
         >
-          {plan.description}
+          {planDescription(t, plan)}
         </Typography>
 
         {plan.savings > 0 ? (
           <Chip
-            label={`Save ${plan.savings}%`}
+            label={t("pricing.save", { percent: plan.savings })}
             color="success"
             size="small"
             sx={{ mt: 2, alignSelf: "flex-start" }}
@@ -142,7 +187,7 @@ function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
             fontWeight={selected ? 600 : 400}
             color={selected ? "primary.main" : "text.secondary"}
           >
-            {selected ? "Selected plan" : "Select plan"}
+            {selected ? t("pricing.selectedPlan") : t("pricing.selectPlan")}
           </Typography>
         </Stack>
       </Box>
@@ -168,6 +213,7 @@ type PricingOverviewProps = {
 };
 
 export function PricingOverview({ plans }: PricingOverviewProps) {
+  const t = useTranslations("student");
   const [duration, setDuration] = useState<ClassDuration>(25);
   const [type, setType] = useState<ClassType>("one-on-one");
   const [classes, setClasses] = useState<PackageSize>(60);
@@ -181,16 +227,16 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Pricing"
-        subtitle="Live classes with certified teachers, built around your schedule."
+        title={t("pricing.breadcrumbTitle")}
+        subtitle={t("pricing.breadcrumbSubtitle")}
       />
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <Stack spacing={3}>
             <SectionCard
-              title="Select your package"
-              subtitle="Choose session length and class format, then pick a credit bundle"
+              title={t("pricing.selectTitle")}
+              subtitle={t("pricing.selectSubtitle")}
             >
               <PackagePlanFilters
                 duration={duration}
@@ -208,13 +254,14 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                       plan={plan}
                       selected={plan.classes === classes}
                       onSelect={() => setClasses(plan.classes)}
+                      t={t}
                     />
                   </Grid>
                 ))}
               </Grid>
 
               <Typography variant="body2" color="text.secondary" mt={2.5}>
-                Monthly payment options available at checkout.
+                {t("pricing.monthlyNote")}
               </Typography>
             </SectionCard>
           </Stack>
@@ -233,15 +280,13 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                 alignItems="flex-start"
               >
                 <Box>
-                  <Typography variant="h5">Your plan</Typography>
+                  <Typography variant="h5">{t("pricing.yourPlan")}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Live{" "}
-                    {classTypeLabel(selectedPlan.type)}{" "}
-                    classes
+                    {t("pricing.livePlan", { type: classTypeLabel(selectedPlan.type, t) })}
                   </Typography>
                 </Box>
                 <Chip
-                  label={selectedPlan.label}
+                  label={planLabel(t, selectedPlan)}
                   color={selectedPlan.classes === 60 ? "primary" : "default"}
                   size="small"
                   variant="outlined"
@@ -252,23 +297,23 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
 
               <Stack spacing={1.5}>
                 <SummaryRow
-                  label="Package"
-                  value={`${selectedPlan.classes} classes`}
+                  label={t("common.package")}
+                  value={t("pricing.packageOption", { count: selectedPlan.classes })}
                 />
                 <SummaryRow
-                  label="Duration"
-                  value={`${selectedPlan.duration} minutes`}
+                  label={t("common.duration")}
+                  value={t("pricing.durationOption", { count: selectedPlan.duration })}
                 />
                 <SummaryRow
-                  label="Format"
+                  label={t("common.format")}
                   value={
                     selectedPlan.type === "paired"
-                      ? "Paired (2 students)"
-                      : "Individual"
+                      ? t("pricing.formatPaired")
+                      : t("pricing.formatIndividual")
                   }
                 />
                 <SummaryRow
-                  label="Price per class"
+                  label={t("common.pricePerClass")}
                   value={formatMoney(selectedPlan.pricePerClass)}
                 />
               </Stack>
@@ -280,7 +325,7 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                 justifyContent="space-between"
                 alignItems="baseline"
               >
-                <Typography variant="h5">Total</Typography>
+                <Typography variant="h5">{t("pricing.total")}</Typography>
                 <Typography
                   variant="h3"
                   fontWeight={700}
@@ -296,7 +341,7 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                   color="text.secondary"
                   textAlign="right"
                 >
-                  {formatMoney(selectedPlan.perStudentTotal)} per student
+                  {t("pricing.perStudentTotal", { amount: formatMoney(selectedPlan.perStudentTotal) })}
                 </Typography>
               ) : null}
 
@@ -308,7 +353,7 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                 endIcon={<IconArrowRight size={18} />}
                 sx={{ mt: 3 }}
               >
-                Continue to checkout
+                {t("actions.continueCheckout")}
               </LinkButton>
 
               <Stack direction="row" spacing={1} alignItems="flex-start" mt={2}>
@@ -316,8 +361,7 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                   <IconShieldCheck size={18} />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  Monthly payment options available at checkout. Reschedule any
-                  class up to 12 hours before it starts.
+                  {t("pricing.finePrint")}
                 </Typography>
               </Stack>
             </CardContent>
@@ -326,12 +370,12 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
 
         <Grid size={12}>
           <SectionCard
-            title="Every package includes"
-            subtitle="Everything you need to make progress stick"
+            title={t("pricing.includesTitle")}
+            subtitle={t("pricing.includesSubtitle")}
           >
             <Grid container spacing={3}>
               {included.map((item) => (
-                <Grid key={item.title} size={{ xs: 12, sm: 6, lg: 3 }}>
+                <Grid key={item.titleKey} size={{ xs: 12, sm: 6, lg: 3 }}>
                   <Stack direction="row" spacing={2} alignItems="flex-start">
                     <Box
                       sx={{
@@ -349,10 +393,10 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
                     </Box>
                     <Box>
                       <Typography variant="subtitle1" fontWeight={600}>
-                        {item.title}
+                        {t(item.titleKey as StudentKey)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {item.description}
+                        {t(item.descriptionKey as StudentKey)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -360,8 +404,7 @@ export function PricingOverview({ plans }: PricingOverviewProps) {
               ))}
             </Grid>
             <Typography variant="body2" color="text.secondary" mt={3}>
-              All prices are in USD. Packages are charged once and credits stay
-              valid for 12 months.
+              {t("pricing.priceNote")}
             </Typography>
           </SectionCard>
         </Grid>

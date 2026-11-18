@@ -8,6 +8,7 @@ import Card from "@mui/material/Card";
 import Drawer from "@mui/material/Drawer";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import {
   markMessageReadAction,
@@ -35,6 +36,8 @@ type EmailMailboxProps = {
 export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
+  const t = useTranslations("apps");
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
 
@@ -141,16 +144,22 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
   const handlePickRecipient = (recipient: MessageRecipient) => {
     setComposeDraft({
       to: recipient.email,
-      subject: `Spanglish — message for ${recipient.name}`,
-      body: `Hi ${recipient.name},\n\n\n`,
+      subject: t("email.compose.subjectFor", { name: recipient.name }),
+      body: t("email.compose.greeting", { name: recipient.name }),
     });
   };
 
   const handleReply = (email: Email) => {
     setComposeDraft({
       to: email.counterpartEmail,
-      subject: email.subject.startsWith("Re:") ? email.subject : `Re: ${email.subject}`,
-      body: `\n\n---\nOn ${email.time.toLocaleString()}, ${email.from} wrote:\n${email.emailExcerpt}`,
+      subject: email.subject.startsWith("Re:")
+        ? email.subject
+        : t("email.compose.replySubject", { subject: email.subject }),
+      body: t("email.compose.replyBody", {
+        time: email.time.toLocaleString(locale),
+        sender: email.from,
+        excerpt: email.emailExcerpt,
+      }),
     });
   };
 
@@ -163,11 +172,11 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Academy email"
+        title={t("email.breadcrumb.title")}
         subtitle={
           unreadInbox
-            ? `${unreadInbox} unread in your inbox — messages also go to the recipient's real email when delivery is configured.`
-            : "Send and read messages inside Spanglish only — each account's inbox in the app, not external Gmail."
+            ? t("email.breadcrumb.subtitleUnread", { count: unreadInbox })
+            : t("email.breadcrumb.subtitleDefault")
         }
       />
 
@@ -218,7 +227,7 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
           {visibleEmails.length === 0 ? (
             <Box p={3}>
               <Typography variant="body2" color="text.secondary">
-                No messages in this folder yet.
+                {t("email.list.empty")}
               </Typography>
             </Box>
           ) : (
@@ -272,7 +281,7 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
                 onClick={() => setRightSidebarOpen(false)}
                 sx={{ mb: 3 }}
               >
-                Back
+                {t("common.back")}
               </Button>
               <EmailContent
                 email={activeEmail}

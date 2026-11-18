@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import nodemailer from "nodemailer";
 import { env } from "@/env";
 
@@ -6,8 +7,9 @@ export async function sendViaGmailSmtp(input: {
   subject: string;
   text: string;
 }) {
+  const t = await getTranslations("ops.providers");
   if (!env.SMTP_USER || !env.SMTP_PASS || !env.EMAIL_FROM) {
-    return { ok: false as const, error: "Gmail SMTP is not fully configured." };
+    return { ok: false as const, error: t("gmailNotConfigured") };
   }
 
   const transporter = nodemailer.createTransport({
@@ -30,7 +32,7 @@ export async function sendViaGmailSmtp(input: {
     return { ok: true as const };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "SMTP send failed.";
+      error instanceof Error ? error.message : t("gmailSendFailed");
     return { ok: false as const, error: message };
   }
 }

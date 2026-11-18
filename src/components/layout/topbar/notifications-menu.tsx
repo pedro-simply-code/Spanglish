@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconBellRinging, IconMail } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Scrollbar } from "@/components/custom-scroll/scrollbar";
 import type { InboxNotificationItem } from "@/server/messages/mailbox";
 
@@ -21,12 +22,14 @@ type NotificationsMenuProps = {
   unreadCount: number;
 };
 
-const timeLabel = (iso: string) =>
-  new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(
+const timeLabel = (iso: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(
     new Date(iso),
   );
 
 export function NotificationsMenu({ inboxItems, unreadCount }: NotificationsMenuProps) {
+  const t = useTranslations("shell");
+  const locale = useLocale();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -39,7 +42,7 @@ export function NotificationsMenu({ inboxItems, unreadCount }: NotificationsMenu
       <IconButton
         size="large"
         color="inherit"
-        aria-label="Notifications"
+        aria-label={t("topbar.notifications")}
         aria-haspopup="true"
         onClick={(event) => setAnchorEl(event.currentTarget)}
         sx={{ color: open ? "primary.main" : "text.secondary" }}
@@ -65,15 +68,15 @@ export function NotificationsMenu({ inboxItems, unreadCount }: NotificationsMenu
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="h6">Notifications</Typography>
+          <Typography variant="h6">{t("topbar.notifications")}</Typography>
           {unreadCount > 0 ? (
-            <Chip label={`${unreadCount} unread`} color="primary" size="small" />
+            <Chip label={t("topbar.unread", { count: unreadCount })} color="primary" size="small" />
           ) : null}
         </Stack>
 
         {!inboxItems.length ? (
           <Typography variant="body2" color="text.secondary" px={4} pb={3}>
-            No messages yet. Academy mail appears here when someone contacts you or sends a notice.
+            {t("topbar.empty")}
           </Typography>
         ) : null}
 
@@ -109,7 +112,7 @@ export function NotificationsMenu({ inboxItems, unreadCount }: NotificationsMenu
                         {item.subject}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" flexShrink={0}>
-                        {timeLabel(item.createdAt)}
+                        {timeLabel(item.createdAt, locale)}
                       </Typography>
                     </Stack>
                     <Typography variant="caption" color="text.secondary" display="block">
@@ -132,7 +135,7 @@ export function NotificationsMenu({ inboxItems, unreadCount }: NotificationsMenu
 
         <Box p={3} pb={1}>
           <Button component={Link} href="/apps/email" variant="outlined" color="primary" fullWidth onClick={handleClose}>
-            Open Email
+            {t("topbar.openEmail")}
           </Button>
         </Box>
       </Menu>

@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { startClassLiveSessionAction } from "@/features/classes/classroom-actions";
 import { useAppToast } from "@/lib/use-app-toast";
 
@@ -19,6 +20,7 @@ export function ClassroomTeacherStartLobby({
   topic,
 }: ClassroomTeacherStartLobbyProps) {
   const router = useRouter();
+  const t = useTranslations("classroom");
   const { showError, showSuccess } = useAppToast();
   const [pending, setPending] = useState(false);
 
@@ -50,11 +52,10 @@ export function ClassroomTeacherStartLobby({
       <Stack spacing={2} alignItems="center" maxWidth={440} textAlign="center">
         <Typography variant="h6">{topic}</Typography>
         <Typography variant="body2" color="rgba(255,255,255,0.75)">
-          You are the teacher for this class. Start the live session so enrolled students can
-          join the call. Until you start, students only see a waiting screen.
+          {t("lobby.teacher.description")}
         </Typography>
         <Button variant="contained" size="large" disabled={pending} onClick={() => void start()}>
-          {pending ? "Starting…" : "Start live class"}
+          {pending ? t("lobby.teacher.starting") : t("lobby.teacher.start")}
         </Button>
       </Stack>
     </Box>

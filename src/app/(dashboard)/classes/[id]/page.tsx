@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { getClassRelation, loadClassForActor } from "@/features/classes";
 import { ClassDetail } from "@/features/classroom";
@@ -9,12 +10,19 @@ import { getClassPolicy } from "@/server/classes/class-policy";
 import { getActor } from "@/server/auth/session";
 import { getUserProfile } from "@/server/auth/user-repository";
 import { resolveTimeZone } from "@/lib/timezone";
+import { listClassRecordings } from "@/server/classes/recordings";
+import { listClassTranscript } from "@/server/classes/class-transcript-repository";
+import { getClassLearning } from "@/server/learning/class-learning";
+import { listLibraryForStaffOrTeacher } from "@/server/materials/library";
 import { getMyRating } from "@/server/teaching/ratings";
 
-export const metadata: Metadata = {
-  title: "Class details",
-  description: "Agenda, materials, and the live meeting room",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("student");
+  return {
+    title: t("meta.classDetails.title"),
+    description: t("meta.classDetails.description"),
+  };
+}
 
 type ClassDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -31,16 +39,26 @@ export default function ClassDetailPage({ params }: ClassDetailPageProps) {
 async function ClassDetailContent({ params }: ClassDetailPageProps) {
   const { id } = await params;
   const actor = await getActor();
-  const [item, relation, profile, myRating] = await Promise.all([
+  const [item, relation, profile, myRating, recordings, transcript, learning] = await Promise.all([
     loadClassForActor(id, actor),
     getClassRelation(id, actor),
     getUserProfile(actor.userId),
     getMyRating(id, actor.userId),
+    listClassRecordings(actor, id),
+    listClassTranscript(actor, id),
+    getClassLearning(actor, id),
   ]);
 
   if (!item || !relation) {
     notFound();
   }
+
+  const library =
+    relation === "teacher" || relation === "staff"
+      ? (await listLibraryForStaffOrTeacher(actor))
+          .filter((material) => material.status === "published")
+          .map((material) => ({ id: material.id, title: material.title, kind: material.kind }))
+      : [];
 
   return (
     <ClassDetail
@@ -51,6 +69,10 @@ async function ClassDetailContent({ params }: ClassDetailPageProps) {
       viewerId={actor.userId}
       viewerTimeZone={resolveTimeZone(profile?.timezone)}
       myRating={myRating}
+      recordings={recordings}
+      transcript={transcript}
+      learning={learning}
+      library={library}
     />
   );
 }

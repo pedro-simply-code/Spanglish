@@ -1,5 +1,6 @@
 import { NextIntlClientProvider } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
+import { HtmlLangSync } from "@/i18n/html-lang-sync";
 import { getRequestLocale } from "@/i18n/locale";
 import { getMessages } from "@/i18n/messages";
 
@@ -23,6 +24,7 @@ export async function LocaleProvider({
       messages={getMessages(resolved)}
       timeZone="UTC"
     >
+      <HtmlLangSync />
       {children}
     </NextIntlClientProvider>
   );

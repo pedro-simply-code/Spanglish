@@ -1,5 +1,7 @@
+"use client";
+
 import Chip from "@mui/material/Chip";
-import { materialKindLabels } from "@/features/materials/data";
+import { useTranslations } from "next-intl";
 import type { MaterialKind, MaterialStatus } from "@/features/materials/types";
 
 const kindColors: Record<
@@ -29,9 +31,10 @@ type MaterialKindChipProps = {
 };
 
 export function MaterialKindChip({ kind, size = "small" }: MaterialKindChipProps) {
+  const t = useTranslations("educator.materials");
   return (
     <Chip
-      label={materialKindLabels[kind]}
+      label={t(`kind.${kind}`)}
       color={kindColors[kind]}
       size={size}
       variant="outlined"
@@ -40,9 +43,10 @@ export function MaterialKindChip({ kind, size = "small" }: MaterialKindChipProps
 }
 
 export function MaterialStatusChip({ status }: { status: MaterialStatus }) {
+  const t = useTranslations("educator.materials");
   return (
     <Chip
-      label={status.charAt(0).toUpperCase() + status.slice(1)}
+      label={t(`status.${status}`)}
       color={statusColors[status]}
       size="small"
       variant="outlined"

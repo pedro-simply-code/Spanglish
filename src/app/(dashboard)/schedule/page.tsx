@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { appNowDate } from "@/lib/app-clock";
 import { ScheduleOverview } from "@/features/academy";
@@ -14,10 +15,13 @@ import { studentTrialLessonAvailable } from "@/server/classes/booking";
 import { emptyTeacherStats, teacherLevelFor } from "@/lib/teacher-levels";
 import { getTeacherStats } from "@/server/teaching/stats";
 
-export const metadata: Metadata = {
-  title: "Book a class",
-  description: "Schedule a live class with a Spanglish teacher",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("student");
+  return {
+    title: t("meta.schedule.title"),
+    description: t("meta.schedule.description"),
+  };
+}
 
 export default function SchedulePage() {
   return (

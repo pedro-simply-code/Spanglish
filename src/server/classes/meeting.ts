@@ -27,12 +27,12 @@ const providerLabels = {
   livekit: "LiveKit",
   zoom: "Zoom",
   "google-meet": "Google Meet",
-  custom: "Custom meeting room",
 } as const;
 
-export function getMeetingProviderLabel() {
+export function getMeetingProviderLabel(t?: (key: string) => string) {
   if (isLiveKitConfigured()) return "LiveKit";
   const key = env.MEETING_PROVIDER;
+  if (key === "custom") return t ? t("meeting.customProvider") : "Custom meeting room";
   return key in providerLabels
     ? providerLabels[key as keyof typeof providerLabels]
     : "LiveKit";

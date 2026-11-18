@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import type { MarketingLandingSnapshot } from "@/features/marketing/data";
+import type { MarketingLandingSnapshot } from "@/features/marketing";
 import { listTeachers } from "@/server/classes/teachers";
 import { countSessions } from "@/server/classes/class-repository";
 import { listPublishedAcademyPlans } from "@/server/pricing/packages";

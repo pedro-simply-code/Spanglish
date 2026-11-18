@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -74,15 +76,38 @@ type ScheduleOverviewProps = {
   trialEligible?: boolean;
 };
 
+type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
+type StudentKey = Parameters<StudentTranslator>[0];
+
+const focusKeys: Record<string, string> = {
+  "Conversation practice": "schedule.focus.conversation",
+  "Grammar review": "schedule.focus.grammar",
+  "Travel Spanish": "schedule.focus.travel",
+  "Business Spanish": "schedule.focus.business",
+  "Exam preparation": "schedule.focus.exam",
+};
+
+const upcomingTopicKeys: Record<string, string> = {
+  "class-1003": "fixtures.classes.class1003.topic",
+  "class-1004": "fixtures.classes.class1004.topic",
+  "class-1001": "fixtures.classes.class1001.topic",
+  "class-1002": "fixtures.classes.class1002.topic",
+  "class-0901": "fixtures.classes.class0901.topic",
+  "class-0902": "fixtures.classes.class0902.topic",
+  "class-0801": "fixtures.classes.class0801.topic",
+  "class-0802": "fixtures.classes.class0802.topic",
+};
+
 const kindKey = (item: BookingBalance) =>
   item.trial ? `trial-${item.durationMinutes}` : `${item.classType}-${item.durationMinutes}`;
 
-function kindLabel(item: BookingBalance) {
+function kindLabel(item: BookingBalance, t: StudentTranslator) {
+  const duration = t("common.minutes", { count: item.durationMinutes });
   if (item.trial) {
-    return `${item.durationMinutes} min · ${classTypeLabel("one-on-one")} · Free trial`;
+    return `${duration} · ${classTypeLabel("one-on-one", t)} · ${t("schedule.freeTrial")}`;
   }
   const type = item.classType === "paired" ? "paired" : "one-on-one";
-  return `${item.durationMinutes} min · ${classTypeLabel(type)}`;
+  return `${duration} · ${classTypeLabel(type, t)}`;
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
@@ -102,10 +127,12 @@ function TeacherCard({
   teacher,
   selected,
   onSelect,
+  t,
 }: {
   teacher: BookingTeacher;
   selected: boolean;
   onSelect: () => void;
+  t: StudentTranslator;
 }) {
   return (
     <ButtonBase
@@ -136,7 +163,7 @@ function TeacherCard({
             <Stack direction="row" spacing={0.5} alignItems="center" mt={0.25}>
               <IconStar size={14} fill="#FFAE1F" color="#FFAE1F" />
               <Typography variant="body2" fontWeight={600}>
-                {teacher.ratingCount ? teacher.ratingAverage.toFixed(1) : "New"}
+                {teacher.ratingCount ? teacher.ratingAverage.toFixed(1) : t("schedule.new")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {teacher.ratingCount ? `(${teacher.ratingCount}) · ` : "· "}
@@ -179,6 +206,10 @@ export function ScheduleOverview({
   trialEligible = false,
 }: ScheduleOverviewProps) {
   const router = useRouter();
+  const t = useTranslations("student");
+  const locale = useLocale();
+  const appLocale = isAppLocale(locale) ? locale : defaultLocale;
+  const intlLocale = appLocale === "es" ? "es-ES" : "en-US";
   const { showError, showSuccess } = useAppToast();
   const [booking, startBooking] = useTransition();
   const trialKinds: BookingBalance[] = trialEligible
@@ -202,16 +233,16 @@ export function ScheduleOverview({
   const teacher = teachers.find((item) => item.id === teacherId);
 
   const dayFormatter = useMemo(
-    () => new Intl.DateTimeFormat("en-US", { timeZone, weekday: "short", month: "short", day: "numeric" }),
-    [timeZone],
+    () => new Intl.DateTimeFormat(intlLocale, { timeZone, weekday: "short", month: "short", day: "numeric" }),
+    [timeZone, intlLocale],
   );
   const timeFormatter = useMemo(
-    () => new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", minute: "2-digit", hour12: false }),
-    [timeZone],
+    () => new Intl.DateTimeFormat(intlLocale, { timeZone, hour: "2-digit", minute: "2-digit", hour12: false }),
+    [timeZone, intlLocale],
   );
   const fullFormatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("en-US", {
+      new Intl.DateTimeFormat(intlLocale, {
         timeZone,
         weekday: "long",
         month: "long",
@@ -220,7 +251,7 @@ export function ScheduleOverview({
         minute: "2-digit",
         timeZoneName: "short",
       }),
-    [timeZone],
+    [timeZone, intlLocale],
   );
 
   // Load free slots whenever the teacher or the class kind changes.
@@ -283,7 +314,10 @@ export function ScheduleOverview({
 
   return (
     <Box mt={3}>
-      <Breadcrumb title="Book a class" subtitle="Pick a teacher and a time that works for you." />
+      <Breadcrumb
+        title={t("schedule.breadcrumbTitle")}
+        subtitle={t("schedule.breadcrumbSubtitle")}
+      />
 
       {!creditKinds.length ? (
         <Alert
@@ -292,14 +326,12 @@ export function ScheduleOverview({
           action={
             trialEligible ? undefined : (
               <LinkButton href="/pricing" color="inherit" size="small">
-                See packages
+                {t("actions.seePackages")}
               </LinkButton>
             )
           }
         >
-          {trialEligible
-            ? "You have no paid credits yet. Book your one free trial below, or buy a package when you are ready."
-            : "You have no class credits yet. Get a package to book live classes."}
+          {trialEligible ? t("schedule.noCreditsTrial") : t("schedule.noCredits")}
         </Alert>
       ) : null}
 
@@ -307,12 +339,8 @@ export function ScheduleOverview({
         <Grid size={{ xs: 12, lg: 8 }}>
           <Stack spacing={3}>
             <SectionCard
-              title="1. Class type"
-              subtitle={
-                trialEligible
-                  ? "Your first trial is free (no credit). Paid classes use one credit each."
-                  : "Each class uses one credit of this type."
-              }
+              title={t("schedule.classTypeTitle")}
+              subtitle={trialEligible ? t("schedule.trialSubtitle") : t("schedule.creditSubtitle")}
             >
               <Stack direction="row" gap={1} flexWrap="wrap">
                 {bookableKinds.length ? (
@@ -320,8 +348,14 @@ export function ScheduleOverview({
                     const key = kindKey(item);
                     const canPick = item.trial || item.balance > 0;
                     const creditLabel = item.trial
-                      ? "1 available"
-                      : `${item.balance} left${item.shared && partnerName ? ` (shared with ${partnerName})` : ""}`;
+                      ? t("schedule.trialLabel")
+                      : t("schedule.creditLabel", {
+                          balance: item.balance,
+                          shared:
+                            item.shared && partnerName
+                              ? t("schedule.sharedWith", { name: partnerName })
+                              : "",
+                        });
                     return (
                       <Chip
                         key={key}
@@ -330,7 +364,7 @@ export function ScheduleOverview({
                         color={key === kind ? "primary" : "default"}
                         variant={key === kind ? "filled" : "outlined"}
                         icon={item.shared ? <IconUsers size={16} /> : undefined}
-                        label={`${kindLabel(item)} · ${creditLabel}`}
+                        label={`${kindLabel(item, t)} · ${creditLabel}`}
                         onClick={() => {
                           if (canPick) setKind(key);
                         }}
@@ -338,12 +372,15 @@ export function ScheduleOverview({
                     );
                   })
                 ) : (
-                  <Typography color="text.secondary">No credits yet.</Typography>
+                  <Typography color="text.secondary">{t("schedule.noCreditsYet")}</Typography>
                 )}
               </Stack>
             </SectionCard>
 
-            <SectionCard title="2. Teacher" subtitle={`${teachers.length} teachers with open times`}>
+            <SectionCard
+              title={t("schedule.teacherSectionTitle")}
+              subtitle={t("schedule.teacherTitle", { count: teachers.length })}
+            >
               {teachers.length ? (
                 <Grid container spacing={2}>
                   {teachers.map((item) => (
@@ -352,28 +389,33 @@ export function ScheduleOverview({
                         teacher={item}
                         selected={item.id === teacherId}
                         onSelect={() => setTeacherId(item.id)}
+                        t={t}
                       />
                     </Grid>
                   ))}
                 </Grid>
               ) : (
-                <Typography color="text.secondary">
-                  No teacher has published availability yet. Check back soon.
-                </Typography>
+                <Typography color="text.secondary">{t("schedule.noTeachers")}</Typography>
               )}
             </SectionCard>
 
-            <SectionCard title="3. Time" subtitle={`Times shown in your time zone (${timeZone}).`}>
+            <SectionCard
+              title={t("schedule.timeTitle")}
+              subtitle={t("schedule.timeSubtitle", { zone: timeZone })}
+            >
               {!teacher || !selectedKind ? (
-                <Typography color="text.secondary">Choose a class type and a teacher first.</Typography>
+                <Typography color="text.secondary">{t("schedule.chooseFirst")}</Typography>
               ) : loadingSlots || slots === null ? (
                 <Stack direction="row" spacing={1} alignItems="center">
                   <CircularProgress size={18} />
-                  <Typography color="text.secondary">Loading open times…</Typography>
+                  <Typography color="text.secondary">{t("schedule.loadingTimes")}</Typography>
                 </Stack>
               ) : !days.length ? (
                 <Typography color="text.secondary">
-                  {teacher.name} has no open {selectedKind.durationMinutes}-minute times in the next three weeks.
+                  {t("schedule.noSlots", {
+                    teacher: teacher.name,
+                    minutes: selectedKind.durationMinutes,
+                  })}
                 </Typography>
               ) : (
                 <Stack spacing={2}>
@@ -416,33 +458,43 @@ export function ScheduleOverview({
             <Card elevation={9}>
               <CardContent sx={{ p: "30px" }}>
                 <Typography variant="h5" mb={2}>
-                  Your booking
+                  {t("schedule.bookingTitle")}
                 </Typography>
                 <Stack spacing={1.5}>
-                  <SummaryRow label="Class" value={selectedKind ? kindLabel(selectedKind) : "—"} />
-                  {selectedKind?.classType === "paired" && partnerName ? (
-                    <SummaryRow label="Partner" value={partnerName} />
-                  ) : null}
-                  <SummaryRow label="Teacher" value={teacher?.name ?? "—"} />
-                  <SummaryRow label="When" value={startsAt ? fullFormatter.format(new Date(startsAt)) : "—"} />
                   <SummaryRow
-                    label={selectedKind?.trial ? "Cost" : "Credits left"}
+                    label={t("schedule.classLabel")}
+                    value={selectedKind ? kindLabel(selectedKind, t) : "—"}
+                  />
+                  {selectedKind?.classType === "paired" && partnerName ? (
+                    <SummaryRow label={t("schedule.partner")} value={partnerName} />
+                  ) : null}
+                  <SummaryRow label={t("schedule.teacher")} value={teacher?.name ?? "—"} />
+                  <SummaryRow
+                    label={t("schedule.when")}
+                    value={startsAt ? fullFormatter.format(new Date(startsAt)) : "—"}
+                  />
+                  <SummaryRow
+                    label={selectedKind?.trial ? t("schedule.cost") : t("schedule.creditsLeft")}
                     value={
-                      selectedKind?.trial ? "Free trial (no credit)" : selectedKind ? String(selectedKind.balance) : "0"
+                      selectedKind?.trial
+                        ? t("schedule.freeTrialNoCredit")
+                        : selectedKind
+                          ? String(selectedKind.balance)
+                          : "0"
                     }
                   />
                 </Stack>
                 <TextField
                   select
                   fullWidth
-                  label="Focus"
+                  label={t("schedule.focus.label")}
                   value={focus}
                   onChange={(event) => setFocus(event.target.value)}
                   sx={{ mt: 3 }}
                 >
                   {lessonFocusOptions.map((option) => (
                     <MenuItem key={option} value={option}>
-                      {option}
+                      {t(focusKeys[option] as StudentKey)}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -455,30 +507,33 @@ export function ScheduleOverview({
                   disabled={!teacher || !selectedKind || !startsAt}
                   onClick={() => setOpen(true)}
                 >
-                  Book class
+                  {t("schedule.bookClass")}
                 </Button>
               </CardContent>
             </Card>
 
-            <SectionCard title="Upcoming classes">
+            <SectionCard title={t("schedule.upcomingTitle")}>
               {upcoming.length ? (
                 <Stack spacing={1.5}>
-                  {upcoming.map((item) => (
-                    <Stack key={item.id} direction="row" spacing={1.5} alignItems="center">
-                      <IconCalendarEvent size={18} />
-                      <Box minWidth={0}>
-                        <Typography variant="subtitle2" noWrap>
-                          {item.topic}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {fullFormatter.format(new Date(item.startsAt))} · {item.teacherName}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  ))}
+                  {upcoming.map((item) => {
+                    const topicKey = upcomingTopicKeys[item.id] as StudentKey | undefined;
+                    return (
+                      <Stack key={item.id} direction="row" spacing={1.5} alignItems="center">
+                        <IconCalendarEvent size={18} />
+                        <Box minWidth={0}>
+                          <Typography variant="subtitle2" noWrap>
+                            {topicKey ? t(topicKey) : item.topic}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {fullFormatter.format(new Date(item.startsAt))} · {item.teacherName}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    );
+                  })}
                 </Stack>
               ) : (
-                <Typography color="text.secondary">No upcoming classes.</Typography>
+                <Typography color="text.secondary">{t("schedule.noUpcoming")}</Typography>
               )}
             </SectionCard>
           </Stack>
@@ -488,22 +543,30 @@ export function ScheduleOverview({
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
         <DialogContent>
           <Typography variant="h5" mb={1}>
-            Confirm your class
+            {t("schedule.confirmTitle")}
           </Typography>
           <Typography color="text.secondary">
-            {selectedKind ? kindLabel(selectedKind) : ""} with {teacher?.name} on{" "}
-            {startsAt ? fullFormatter.format(new Date(startsAt)) : ""}.
+            {t("schedule.confirmBody", {
+              kind: selectedKind ? kindLabel(selectedKind, t) : "",
+              teacher: teacher?.name ?? "",
+              date: startsAt ? fullFormatter.format(new Date(startsAt)) : "",
+            })}
             {selectedKind?.trial
-              ? " This is your free demo lesson — no credit will be used."
-              : ` One credit will be used${selectedKind?.classType === "paired" && partnerName ? ` from the pool you share with ${partnerName}` : ""}.`}
+              ? t("schedule.confirmTrial")
+              : t("schedule.confirmCredit", {
+                  paired:
+                    selectedKind?.classType === "paired" && partnerName
+                      ? t("schedule.confirmPaired", { name: partnerName })
+                      : "",
+                })}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={() => setOpen(false)} disabled={booking}>
-            Back
+            {t("schedule.back")}
           </Button>
           <Button variant="contained" onClick={handleConfirm} disabled={booking}>
-            {booking ? "Booking…" : "Confirm booking"}
+            {booking ? t("schedule.booking") : t("schedule.confirmBooking")}
           </Button>
         </DialogActions>
       </Dialog>

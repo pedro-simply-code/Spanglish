@@ -421,6 +421,10 @@ export const classSessions = pgTable(
     liveStartedAt: timestamp("live_started_at", { withTimezone: true }),
     liveStartedByUserId: text("live_started_by_user_id"),
     liveEndedAt: timestamp("live_ended_at", { withTimezone: true }),
+    /** Live captions in the classroom (browser speech recognition), turned on by the teacher. */
+    captionsEnabled: boolean("captions_enabled").notNull().default(false),
+    /** BCP-47 language the speech recognizers listen for (es-ES, en-US). */
+    captionsLang: text("captions_lang").notNull().default("es-ES"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -528,6 +532,8 @@ export const recordings = pgTable(
     }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
+    /** Why a recording failed (LiveKit or storage message), for the teacher. */
+    error: text("error"),
   },
   (table) => [
     index("recordings_session_idx").on(table.sessionId, table.createdAt),
@@ -552,6 +558,25 @@ export const classroomChatMessages = pgTable(
       .defaultNow(),
   },
   (table) => [index("classroom_chat_messages_class_sent_idx").on(table.classId, table.sentAt)],
+);
+
+/** Final caption lines from a live class, kept as the class transcript. */
+export const classTranscriptSegments = pgTable(
+  "class_transcript_segments",
+  {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => classSessions.id, { onDelete: "cascade" }),
+    speakerIdentity: text("speaker_identity").notNull(),
+    speakerUserId: text("speaker_user_id").references(() => users.id, { onDelete: "set null" }),
+    speakerName: text("speaker_name").notNull(),
+    body: text("body").notNull(),
+    lang: text("lang").notNull(),
+    spokenAt: timestamp("spoken_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("class_transcript_segments_session_idx").on(table.sessionId, table.spokenAt)],
 );
 
 export type PricingClassType = ClassType;
@@ -629,6 +654,127 @@ export const materials = pgTable(
   (table) => [
     index("materials_author_idx").on(table.authorUserId),
     index("materials_visibility_idx").on(table.visibility, table.moderation),
+  ],
+);
+
+/** Words the teacher adds to a class; copied into each student's word list. */
+export const classVocabulary = pgTable(
+  "class_vocabulary",
+  {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => classSessions.id, { onDelete: "cascade" }),
+    term: text("term").notNull(),
+    translation: text("translation").notNull().default(""),
+    example: text("example").notNull().default(""),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("class_vocabulary_session_idx").on(table.sessionId, table.createdAt)],
+);
+
+/**
+ * A student's personal word list (from classes or added by the student) with
+ * spaced-repetition state: `box` 0-5 (Leitner), next review at `dueAt`.
+ */
+export const studentWords = pgTable(
+  "student_words",
+  {
+    id: text("id").primaryKey(),
+    studentId: text("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    term: text("term").notNull(),
+    translation: text("translation").notNull().default(""),
+    example: text("example").notNull().default(""),
+    sourceSessionId: text("source_session_id").references(() => classSessions.id, {
+      onDelete: "set null",
+    }),
+    sourceVocabId: text("source_vocab_id").references(() => classVocabulary.id, {
+      onDelete: "cascade",
+    }),
+    box: smallint("box").notNull().default(0),
+    dueAt: timestamp("due_at", { withTimezone: true }).notNull().defaultNow(),
+    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    reviewCount: integer("review_count").notNull().default(0),
+    correctCount: integer("correct_count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("student_words_student_due_idx").on(table.studentId, table.dueAt),
+    uniqueIndex("student_words_source_idx").on(table.studentId, table.sourceVocabId),
+  ],
+);
+
+export type AssignmentQuestion = {
+  id: string;
+  type: "multiple-choice" | "short-answer" | "speaking" | "listening";
+  prompt: string;
+  options?: string[];
+  correctOption?: number;
+  points: number;
+};
+
+export type SubmissionAnswer = {
+  questionId: string;
+  answer: string;
+  /** Points given (auto for multiple choice, teacher for the rest). */
+  points?: number | null;
+};
+
+/** A practice form (material of kind `form`) assigned to a class's students. */
+export const assignments = pgTable(
+  "assignments",
+  {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => classSessions.id, { onDelete: "cascade" }),
+    materialId: text("material_id")
+      .notNull()
+      .references(() => materials.id, { onDelete: "cascade" }),
+    teacherId: text("teacher_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    instructions: text("instructions").notNull().default(""),
+    /** Questions frozen when assigned, so later edits do not change grading. */
+    questions: jsonb("questions").$type<AssignmentQuestion[]>().notNull(),
+    dueAt: timestamp("due_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("assignments_session_idx").on(table.sessionId),
+    index("assignments_teacher_idx").on(table.teacherId, table.createdAt),
+  ],
+);
+
+export type SubmissionStatus = "submitted" | "graded";
+
+export const assignmentSubmissions = pgTable(
+  "assignment_submissions",
+  {
+    id: text("id").primaryKey(),
+    assignmentId: text("assignment_id")
+      .notNull()
+      .references(() => assignments.id, { onDelete: "cascade" }),
+    studentId: text("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    answers: jsonb("answers").$type<SubmissionAnswer[]>().notNull(),
+    status: text("status").$type<SubmissionStatus>().notNull().default("submitted"),
+    score: integer("score"),
+    maxScore: integer("max_score").notNull(),
+    feedback: text("feedback"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
+    gradedAt: timestamp("graded_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("assignment_submissions_unique_idx").on(table.assignmentId, table.studentId),
+    index("assignment_submissions_student_idx").on(table.studentId, table.submittedAt),
   ],
 );
 

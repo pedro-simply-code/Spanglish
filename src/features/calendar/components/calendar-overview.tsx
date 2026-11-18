@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -27,6 +28,8 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
+import enUS from "date-fns/locale/en-US";
+import es from "date-fns/locale/es";
 import { Calendar, dateFnsLocalizer, type View } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@/features/calendar/calendar.css";
@@ -36,13 +39,6 @@ import {
   loadCalendarAction,
   resetCalendarFeedAction,
 } from "@/features/calendar/actions";
-
-const localizer = dateFnsLocalizer({
-  format,
-  getDay,
-  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
-  locales: {},
-});
 
 export type CalendarRole = "student" | "teacher" | "manager";
 
@@ -76,13 +72,6 @@ type Event = {
   item: ClassItem;
 };
 
-const subtitles: Record<CalendarRole, string> = {
-  student: "Your live classes. Click an empty time to book a class.",
-  teacher: "Your classes over your weekly availability (green).",
-  manager:
-    "Every class in the academy. Pick a teacher to see their availability.",
-};
-
 /** Visible range for a view, padded to whole weeks (month view shows them). */
 function rangeFor(date: Date, view: View) {
   if (view === "month") {
@@ -109,6 +98,8 @@ export function CalendarOverview({
   hasFeed,
 }: Props) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("apps");
   const [classes, setClasses] = useState(initialClasses);
   const [availability, setAvailability] = useState(initialAvailability);
   const [date, setDate] = useState(() => new Date(initialDate));
@@ -119,6 +110,45 @@ export function CalendarOverview({
   const [feedUrl, setFeedUrl] = useState<string | null>(null);
   const [feedPending, startFeed] = useTransition();
   const request = useRef(0);
+
+  const localizer = useMemo(
+    () =>
+      dateFnsLocalizer({
+        format,
+        getDay,
+        startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
+        locales: { en: enUS, es },
+      }),
+    [],
+  );
+
+  const calendarMessages = useMemo(
+    () => ({
+      date: t("calendar.rbc.date"),
+      time: t("calendar.rbc.time"),
+      event: t("calendar.rbc.event"),
+      allDay: t("calendar.rbc.allDay"),
+      week: t("calendar.rbc.week"),
+      work_week: t("calendar.rbc.workWeek"),
+      day: t("calendar.rbc.day"),
+      month: t("calendar.rbc.month"),
+      previous: t("calendar.rbc.previous"),
+      next: t("calendar.rbc.next"),
+      yesterday: t("calendar.rbc.yesterday"),
+      tomorrow: t("calendar.rbc.tomorrow"),
+      today: t("calendar.rbc.today"),
+      agenda: t("calendar.rbc.agenda"),
+      showMore: (count: number) => t("calendar.rbc.showMore", { count }),
+      noEventsInRange: t("calendar.rbc.noEventsInRange"),
+    }),
+    [t],
+  );
+
+  const subtitles: Record<CalendarRole, string> = {
+    student: t("calendar.subtitle.student"),
+    teacher: t("calendar.subtitle.teacher"),
+    manager: t("calendar.subtitle.manager"),
+  };
 
   const timeZone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -155,11 +185,11 @@ export function CalendarOverview({
     () =>
       availability.map((block, index) => ({
         id: `a${index}`,
-        title: "Available",
+        title: t("calendar.legend.available"),
         start: new Date(block.start),
         end: new Date(block.end),
       })),
-    [availability],
+    [availability, t],
   );
 
   const eventClass = (event: { item?: ClassItem }) => {
@@ -180,7 +210,7 @@ export function CalendarOverview({
 
   return (
     <Box mt={3}>
-      <Breadcrumb title="Calendar" subtitle={subtitles[role]} />
+      <Breadcrumb title={t("calendar.breadcrumb")} subtitle={subtitles[role]} />
 
       <Card variant="outlined" sx={{ p: 0 }}>
         <CardContent>
@@ -201,34 +231,34 @@ export function CalendarOverview({
               <Chip
                 size="small"
                 sx={{ bgcolor: "#fa896b", color: "#fff" }}
-                label="Individual"
+                label={t("calendar.legend.individual")}
               />
               <Chip
                 size="small"
                 sx={{ bgcolor: "#1a97f5", color: "#fff" }}
-                label="Paired"
+                label={t("calendar.legend.paired")}
               />
               <Chip
                 size="small"
                 sx={{ bgcolor: "#b6bcc4", color: "#fff" }}
-                label="Finished"
+                label={t("calendar.legend.finished")}
               />
               <Chip
                 size="small"
                 variant="outlined"
-                label="Canceled"
+                label={t("calendar.legend.canceled")}
                 sx={{ textDecoration: "line-through" }}
               />
               {role !== "student" ? (
                 <Chip
                   size="small"
                   variant="outlined"
-                  label="Available"
+                  label={t("calendar.legend.available")}
                   sx={{ borderStyle: "dashed", color: "#39b69a" }}
                 />
               ) : null}
               <Typography variant="caption" color="text.secondary" ml={1}>
-                Times in {timeZone}
+                {t("calendar.timezone", { timeZone })}
               </Typography>
             </Stack>
 
@@ -237,7 +267,7 @@ export function CalendarOverview({
                 <TextField
                   select
                   size="small"
-                  label="Teacher"
+                  label={t("calendar.toolbar.teacher")}
                   value={teacherId}
                   onChange={(event) => {
                     setTeacherId(event.target.value);
@@ -245,7 +275,7 @@ export function CalendarOverview({
                   }}
                   sx={{ minWidth: 200 }}
                 >
-                  <MenuItem value="">All teachers</MenuItem>
+                  <MenuItem value="">{t("calendar.toolbar.allTeachers")}</MenuItem>
                   {teachers.map((teacher) => (
                     <MenuItem key={teacher.id} value={teacher.id}>
                       {teacher.name}
@@ -260,7 +290,7 @@ export function CalendarOverview({
                   size="small"
                   startIcon={<IconCalendarPlus size={16} />}
                 >
-                  Book a class
+                  {t("calendar.toolbar.bookClass")}
                 </LinkButton>
               ) : null}
               {role === "teacher" ? (
@@ -269,7 +299,7 @@ export function CalendarOverview({
                   variant="outlined"
                   size="small"
                 >
-                  Edit availability
+                  {t("calendar.toolbar.editAvailability")}
                 </LinkButton>
               ) : null}
               <Button
@@ -281,7 +311,7 @@ export function CalendarOverview({
                   setFeedOpen(true);
                 }}
               >
-                Add to my calendar
+                {t("calendar.toolbar.addToCalendar")}
               </Button>
             </Stack>
           </Stack>
@@ -290,6 +320,8 @@ export function CalendarOverview({
 
           <Calendar<Event | (typeof background)[number]>
             localizer={localizer}
+            culture={locale}
+            messages={calendarMessages}
             events={events}
             backgroundEvents={background}
             date={date}
@@ -310,8 +342,12 @@ export function CalendarOverview({
             }}
             tooltipAccessor={(event) =>
               "item" in event
-                ? `${event.item.title}${event.item.status === "canceled" ? " (canceled)" : ""}`
-                : "Available"
+                ? `${event.item.title}${
+                    event.item.status === "canceled"
+                      ? t("calendar.event.canceledSuffix")
+                      : ""
+                  }`
+                : t("calendar.legend.available")
             }
             eventPropGetter={(event) =>
               eventClass(event as { item?: ClassItem })
@@ -328,15 +364,11 @@ export function CalendarOverview({
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>
-          Add your classes to Google Calendar or Outlook
-        </DialogTitle>
+        <DialogTitle>{t("calendar.feed.title")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <Typography variant="body2" color="text.secondary">
-              A private link your calendar app checks every hour. Anyone with
-              the link can see your class times, so do not share it. Creating a
-              new link turns the old one off.
+              {t("calendar.feed.description")}
             </Typography>
             {feedUrl ? (
               <>
@@ -350,28 +382,23 @@ export function CalendarOverview({
                   }}
                   onFocus={(event) => event.target.select()}
                 />
-                <Alert severity="info">
-                  Google Calendar: Other calendars → + → From URL. Outlook: Add
-                  calendar → Subscribe from web. Copy it now: for your security
-                  it is shown only once.
-                </Alert>
+                <Alert severity="info">{t("calendar.feed.instructions")}</Alert>
               </>
             ) : hasFeed ? (
               <Alert severity="warning">
-                You already have a link. Create a new one only if you lost it or
-                think someone else has it.
+                {t("calendar.feed.existingWarning")}
               </Alert>
             ) : null}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setFeedOpen(false)}>Close</Button>
+          <Button onClick={() => setFeedOpen(false)}>{t("common.close")}</Button>
           {feedUrl ? (
             <Button
               variant="contained"
               onClick={() => void navigator.clipboard?.writeText(feedUrl)}
             >
-              Copy link
+              {t("calendar.feed.copyLink")}
             </Button>
           ) : (
             <Button
@@ -379,7 +406,9 @@ export function CalendarOverview({
               disabled={feedPending}
               onClick={createFeed}
             >
-              {hasFeed ? "Create a new link" : "Create my link"}
+              {hasFeed
+                ? t("calendar.feed.createNewLink")
+                : t("calendar.feed.createLink")}
             </Button>
           )}
         </DialogActions>

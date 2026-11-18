@@ -9,6 +9,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { IconAlertCircle, IconMail, IconSend, IconStar, IconTrash } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Scrollbar } from "@/components/custom-scroll/scrollbar";
 import { EmailCompose, type EmailComposeInitial } from "@/features/email/components/email-compose";
 import type { EmailFilterId } from "@/features/email/types";
@@ -18,21 +19,12 @@ type FilterIcon = ComponentType<{ size?: number | string; stroke?: number | stri
 type FilterEntry = {
   key: string;
   name?: EmailFilterId;
+  label?: string;
   filterbyTitle?: string;
   divider?: boolean;
   icon?: FilterIcon;
   color?: string;
 };
-
-const filterData: FilterEntry[] = [
-  { key: "inbox", name: "inbox", icon: IconMail, color: "inherit" },
-  { key: "sent", name: "sent", icon: IconSend, color: "inherit" },
-  { key: "trash", name: "trash", icon: IconTrash, color: "inherit" },
-  { key: "divider-1", divider: true },
-  { key: "sort-by", filterbyTitle: "Sort By" },
-  { key: "starred", name: "starred", icon: IconStar, color: "inherit" },
-  { key: "important", name: "important", icon: IconAlertCircle, color: "inherit" },
-];
 
 type EmailFilterProps = {
   active: EmailFilterId;
@@ -53,6 +45,17 @@ export function EmailFilter({
   onSend,
   sendPending,
 }: EmailFilterProps) {
+  const t = useTranslations("apps");
+  const filterData: FilterEntry[] = [
+    { key: "inbox", name: "inbox", label: t("email.filters.inbox"), icon: IconMail, color: "inherit" },
+    { key: "sent", name: "sent", label: t("email.filters.sent"), icon: IconSend, color: "inherit" },
+    { key: "trash", name: "trash", label: t("email.filters.trash"), icon: IconTrash, color: "inherit" },
+    { key: "divider-1", divider: true },
+    { key: "sort-by", filterbyTitle: t("email.filters.sortBy") },
+    { key: "starred", name: "starred", label: t("email.filters.starred"), icon: IconStar, color: "inherit" },
+    { key: "important", name: "important", label: t("email.filters.important"), icon: IconAlertCircle, color: "inherit" },
+  ];
+
   return (
     <>
       <Box>
@@ -107,7 +110,7 @@ export function EmailFilter({
                   {Icon ? <Icon stroke={1.5} size={19} /> : null}
                 </ListItemIcon>
                 <ListItemText sx={{ textTransform: "capitalize" }}>
-                  {filter.name}
+                  {filter.label}
                 </ListItemText>
               </ListItemButton>
             );

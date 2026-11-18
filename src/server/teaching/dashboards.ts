@@ -1,6 +1,7 @@
 import { requestTime } from "@/server/request-time";
 import { connection } from "next/server";
 import { eq, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AdminAlert, AdminStat } from "@/features/admin";
 import type {
   ManagerBillingSnapshot,
@@ -103,6 +104,7 @@ export type ManagerAttentionItem = {
 
 export async function getManagerWorkQueue(): Promise<{ team: ManagerTeamRow[]; attention: ManagerAttentionItem[] }> {
   await connection();
+  const t = await getTranslations("ops.teaching");
   await accrueEarnings();
   const teachers = await listTeachers();
   const [stats, applications, materials, changeRequests, batches, unbatched] = await Promise.all([
@@ -148,8 +150,8 @@ export async function getManagerWorkQueue(): Promise<{ team: ManagerTeamRow[]; a
   if (applications) {
     attention.push({
       id: "applications",
-      title: `${applications} teacher application${applications === 1 ? "" : "s"}`,
-      detail: "Waiting for a decision",
+      title: t(applications === 1 ? "attentionApplicationOne" : "attentionApplicationOther", { count: applications }),
+      detail: t("attentionApplicationsDetail"),
       href: "/manager/applications",
       severity: "high",
     });
@@ -157,8 +159,8 @@ export async function getManagerWorkQueue(): Promise<{ team: ManagerTeamRow[]; a
   if (materials) {
     attention.push({
       id: "materials",
-      title: `${materials} material${materials === 1 ? "" : "s"} to review`,
-      detail: "Teachers asked to publish them in the academy library",
+      title: t(materials === 1 ? "attentionMaterialOne" : "attentionMaterialOther", { count: materials }),
+      detail: t("attentionMaterialsDetail"),
       href: "/manager/materials",
       severity: "normal",
     });
@@ -167,8 +169,8 @@ export async function getManagerWorkQueue(): Promise<{ team: ManagerTeamRow[]; a
   if (Number(unbatchedRow?.cents ?? 0) > 0) {
     attention.push({
       id: "unbatched",
-      title: `${formatCents(Number(unbatchedRow!.cents))} in unpaid teacher earnings`,
-      detail: `${unbatchedRow!.teachers} teacher(s) · prepare a payout batch`,
+      title: t("attentionUnbatchedTitle", { amount: formatCents(Number(unbatchedRow!.cents)) }),
+      detail: t("attentionUnbatchedDetail", { count: unbatchedRow!.teachers }),
       href: "/manager/payouts",
       severity: "normal",
     });
@@ -176,8 +178,8 @@ export async function getManagerWorkQueue(): Promise<{ team: ManagerTeamRow[]; a
   if (changeRequests) {
     attention.push({
       id: "change-requests",
-      title: `${changeRequests} open class change request(s)`,
-      detail: "Paired students are still answering a reschedule proposal",
+      title: t("attentionChangeTitle", { count: changeRequests }),
+      detail: t("attentionChangeDetail"),
       href: "/manager/rooms",
       severity: "low",
     });
@@ -244,40 +246,41 @@ async function getManagerBillingSnapshot(): Promise<ManagerBillingSnapshot> {
   };
 }
 
-function buildManagerStats(input: {
+async function buildManagerStats(input: {
   applications: number;
   materials: number;
   operations: ManagerClassOperations;
   billing: ManagerBillingSnapshot;
   teacherCount: number;
-}): ManagerDashboardStat[] {
+}): Promise<ManagerDashboardStat[]> {
+  const t = await getTranslations("ops.teaching");
   return [
     {
       id: "applications",
-      label: "Teacher applications",
+      label: t("statApplicationsLabel"),
       value: formatInt(input.applications),
-      helper: input.applications === 1 ? "Waiting for your review" : "Waiting for review",
+      helper: t(input.applications === 1 ? "statApplicationsHelperOne" : "statApplicationsHelperOther"),
       href: "/manager/applications",
     },
     {
       id: "materials",
-      label: "Materials to review",
+      label: t("statMaterialsLabel"),
       value: formatInt(input.materials),
-      helper: "Publish requests from teachers",
+      helper: t("statMaterialsHelper"),
       href: "/manager/materials",
     },
     {
       id: "classes-week",
-      label: "Classes this week",
+      label: t("statClassesWeekLabel"),
       value: formatInt(input.operations.classesThisWeek),
-      helper: `${input.operations.liveNow} live now · ${input.operations.upcoming} upcoming`,
+      helper: t("statClassesWeekHelper", { live: input.operations.liveNow, upcoming: input.operations.upcoming }),
       href: "/apps/calendar",
     },
     {
       id: "payouts-prep",
-      label: "Unbatched teacher pay",
+      label: t("statUnbatchedLabel"),
       value: formatCents(input.billing.teacherUnbatchedCents),
-      helper: `${formatInt(input.teacherCount)} active teachers`,
+      helper: t("statUnbatchedHelper", { count: formatInt(input.teacherCount) }),
       href: "/manager/payouts",
     },
   ];
@@ -297,7 +300,7 @@ export async function getManagerDashboardSnapshot(): Promise<ManagerDashboardSna
   ]);
 
   return {
-    stats: buildManagerStats({
+    stats: await buildManagerStats({
       applications,
       materials,
       operations,
@@ -315,6 +318,7 @@ export async function getManagerDashboardSnapshot(): Promise<ManagerDashboardSna
 /** Finance tiles and alerts for the admin home page. */
 export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; alerts: AdminAlert[] }> {
   await connection();
+  const t = await getTranslations("ops.teaching");
   const [summary, open] = await Promise.all([
     getFinanceSummary(),
     db
@@ -334,30 +338,30 @@ export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; a
   const stats: AdminStat[] = [
     {
       id: "revenue",
-      label: "Revenue (paid orders)",
+      label: t("statRevenueLabel"),
       value: formatCents(summary.revenueCents),
-      helper: `${summary.orders} orders · ${summary.creditsSold} credits sold`,
+      helper: t("statRevenueHelper", { orders: summary.orders, credits: summary.creditsSold }),
       href: "/admin/finance/ledger",
     },
     {
       id: "deferred",
-      label: "Prepaid, not taught",
+      label: t("statDeferredLabel"),
       value: formatCents(summary.deferredRevenueCents),
-      helper: `${summary.creditsOutstanding} credits outstanding`,
+      helper: t("statDeferredHelper", { count: summary.creditsOutstanding }),
       href: "/admin/finance/ledger",
     },
     {
       id: "teacher-earned",
-      label: "Teacher earnings this month",
+      label: t("statTeacherEarnedLabel"),
       value: formatCents(summary.teacherEarnedThisMonthCents),
-      helper: `${formatCents(summary.teacherUnbatchedCents)} not in a batch yet`,
+      helper: t("statTeacherEarnedHelper", { amount: formatCents(summary.teacherUnbatchedCents) }),
       href: "/admin/finance/payouts",
     },
     {
       id: "teacher-paid",
-      label: "Paid to teachers",
+      label: t("statTeacherPaidLabel"),
       value: formatCents(summary.teacherPaidCents),
-      helper: `of ${formatCents(summary.teacherEarnedCents)} earned in total`,
+      helper: t("statTeacherPaidHelper", { amount: formatCents(summary.teacherEarnedCents) }),
       href: "/admin/finance/payouts",
     },
   ];
@@ -366,8 +370,11 @@ export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; a
     const days = daysSince(waiting!.oldest);
     alerts.push({
       id: "payouts-awaiting",
-      title: `${waiting!.value} payout batch(es) need your approval`,
-      detail: `${formatCents(Number(waiting!.cents))} prepared by managers${days >= 1 ? ` · waiting ${days} day(s)` : ""}`,
+      title: t("alertAwaitingTitle", { count: waiting!.value }),
+      detail: t("alertAwaitingDetail", {
+        amount: formatCents(Number(waiting!.cents)),
+        waiting: days >= 1 ? t("alertWaitingSuffix", { days }) : "",
+      }),
       severity: days >= 3 ? "critical" : "warning",
       href: "/admin/finance/payouts",
     });
@@ -376,8 +383,11 @@ export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; a
     const days = daysSince(toPay!.oldest);
     alerts.push({
       id: "payouts-to-pay",
-      title: `${toPay!.value} approved payout batch(es) not sent`,
-      detail: `Send ${formatCents(Number(toPay!.cents))}${days >= 1 ? ` · approved ${days} day(s) ago` : ""}`,
+      title: t("alertToPayTitle", { count: toPay!.value }),
+      detail: t("alertToPayDetail", {
+        amount: formatCents(Number(toPay!.cents)),
+        approved: days >= 1 ? t("alertApprovedSuffix", { days }) : "",
+      }),
       severity: days >= 3 ? "warning" : "info",
       href: "/admin/finance/payouts",
     });
@@ -394,8 +404,8 @@ export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; a
     if (Number(late?.cents ?? 0) > 0) {
       alerts.push({
         id: "payouts-not-prepared",
-        title: "Last month's payout was not prepared",
-        detail: `${formatCents(Number(late!.cents))} of delivered classes wait for a manager to prepare the batch`,
+        title: t("alertNotPreparedTitle"),
+        detail: t("alertNotPreparedDetail", { amount: formatCents(Number(late!.cents)) }),
         severity: "info",
         href: "/admin/finance/payouts",
       });
@@ -416,8 +426,8 @@ export async function getAdminFinanceOverview(): Promise<{ stats: AdminStat[]; a
     if (Number(missing?.count ?? 0) > 0) {
       alerts.push({
         id: "teachers-without-stripe",
-        title: `${missing!.count} teacher(s) with pay pending have not connected Stripe`,
-        detail: "They must finish Stripe setup on their Earnings page before \"Pay with Stripe\" works",
+        title: t("alertNoStripeTitle", { count: missing!.count }),
+        detail: t("alertNoStripeDetail"),
         severity: "warning",
         href: "/admin/finance/payouts",
       });

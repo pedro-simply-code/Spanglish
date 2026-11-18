@@ -1,6 +1,7 @@
 import { requestTime } from "@/server/request-time";
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AuthSession } from "@/lib/auth-types";
 import { teacherLevelFor } from "@/lib/teacher-levels";
 import {
@@ -63,6 +64,7 @@ function validTake(percent: number) {
 }
 
 export async function savePayoutSettings(actor: AuthSession, input: PayoutSettings) {
+  const t = await getTranslations("ops.teaching");
   const values = {
     platformTakeLevel1: Math.round(Number(input.platformTakeLevel1)),
     platformTakeLevel2: Math.round(Number(input.platformTakeLevel2)),
@@ -86,7 +88,7 @@ export async function savePayoutSettings(actor: AuthSession, input: PayoutSettin
   ) {
     return {
       ok: false as const,
-      message: "Platform take: 0–60% per level; trial 0–100%; trial reference $1–$1,000.",
+      message: t("invalidPayoutSettings"),
     };
   }
   await db
@@ -111,7 +113,7 @@ export async function savePayoutSettings(actor: AuthSession, input: PayoutSettin
     targetId: "payout",
     metadata: values,
   });
-  return { ok: true as const, message: "Rates saved. They apply to classes delivered from now on." };
+  return { ok: true as const, message: t("ratesSaved") };
 }
 
 
@@ -340,8 +342,9 @@ export async function getTeacherPayoutRequestSummary(teacherId: string): Promise
 
 /** Teacher claims all current unpaid earnings into a single-teacher batch for approval. */
 export async function requestTeacherPayout(actor: AuthSession) {
+  const t = await getTranslations("ops.teaching");
   if (!actor.roles.includes("teacher")) {
-    return { ok: false as const, message: "Only teachers can request payouts." };
+    return { ok: false as const, message: t("onlyTeachersRequest") };
   }
   const { getPaymentProviderSettings, manualPayoutAllowed, payoutUsesStripeConnect } = await import(
     "@/server/payments/provider-settings"
@@ -350,24 +353,24 @@ export async function requestTeacherPayout(actor: AuthSession) {
   const stripePayout = payoutUsesStripeConnect(providerSettings);
   const manualPayout = manualPayoutAllowed(providerSettings);
   if (!stripePayout && !manualPayout) {
-    return { ok: false as const, message: "Payouts are paused — contact the academy." };
+    return { ok: false as const, message: t("payoutsPaused") };
   }
   const teacherId = actor.userId;
   const summary = await getTeacherPayoutRequestSummary(teacherId);
   if (stripePayout && !manualPayout && !summary.stripeReady) {
-    return { ok: false as const, message: "Connect Stripe and finish setup before requesting a payout." };
+    return { ok: false as const, message: t("connectStripeFirst") };
   }
   if (summary.pendingBatch) {
-    return { ok: false as const, message: "You already have a payout request waiting for review." };
+    return { ok: false as const, message: t("pendingRequest") };
   }
   if (summary.unpaidCents < MIN_TEACHER_PAYOUT_REQUEST_CENTS) {
     return {
       ok: false as const,
-      message: `You need at least ${formatCents(MIN_TEACHER_PAYOUT_REQUEST_CENTS)} unpaid before requesting a payout.`,
+      message: t("minRequest", { amount: formatCents(MIN_TEACHER_PAYOUT_REQUEST_CENTS) }),
     };
   }
   if (!summary.unpaidClasses) {
-    return { ok: false as const, message: "No unpaid classes to pay out." };
+    return { ok: false as const, message: t("noUnpaidClasses") };
   }
 
   await accrueEarnings();
@@ -406,7 +409,7 @@ export async function requestTeacherPayout(actor: AuthSession) {
   const batch = rowsOf<{ totalCents: number; classCount: number }>(result)[0];
   if (!batch) {
     await db.update(teacherEarnings).set({ payoutBatchId: null }).where(eq(teacherEarnings.payoutBatchId, batchId));
-    return { ok: false as const, message: "Could not create the payout request. Try again." };
+    return { ok: false as const, message: t("requestFailed") };
   }
 
   const [teacher] = await db.select({ name: users.name }).from(users).where(eq(users.id, teacherId)).limit(1);
@@ -418,13 +421,16 @@ export async function requestTeacherPayout(actor: AuthSession) {
     targetId: batchId,
     metadata: { totalCents: batch.totalCents, classes: batch.classCount, teacherId },
   });
-  const processingDays = payoutProcessingWindowPhrase();
+  const processingDays = payoutProcessingWindowPhrase(undefined, {
+    one: t("processingDaysOne"),
+    other: t("processingDaysOther"),
+  });
   notifyRole("payout-requested", "manager", { name: teacher?.name, amount, processingDays });
   notifyRole("payout-requested", "admin", { name: teacher?.name, amount, processingDays });
   notifyUsers("payout-request-submitted", [teacherId], { amount, processingDays });
   return {
     ok: true as const,
-    message: `Requested ${amount} for ${batch.classCount} class(es). We will email you after approval and when payment is sent (bank transfer may take up to ${processingDays}).`,
+    message: t("payoutRequested", { amount, count: batch.classCount, days: processingDays }),
   };
 }
 
@@ -470,13 +476,14 @@ export async function seedTeacherPayoutRequest(teacherId: string) {
 }
 
 export async function createPayoutBatch(actor: AuthSession, input: { periodStart: string; periodEnd: string }) {
+  const t = await getTranslations("ops.teaching");
   const start = new Date(input.periodStart);
   const end = new Date(input.periodEnd);
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start >= end) {
-    return { ok: false as const, message: "Pick a valid period." };
+    return { ok: false as const, message: t("invalidPeriod") };
   }
   if (end.getTime() > Date.now()) {
-    return { ok: false as const, message: "The period must have ended." };
+    return { ok: false as const, message: t("periodMustEnd") };
   }
   await accrueEarnings();
 
@@ -500,7 +507,7 @@ export async function createPayoutBatch(actor: AuthSession, input: { periodStart
     SELECT total_cents AS "totalCents", class_count AS "classCount" FROM batch
   `);
   const batch = rowsOf<{ totalCents: number; classCount: number }>(result)[0];
-  if (!batch) return { ok: false as const, message: "No unpaid classes in that period." };
+  if (!batch) return { ok: false as const, message: t("noUnpaidInPeriod") };
 
   await recordAuditEvent({
     action: "payout.created",
@@ -513,7 +520,7 @@ export async function createPayoutBatch(actor: AuthSession, input: { periodStart
     amount: formatCents(Number(batch.totalCents)),
     period: formatPeriod(start, end),
   });
-  return { ok: true as const, message: `Payout of ${formatCents(Number(batch.totalCents))} sent to the admin for approval.` };
+  return { ok: true as const, message: t("payoutSentToAdmin", { amount: formatCents(Number(batch.totalCents)) }) };
 }
 
 export async function listPayoutBatches(limit = 30): Promise<PayoutBatchView[]> {
@@ -583,12 +590,13 @@ async function moveBatch(
 }
 
 export async function approvePayoutBatch(actor: AuthSession, id: string) {
+  const t = await getTranslations("ops.teaching");
   const batch = await moveBatch(id, "awaiting_approval", {
     status: "approved",
     approvedByUserId: actor.userId,
     approvedAt: new Date(),
   });
-  if (!batch) return { ok: false as const, message: "Only batches awaiting approval can be approved." };
+  if (!batch) return { ok: false as const, message: t("onlyAwaitingApproval") };
   await recordAuditEvent({
     action: "payout.approved",
     severity: "warning",
@@ -598,7 +606,10 @@ export async function approvePayoutBatch(actor: AuthSession, id: string) {
     metadata: { totalCents: batch.totalCents },
   });
 
-  const processingDays = payoutProcessingWindowPhrase();
+  const processingDays = payoutProcessingWindowPhrase(undefined, {
+    one: t("processingDaysOne"),
+    other: t("processingDaysOther"),
+  });
   const period = formatPeriod(batch.periodStart, batch.periodEnd);
   const lines = await db
     .select({
@@ -619,18 +630,19 @@ export async function approvePayoutBatch(actor: AuthSession, id: string) {
   const days = payoutProcessingBusinessDays();
   return {
     ok: true as const,
-    message: `Approved. Teachers were notified. Send the money, then mark as paid; their banks may take up to ${days} business day${days === 1 ? "" : "s"}.`,
+    message: t("approvedMessage", { days }),
   };
 }
 
 export async function rejectPayoutBatch(actor: AuthSession, id: string, reason: string) {
+  const t = await getTranslations("ops.teaching");
   const batch = await moveBatch(id, "awaiting_approval", {
     status: "rejected",
     approvedByUserId: actor.userId,
     approvedAt: new Date(),
-    rejectedReason: reason.trim().slice(0, 500) || "Rejected",
+    rejectedReason: reason.trim().slice(0, 500) || t("rejectedDefault"),
   });
-  if (!batch) return { ok: false as const, message: "Only batches awaiting approval can be rejected." };
+  if (!batch) return { ok: false as const, message: t("onlyAwaitingRejection") };
   // The classes go back to "unpaid" so a new batch can include them.
   await db.update(teacherEarnings).set({ payoutBatchId: null }).where(eq(teacherEarnings.payoutBatchId, id));
   await recordAuditEvent({
@@ -640,19 +652,20 @@ export async function rejectPayoutBatch(actor: AuthSession, id: string, reason: 
     targetId: id,
     metadata: { reason },
   });
-  return { ok: true as const, message: "Rejected. Its classes are unpaid again." };
+  return { ok: true as const, message: t("rejectedMessage") };
 }
 
 export async function markPayoutBatchPaid(actor: AuthSession, id: string, reference: string) {
+  const t = await getTranslations("ops.teaching");
   const { getPaymentProviderSettings, manualPayoutAllowed } = await import("@/server/payments/provider-settings");
   const settings = await getPaymentProviderSettings();
   if (!manualPayoutAllowed(settings)) {
-    return { ok: false as const, message: "Manual transfers are disabled in payment provider settings." };
+    return { ok: false as const, message: t("manualDisabled") };
   }
   const ref = reference.trim().slice(0, 200);
-  if (ref.length < 3) return { ok: false as const, message: "Add the transfer reference." };
+  if (ref.length < 3) return { ok: false as const, message: t("addReference") };
   const batch = await moveBatch(id, "approved", { status: "paid", paidAt: new Date(), paidReference: ref });
-  if (!batch) return { ok: false as const, message: "Only approved batches can be marked as paid." };
+  if (!batch) return { ok: false as const, message: t("onlyApprovedMarkPaid") };
 
   await recordAuditEvent({
     action: "payout.paid",
@@ -671,7 +684,10 @@ export async function markPayoutBatchPaid(actor: AuthSession, id: string, refere
     .from(teacherEarnings)
     .where(eq(teacherEarnings.payoutBatchId, id))
     .groupBy(teacherEarnings.teacherId);
-  const processingDays = payoutProcessingWindowPhrase();
+  const processingDays = payoutProcessingWindowPhrase(undefined, {
+    one: t("processingDaysOne"),
+    other: t("processingDaysOther"),
+  });
   const period = formatPeriod(batch.periodStart, batch.periodEnd);
   for (const line of lines) {
     notifyUsers("payout-paid", [line.teacherId], {
@@ -682,7 +698,7 @@ export async function markPayoutBatchPaid(actor: AuthSession, id: string, refere
   }
   return {
     ok: true as const,
-    message: `Marked as paid. Teachers were emailed; funds may take up to ${processingDays} to reach their bank.`,
+    message: t("markedPaid", { days: processingDays }),
   };
 }
 

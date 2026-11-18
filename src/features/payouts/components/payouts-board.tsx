@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -14,6 +14,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { IconEye } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { SectionCard } from "@/components/ui/section-card";
@@ -69,32 +70,14 @@ type Props = {
   processingWindow?: string;
 };
 
-const money = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-const period = (batch: PayoutBatchItem) =>
+const period = (batch: PayoutBatchItem, dateFormat: Intl.DateTimeFormat) =>
   `${dateFormat.format(new Date(batch.periodStart))} – ${dateFormat.format(new Date(new Date(batch.periodEnd).getTime() - 1))}`;
 
-const requestLabel = (batch: PayoutBatchItem) => {
+const requestLabel = (batch: PayoutBatchItem, dateFormat: Intl.DateTimeFormat, fallback: string) => {
   if (batch.initiatedBy === "teacher") {
-    return batch.lines[0]?.teacherName ?? "Teacher request";
+    return batch.lines[0]?.teacherName ?? fallback;
   }
-  return period(batch);
-};
-
-const statusChip = {
-  awaiting_approval: { label: "Awaiting approval", color: "warning" as const },
-  approved: { label: "Approved", color: "info" as const },
-  paid: { label: "Paid", color: "success" as const },
-  rejected: { label: "Rejected", color: "default" as const },
+  return period(batch, dateFormat);
 };
 
 function isoMonthKey(iso: string) {
@@ -157,8 +140,11 @@ export function PayoutsBoard({
   minMonth,
   maxMonth,
   stripe = { enabled: false, testMode: false, manualTransferEnabled: true },
-  processingWindow = "a few business days",
+  processingWindow,
 }: Props) {
+  const t = useTranslations("educator");
+  const window = processingWindow ?? t("payouts.processingDays", { days: 3 });
+  const locale = useLocale();
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -166,6 +152,32 @@ export function PayoutsBoard({
   const [listPage, setListPage] = useState(1);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>>({});
+
+  const money = useMemo(
+    () => (cents: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100),
+    [locale],
+  );
+  const dateFormat = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }),
+    [locale],
+  );
+  const dateTimeFormat = useMemo(
+    () => new Intl.DateTimeFormat(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    [locale],
+  );
+
+  const statusChip = useMemo(() => ({
+    awaiting_approval: { label: t("status.awaitingApproval"), color: "warning" as const },
+    approved: { label: t("status.approved"), color: "info" as const },
+    paid: { label: t("status.paid"), color: "success" as const },
+    rejected: { label: t("status.rejected"), color: "default" as const },
+  }), [t]);
 
   const detailBatch = useMemo(
     () => (detailId ? (batches.find((batch) => batch.id === detailId) ?? null) : null),
@@ -191,10 +203,6 @@ export function PayoutsBoard({
     [filteredBatches, listPage],
   );
 
-  useEffect(() => {
-    setListPage(1);
-  }, [month]);
-
   const run = (task: () => Promise<{ ok: boolean; message: string }>, afterOk?: () => void) =>
     startTransition(async () => {
       const result = await task();
@@ -214,9 +222,9 @@ export function PayoutsBoard({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={mode === "admin" ? "Payout approvals" : "Teacher payouts"}
-        subtitle="Browse by month, then open a row for the payout cycle, line items, and actions."
-        items={[breadcrumbRoot, { title: "Payouts" }]}
+        title={mode === "admin" ? t("payouts.board.approvalTitle") : t("payouts.board.prepareTitle")}
+        subtitle={t("payouts.board.subtitle")}
+        items={[breadcrumbRoot, { title: t("payouts.board.payouts") }]}
       />
 
       <Stack spacing={3}>
@@ -224,83 +232,86 @@ export function PayoutsBoard({
           month={month}
           minMonth={minMonth}
           maxMonth={maxMonth}
-          onMonthChange={(next) => setMonth(clampMonth(next, minMonth, maxMonth))}
+          onMonthChange={(next) => {
+            setMonth(clampMonth(next, minMonth, maxMonth));
+            setListPage(1);
+          }}
           paidCents={paidCents}
           pendingCents={inProgressCents}
         />
 
-        <SectionCard title={mode === "admin" ? "Approval queue" : "Payout batches"} subtitle="Rows for the month selected above.">
+        <SectionCard
+          title={mode === "admin" ? t("payouts.board.approvalQueue") : t("payouts.board.batches")}
+          subtitle={t("payouts.board.rowsForMonth")}
+        >
           {filteredBatches.length ? (
             <>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Request</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="right">Classes</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Submitted</TableCell>
-                  <TableCell align="right"> </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pagedBatches.map((batch) => {
-                  const chip = statusChip[batch.status];
-                  return (
-                    <TableRow key={batch.id} hover sx={{ cursor: "pointer" }} onClick={() => setDetailId(batch.id)}>
-                      <TableCell>
-                        <Typography variant="subtitle2">{requestLabel(batch)}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {batch.initiatedBy === "teacher"
-                            ? batch.createdByName ?? "Teacher"
-                            : `${batch.teacherCount} teachers · ${batch.createdByName ?? "Manager"}`}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {batch.initiatedBy === "teacher" ? (
-                          <Chip size="small" variant="outlined" color="secondary" label="Teacher request" />
-                        ) : (
-                          <Chip size="small" variant="outlined" label="Monthly batch" />
-                        )}
-                      </TableCell>
-                      <TableCell align="right">{money(batch.totalCents)}</TableCell>
-                      <TableCell align="right">{batch.classCount}</TableCell>
-                      <TableCell>
-                        <Chip size="small" color={chip.color} label={chip.label} />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {batch.createdAt ? dateTimeFormat.format(new Date(batch.createdAt)) : "—"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right" onClick={(event) => event.stopPropagation()}>
-                        <IconButton aria-label="View payout details" size="small" onClick={() => setDetailId(batch.id)}>
-                          <IconEye size={18} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <ListPagination page={listPage} total={filteredBatches.length} onPageChange={setListPage} />
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t("payouts.board.request")}</TableCell>
+                    <TableCell>{t("payouts.board.type")}</TableCell>
+                    <TableCell align="right">{t("payouts.board.amount")}</TableCell>
+                    <TableCell align="right">{t("payouts.board.classes")}</TableCell>
+                    <TableCell>{t("payouts.board.status")}</TableCell>
+                    <TableCell>{t("payouts.board.submitted")}</TableCell>
+                    <TableCell align="right"> </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {pagedBatches.map((batch) => {
+                    const chip = statusChip[batch.status];
+                    return (
+                      <TableRow key={batch.id} hover sx={{ cursor: "pointer" }} onClick={() => setDetailId(batch.id)}>
+                        <TableCell>
+                          <Typography variant="subtitle2">{requestLabel(batch, dateFormat, t("common.teacher"))}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {batch.initiatedBy === "teacher"
+                              ? batch.createdByName ?? t("common.teacher")
+                              : t("payouts.board.teachersCount", { count: batch.teacherCount })}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {batch.initiatedBy === "teacher" ? (
+                            <Chip size="small" variant="outlined" color="secondary" label={t("payouts.board.teacherRequest")} />
+                          ) : (
+                            <Chip size="small" variant="outlined" label={t("payouts.board.monthlyBatch")} />
+                          )}
+                        </TableCell>
+                        <TableCell align="right">{money(batch.totalCents)}</TableCell>
+                        <TableCell align="right">{batch.classCount}</TableCell>
+                        <TableCell>
+                          <Chip size="small" color={chip.color} label={chip.label} />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="text.secondary">
+                            {batch.createdAt ? dateTimeFormat.format(new Date(batch.createdAt)) : "—"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right" onClick={(event) => event.stopPropagation()}>
+                          <IconButton aria-label={t("payouts.board.viewDetails")} size="small" onClick={() => setDetailId(batch.id)}>
+                            <IconEye size={18} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+              <ListPagination page={listPage} total={filteredBatches.length} onPageChange={setListPage} />
             </>
           ) : (
-            <Typography color="text.secondary">
-              No payout requests in this month. Use the arrows to browse other months — open requests only appear in the month they
-              were submitted (or the month they were paid).
-            </Typography>
+            <Typography color="text.secondary">{t("payouts.board.empty")}</Typography>
           )}
           {mode === "admin" ? (
             <Alert severity="info" sx={{ mt: 2 }}>
               {stripe.enabled
-                ? `Open a row for the cycle stepper, teacher lines, and pay actions. Settlement may take up to ${processingWindow}.`
-                : `Open a row to approve, reject, or mark as paid after an off-platform transfer.`}
+                ? t("payouts.board.adminStripeNote", { window })
+                : t("payouts.board.adminManualNote")}
             </Alert>
           ) : (
             <Alert severity="info" sx={{ mt: 2 }}>
-              Teachers start payouts from Earnings when they are ready. Approve or reject each request in the table.
+              {t("payouts.board.managerNote")}
             </Alert>
           )}
         </SectionCard>
@@ -312,7 +323,7 @@ export function PayoutsBoard({
         mode={mode}
         pending={pending}
         stripe={stripe}
-        processingWindow={processingWindow}
+        processingWindow={window}
         note={detailNote}
         onNoteChange={setDetailNote}
         onClose={() => setDetailId(null)}

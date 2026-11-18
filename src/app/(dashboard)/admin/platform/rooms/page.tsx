@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { env } from "@/env";
 import { PlatformRoomsOverview } from "@/features/admin";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 
-export const metadata: Metadata = {
-  title: "Classroom defaults",
-  description: "Live class policy from environment",
-};
+export const metadata: Metadata = adminStaticMetadata("rooms");
 
 export default function AdminPlatformRoomsPage() {
   return (

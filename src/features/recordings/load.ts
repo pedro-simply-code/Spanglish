@@ -14,9 +14,13 @@ export async function loadStoredClassRecordingsForActor(
     sizeBytes: row.sizeBytes ?? 0,
     createdAt: row.createdAt,
     classTopic: row.classTopic,
+    classStartsAt: row.classStartsAt,
     teacherName: row.teacherName,
+    students: row.students,
     source: row.source,
     status: row.status,
+    storage: row.storage,
+    error: row.error,
     downloadUrl: row.status === "ready" ? classRecordingDownloadUrl(row.id) : null,
   }));
 }

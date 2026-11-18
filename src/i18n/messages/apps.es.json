@@ -1,0 +1,269 @@
+{
+  "apps": {
+    "common": {
+      "back": "Volver",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "send": "Enviar"
+    },
+    "metadata": {
+      "email": {
+        "title": "Correo",
+        "description": "App de correo de Spanglish"
+      },
+      "chat": {
+        "title": "Chat",
+        "description": "App de mensajería de Spanglish"
+      },
+      "calendar": {
+        "title": "Calendario",
+        "description": "Horario de clases de la academia"
+      }
+    },
+    "email": {
+      "breadcrumb": {
+        "title": "Correo de la academia",
+        "subtitleUnread": "{count} sin leer en tu bandeja de entrada: los mensajes también se envían al correo real del destinatario cuando la entrega está configurada.",
+        "subtitleDefault": "Envía y lee mensajes solo dentro de Spanglish: la bandeja de cada cuenta en la app, no el Gmail externo."
+      },
+      "roles": {
+        "student": "Estudiante",
+        "teacher": "Profesor",
+        "manager": "Gerente",
+        "admin": "Administrador"
+      },
+      "labels": {
+        "academy": "Academia",
+        "promotional": "Promocional",
+        "social": "Social",
+        "health": "Salud"
+      },
+      "filters": {
+        "sortBy": "Ordenar por",
+        "inbox": "Bandeja de entrada",
+        "sent": "Enviados",
+        "trash": "Papelera",
+        "starred": "Destacados",
+        "important": "Importantes"
+      },
+      "search": {
+        "openFilters": "Abrir filtros de correo",
+        "placeholder": "Buscar mensajes o correos de la academia",
+        "contacts": "Contactos de la academia (todos los roles)"
+      },
+      "compose": {
+        "button": "Redactar",
+        "title": "Redactar correo",
+        "notice": "Se entrega solo en la bandeja de Spanglish del destinatario (Correo en la app), no en Gmail ni en otro correo externo.",
+        "to": "Para (correo de la academia)",
+        "toPlaceholder": "Busca un nombre o correo en la academia",
+        "recipientUnknown": "Ninguna cuenta de la academia coincide con este correo.",
+        "recipientBounced": "Cuenta encontrada (el correo externo rebotó; la bandeja de Spanglish sigue funcionando en la app).",
+        "recipientHint": "Escribe un nombre o correo para buscar todos los roles de la academia.",
+        "subject": "Asunto",
+        "message": "Mensaje",
+        "messagePlaceholder": "Escribe un mensaje",
+        "subjectFor": "Spanglish — mensaje para {name}",
+        "greeting": "Hola {name},\n\n\n",
+        "replySubject": "Re: {subject}",
+        "replyBody": "\n\n---\nEl {time}, {sender} escribió:\n{excerpt}"
+      },
+      "list": {
+        "empty": "Aún no hay mensajes en esta carpeta.",
+        "selectEmail": "Seleccionar correo de {from}"
+      },
+      "content": {
+        "emptyTitle": "Selecciona un correo",
+        "emptyImageAlt": "Icono de correo",
+        "star": "Destacar",
+        "unstar": "Quitar destacado",
+        "starAria": "Marcar correo como destacado",
+        "unstarAria": "Quitar el destacado del correo",
+        "important": "Importante",
+        "notImportant": "No importante",
+        "markImportant": "Marcar como importante",
+        "markNotImportant": "Marcar como no importante",
+        "delete": "Eliminar",
+        "deleteAria": "Mover correo a la papelera",
+        "attachments": "Adjuntos ({count})",
+        "reply": "Responder",
+        "forward": "Reenviar",
+        "replyPlaceholder": "Escribe aquí..."
+      },
+      "prefix": {
+        "to": "Para: {name}",
+        "from": "De: {email}"
+      },
+      "errors": {
+        "invalidRecipient": "Introduce un correo de destinatario válido.",
+        "subjectRequired": "El asunto es obligatorio.",
+        "bodyRequired": "El cuerpo del mensaje es obligatorio.",
+        "recipientNotFound": "No hay ninguna cuenta de la academia con ese correo.",
+        "selfMessage": "No puedes enviarte un mensaje a ti mismo."
+      },
+      "success": {
+        "delivered": "Mensaje entregado en su bandeja de Spanglish (Correo en la app)."
+      }
+    },
+    "chat": {
+      "breadcrumb": {
+        "title": "App de chat",
+        "subtitle": "Mensajería"
+      },
+      "status": {
+        "online": "en línea",
+        "busy": "ocupado",
+        "away": "ausente",
+        "offline": "desconectado"
+      },
+      "sidebar": {
+        "currentUserRole": "Diseñador",
+        "searchPlaceholder": "Buscar contactos",
+        "recentChats": "Chats recientes",
+        "sortByTime": "Ordenar por hora",
+        "sortByUnread": "Ordenar por no leídos",
+        "markAllRead": "Marcar todo como leído",
+        "noContacts": "¡No se encontraron contactos!",
+        "you": "Tú: ",
+        "sentPhoto": "Foto enviada"
+      },
+      "content": {
+        "selectChat": "Selecciona un chat",
+        "openChatList": "Abrir lista de chats",
+        "startVoiceCall": "Iniciar llamada de voz",
+        "startVideoCall": "Iniciar videollamada",
+        "toggleDetails": "Mostrar u ocultar detalles del chat",
+        "messageTime": "{name}, {time}",
+        "sharedAttachment": "Adjunto compartido"
+      },
+      "composer": {
+        "placeholder": "Escribe un mensaje",
+        "send": "Enviar mensaje",
+        "photo": "Enviar una foto",
+        "attach": "Adjuntar un archivo"
+      },
+      "details": {
+        "media": "Multimedia ({count})",
+        "noMedia": "¡No hay multimedia!",
+        "sharedMedia": "Multimedia compartido",
+        "attachments": "Adjuntos ({count})",
+        "noAttachments": "¡No hay adjuntos!",
+        "download": "Descargar {file}"
+      },
+      "excerpts": {
+        "themeDeveloper": "Desarrollador de temas",
+        "doctor": "Médico",
+        "hacker": "Pirata informático",
+        "house": "Espera fuera de la casa",
+        "frontEnd": "Desarrollador front-end",
+        "graphics": "Diseñador gráfico",
+        "backEnd": "Desarrollador back-end",
+        "administrator": "Administrador"
+      },
+      "messages": {
+        "c1m1": "Oye, Mathew, ¿puedes echar un vistazo a las nuevas variables del tema?",
+        "c1m2": "Subí la paleta actualizada a la rama compartida.",
+        "c1m3": "Bien, lo revisaré antes de almorzar.",
+        "c1m5": "Se ve muy bien; publiquémoslo hoy.",
+        "c2m1": "¡Buenos días! ¿Seguimos con la videollamada de revisión?",
+        "c2m2": "Puedo enviarte las notas de la última sesión.",
+        "c2m3": "¡Buenos días! Sí, la misma hora me viene bien.",
+        "c2m5": "Perfecto, hasta entonces.",
+        "c3m1": "La canalización de compilación vuelve a fallar en el entorno de pruebas.",
+        "c3m2": "Te adjunto el volcado de registros.",
+        "c3m3": "Lo encontré: falta una variable de entorno.",
+        "c3m4": "La estoy añadiendo al gestor de secretos ahora.",
+        "c4m1": "¿Estás en casa? Estoy a la vuelta de la esquina.",
+        "c4m2": "Dame cinco minutos, estoy terminando una llamada.",
+        "c4m4": "Por favor, espera fuera de la casa.",
+        "c4m5": "No hay problema, tómate tu tiempo.",
+        "c5m1": "Los nuevos componentes de la lección están listos para revisión.",
+        "c5m2": "Mantuve el radio de las tarjetas coherente con el resto.",
+        "c5m3": "Estoy revisando la solicitud de extracción ahora mismo.",
+        "c5m5": "La apruebo, ¡buen trabajo!",
+        "c6m1": "¿Tienes las ilustraciones finales del curso?",
+        "c6m3": "Casi listo, queda una exportación.",
+        "c6m4": "Te envío todo en cinco minutos.",
+        "c7m1": "El endpoint de progreso de la lección está devolviendo datos obsoletos.",
+        "c7m2": "Las cabeceras de caché me parecen incorrectas.",
+        "c7m3": "Buen hallazgo, faltaba la regla de la CDN.",
+        "c7m4": "Corregido y desplegado en el entorno de pruebas.",
+        "c8m1": "Aquí está el inventario actualizado de componentes.",
+        "c8m2": "También se incluyen las plantillas de página.",
+        "c8m3": "Gracias, lo estoy descargando ahora.",
+        "c8m4": "Añadiré comentarios antes de mañana.",
+        "c9m1": "Se ha concedido acceso a los nuevos estudiantes.",
+        "c9m2": "Pueden empezar con la prueba de nivel.",
+        "c9m3": "Perfecto, les daré la bienvenida en el grupo.",
+        "c9m4": "Además, el informe semanal está listo.",
+        "c10m1": "Recordatorio: el taller de salud empieza a las seis.",
+        "c10m2": "Te guardé un asiento junto a la ventana.",
+        "c10m3": "Gracias, estaré allí a tiempo.",
+        "c10m4": "¡Hasta esta noche!"
+      }
+    },
+    "calendar": {
+      "breadcrumb": "Calendario",
+      "subtitle": {
+        "student": "Tus clases en vivo. Haz clic en un horario libre para reservar una clase.",
+        "teacher": "Tus clases sobre tu disponibilidad semanal (en verde).",
+        "manager": "Todas las clases de la academia. Elige un profesor para ver su disponibilidad."
+      },
+      "timezone": "Horarios en {timeZone}",
+      "legend": {
+        "individual": "Individual",
+        "paired": "En parejas",
+        "finished": "Finalizada",
+        "canceled": "Cancelada",
+        "available": "Disponible"
+      },
+      "toolbar": {
+        "teacher": "Profesor",
+        "allTeachers": "Todos los profesores",
+        "bookClass": "Reservar una clase",
+        "editAvailability": "Editar disponibilidad",
+        "addToCalendar": "Añadir a mi calendario"
+      },
+      "event": {
+        "student": "Estudiante",
+        "canceledSuffix": " (cancelada)"
+      },
+      "feed": {
+        "title": "Añade tus clases a Google Calendar u Outlook",
+        "description": "Un enlace privado que tu app de calendario consulta cada hora. Cualquier persona con el enlace puede ver tus horarios de clase, así que no lo compartas. Crear un enlace nuevo desactiva el anterior.",
+        "instructions": "Google Calendar: Otros calendarios → + → Desde URL. Outlook: Añadir calendario → Suscribirse desde la web. Cópialo ahora: por tu seguridad, solo se muestra una vez.",
+        "existingWarning": "Ya tienes un enlace. Crea uno nuevo solo si lo perdiste o crees que alguien más lo tiene.",
+        "copyLink": "Copiar enlace",
+        "createNewLink": "Crear un enlace nuevo",
+        "createLink": "Crear mi enlace"
+      },
+      "rbc": {
+        "date": "Fecha",
+        "time": "Hora",
+        "event": "Evento",
+        "allDay": "todo el día",
+        "week": "Semana",
+        "workWeek": "Semana laborable",
+        "day": "Día",
+        "month": "Mes",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "yesterday": "Ayer",
+        "tomorrow": "Mañana",
+        "today": "Hoy",
+        "agenda": "Agenda",
+        "showMore": "+{count} más",
+        "noEventsInRange": "No hay eventos en este período."
+      },
+      "ics": {
+        "description": "Abrir la clase:"
+      },
+      "errors": {
+        "adminNoCalendar": "El panel de administración no tiene calendario."
+      },
+      "success": {
+        "linkCreated": "Nuevo enlace privado creado."
+      }
+    }
+  }
+}

@@ -17,11 +17,11 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { useTranslations } from "next-intl";
 import { LinkButton } from "@/components/ui/link-button";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { SectionCard } from "@/components/ui/section-card";
 import { DEFAULT_PAGE_SIZE, sliceForPage } from "@/lib/pagination";
-import { teacherLevels } from "@/lib/teacher-levels";
 
 export type StaffTeacherCard = {
   id: string;
@@ -42,11 +42,14 @@ type LevelFilter = "" | (1 | 2 | 3 | 4);
 type AvailabilityFilter = "" | "yes" | "no";
 type BookableFilter = "" | "yes" | "no";
 
+const teacherLevelNumbers = [1, 2, 3, 4] as const;
+
 function normalizeSearch(value: string) {
   return value.trim().toLowerCase();
 }
 
 export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
+  const t = useTranslations("admin");
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("");
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("");
@@ -72,12 +75,17 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
       if (bookableFilter === "no" && teacher.bookable) return false;
       if (countryFilter && teacher.country !== countryFilter) return false;
       if (!query) return true;
-      const haystack = [teacher.name, teacher.headline, teacher.country, teacher.levelName]
+      const haystack = [
+        teacher.name,
+        teacher.headline,
+        teacher.country,
+        t(`management.staff.level.${teacher.level}`),
+      ]
         .join(" ")
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [teachers, search, levelFilter, availabilityFilter, bookableFilter, countryFilter]);
+  }, [teachers, search, levelFilter, availabilityFilter, bookableFilter, countryFilter, t]);
 
   const pageRows = sliceForPage(filtered, listPage, DEFAULT_PAGE_SIZE);
 
@@ -86,27 +94,30 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Staff"
-        subtitle="Teachers on the academy roster — filter and review teaching load and booking readiness."
+        title={t("management.staff.title")}
+        subtitle={t("management.staff.subtitle")}
         items={[
-          { title: "Manager", to: "/manager" },
-          { title: "Staff" },
+          { title: t("management.breadcrumb.manager"), to: "/manager" },
+          { title: t("management.staff.title") },
         ]}
       />
 
       <SectionCard
-        title="Teachers"
+        title={t("management.staff.teachers")}
         subtitle={
           filtered.length === teachers.length
-            ? `${teachers.length} on roster`
-            : `${filtered.length} of ${teachers.length} match filters`
+            ? t("management.staff.onRoster", { count: teachers.length })
+            : t("management.staff.matchFilters", {
+                shown: filtered.length,
+                total: teachers.length,
+              })
         }
       >
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2} useFlexGap flexWrap="wrap">
           <TextField
             size="small"
-            label="Search"
-            placeholder="Name, headline, country…"
+            label={t("management.staff.filter.search")}
+            placeholder={t("management.staff.filter.searchPlaceholder")}
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -115,10 +126,10 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
             sx={{ minWidth: { md: 220 }, flex: { md: 1 } }}
           />
           <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel id="staff-level-filter">Level</InputLabel>
+            <InputLabel id="staff-level-filter">{t("management.staff.filter.level")}</InputLabel>
             <Select
               labelId="staff-level-filter"
-              label="Level"
+              label={t("management.staff.filter.level")}
               value={levelFilter === "" ? "" : String(levelFilter)}
               onChange={(event) => {
                 const raw = event.target.value;
@@ -126,59 +137,59 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
                 resetPage();
               }}
             >
-              <MenuItem value="">All levels</MenuItem>
-              {teacherLevels.map((level) => (
-                <MenuItem key={level.level} value={String(level.level)}>
-                  {level.name}
+              <MenuItem value="">{t("management.staff.filter.allLevels")}</MenuItem>
+              {teacherLevelNumbers.map((level) => (
+                <MenuItem key={level} value={String(level)}>
+                  {t(`management.staff.level.${level}`)}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel id="staff-availability-filter">Availability</InputLabel>
+            <InputLabel id="staff-availability-filter">{t("management.staff.filter.availability")}</InputLabel>
             <Select
               labelId="staff-availability-filter"
-              label="Availability"
+              label={t("management.staff.filter.availability")}
               value={availabilityFilter}
               onChange={(event) => {
                 setAvailabilityFilter(event.target.value as AvailabilityFilter);
                 resetPage();
               }}
             >
-              <MenuItem value="">Any</MenuItem>
-              <MenuItem value="yes">Has windows</MenuItem>
-              <MenuItem value="no">No windows</MenuItem>
+              <MenuItem value="">{t("management.staff.filter.any")}</MenuItem>
+              <MenuItem value="yes">{t("management.staff.filter.hasWindows")}</MenuItem>
+              <MenuItem value="no">{t("management.staff.filter.noWindows")}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel id="staff-bookable-filter">Bookable</InputLabel>
+            <InputLabel id="staff-bookable-filter">{t("management.staff.filter.bookable")}</InputLabel>
             <Select
               labelId="staff-bookable-filter"
-              label="Bookable"
+              label={t("management.staff.filter.bookable")}
               value={bookableFilter}
               onChange={(event) => {
                 setBookableFilter(event.target.value as BookableFilter);
                 resetPage();
               }}
             >
-              <MenuItem value="">Any</MenuItem>
-              <MenuItem value="yes">Bookable</MenuItem>
-              <MenuItem value="no">Not bookable</MenuItem>
+              <MenuItem value="">{t("management.staff.filter.any")}</MenuItem>
+              <MenuItem value="yes">{t("management.staff.filter.bookable")}</MenuItem>
+              <MenuItem value="no">{t("management.staff.filter.notBookable")}</MenuItem>
             </Select>
           </FormControl>
           {countryOptions.length ? (
             <FormControl size="small" sx={{ minWidth: 160 }}>
-              <InputLabel id="staff-country-filter">Country</InputLabel>
+              <InputLabel id="staff-country-filter">{t("management.staff.filter.country")}</InputLabel>
               <Select
                 labelId="staff-country-filter"
-                label="Country"
+                label={t("management.staff.filter.country")}
                 value={countryFilter}
                 onChange={(event) => {
                   setCountryFilter(event.target.value);
                   resetPage();
                 }}
               >
-                <MenuItem value="">All countries</MenuItem>
+                <MenuItem value="">{t("management.staff.filter.allCountries")}</MenuItem>
                 {countryOptions.map((country) => (
                   <MenuItem key={country} value={country}>
                     {country}
@@ -191,11 +202,11 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
 
         {!teachers.length ? (
           <Typography variant="body2" color="text.secondary">
-            No teachers on the roster yet. Approve applications or promote a verified student.
+            {t("management.staff.empty.none")}
           </Typography>
         ) : !filtered.length ? (
           <Typography variant="body2" color="text.secondary">
-            No teachers match the current filters.
+            {t("management.staff.empty.filtered")}
           </Typography>
         ) : (
           <>
@@ -203,13 +214,13 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Teacher</TableCell>
-                    <TableCell>Level</TableCell>
-                    <TableCell>Country</TableCell>
-                    <TableCell>Availability</TableCell>
-                    <TableCell>Bookable</TableCell>
-                    <TableCell align="right">Classes</TableCell>
-                    <TableCell>Rating</TableCell>
+                    <TableCell>{t("management.staff.detail.teacher")}</TableCell>
+                    <TableCell>{t("management.staff.filter.level")}</TableCell>
+                    <TableCell>{t("management.staff.filter.country")}</TableCell>
+                    <TableCell>{t("management.staff.filter.availability")}</TableCell>
+                    <TableCell>{t("management.staff.filter.bookable")}</TableCell>
+                    <TableCell align="right">{t("management.staff.detail.classes")}</TableCell>
+                    <TableCell>{t("management.staff.detail.rating")}</TableCell>
                     <TableCell align="right" />
                   </TableRow>
                 </TableHead>
@@ -226,13 +237,17 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
                               {teacher.name}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" noWrap title={teacher.headline}>
-                              {teacher.headline || "Profile not completed"}
+                              {teacher.headline || t("management.staff.detail.profileNotCompleted")}
                             </Typography>
                           </Box>
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Chip size="small" variant="outlined" label={teacher.levelName} />
+                        <Chip
+                          size="small"
+                          variant="outlined"
+                          label={t(`management.staff.level.${teacher.level}`)}
+                        />
                       </TableCell>
                       <TableCell>{teacher.country || "—"}</TableCell>
                       <TableCell>
@@ -240,7 +255,9 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
                           size="small"
                           variant="outlined"
                           color={teacher.hasAvailability ? "success" : "warning"}
-                          label={teacher.hasAvailability ? "Yes" : "No"}
+                          label={teacher.hasAvailability
+                            ? t("common.yes")
+                            : t("common.no")}
                         />
                       </TableCell>
                       <TableCell>
@@ -248,7 +265,9 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
                           size="small"
                           variant="outlined"
                           color={teacher.bookable ? "success" : "default"}
-                          label={teacher.bookable ? "Yes" : "No"}
+                          label={teacher.bookable
+                            ? t("common.yes")
+                            : t("common.no")}
                         />
                       </TableCell>
                       <TableCell align="right">
@@ -265,7 +284,7 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
                       </TableCell>
                       <TableCell align="right">
                         <LinkButton href="/apps/calendar" size="small" variant="text">
-                          Schedule
+                          {t("management.staff.schedule")}
                         </LinkButton>
                       </TableCell>
                     </TableRow>

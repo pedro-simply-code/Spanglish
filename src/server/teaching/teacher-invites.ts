@@ -3,6 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { hasRole, type RoleCode } from "@/lib/auth-roles";
 import type { AuthSession } from "@/lib/auth-types";
@@ -66,21 +67,22 @@ export async function listPendingTeacherInvitations(): Promise<TeacherInvitation
 }
 
 export async function inviteTeacherApplicant(actor: AuthSession, input: { email: string; note?: string }) {
+  const t = await getTranslations("ops.teaching");
   if (!canInviteTeachers(actor)) {
-    return { ok: false as const, message: "Only managers and the admin can invite teachers." };
+    return { ok: false as const, message: t("inviteManagersOnly") };
   }
 
   const email = normalizeEmail(input.email);
-  if (!email.includes("@")) return { ok: false as const, message: "Enter a valid email address." };
+  if (!email.includes("@")) return { ok: false as const, message: t("inviteInvalidEmail") };
 
   const existing = await findUserByEmail(email);
   if (existing) {
     const roles = existing.roles as RoleCode[];
     if (hasRole(roles, "teacher")) {
-      return { ok: false as const, message: "This account is already a teacher." };
+      return { ok: false as const, message: t("inviteAlreadyTeacher") };
     }
     if (hasRole(roles, "admin") || hasRole(roles, "manager")) {
-      return { ok: false as const, message: "Managers and admins cannot apply through this flow." };
+      return { ok: false as const, message: t("inviteStaffCannotApply") };
     }
 
     const openApp = await db
@@ -89,7 +91,7 @@ export async function inviteTeacherApplicant(actor: AuthSession, input: { email:
       .where(and(eq(teacherApplications.userId, existing.id), eq(teacherApplications.status, "submitted")))
       .limit(1);
     if (openApp.length > 0) {
-      return { ok: false as const, message: "This person already has an application under review." };
+      return { ok: false as const, message: t("inviteOpenApplication") };
     }
   }
 
@@ -114,12 +116,12 @@ export async function inviteTeacherApplicant(actor: AuthSession, input: { email:
   const appBase = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   const applyUrl = `${appBase}/apply`;
   const body = [
-    "You are invited to apply as a teacher at Spanglish.",
-    inviteNote ? `\nNote from the academy:\n${inviteNote}\n` : "",
-    `Sign in with ${email} (student account), then open:`,
+    t("inviteBodyLine1"),
+    inviteNote ? t("inviteBodyNote", { note: inviteNote }) : "",
+    t("inviteBodySignIn", { email }),
     applyUrl,
-    "\nComplete the application form. We will review it in Teacher applications.",
-    `\nThis invitation expires in ${INVITE_TTL_DAYS} days.`,
+    t("inviteBodyComplete"),
+    t("inviteBodyExpires", { days: INVITE_TTL_DAYS }),
   ].join("\n");
 
   let inboxDelivered = false;
@@ -127,7 +129,7 @@ export async function inviteTeacherApplicant(actor: AuthSession, input: { email:
     await insertPlatformMessage({
       senderUserId: actor.userId,
       recipientUserId: existing.id,
-      subject: "Teacher application invitation",
+      subject: t("inviteSubject"),
       body,
     });
     inboxDelivered = true;
@@ -146,19 +148,20 @@ export async function inviteTeacherApplicant(actor: AuthSession, input: { email:
   if (inboxDelivered) {
     return {
       ok: true as const,
-      message: "Invitation saved and sent to their Spanglish inbox (Email in the app).",
+      message: t("inviteInboxSuccess"),
     };
   }
 
   return {
     ok: true as const,
-    message: `Invitation saved for ${email}. When they register with that address, they can open Email or go to ${applyUrl}.`,
+    message: t("inviteSavedSuccess", { email, url: applyUrl }),
   };
 }
 
 export async function revokeTeacherInvitation(actor: AuthSession, invitationId: string) {
+  const t = await getTranslations("ops.teaching");
   if (!canInviteTeachers(actor)) {
-    return { ok: false as const, message: "Only managers and the admin can revoke invitations." };
+    return { ok: false as const, message: t("revokeManagersOnly") };
   }
 
   await db
@@ -166,7 +169,7 @@ export async function revokeTeacherInvitation(actor: AuthSession, invitationId: 
     .set({ status: "revoked" })
     .where(and(eq(teacherInvitations.id, invitationId), eq(teacherInvitations.status, "pending")));
 
-  return { ok: true as const, message: "Invitation revoked." };
+  return { ok: true as const, message: t("inviteRevoked") };
 }
 
 export async function markTeacherInvitationSubmitted(email: string, applicationId: string) {

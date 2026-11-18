@@ -11,9 +11,11 @@ import {
   IconMovie,
   IconPlus,
 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { MaterialsLibrary } from "@/features/materials/components/materials-library";
+import { localizeMaterials } from "@/features/materials/data";
 import type { Material } from "@/features/materials/types";
 
 type TeacherMaterialsOverviewProps = {
@@ -26,8 +28,11 @@ export function TeacherMaterialsOverview({
   viewerId,
   materials,
 }: TeacherMaterialsOverviewProps) {
-  const ownMaterials = materials.filter((material) => material.ownerId === viewerId);
-  const colleagues = materials.filter((material) => material.ownerId !== viewerId);
+  const t = useTranslations("educator");
+  const materialsT = useTranslations("educator.materials");
+  const rows = localizeMaterials(materials, materialsT);
+  const ownMaterials = rows.filter((material) => material.ownerId === viewerId);
+  const colleagues = rows.filter((material) => material.ownerId !== viewerId);
   const published = ownMaterials.filter(
     (material) => material.status === "published",
   );
@@ -39,30 +44,33 @@ export function TeacherMaterialsOverview({
   const stats = [
     {
       id: "library",
-      label: "Library",
+      label: t("materials.teacherOverview.library"),
       value: `${ownMaterials.length}`,
-      helper: "Materials you own",
+      helper: t("materials.teacherOverview.materialsYouOwn"),
       icon: IconFileText,
     },
     {
       id: "published",
-      label: "Academy library",
+      label: t("materials.visibility.academyLibrary"),
       value: `${ownMaterials.filter((material) => material.visibility === "global" && material.moderation === "approved").length}`,
-      helper: `${published.length} published · ${ownMaterials.filter((material) => material.moderation === "pending").length} in review`,
+      helper: t("materials.teacherOverview.publishedInReview", {
+        published: published.length,
+        review: ownMaterials.filter((material) => material.moderation === "pending").length,
+      }),
       icon: IconClipboardList,
     },
     {
       id: "forms",
-      label: "Forms",
+      label: t("materials.teacherOverview.forms"),
       value: `${forms.length}`,
-      helper: "Practice activities",
+      helper: t("materials.teacherOverview.practiceActivities"),
       icon: IconClipboardList,
     },
     {
       id: "recordings",
-      label: "Recordings",
+      label: t("materials.teacherOverview.recordings"),
       value: `${recordings.length}`,
-      helper: "From past classes",
+      helper: t("materials.teacherOverview.fromPastClasses"),
       icon: IconMovie,
     },
   ];
@@ -70,16 +78,19 @@ export function TeacherMaterialsOverview({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Materials"
-        subtitle="The teaching library. Create a resource once, then share it with a class, a student, or a cohort."
-        items={[{ title: "Teacher", to: "/teacher" }, { title: "Materials" }]}
+        title={t("common.materials")}
+        subtitle={t("materials.teacherOverview.subtitle")}
+        items={[
+          { title: t("shell.roles.teacher"), to: "/teacher" },
+          { title: t("common.materials") },
+        ]}
       >
         <LinkButton
           href="/teacher/materials/new"
           variant="contained"
           startIcon={<IconPlus size={16} />}
         >
-          New material
+          {t("materials.teacherOverview.newMaterial")}
         </LinkButton>
       </Breadcrumb>
 
@@ -127,23 +138,23 @@ export function TeacherMaterialsOverview({
       </Grid>
 
       <Typography variant="h5" mb={2}>
-        My materials
+        {t("materials.teacherOverview.myLibrary")}
       </Typography>
       <MaterialsLibrary
         entries={ownMaterials.map((material) => ({ material }))}
         basePath="/teacher/materials"
         showVisibility
-        emptyMessage="No materials yet. Create your first resource to start building the library."
+        emptyMessage={t("materials.teacherOverview.noMaterials")}
       />
 
       <Typography variant="h5" mt={5} mb={2}>
-        From other teachers
+        {t("materials.teacherOverview.fromOtherTeachers")}
       </Typography>
       <MaterialsLibrary
         entries={colleagues.map((material) => ({ material }))}
         basePath="/teacher/materials"
         showVisibility
-        emptyMessage="No shared materials from colleagues yet."
+        emptyMessage={t("materials.teacherOverview.noSharedMaterials")}
       />
     </Box>
   );

@@ -2,30 +2,42 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Box from "@mui/material/Box";
 import { connection } from "next/server";
-import { MarketingPackagesSection, MarketingShell } from "@/features/marketing";
+import { getTranslations } from "next-intl/server";
+import { MarketingLoading, MarketingPackagesSection, MarketingShell } from "@/features/marketing";
+import { LocaleProvider } from "@/i18n/locale-provider";
 import { getMarketingLandingSnapshot } from "@/server/marketing/landing-snapshot";
 
-export const metadata: Metadata = {
-  title: "Packages & pricing",
-  description:
-    "Compare Spanglish Academy class packages — individual or paired, 25 or 50 minutes, native teachers from Guatemala.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("marketing");
+  return {
+    title: t("metadata.packagesTitle"),
+    description: t("metadata.packagesDescription"),
+  };
+}
 
 function PackagesFallback() {
   return (
-    <div
-      className="flex min-h-[40vh] items-center justify-center bg-[var(--background)] text-[var(--muted)]"
-      aria-busy
+    <Suspense
+      fallback={
+        <div
+          className="flex min-h-[40vh] items-center justify-center bg-[var(--background)]"
+          aria-busy
+        />
+      }
     >
-      Loading…
-    </div>
+      <LocaleProvider>
+        <MarketingLoading minHeight="min-h-[40vh]" />
+      </LocaleProvider>
+    </Suspense>
   );
 }
 
 export default function PackagesPage() {
   return (
     <Suspense fallback={<PackagesFallback />}>
-      <PackagesContent />
+      <LocaleProvider>
+        <PackagesContent />
+      </LocaleProvider>
     </Suspense>
   );
 }

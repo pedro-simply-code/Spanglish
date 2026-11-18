@@ -66,7 +66,14 @@ export function classesByDayOptions(theme: Theme, categories: string[], height =
   };
 }
 
-export function classStatusDonutOptions(theme: Theme, labels: string[], height = CHART_HEIGHT): ApexOptions {
+type Translator = (key: string) => string;
+
+export function classStatusDonutOptions(
+  theme: Theme,
+  labels: string[],
+  t: Translator,
+  height = CHART_HEIGHT,
+): ApexOptions {
   return {
     chart: { type: "donut", ...chartBase(theme, height) },
     labels,
@@ -79,7 +86,12 @@ export function classStatusDonutOptions(theme: Theme, labels: string[], height =
     dataLabels: { enabled: false },
     legend: { position: "bottom", fontSize: "11px" },
     plotOptions: {
-      pie: { donut: { size: "62%", labels: { show: true, total: { show: true, label: "Total", fontSize: "11px" } } } },
+      pie: {
+        donut: {
+          size: "62%",
+          labels: { show: true, total: { show: true, label: t("common.total"), fontSize: "11px" } },
+        },
+      },
     },
   };
 }
@@ -143,7 +155,7 @@ export function teacherEarningsByDayOptions(theme: Theme, categories: string[], 
   };
 }
 
-export function financeTotalsBarOptions(theme: Theme, height = CHART_HEIGHT): ApexOptions {
+export function financeTotalsBarOptions(theme: Theme, t: Translator, height = CHART_HEIGHT): ApexOptions {
   return {
     chart: { type: "bar", ...chartBase(theme, height) },
     plotOptions: { bar: { borderRadius: 4, columnWidth: "70%" } },
@@ -156,7 +168,12 @@ export function financeTotalsBarOptions(theme: Theme, height = CHART_HEIGHT): Ap
     dataLabels: { enabled: false },
     grid: { strokeDashArray: 3 },
     xaxis: {
-      categories: ["Revenue", "Earned", "Paid", "Unsettled"],
+      categories: [
+        t("finance.ledger.chart.revenue"),
+        t("finance.ledger.chart.earned"),
+        t("finance.ledger.chart.paid"),
+        t("finance.ledger.chart.unsettled"),
+      ],
       axisBorder: { show: false },
       labels: { style: { fontSize: "10px" } },
     },

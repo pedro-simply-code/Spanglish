@@ -16,6 +16,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   deletePricingPackageAction,
   savePricingPackageAction,
@@ -23,10 +24,12 @@ import {
 import type { AdminPackageDetail } from "@/features/admin/types";
 import { suggestedPackageId } from "@/lib/pricing-package-schema";
 
-function emptyPackage(): AdminPackageDetail {
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+function emptyPackage(t: Translator): AdminPackageDetail {
   return {
     id: "individual-25-30",
-    name: "New package",
+    name: t("commerce.editor.newPackage"),
     classType: "Individual",
     classTypeCode: "one-on-one",
     duration: "25 min",
@@ -35,8 +38,8 @@ function emptyPackage(): AdminPackageDetail {
     priceUsd: 480,
     pricePerClassUsd: 16,
     totalUsd: 480,
-    label: "New",
-    description: "Describe who this package is for.",
+    label: t("commerce.editor.newBadge"),
+    description: t("commerce.editor.newDescription"),
     savingsPercent: 0,
     active: false,
     publishedAt: null,
@@ -57,10 +60,11 @@ export function PackageEditorDialog({
   initial,
   onClose,
 }: PackageEditorDialogProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<AdminPackageDetail>(() => initial ?? emptyPackage());
+  const [form, setForm] = useState<AdminPackageDetail>(() => initial ?? emptyPackage(t));
 
   const previousId = mode === "edit" ? initial?.id : undefined;
 
@@ -108,7 +112,8 @@ export function PackageEditorDialog({
   };
 
   const handleDelete = () => {
-    if (!initial?.id || !window.confirm(`Delete package "${initial.name}"?`)) return;
+    if (!initial?.id || !window.confirm(t("commerce.editor.confirmDelete", { name: initial.name })))
+      return;
     setError(null);
     startTransition(async () => {
       const result = await deletePricingPackageAction(initial.id);
@@ -123,36 +128,38 @@ export function PackageEditorDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{mode === "create" ? "Add package" : "Edit package"}</DialogTitle>
+      <DialogTitle>
+        {mode === "create" ? t("commerce.editor.addTitle") : t("commerce.editor.editTitle")}
+      </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {error ? <Alert severity="error">{error}</Alert> : null}
 
           <TextField
-            label="Package id"
+            label={t("commerce.editor.field.id")}
             value={form.id}
             onChange={(event) => setForm({ ...form, id: event.target.value })}
-            helperText={`Suggested: ${syncId}`}
+            helperText={t("commerce.editor.field.suggested", { id: syncId })}
             fullWidth
           />
           <Button size="small" onClick={() => setForm({ ...form, id: syncId })} sx={{ alignSelf: "flex-start" }}>
-            Use suggested id
+            {t("commerce.editor.useSuggestedId")}
           </Button>
 
           <TextField
-            label="Display name"
+            label={t("commerce.editor.field.displayName")}
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
             fullWidth
           />
           <TextField
-            label="Badge label"
+            label={t("commerce.editor.field.badge")}
             value={form.label}
             onChange={(event) => setForm({ ...form, label: event.target.value })}
             fullWidth
           />
           <TextField
-            label="Description"
+            label={t("commerce.editor.field.description")}
             value={form.description}
             onChange={(event) => setForm({ ...form, description: event.target.value })}
             multiline
@@ -162,10 +169,10 @@ export function PackageEditorDialog({
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <FormControl fullWidth>
-              <InputLabel id="pkg-type-label">Class type</InputLabel>
+              <InputLabel id="pkg-type-label">{t("common.classType.label")}</InputLabel>
               <Select
                 labelId="pkg-type-label"
-                label="Class type"
+                label={t("common.classType.label")}
                 value={form.classTypeCode}
                 onChange={(event) => {
                   const classTypeCode = event.target.value as AdminPackageDetail["classTypeCode"];
@@ -176,15 +183,15 @@ export function PackageEditorDialog({
                   });
                 }}
               >
-                <MenuItem value="one-on-one">Individual</MenuItem>
-                <MenuItem value="paired">Paired</MenuItem>
+                <MenuItem value="one-on-one">{t("common.classType.individual")}</MenuItem>
+                <MenuItem value="paired">{t("common.classType.paired")}</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel id="pkg-duration-label">Duration</InputLabel>
+              <InputLabel id="pkg-duration-label">{t("common.duration")}</InputLabel>
               <Select
                 labelId="pkg-duration-label"
-                label="Duration"
+                label={t("common.duration")}
                 value={form.durationMinutes}
                 onChange={(event) => {
                   const durationMinutes = Number(event.target.value) as 25 | 50;
@@ -202,7 +209,7 @@ export function PackageEditorDialog({
           </Stack>
 
           <TextField
-            label="Credits (classes in package)"
+            label={t("commerce.editor.field.credits")}
             type="number"
             value={form.credits}
             onChange={(event) => {
@@ -218,7 +225,7 @@ export function PackageEditorDialog({
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <TextField
-              label="Price per class (USD)"
+              label={t("commerce.editor.field.pricePerClass")}
               type="number"
               value={form.pricePerClassUsd}
               onChange={(event) => {
@@ -231,7 +238,7 @@ export function PackageEditorDialog({
               fullWidth
             />
             <TextField
-              label="Package total (USD)"
+              label={t("commerce.editor.field.packageTotal")}
               type="number"
               value={form.totalUsd}
               onChange={(event) => {
@@ -243,7 +250,7 @@ export function PackageEditorDialog({
           </Stack>
 
           <TextField
-            label="Savings % vs. starter tier"
+            label={t("commerce.editor.field.savings")}
             type="number"
             value={form.savingsPercent}
             onChange={(event) =>
@@ -259,7 +266,7 @@ export function PackageEditorDialog({
                 onChange={(event) => setForm({ ...form, active: event.target.checked })}
               />
             }
-            label="Live on /pricing"
+            label={t("commerce.editor.field.liveOnPricing")}
           />
         </Stack>
       </DialogContent>
@@ -267,16 +274,16 @@ export function PackageEditorDialog({
         <div>
           {mode === "edit" ? (
             <Button color="error" onClick={handleDelete} disabled={pending}>
-              Delete
+              {t("common.delete")}
             </Button>
           ) : null}
         </div>
         <Stack direction="row" spacing={1}>
           <Button onClick={onClose} disabled={pending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button variant="contained" onClick={handleSave} disabled={pending}>
-            Save
+            {t("common.save")}
           </Button>
         </Stack>
       </DialogActions>

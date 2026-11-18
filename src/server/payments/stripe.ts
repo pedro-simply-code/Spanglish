@@ -29,7 +29,7 @@ export function stripe(): Stripe {
 /** Stripe amounts are in the smallest unit; the academy sells in USD. */
 export const STRIPE_CURRENCY = "usd";
 
-export function stripeErrorMessage(error: unknown) {
+export function stripeErrorMessage(error: unknown, unknownMessage = "UNKNOWN_STRIPE_ERROR") {
   if (error instanceof Stripe.errors.StripeError) return error.message;
-  return error instanceof Error ? error.message : "Unknown Stripe error";
+  return error instanceof Error ? error.message : unknownMessage;
 }

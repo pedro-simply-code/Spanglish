@@ -16,6 +16,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconMail, IconUserPlus } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { AcademyContactButton } from "@/components/ui/academy-contact-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -36,9 +37,14 @@ type Props = {
   mailFromName: string;
 };
 
-const inviteDate = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
-
 export function OrganizationManagersOverview({ managers, invitations, mailFromName }: Props) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
+  const inviteDate = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -72,25 +78,24 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Managers"
-        subtitle="Invitations notify the academy inbox inside the app — not Gmail. Invitees accept at /join/manager."
-        items={adminBreadcrumb("Organization", "Managers", "/admin/organization/managers")}
+        title={t("common.page.managers")}
+        subtitle={t("organization.managers.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.organization"), t("common.page.managers"), "/admin/organization/managers")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Managers cannot self-serve: invite via the in-app Email inbox or promote an existing verified account. Teacher applications
-        stay on the applications page — this flow is for operations leads only.
+        {t("organization.managers.notice")}
       </Alert>
 
       <Box sx={{ mb: 3 }}>
         <SectionCard
-          title="Pending invitations"
-          subtitle="Open invites expire after 14 days"
+          title={t("organization.managers.pending")}
+          subtitle={t("organization.managers.pendingSubtitle")}
           action={
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <Tooltip title="Invite by email">
+              <Tooltip title={t("organization.managers.inviteByEmail")}>
                 <IconButton
-                  aria-label="Invite manager by email"
+                  aria-label={t("organization.managers.inviteManagerByEmail")}
                   color="primary"
                   size="small"
                   onClick={() => setInviteOpen(true)}
@@ -98,9 +103,9 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                   <IconMail size={18} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Promote existing user">
+              <Tooltip title={t("organization.managers.promoteExisting")}>
                 <IconButton
-                  aria-label="Promote verified user to manager"
+                  aria-label={t("organization.managers.promoteVerifiedUser")}
                   color="primary"
                   size="small"
                   onClick={() => setPromoteOpen(true)}
@@ -114,7 +119,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
           <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
             {invitations.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
-                No pending invitations. Use the mail or user icon above to invite or promote.
+                {t("organization.managers.pendingEmpty")}
               </Typography>
             ) : null}
             {invitations.map((invite) => (
@@ -130,8 +135,10 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                     {invite.email}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Sent {inviteDate.format(new Date(invite.createdAt))} · expires{" "}
-                    {inviteDate.format(new Date(invite.expiresAt))}
+                    {t("organization.managers.sentExpires", {
+                      sent: inviteDate.format(new Date(invite.createdAt)),
+                      expires: inviteDate.format(new Date(invite.expiresAt)),
+                    })}
                   </Typography>
                   {invite.inviteNote ? (
                     <Typography variant="body2" color="text.secondary" mt={0.5}>
@@ -142,7 +149,11 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Chip
                     size="small"
-                    label={invite.status}
+                    label={t(
+                      invite.status === "pending"
+                        ? "common.pending"
+                        : "common.expired",
+                    )}
                     color={invite.status === "pending" ? "warning" : "default"}
                   />
                   {invite.status === "pending" ? (
@@ -152,7 +163,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                       disabled={pending}
                       onClick={() => run(() => revokeManagerInvitationAction(invite.id))}
                     >
-                      Revoke
+                      {t("organization.managers.revoke")}
                     </Button>
                   ) : null}
                 </Stack>
@@ -162,11 +173,14 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
         </SectionCard>
       </Box>
 
-      <SectionCard title="Active managers" subtitle="Remove access returns the account to student.">
+      <SectionCard
+        title={t("organization.managers.active")}
+        subtitle={t("organization.managers.activeSubtitle")}
+      >
         <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
           {managers.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No managers yet. Invite someone or promote an existing user.
+              {t("organization.managers.activeEmpty")}
             </Typography>
           ) : null}
           {managers.map((manager) => (
@@ -185,12 +199,14 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                   {manager.email}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Manager since {manager.since}
+                  {t("organization.managers.managerSince", { date: manager.since })}
                 </Typography>
               </Box>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Chip
-                  label={manager.status}
+                  label={t(
+                    manager.status === "Active" ? "common.active" : "common.suspended",
+                  )}
                   color={manager.status === "Active" ? "success" : "warning"}
                   size="small"
                 />
@@ -206,7 +222,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
                   disabled={pending}
                   onClick={() => run(() => revokeManagerRoleAction(manager.id))}
                 >
-                  Remove access
+                  {t("organization.managers.removeAccess")}
                 </Button>
               </Stack>
             </Stack>
@@ -215,14 +231,14 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
       </SectionCard>
 
       <Dialog open={inviteOpen} onClose={closeInvite} fullWidth maxWidth="sm">
-        <DialogTitle>Invite by email</DialogTitle>
+        <DialogTitle>{t("organization.managers.inviteByEmail")}</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            If they already have an account, they get this in Email in the app. Otherwise they register with this address first.
+            {t("organization.managers.inviteDialogHelp")}
           </Typography>
           <Stack spacing={2}>
             <TextField
-              label="Email"
+              label={t("common.email")}
               type="email"
               size="small"
               value={inviteEmail}
@@ -231,7 +247,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
               autoFocus
             />
             <TextField
-              label="Note to invitee (optional)"
+              label={t("organization.managers.noteLabel")}
               size="small"
               value={inviteNote}
               onChange={(event) => setInviteNote(event.target.value)}
@@ -243,7 +259,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
         </DialogContent>
         <DialogActions>
           <Button onClick={closeInvite} disabled={pending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="contained"
@@ -255,19 +271,19 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
               )
             }
           >
-            Send invitation
+            {t("organization.managers.sendInvitation")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={promoteOpen} onClose={closePromote} fullWidth maxWidth="sm">
-        <DialogTitle>Promote existing user</DialogTitle>
+        <DialogTitle>{t("organization.managers.promoteExisting")}</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            The account must already exist with a verified email. The manager role is granted immediately.
+            {t("organization.managers.promoteDialogHelp")}
           </Typography>
           <TextField
-            label="Verified account email"
+            label={t("organization.managers.verifiedEmail")}
             type="email"
             size="small"
             value={promoteEmail}
@@ -278,14 +294,14 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
         </DialogContent>
         <DialogActions>
           <Button onClick={closePromote} disabled={pending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="contained"
             disabled={pending || !promoteEmail.trim()}
             onClick={() => run(() => promoteManagerByEmailAction(promoteEmail), closePromote)}
           >
-            Grant manager role
+            {t("organization.managers.grantRole")}
           </Button>
         </DialogActions>
       </Dialog>

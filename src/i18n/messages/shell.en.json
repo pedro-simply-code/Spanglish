@@ -1,0 +1,270 @@
+{
+  "shell": {
+    "roles": {
+      "student": "Student",
+      "teacher": "Teacher",
+      "manager": "Manager",
+      "admin": "Admin",
+      "descriptions": {
+        "student": "Books live classes, joins the classroom, and follows learning material.",
+        "teacher": "Teaches live classes, reviews rosters, and publishes materials, forms, and recordings.",
+        "manager": "Oversees teachers, classes, and billing without platform-wide access.",
+        "admin": "Full access, including role changes and platform configuration."
+      },
+      "badges": {
+        "student": "Student",
+        "teacher": "Teacher",
+        "manager": "Manager",
+        "admin": "Admin"
+      }
+    },
+    "dashboards": {
+      "student": "Student dashboard",
+      "teacher": "Teacher dashboard",
+      "manager": "Manager dashboard",
+      "admin": "Admin dashboard"
+    },
+    "language": {
+      "label": "Language",
+      "en": "English",
+      "es": "Español"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "academy": "Academy",
+      "learning": "Learning",
+      "insights": "Insights",
+      "teaching": "Teaching",
+      "operations": "Operations",
+      "account": "Account",
+      "commerce": "Commerce",
+      "finance": "Finance",
+      "organization": "Organization",
+      "platform": "Platform",
+      "compliance": "Compliance",
+      "overview": "Overview",
+      "myClasses": "My classes",
+      "bookAClass": "Book a class",
+      "pricing": "Pricing",
+      "lessons": "Lessons",
+      "practice": "Practice",
+      "vocabulary": "Vocabulary",
+      "materials": "Materials",
+      "progress": "Progress",
+      "achievements": "Achievements",
+      "teachWithUs": "Teach with us",
+      "settings": "Settings",
+      "availability": "Availability",
+      "earnings": "Earnings",
+      "assignments": "Assignments",
+      "recordings": "Recordings",
+      "students": "Students",
+      "academySchedule": "Academy schedule",
+      "studentsAndCredits": "Students & credits",
+      "teacherApplications": "Teacher applications",
+      "materialReview": "Material review",
+      "teacherPayouts": "Teacher payouts",
+      "billing": "Billing",
+      "staff": "Staff",
+      "rooms": "Rooms",
+      "packages": "Packages",
+      "teacherPayRates": "Teacher pay rates",
+      "payoutApprovals": "Payout approvals",
+      "paymentProviders": "Payment providers",
+      "creditLedger": "Credit ledger",
+      "users": "Users",
+      "managers": "Managers",
+      "roles": "Roles",
+      "integrations": "Integrations",
+      "securityPolicy": "Security policy",
+      "emailDeliverability": "Email deliverability",
+      "classroomDefaults": "Classroom defaults",
+      "auditLog": "Audit log",
+      "myCredits": "My credits"
+    },
+    "notifications": {
+      "classReminder": {
+        "title": "Class reminder",
+        "subtitle": "María González tomorrow at 18:00"
+      },
+      "badge": {
+        "title": "New badge unlocked",
+        "subtitle": "You earned Word Collector"
+      },
+      "streak": {
+        "title": "{days}-day streak",
+        "subtitle": "Keep it alive with a quick review"
+      },
+      "dailyGoal": {
+        "title": "Daily goal almost there",
+        "subtitle": "{minutes} minutes left to hit your goal"
+      },
+      "vocabulary": {
+        "title": "Vocabulary review ready",
+        "subtitle": "{count} words are due today"
+      },
+      "lesson": {
+        "title": "Lesson in progress",
+        "subtitle": "Everyday Spanglish Phrases is {percent}% done"
+      }
+    },
+    "profileMenu": {
+      "ariaLabel": "Profile",
+      "heading": "My account",
+      "activeDashboard": "{role} dashboard active",
+      "signOut": "Sign out",
+      "links": {
+        "profileTitle": "My Profile",
+        "profileSubtitle": "Account settings",
+        "messagesTitle": "Messages",
+        "messagesSubtitle": "Your inbox",
+        "progressSubtitle": "Streaks and milestones",
+        "classesStudentSubtitle": "Join and manage live classes",
+        "classesTeacherSubtitle": "Your schedule and classrooms",
+        "earningsSubtitle": "Pay per class and payouts",
+        "academyScheduleSubtitle": "Filter by teacher, not your personal classes",
+        "payoutsSubtitle": "Prepare monthly payouts",
+        "payoutApprovalsSubtitle": "Approve and send teacher pay",
+        "auditSubtitle": "Security and governance events",
+        "integrationsSubtitle": "Email, Google, Stripe, LiveKit"
+      }
+    },
+    "search": {
+      "ariaLabel": "Search",
+      "placeholder": "Search here",
+      "close": "Close search",
+      "quickLinks": "Quick Page Links",
+      "noResults": "No results found"
+    },
+    "sidebar": {
+      "dashboardSuffix": "{role} dashboard",
+      "signOut": "Sign out"
+    },
+    "topbar": {
+      "toggleSidebar": "Toggle sidebar",
+      "switchDashboard": "Switch dashboard",
+      "notifications": "Notifications",
+      "unread": "{count} unread",
+      "empty": "No messages yet. Academy mail appears here when someone contacts you or sends a notice.",
+      "openEmail": "Open Email",
+      "apps": {
+        "calendar": "Calendar",
+        "email": "Email"
+      }
+    },
+    "footer": {
+      "tagline": "Live Spanish with native teachers from Guatemala."
+    },
+    "snackbar": {
+      "dismiss": "Dismiss notification"
+    },
+    "contact": {
+      "tooltip": "Contact via email app",
+      "ariaLabel": "Email {name}"
+    },
+    "chart": {
+      "studyMinutes": "Study minutes"
+    },
+    "pagination": {
+      "showing": "Showing {from}–{to} of {total}"
+    },
+    "breadcrumb": {
+      "decorationAlt": "Breadcrumb decoration",
+      "ariaLabel": "breadcrumb"
+    },
+    "settings": {
+      "metadata": {
+        "title": "Settings",
+        "description": "Spanglish settings, roles, access, and security"
+      },
+      "breadcrumb": {
+        "title": "Settings",
+        "subtitle": "Make Spanglish yours"
+      },
+      "tabs": {
+        "ariaLabel": "Settings sections",
+        "profile": "Profile",
+        "notifications": "Notifications",
+        "preferences": "Preferences",
+        "rolesAccess": "Roles & access",
+        "security": "Security"
+      },
+      "profile": {
+        "signOutTitle": "Sign out",
+        "signOutHelp": "Your dashboard choice is remembered for the next sign-in.",
+        "signOut": "Sign out"
+      },
+      "notifications": {
+        "daily": {
+          "title": "Daily reminders",
+          "description": "Get a nudge to practice every day."
+        },
+        "weekly": {
+          "title": "Weekly summary",
+          "description": "Receive a recap of your progress each week."
+        },
+        "achievements": {
+          "title": "Achievement alerts",
+          "description": "Know as soon as you unlock a new badge."
+        }
+      },
+      "preferences": {
+        "levelLabel": "Spanish level",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced",
+        "goalLabel": "Daily goal",
+        "minutes10": "10 minutes",
+        "minutes20": "20 minutes",
+        "minutes30": "30 minutes",
+        "theme": "Theme",
+        "themeHelp": "Spanglish uses a single orange theme for the whole app. There is no theme switcher."
+      },
+      "rolesAccess": {
+        "notice": "One dashboard is visible at a time. Switching role changes the sidebar, the topbar, and the whole dashboard content. The server redirects you away from any dashboard that is not active.",
+        "heading": "Roles & access",
+        "description": "Permissions are cumulative. Every role you hold adds to your access, but only the active role decides the visible dashboard.",
+        "priority": "Priority {priority}",
+        "granted": "Granted",
+        "notGranted": "Not granted",
+        "addsPermissions": "Adds permissions",
+        "activeNow": "This dashboard is active right now.",
+        "switch": "Switch to {role} dashboard",
+        "notAssigned": "This role is not assigned to your account. An administrator can grant it from the admin role-management tools.",
+        "effectiveTitle": "Your effective permissions",
+        "effectiveSubtitle": "{permissions} permissions from {roles, plural, one {role} other {roles}}",
+        "activeDashboard": "Active dashboard",
+        "defaultNote": "The Student role is the account default and cannot be removed. The academy always keeps at least one administrator."
+      }
+    },
+    "permissions": {
+      "classesViewOwn": "View own classes",
+      "classesBook": "Book classes",
+      "classesJoinOwn": "Join own classes",
+      "classesCancelOwn": "Cancel own classes",
+      "classesRescheduleOwn": "Reschedule own classes",
+      "classesViewRoster": "View class rosters",
+      "classesManage": "Manage classes",
+      "studentsView": "View students",
+      "materialsRead": "Read materials",
+      "materialsWrite": "Write materials",
+      "materialsShare": "Share materials",
+      "formsGrade": "Grade forms",
+      "recordingsManage": "Manage recordings",
+      "progressViewOwn": "View own progress",
+      "billingViewOwn": "View own billing",
+      "billingManage": "Manage billing",
+      "staffView": "View staff",
+      "teachersApprove": "Approve teachers",
+      "materialsModerate": "Moderate materials",
+      "payoutsPrepare": "Prepare payouts",
+      "payoutsApprove": "Approve payouts",
+      "rolesManage": "Manage roles",
+      "platformManage": "Manage platform"
+    },
+    "demo": {
+      "noteStudent": "Student dashboard: classes, materials, and progress.",
+      "noteRole": "Active dashboard: {role}."
+    }
+  }
+}

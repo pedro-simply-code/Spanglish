@@ -245,5 +245,21 @@
     "body": "This account has full access to the academy. Turn on two-factor authentication so a stolen password or email is not enough to get in.",
     "action": "Turn on 2FA",
     "skip": "Skip for now"
+  },
+  "metadata": {
+    "siteDescription": "Learn Spanish live with native teachers from Guatemala — Spanglish Academy",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home",
+    "loginTitle": "Sign in",
+    "loginDescription": "Sign in to your Spanglish account",
+    "registerTitle": "Create account",
+    "registerDescription": "Create your Spanglish account",
+    "recoverTitle": "Reset password",
+    "recoverDescription": "Reset your password with an email code",
+    "twoFactorTitle": "Two-factor verification",
+    "twoFactorDescription": "Enter your authenticator code",
+    "onboardingTitle": "Complete your profile",
+    "onboardingDescription": "Tell us a little about you to get started"
   }
 }

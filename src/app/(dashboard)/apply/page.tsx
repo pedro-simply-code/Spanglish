@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { ApplyForm } from "@/features/teaching";
 import { requireDashboard } from "@/server/auth/session";
 import { getMyApplication } from "@/server/teaching/applications";
 
-export const metadata: Metadata = {
-  title: "Teach with us",
-  description: "Apply to teach live classes at Spanglish",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("student");
+  return {
+    title: t("meta.teach.title"),
+    description: t("meta.teach.description"),
+  };
+}
 
 export default function ApplyPage() {
   return (

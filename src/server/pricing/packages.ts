@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, asc, count, eq, like, max, ne, or } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { normalizePricingPackageId } from "@/lib/pricing-package-schema";
 import {
   academyPlans,
@@ -241,6 +242,7 @@ export async function savePricingPackage(
   input: PricingPackageInput,
   options?: { previousId?: string },
 ): Promise<SavePackageResult> {
+  const t = await getTranslations("ops.packages");
   const now = new Date();
   const previousId = options?.previousId?.trim();
 
@@ -248,7 +250,7 @@ export async function savePricingPackage(
     return {
       ok: false,
       code: "VARIANT_EXISTS",
-      message: "Another package already uses this class type, duration, and credit count.",
+      message: t("variantExists"),
     };
   }
 
@@ -282,7 +284,7 @@ export async function savePricingPackage(
         .where(eq(pricingPackages.id, input.id))
         .limit(1);
       if (idCollision) {
-        return { ok: false, code: "ID_TAKEN", message: "That package id is already in use." };
+        return { ok: false, code: "ID_TAKEN", message: t("idTaken") };
       }
       await db.delete(pricingPackages).where(eq(pricingPackages.id, previousId));
       await db.insert(pricingPackages).values({
@@ -311,7 +313,7 @@ export async function savePricingPackage(
     .where(eq(pricingPackages.id, input.id))
     .limit(1);
   if (idCollision) {
-    return { ok: false, code: "ID_TAKEN", message: "That package id is already in use." };
+    return { ok: false, code: "ID_TAKEN", message: t("idTaken") };
   }
 
   await db.insert(pricingPackages).values({
@@ -324,13 +326,14 @@ export async function savePricingPackage(
 }
 
 export async function deletePricingPackage(id: string): Promise<SavePackageResult> {
+  const t = await getTranslations("ops.packages");
   const [row] = await db
     .select({ id: pricingPackages.id })
     .from(pricingPackages)
     .where(eq(pricingPackages.id, id))
     .limit(1);
   if (!row) {
-    return { ok: false, code: "NOT_FOUND", message: "Package not found." };
+    return { ok: false, code: "NOT_FOUND", message: t("packageNotFound") };
   }
   await db.delete(pricingPackages).where(eq(pricingPackages.id, id));
   return { ok: true };

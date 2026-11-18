@@ -14,6 +14,7 @@ import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import type { TransitionProps } from "@mui/material/transitions";
+import { useTranslations } from "next-intl";
 import { RecipientEmailField } from "@/features/email/components/recipient-email-field";
 
 export type EmailComposeInitial = {
@@ -51,6 +52,7 @@ export function EmailCompose({
   onSend,
   sendPending,
 }: EmailComposeProps) {
+  const t = useTranslations("apps");
   const [open, setOpen] = useState(false);
   const [to, setTo] = useState(initial?.to ?? "");
   const [toValid, setToValid] = useState<boolean | null>(null);
@@ -91,7 +93,7 @@ export function EmailCompose({
     <Box>
       <Box p={3} pb={1}>
         <Button variant="contained" fullWidth color="primary" onClick={() => setOpen(true)}>
-          Compose
+          {t("email.compose.button")}
         </Button>
       </Box>
 
@@ -105,12 +107,12 @@ export function EmailCompose({
         aria-describedby="compose-dialog-description"
       >
         <DialogTitle id="compose-dialog-title" variant="h5">
-          Compose Mail
+          {t("email.compose.title")}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="compose-dialog-description" component="div">
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Delivered only to the recipient&apos;s Spanglish inbox (Email in the app), not Gmail or external mail.
+              {t("email.compose.notice")}
             </Typography>
             <RecipientEmailField
               value={to}
@@ -119,7 +121,9 @@ export function EmailCompose({
               disabled={sendPending}
             />
 
-            <ComposeFormLabel htmlFor="compose-subject">Subject</ComposeFormLabel>
+            <ComposeFormLabel htmlFor="compose-subject">
+              {t("email.compose.subject")}
+            </ComposeFormLabel>
             <TextField
               id="compose-subject"
               fullWidth
@@ -129,10 +133,12 @@ export function EmailCompose({
               onChange={(event) => setSubject(event.target.value)}
             />
 
-            <ComposeFormLabel htmlFor="compose-message">Message</ComposeFormLabel>
+            <ComposeFormLabel htmlFor="compose-message">
+              {t("email.compose.message")}
+            </ComposeFormLabel>
             <TextField
               id="compose-message"
-              placeholder="Write a message"
+              placeholder={t("email.compose.messagePlaceholder")}
               multiline
               fullWidth
               rows={8}
@@ -149,10 +155,10 @@ export function EmailCompose({
             variant="contained"
             disabled={sendPending || !to.trim() || toValid === false}
           >
-            Send
+            {t("common.send")}
           </Button>
           <Button onClick={() => setOpen(false)} color="secondary" disabled={sendPending}>
-            Cancel
+            {t("common.cancel")}
           </Button>
         </DialogActions>
       </Dialog>

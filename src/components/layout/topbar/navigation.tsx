@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Button from "@mui/material/Button";
+import { useTranslations } from "next-intl";
 import type { RoleCode } from "@/lib/auth-roles";
 
-const toolbarApps = [
-  { title: "Calendar", href: "/apps/calendar" },
-  { title: "Email", href: "/apps/email" },
-] as const;
-
 export function Navigation({ activeRole }: { activeRole: RoleCode }) {
+  const t = useTranslations("shell");
   const pathname = usePathname();
+  const toolbarApps = [
+    { title: t("topbar.apps.calendar"), href: "/apps/calendar" },
+    { title: t("topbar.apps.email"), href: "/apps/email" },
+  ] as const;
 
   return (
     <>

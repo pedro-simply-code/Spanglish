@@ -1,0 +1,269 @@
+{
+  "apps": {
+    "common": {
+      "back": "Back",
+      "cancel": "Cancel",
+      "close": "Close",
+      "send": "Send"
+    },
+    "metadata": {
+      "email": {
+        "title": "Email",
+        "description": "Spanglish email app"
+      },
+      "chat": {
+        "title": "Chat",
+        "description": "Spanglish messenger app"
+      },
+      "calendar": {
+        "title": "Calendar",
+        "description": "Academy class schedule"
+      }
+    },
+    "email": {
+      "breadcrumb": {
+        "title": "Academy email",
+        "subtitleUnread": "{count} unread in your inbox — messages also go to the recipient’s real email when delivery is configured.",
+        "subtitleDefault": "Send and read messages inside Spanglish only — each account's inbox in the app, not external Gmail."
+      },
+      "roles": {
+        "student": "Student",
+        "teacher": "Teacher",
+        "manager": "Manager",
+        "admin": "Admin"
+      },
+      "labels": {
+        "academy": "Academy",
+        "promotional": "Promotional",
+        "social": "Social",
+        "health": "Health"
+      },
+      "filters": {
+        "sortBy": "Sort By",
+        "inbox": "Inbox",
+        "sent": "Sent",
+        "trash": "Trash",
+        "starred": "Starred",
+        "important": "Important"
+      },
+      "search": {
+        "openFilters": "Open email filters",
+        "placeholder": "Search messages or academy email",
+        "contacts": "Academy contacts (all roles)"
+      },
+      "compose": {
+        "button": "Compose",
+        "title": "Compose Mail",
+        "notice": "Delivered only to the recipient’s Spanglish inbox (Email in the app), not Gmail or external mail.",
+        "to": "To (academy email)",
+        "toPlaceholder": "Search name or email in the academy",
+        "recipientUnknown": "No academy account matches this email.",
+        "recipientBounced": "Account found (external mail bounced — Spanglish inbox still works in the app).",
+        "recipientHint": "Type a name or email to search all roles in the academy.",
+        "subject": "Subject",
+        "message": "Message",
+        "messagePlaceholder": "Write a message",
+        "subjectFor": "Spanglish — message for {name}",
+        "greeting": "Hi {name},\n\n\n",
+        "replySubject": "Re: {subject}",
+        "replyBody": "\n\n---\nOn {time}, {sender} wrote:\n{excerpt}"
+      },
+      "list": {
+        "empty": "No messages in this folder yet.",
+        "selectEmail": "Select email from {from}"
+      },
+      "content": {
+        "emptyTitle": "Please Select a Mail",
+        "emptyImageAlt": "Email icon",
+        "star": "Star",
+        "unstar": "Unstar",
+        "starAria": "Star email",
+        "unstarAria": "Unstar email",
+        "important": "Important",
+        "notImportant": "Not Important",
+        "markImportant": "Mark important",
+        "markNotImportant": "Mark not important",
+        "delete": "Delete",
+        "deleteAria": "Move email to trash",
+        "attachments": "Attachments ({count})",
+        "reply": "Reply",
+        "forward": "Forward",
+        "replyPlaceholder": "Type here..."
+      },
+      "prefix": {
+        "to": "To: {name}",
+        "from": "From: {email}"
+      },
+      "errors": {
+        "invalidRecipient": "Enter a valid recipient email.",
+        "subjectRequired": "Subject is required.",
+        "bodyRequired": "Message body is required.",
+        "recipientNotFound": "No academy account with that email.",
+        "selfMessage": "You cannot message yourself."
+      },
+      "success": {
+        "delivered": "Message delivered to their Spanglish inbox (Email in the app)."
+      }
+    },
+    "chat": {
+      "breadcrumb": {
+        "title": "Chat app",
+        "subtitle": "Messenger"
+      },
+      "status": {
+        "online": "online",
+        "busy": "busy",
+        "away": "away",
+        "offline": "offline"
+      },
+      "sidebar": {
+        "currentUserRole": "Designer",
+        "searchPlaceholder": "Search contacts",
+        "recentChats": "Recent Chats",
+        "sortByTime": "Sort By Time",
+        "sortByUnread": "Sort By Unread",
+        "markAllRead": "Mark as all Read",
+        "noContacts": "No Contacts Found!",
+        "you": "You: ",
+        "sentPhoto": "Sent a photo"
+      },
+      "content": {
+        "selectChat": "Select Chat",
+        "openChatList": "Open chat list",
+        "startVoiceCall": "Start voice call",
+        "startVideoCall": "Start video call",
+        "toggleDetails": "Toggle chat details",
+        "messageTime": "{name}, {time}",
+        "sharedAttachment": "Shared attachment"
+      },
+      "composer": {
+        "placeholder": "Type a Message",
+        "send": "Send message",
+        "photo": "Send a photo",
+        "attach": "Attach a file"
+      },
+      "details": {
+        "media": "Media ({count})",
+        "noMedia": "No Media Found!",
+        "sharedMedia": "Shared media",
+        "attachments": "Attachments ({count})",
+        "noAttachments": "No Attachment Found!",
+        "download": "Download {file}"
+      },
+      "excerpts": {
+        "themeDeveloper": "Theme Developer",
+        "doctor": "Doctor",
+        "hacker": "Hacker",
+        "house": "Please wait outside of the house",
+        "frontEnd": "Front End Developer",
+        "graphics": "Graphics Designer",
+        "backEnd": "Back End Developer",
+        "administrator": "Administrator"
+      },
+      "messages": {
+        "c1m1": "Hey Mathew, can you take a look at the new theme tokens?",
+        "c1m2": "I pushed the updated palette to the shared branch.",
+        "c1m3": "Nice, I will review it before lunch.",
+        "c1m5": "Looks great, let us ship it today.",
+        "c2m1": "Good morning! Are we still on for the checkup call?",
+        "c2m2": "I can send over the notes from last session.",
+        "c2m3": "Morning! Yes, same time works for me.",
+        "c2m5": "Perfect, see you then.",
+        "c3m1": "The build pipeline is failing again on the staging job.",
+        "c3m2": "I attached the log dump for you.",
+        "c3m3": "Found it, a missing environment variable.",
+        "c3m4": "Adding it to the secrets manager now.",
+        "c4m1": "Are you home? I am around the corner.",
+        "c4m2": "Give me five minutes, I am wrapping up a call.",
+        "c4m4": "Please wait outside of the house.",
+        "c4m5": "No problem, take your time.",
+        "c5m1": "The new lesson widgets are ready for review.",
+        "c5m2": "I kept the card radius consistent with the rest.",
+        "c5m3": "Checking the pull request right now.",
+        "c5m5": "Approving it, nice work!",
+        "c6m1": "Do you have the final illustrations for the course?",
+        "c6m3": "Almost done, one export left.",
+        "c6m4": "Sending everything in five.",
+        "c7m1": "The lesson progress endpoint is returning stale data.",
+        "c7m2": "Cache headers look wrong to me.",
+        "c7m3": "Good catch, the CDN rule was missing.",
+        "c7m4": "Fixed and deployed to staging.",
+        "c8m1": "Here is the updated component inventory.",
+        "c8m2": "Page templates are included as well.",
+        "c8m3": "Thanks, downloading it now.",
+        "c8m4": "I will add comments by tomorrow.",
+        "c9m1": "Access for the new students has been granted.",
+        "c9m2": "They can start with the placement quiz.",
+        "c9m3": "Perfect, I will welcome them in the group.",
+        "c9m4": "Also, the weekly report is ready.",
+        "c10m1": "Reminder: the health workshop starts at six.",
+        "c10m2": "I saved you a seat near the window.",
+        "c10m3": "Thank you, I will be there on time.",
+        "c10m4": "See you tonight!"
+      }
+    },
+    "calendar": {
+      "breadcrumb": "Calendar",
+      "subtitle": {
+        "student": "Your live classes. Click an empty time to book a class.",
+        "teacher": "Your classes over your weekly availability (green).",
+        "manager": "Every class in the academy. Pick a teacher to see their availability."
+      },
+      "timezone": "Times in {timeZone}",
+      "legend": {
+        "individual": "Individual",
+        "paired": "Paired",
+        "finished": "Finished",
+        "canceled": "Canceled",
+        "available": "Available"
+      },
+      "toolbar": {
+        "teacher": "Teacher",
+        "allTeachers": "All teachers",
+        "bookClass": "Book a class",
+        "editAvailability": "Edit availability",
+        "addToCalendar": "Add to my calendar"
+      },
+      "event": {
+        "student": "Student",
+        "canceledSuffix": " (canceled)"
+      },
+      "feed": {
+        "title": "Add your classes to Google Calendar or Outlook",
+        "description": "A private link your calendar app checks every hour. Anyone with the link can see your class times, so do not share it. Creating a new link turns the old one off.",
+        "instructions": "Google Calendar: Other calendars → + → From URL. Outlook: Add calendar → Subscribe from web. Copy it now: for your security it is shown only once.",
+        "existingWarning": "You already have a link. Create a new one only if you lost it or think someone else has it.",
+        "copyLink": "Copy link",
+        "createNewLink": "Create a new link",
+        "createLink": "Create my link"
+      },
+      "rbc": {
+        "date": "Date",
+        "time": "Time",
+        "event": "Event",
+        "allDay": "all day",
+        "week": "Week",
+        "workWeek": "Work week",
+        "day": "Day",
+        "month": "Month",
+        "previous": "Previous",
+        "next": "Next",
+        "yesterday": "Yesterday",
+        "tomorrow": "Tomorrow",
+        "today": "Today",
+        "agenda": "Agenda",
+        "showMore": "+{count} more",
+        "noEventsInRange": "There are no events in this range."
+      },
+      "ics": {
+        "description": "Open the class:"
+      },
+      "errors": {
+        "adminNoCalendar": "The admin dashboard has no calendar."
+      },
+      "success": {
+        "linkCreated": "New private link created."
+      }
+    }
+  }
+}

@@ -13,12 +13,17 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconArrowLeft, IconExternalLink } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { reviewMaterialAction } from "@/features/materials/actions";
 import { MaterialKindChip } from "@/features/materials/components/material-kind-chip";
+import {
+  localizeFormQuestions,
+  localizeMaterial,
+} from "@/features/materials/data";
 import type { FormQuestion, Material } from "@/features/materials/types";
-import { formatMaterialDateTime } from "@/features/materials/format";
+import { formatMaterialDateTime, formatMaterialLevel } from "@/features/materials/format";
 import { useAppToast } from "@/lib/use-app-toast";
 
 type MaterialModerationReviewProps = {
@@ -26,7 +31,19 @@ type MaterialModerationReviewProps = {
   questions?: FormQuestion[];
 };
 
-export function MaterialModerationReview({ material, questions = [] }: MaterialModerationReviewProps) {
+export function MaterialModerationReview({
+  material: sourceMaterial,
+  questions: sourceQuestions = [],
+}: MaterialModerationReviewProps) {
+  const t = useTranslations("educator");
+  const materialsT = useTranslations("educator.materials");
+  const locale = useLocale();
+  const material = localizeMaterial(sourceMaterial, materialsT) ?? sourceMaterial;
+  const questions = localizeFormQuestions(
+    sourceQuestions,
+    sourceMaterial.id,
+    materialsT,
+  );
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -49,28 +66,27 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
     <Box mt={3}>
       <Breadcrumb
         title={material.title}
-        subtitle="Preview this academy library post before you publish it for every student."
+        subtitle={t("materials.moderation.reviewSubtitle")}
         items={[
-          { title: "Manager", to: "/manager" },
-          { title: "Material review", to: "/manager/materials" },
+          { title: t("shell.roles.manager"), to: "/manager" },
+          { title: t("materials.moderation.title"), to: "/manager/materials" },
           { title: material.title },
         ]}
       />
 
       {canPublish ? (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Read the post below (and open the external link if there is one). When it looks good, use <strong>Publish</strong>
-          to add it to the student library.
+          {t("materials.moderation.reviewHelp")}
         </Alert>
       ) : null}
       {isLive ? (
         <Alert severity="success" sx={{ mb: 2 }}>
-          This post is already published in the academy library.
+          {t("materials.moderation.alreadyPublished")}
         </Alert>
       ) : null}
       {material.moderation === "rejected" ? (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          This post was rejected and is not visible to students.
+          {t("materials.moderation.rejectedNote")}
         </Alert>
       ) : null}
 
@@ -79,7 +95,7 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
           <Stack spacing={2.5}>
             <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center" useFlexGap>
               <MaterialKindChip kind={material.kind} />
-              <Chip size="small" variant="outlined" label={material.level} />
+              <Chip size="small" variant="outlined" label={formatMaterialLevel(material.level, materialsT)} />
               <Chip
                 size="small"
                 color={
@@ -91,7 +107,7 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
                         ? "error"
                         : "default"
                 }
-                label={material.moderation ?? "none"}
+                label={material.moderation ?? t("common.none")}
               />
             </Stack>
 
@@ -100,12 +116,15 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
                 {material.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                By {material.ownerName} · submitted {formatMaterialDateTime(material.updatedAt)}
+                {t("materials.moderation.detail.createdByUpdated", {
+                  name: material.ownerName,
+                  date: formatMaterialDateTime(material.updatedAt, locale),
+                })}
               </Typography>
             </Box>
 
             <Typography variant="body1" whiteSpace="pre-line" sx={{ lineHeight: 1.7 }}>
-              {material.description || "No description provided."}
+              {material.description || t("materials.moderation.noDescription")}
             </Typography>
 
             {material.tags.length ? (
@@ -121,7 +140,7 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
             {material.href ? (
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
                 <Box flexGrow={1}>
-                  <Typography variant="subtitle2">Resource link</Typography>
+                  <Typography variant="subtitle2">{t("materials.moderation.resourceLink")}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-all" }}>
                     {material.href}
                   </Typography>
@@ -133,13 +152,13 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
                   variant="contained"
                   endIcon={<IconExternalLink size={16} />}
                 >
-                  Open & review
+                  {t("materials.moderation.openReview")}
                 </LinkButton>
               </Stack>
             ) : material.kind === "form" && questions.length > 0 ? (
               <Box>
                 <Typography variant="subtitle2" gutterBottom>
-                  Practice form preview ({questions.length} questions)
+                  {t("materials.moderation.formPreview", { count: questions.length })}
                 </Typography>
                 <Stack spacing={1}>
                   {questions.slice(0, 5).map((question, index) => (
@@ -149,14 +168,14 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
                   ))}
                   {questions.length > 5 ? (
                     <Typography variant="caption" color="text.secondary">
-                      +{questions.length - 5} more questions
+                      {t("materials.moderation.moreQuestions", { count: questions.length - 5 })}
                     </Typography>
                   ) : null}
                 </Stack>
               </Box>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                No external link — this post is text-only in the library.
+                {t("materials.moderation.textOnly")}
               </Typography>
             )}
           </Stack>
@@ -168,14 +187,14 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
           <CardContent>
             <Stack spacing={2}>
               <Typography variant="subtitle1" fontWeight={600}>
-                Publish to the academy library
+                {t("materials.moderation.publishTitle")}
               </Typography>
               <TextField
                 size="small"
                 fullWidth
                 multiline
                 minRows={2}
-                label="Note to the author (optional)"
+                label={t("materials.moderation.noteToAuthor")}
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
               />
@@ -185,13 +204,13 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
                   variant="outlined"
                   startIcon={<IconArrowLeft size={16} />}
                 >
-                  Back to queue
+                  {t("materials.moderation.backQueue")}
                 </LinkButton>
                 <Button color="error" disabled={pending} onClick={() => publish(false)}>
-                  Reject
+                  {t("materials.moderation.reject")}
                 </Button>
                 <Button variant="contained" disabled={pending} onClick={() => publish(true)}>
-                  Publish for students
+                  {t("materials.moderation.publishStudents")}
                 </Button>
               </Stack>
             </Stack>
@@ -199,7 +218,7 @@ export function MaterialModerationReview({ material, questions = [] }: MaterialM
         </Card>
       ) : (
         <LinkButton href="/manager/materials" variant="outlined" startIcon={<IconArrowLeft size={16} />}>
-          Back to material review
+          {t("materials.moderation.backReview")}
         </LinkButton>
       )}
     </Box>

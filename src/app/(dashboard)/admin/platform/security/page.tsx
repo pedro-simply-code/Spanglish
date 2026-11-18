@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { env } from "@/env";
 import { PlatformSecurityOverview } from "@/features/admin";
-import { captchaEnabled, googleSignInEnabled } from "@/server/auth/auth";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
+import { captchaEnabled, googleSignInEnabled } from "@/server/auth/platform-flags";
 
-export const metadata: Metadata = {
-  title: "Security policy",
-  description: "Platform authentication and access controls",
-};
+export const metadata: Metadata = adminStaticMetadata("security");
 
 export default function AdminPlatformSecurityPage() {
   const demoAccountsEnabled =

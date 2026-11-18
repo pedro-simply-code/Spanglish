@@ -21,6 +21,7 @@ import {
   IconVideo,
 } from "@tabler/icons-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { useTranslations } from "next-intl";
 import { classTypeLabel } from "@/lib/class-type-label";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -35,11 +36,14 @@ const statusOrder: LiveClassStatus[] = [
   "canceled",
 ];
 
-const statusLabels: Record<LiveClassStatus, string> = {
-  upcoming: "Upcoming",
-  "in-progress": "In progress",
-  completed: "Completed",
-  canceled: "Canceled",
+const statusKeys: Record<
+  LiveClassStatus,
+  "status.upcoming" | "status.inProgress" | "status.completed" | "status.canceled"
+> = {
+  upcoming: "status.upcoming",
+  "in-progress": "status.inProgress",
+  completed: "status.completed",
+  canceled: "status.canceled",
 };
 
 export type ClassCreditSummary = {
@@ -56,6 +60,8 @@ type ClassesOverviewProps = {
   viewMode?: "student" | "staff";
   /** Student credits; null for teachers and staff (no booking hero). */
   credits: ClassCreditSummary[] | null;
+  /** Signed-in user, so each card can say who the class is with. */
+  viewerId?: string;
 };
 
 export function ClassesOverview({
@@ -64,8 +70,16 @@ export function ClassesOverview({
   now,
   viewMode = "student",
   credits,
+  viewerId,
 }: ClassesOverviewProps) {
   const [tab, setTab] = useState<LiveClassStatus>("upcoming");
+  const t = useTranslations("student");
+  const statusLabels: Record<LiveClassStatus, string> = {
+    upcoming: t(statusKeys.upcoming),
+    "in-progress": t(statusKeys["in-progress"]),
+    completed: t(statusKeys.completed),
+    canceled: t(statusKeys.canceled),
+  };
 
   const counts = statusOrder.reduce<Record<LiveClassStatus, number>>(
     (accumulator, status) => {
@@ -95,11 +109,15 @@ export function ClassesOverview({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={viewMode === "staff" ? "Academy classes" : "My classes"}
+        title={
+          viewMode === "staff"
+            ? t("classes.overview.staffTitle")
+            : t("classes.overview.title")
+        }
         subtitle={
           viewMode === "staff"
-            ? "All scheduled sessions across the academy. Switch to Manager in the top bar for day-to-day operations."
-            : "Join, review, reschedule, or cancel your live classes."
+            ? t("classes.overview.staffSubtitle")
+            : t("classes.overview.subtitle")
         }
       />
 
@@ -127,8 +145,7 @@ export function ClassesOverview({
                   </Avatar>
                   <Box>
                     <Typography variant="h5">
-                      {totalCredits} class credit{totalCredits === 1 ? "" : "s"}{" "}
-                      left
+                      {t("classes.overview.creditsLeft", { count: totalCredits })}
                     </Typography>
                     <Stack direction="row" gap={0.75} flexWrap="wrap" mt={0.75}>
                       {credits.length ? (
@@ -137,12 +154,17 @@ export function ClassesOverview({
                             key={`${item.classType}-${item.durationMinutes}`}
                             size="small"
                             variant="outlined"
-                            label={`${item.durationMinutes} min ${classTypeLabel(item.classType)}: ${item.balance}${item.shared ? " (shared)" : ""}`}
+                            label={t("classes.overview.creditChip", {
+                              minutes: item.durationMinutes,
+                              type: classTypeLabel(item.classType, t),
+                              balance: item.balance,
+                              shared: item.shared ? t("classes.overview.shared") : "",
+                            })}
                           />
                         ))
                       ) : (
                         <Typography variant="body2" color="text.secondary">
-                          Get a package to start booking classes.
+                          {t("classes.overview.noCredits")}
                         </Typography>
                       )}
                     </Stack>
@@ -161,14 +183,14 @@ export function ClassesOverview({
                     variant="contained"
                     startIcon={<IconCalendarPlus size={18} />}
                   >
-                    Book a class
+                    {t("actions.bookClass")}
                   </LinkButton>
                   <LinkButton
                     href="/pricing"
                     variant="outlined"
                     startIcon={<IconCreditCard size={18} />}
                   >
-                    View plans
+                    {t("actions.viewPlans")}
                   </LinkButton>
                 </Stack>
               </Grid>
@@ -187,13 +209,16 @@ export function ClassesOverview({
                   onChange={(_, value: LiveClassStatus) => setTab(value)}
                   variant="scrollable"
                   allowScrollButtonsMobile
-                  aria-label="Class status"
+                  aria-label={t("classes.overview.statusAria")}
                 >
                   {statusOrder.map((status) => (
                     <Tab
                       key={status}
                       value={status}
-                      label={`${statusLabels[status]} (${counts[status]})`}
+                      label={t("classes.overview.statusTab", {
+                        status: statusLabels[status],
+                        count: counts[status],
+                      })}
                     />
                   ))}
                 </Tabs>
@@ -208,6 +233,7 @@ export function ClassesOverview({
                     item={item}
                     now={now}
                     policy={policy}
+                    viewerId={viewerId}
                   />
                 ))}
               </Stack>
@@ -227,7 +253,9 @@ export function ClassesOverview({
                     <IconCalendarEvent size={28} />
                   </Avatar>
                   <Typography variant="h5">
-                    No {statusLabels[tab].toLowerCase()} classes
+                    {t("classes.overview.emptyTitle", {
+                      status: statusLabels[tab].toLowerCase(),
+                    })}
                   </Typography>
                   <Typography
                     variant="body2"
@@ -236,12 +264,12 @@ export function ClassesOverview({
                     mb={2.5}
                   >
                     {tab === "upcoming"
-                      ? "Book your next live class and keep the momentum going."
-                      : "Classes will appear here as your schedule moves forward."}
+                      ? t("classes.overview.emptyUpcoming")
+                      : t("classes.overview.emptyOther")}
                   </Typography>
                   {tab === "upcoming" || tab === "canceled" ? (
                     <LinkButton href="/schedule" variant="contained">
-                      Book a class
+                      {t("actions.bookClass")}
                     </LinkButton>
                   ) : null}
                 </CardContent>
@@ -253,8 +281,8 @@ export function ClassesOverview({
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <SectionCard
-              title="Class policy"
-              subtitle="Checked on the server"
+              title={t("classes.overview.policyTitle")}
+              subtitle={t("classes.overview.policySubtitle")}
               action={
                 <Avatar
                   sx={{
@@ -271,51 +299,55 @@ export function ClassesOverview({
               <Stack spacing={2.5}>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Cancellations
+                    {t("classes.overview.cancellations")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    At least {policy.cancelCutoffHours} hours before the class
-                    starts.
+                    {t("classes.overview.cancellationsBody", {
+                      hours: policy.cancelCutoffHours,
+                    })}
                   </Typography>
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Rescheduling
+                    {t("classes.overview.rescheduling")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    At least {policy.rescheduleCutoffHours} hours before the
-                    class starts.
+                    {t("classes.overview.reschedulingBody", {
+                      hours: policy.rescheduleCutoffHours,
+                    })}
                   </Typography>
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Join window
+                    {t("classes.overview.joinWindow")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Opens {policy.joinWindowBeforeMinutes} minutes before and
-                    stays open {policy.joinWindowAfterMinutes} minutes after the
-                    start.
+                    {t("classes.overview.joinWindowBody", {
+                      before: policy.joinWindowBeforeMinutes,
+                      after: policy.joinWindowAfterMinutes,
+                    })}
                   </Typography>
                 </Box>
                 <Divider />
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Credits
+                    {t("classes.overview.credits")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    One credit per class. Cancel at least {policy.cancelCutoffHours}{" "}
-                    hours ahead and the credit returns to your package.
+                    {t("classes.overview.creditsBody", {
+                      hours: policy.cancelCutoffHours,
+                    })}
                   </Typography>
                 </Box>
               </Stack>
             </SectionCard>
 
             <SectionCard
-              title="At a glance"
-              subtitle="Your class activity"
+              title={t("classes.overview.atGlance")}
+              subtitle={t("classes.overview.yourActivity")}
               action={
                 <Chip
-                  label={`${items.length} total`}
+                  label={t("classes.overview.total", { count: items.length })}
                   size="small"
                   variant="outlined"
                 />
@@ -343,7 +375,10 @@ export function ClassesOverview({
               </Stack>
             </SectionCard>
 
-            <SectionCard title="Need a hand?" subtitle="We are here to help">
+            <SectionCard
+              title={t("classes.overview.needHand")}
+              subtitle={t("classes.overview.hereToHelp")}
+            >
               <Stack direction="row" spacing={2} alignItems="flex-start">
                 <Avatar
                   sx={{
@@ -357,11 +392,10 @@ export function ClassesOverview({
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    Outside the change window?
+                    {t("classes.overview.outsideWindow")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" mt={0.5}>
-                    Message support from Settings and the academy team will
-                    review your case.
+                    {t("classes.overview.outsideWindowBody")}
                   </Typography>
                   <LinkButton
                     href="/settings"
@@ -369,7 +403,7 @@ export function ClassesOverview({
                     sx={{ mt: 1.5, px: 0 }}
                     endIcon={null}
                   >
-                    Open settings
+                    {t("actions.openSettings")}
                   </LinkButton>
                 </Box>
               </Stack>

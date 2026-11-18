@@ -98,62 +98,84 @@ export type AuditEntry = {
   severity: "info" | "warning" | "critical";
 };
 
-export const invoices: Invoice[] = [
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+export const invoices = (t: Translator): Invoice[] => [
   {
     id: "inv-2041",
     student: "Priya Shah",
-    plan: "Individual · 50 min · 30 classes",
+    plan: t("management.billing.plan.individual", { minutes: 50, classes: 30 }),
     amount: "$510.00",
     status: "paid",
-    issuedAt: "Nov 15, 2026",
+    issuedAt: t("management.billing.date.nov15"),
   },
   {
     id: "inv-2040",
     student: "Alex Rivera",
-    plan: "Individual · 25 min · 60 classes",
+    plan: t("management.billing.plan.individual", { minutes: 25, classes: 60 }),
     amount: "$720.00",
     status: "paid",
-    issuedAt: "Nov 14, 2026",
+    issuedAt: t("management.billing.date.nov14"),
   },
   {
     id: "inv-2039",
     student: "Mateo Silva",
-    plan: "Paired · 50 min · 30 classes",
+    plan: t("management.billing.plan.paired", { minutes: 50, classes: 30 }),
     amount: "$510.00",
     status: "due",
-    issuedAt: "Nov 13, 2026",
+    issuedAt: t("management.billing.date.nov13"),
   },
   {
     id: "inv-2038",
     student: "Hannah Kim",
-    plan: "Individual · 50 min · 60 classes",
+    plan: t("management.billing.plan.individual", { minutes: 50, classes: 60 }),
     amount: "$1,020.00",
     status: "due",
-    issuedAt: "Nov 12, 2026",
+    issuedAt: t("management.billing.date.nov12"),
   },
   {
     id: "inv-2037",
     student: "Diego Torres",
-    plan: "Paired · 25 min · 90 classes",
+    plan: t("management.billing.plan.paired", { minutes: 25, classes: 90 }),
     amount: "$1,440.00",
     status: "refunded",
-    issuedAt: "Nov 10, 2026",
+    issuedAt: t("management.billing.date.nov10"),
   },
 ];
 
-export const billingStats = [
-  { id: "mrr", label: "Monthly recurring revenue", value: "$12,480", helper: "+8.4% vs. October" },
-  { id: "open", label: "Open invoices", value: "$1,530", helper: "2 awaiting payment" },
-  { id: "renewal", label: "Renewal rate", value: "81%", helper: "Target is 80%" },
-  { id: "refunds", label: "Refunds this month", value: "$340", helper: "3 credited classes" },
+export const billingStats = (t: Translator) => [
+  {
+    id: "mrr",
+    label: t("management.billing.stat.mrr.label"),
+    value: "$12,480",
+    helper: t("management.billing.stat.mrr.helper"),
+  },
+  {
+    id: "open",
+    label: t("management.billing.stat.open.label"),
+    value: "$1,530",
+    helper: t("management.billing.stat.open.helper"),
+  },
+  {
+    id: "renewal",
+    label: t("management.billing.stat.renewal.label"),
+    value: "81%",
+    helper: t("management.billing.stat.renewal.helper"),
+  },
+  {
+    id: "refunds",
+    label: t("management.billing.stat.refunds.label"),
+    value: "$340",
+    helper: t("management.billing.stat.refunds.helper"),
+  },
 ];
 
-export const staffMembers: StaffMember[] = [
+export const staffMembers = (t: Translator): StaffMember[] => [
   {
     id: "staff-maria",
     name: "María González",
     role: "Teacher",
-    specialty: "Pronunciation and travel Spanish",
+    specialty: t("management.staff.specialty.pronunciation"),
     students: 18,
     utilization: 82,
     status: "Active",
@@ -162,7 +184,7 @@ export const staffMembers: StaffMember[] = [
     id: "staff-carlos",
     name: "Carlos Mendoza",
     role: "Teacher",
-    specialty: "Grammar and exam preparation",
+    specialty: t("management.staff.specialty.grammar"),
     students: 21,
     utilization: 76,
     status: "Active",
@@ -171,7 +193,7 @@ export const staffMembers: StaffMember[] = [
     id: "staff-lucia",
     name: "Lucía Fernández",
     role: "Teacher",
-    specialty: "Business and interview Spanish",
+    specialty: t("management.staff.specialty.business"),
     students: 12,
     utilization: 64,
     status: "Active",
@@ -180,7 +202,7 @@ export const staffMembers: StaffMember[] = [
     id: "staff-diego",
     name: "Diego Ramírez",
     role: "Manager",
-    specialty: "Academy operations and billing",
+    specialty: t("management.staff.specialty.operations"),
     students: 0,
     utilization: 40,
     status: "Active",
@@ -189,7 +211,7 @@ export const staffMembers: StaffMember[] = [
     id: "staff-ana",
     name: "Ana Torres",
     role: "Teacher",
-    specialty: "Beginner conversation",
+    specialty: t("management.staff.specialty.conversation"),
     students: 9,
     utilization: 28,
     status: "On leave",
@@ -255,104 +277,99 @@ export const peopleAccounts: PersonAccount[] = [
   },
 ];
 
-export const integrations: Integration[] = [
+export const integrations = (t: Translator): Integration[] => [
   {
     id: "integration-meet",
     name: "LiveKit",
-    description:
-      "In-app video, screen share, and room tokens. Configure LIVEKIT_* in the environment.",
+    description: t("management.integration.meet.description"),
     status: "action-needed",
-    owner: "Platform",
+    owner: t("management.integration.owner.platform"),
   },
   {
     id: "integration-email",
-    name: "Transactional email",
-    description:
-      "Verification codes and notifications via Gmail SMTP (default) or Postmark (EMAIL_PROVIDER).",
+    name: t("management.integration.email.name"),
+    description: t("management.integration.email.description"),
     status: "action-needed",
-    owner: "Platform",
+    owner: t("management.integration.owner.platform"),
   },
   {
     id: "integration-google",
-    name: "Google sign-in",
-    description:
-      "OAuth client for one-tap sign-in. Falls back to the sample session until keys exist.",
+    name: t("management.integration.google.name"),
+    description: t("management.integration.google.description"),
     status: "not-configured",
-    owner: "Platform",
+    owner: t("management.integration.owner.platform"),
   },
   {
     id: "integration-storage",
     name: "Backblaze B2",
-    description:
-      "S3-compatible bucket for class recordings and large material files (B2_* env vars).",
+    description: t("management.integration.storage.description"),
     status: "not-configured",
-    owner: "Platform",
+    owner: t("management.integration.owner.platform"),
   },
   {
     id: "integration-billing",
-    name: "Payments",
-    description:
-      "Checkout is a static demo. Connect the provider before charging real cards.",
+    name: t("management.integration.billing.name"),
+    description: t("management.integration.billing.description"),
     status: "not-configured",
-    owner: "Finance",
+    owner: t("management.integration.owner.finance"),
   },
 ];
 
-export const auditLog: AuditEntry[] = [
+export const auditLog = (t: Translator): AuditEntry[] => [
   {
     id: "audit-01",
     actor: "Lucía Fernández",
-    action: "Granted the Manager role",
+    action: t("management.audit.action.managerRoleGranted"),
     target: "Diego Ramírez",
-    at: "Today · 09:12",
+    at: t("management.audit.at.today", { time: "09:12" }),
     severity: "warning",
   },
   {
     id: "audit-02",
     actor: "Lucía Fernández",
-    action: "Updated the cancellation policy",
-    target: "Academy settings · 24-hour cutoff",
-    at: "Yesterday · 16:40",
+    action: t("management.audit.action.cancellationPolicyUpdated"),
+    target: t("management.audit.target.academySettings"),
+    at: t("management.audit.at.yesterday", { time: "16:40" }),
     severity: "critical",
   },
   {
     id: "audit-03",
-    actor: "System",
-    action: "Rotated the meeting provider signing key",
-    target: "Meeting provider",
-    at: "Nov 14 · 03:00",
+    actor: t("management.audit.system"),
+    action: t("management.audit.action.signingKeyRotated"),
+    target: t("management.audit.target.meetingProvider"),
+    at: t("management.audit.at.nov14", { time: "03:00" }),
     severity: "info",
   },
   {
     id: "audit-04",
     actor: "Diego Ramírez",
-    action: "Issued a credit refund",
-    target: "Invoice inv-2037",
-    at: "Nov 13 · 14:05",
+    action: t("management.audit.action.creditRefundIssued"),
+    target: t("management.audit.target.invoice", { id: "inv-2037" }),
+    at: t("management.audit.at.nov13", { time: "14:05" }),
     severity: "warning",
   },
   {
     id: "audit-05",
     actor: "Lucía Fernández",
-    action: "Invited two teachers",
+    action: t("management.audit.action.teachersInvited"),
     target: "María González, Ana Torres",
-    at: "Nov 13 · 11:25",
+    at: t("management.audit.at.nov13", { time: "11:25" }),
     severity: "info",
   },
   {
     id: "audit-06",
-    actor: "System",
-    action: "Rejected a late cancellation",
-    target: "Class class-1003",
-    at: "Nov 12 · 20:44",
+    actor: t("management.audit.system"),
+    action: t("management.audit.action.lateCancelationRejected"),
+    target: t("management.audit.target.class", { id: "class-1003" }),
+    at: t("management.audit.at.nov12", { time: "20:44" }),
     severity: "info",
   },
   {
     id: "audit-07",
     actor: "Lucía Fernández",
-    action: "Suspended an account",
+    action: t("management.audit.action.accountSuspended"),
     target: "Ana Torres",
-    at: "Nov 11 · 10:02",
+    at: t("management.audit.at.nov11", { time: "10:02" }),
     severity: "critical",
   },
 ];
@@ -373,8 +390,8 @@ export const auditSeverityColor: Record<
   critical: "error",
 };
 
-export const roomStatusLabels: Record<RoomStatus, string> = {
-  live: "Live now",
-  ready: "Ready",
-  maintenance: "Maintenance",
-};
+export const roomStatusLabels = (t: Translator): Record<RoomStatus, string> => ({
+  live: t("management.rooms.status.live"),
+  ready: t("management.rooms.status.ready"),
+  maintenance: t("management.rooms.status.maintenance"),
+});

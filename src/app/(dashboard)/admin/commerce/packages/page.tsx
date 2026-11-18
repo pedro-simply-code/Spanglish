@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { CommercePackagesOverview } from "@/features/admin";
 import { adminPackageKindToClassType, parseAdminPackageKindParam } from "@/lib/admin-package-filter";
 import { DEFAULT_PAGE_SIZE, pageOffset, parsePageParam } from "@/lib/pagination";
 import { countCommercePackages, listAdminPackageDetailsPaginated } from "@/server/admin/insights";
 
-export const metadata: Metadata = {
-  title: "Packages",
-  description: "Admin catalog of class packages and prices",
-};
+export const metadata: Metadata = adminStaticMetadata("packages");
 
 type PageProps = {
   searchParams: Promise<{ page?: string; type?: string }>;

@@ -1,5 +1,7 @@
+import { syncPendingEgressRecordings } from "@/server/classes/livekit-egress";
 import { randomUUID } from "node:crypto";
-import { and, desc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { AuthSession } from "@/lib/auth-types";
 import { hasPermission, hasRole } from "@/lib/auth-roles";
 import { recordAuditEvent } from "@/server/audit/audit-log";
@@ -56,14 +58,15 @@ export async function startBrowserUpload(
   actor: AuthSession,
   input: { classId: string; fileName: string; sizeBytes: number; contentType: string },
 ): Promise<UploadTicket> {
+  const t = await getTranslations("ops.recordings");
   if (!isBackblazeConfigured()) {
-    return { ok: false, message: "Add Backblaze B2 credentials to upload recordings." };
+    return { ok: false, message: t("missingCredentials") };
   }
   if (!(await canRecordClass(actor, input.classId))) {
-    return { ok: false, message: "Only the class teacher can save recordings." };
+    return { ok: false, message: t("teacherOnly") };
   }
   if (!Number.isInteger(input.sizeBytes) || input.sizeBytes <= 0 || input.sizeBytes > MAX_RECORDING_UPLOAD_BYTES) {
-    return { ok: false, message: "Recordings must be between 1 byte and 2 GB." };
+    return { ok: false, message: t("invalidSize") };
   }
   const contentType = /^video\/(webm|mp4)$/.test(input.contentType.split(";")[0] ?? "")
     ? input.contentType.split(";")[0]!
@@ -96,19 +99,20 @@ export async function startBrowserUpload(
 
 /** Called after the browser PUT: checks the object really is in B2. */
 export async function finishBrowserUpload(actor: AuthSession, recordingId: string) {
+  const t = await getTranslations("ops.recordings");
   const [row] = await db
     .select()
     .from(recordings)
     .where(and(eq(recordings.id, recordingId), eq(recordings.createdByUserId, actor.userId)))
     .limit(1);
   if (!row?.objectKey || row.status !== "uploading") {
-    return { ok: false as const, message: "Upload not found." };
+    return { ok: false as const, message: t("uploadNotFound") };
   }
 
   const head = await headRecordingObject(row.objectKey);
   if (!head) {
     await db.update(recordings).set({ status: "failed" }).where(eq(recordings.id, row.id));
-    return { ok: false as const, message: "The file did not reach storage. Try again." };
+    return { ok: false as const, message: t("fileNotStored") };
   }
 
   await db
@@ -122,7 +126,7 @@ export async function finishBrowserUpload(actor: AuthSession, recordingId: strin
     targetId: row.sessionId,
     metadata: { recordingId: row.id, source: "browser", sizeBytes: head.sizeBytes },
   });
-  return { ok: true as const, message: "Recording saved." };
+  return { ok: true as const, message: t("saved") };
 }
 
 /** Local-disk recordings (RECORDING_STORAGE=local) are rows too. */
@@ -162,10 +166,16 @@ export type RecordingListEntry = {
   fileName: string | null;
   sizeBytes: number | null;
   createdAt: string;
+  error: string | null;
+  storage: RecordingRow["storage"];
+  /** Students booked into the class (the teacher is excluded). */
+  students: { id: string; name: string }[];
 };
 
 /** Recordings of the classes the actor teaches, takes part in, or (staff) all. */
-export async function listRecordingsForActor(actor: AuthSession, limit = 200) {
+export async function listRecordingsForActor(actor: AuthSession, limit = 1000) {
+  // Settle cloud recordings whose LiveKit webhook did not arrive.
+  await syncPendingEgressRecordings().catch(() => undefined);
   const staff = hasRole(actor.roles, "manager") || hasRole(actor.roles, "admin");
 
   let sessionFilter;
@@ -186,6 +196,7 @@ export async function listRecordingsForActor(actor: AuthSession, limit = 200) {
       recording: recordings,
       topic: classSessions.topic,
       startsAt: classSessions.startsAt,
+      teacherId: classSessions.teacherId,
       teacherName: users.name,
     })
     .from(recordings)
@@ -200,6 +211,25 @@ export async function listRecordingsForActor(actor: AuthSession, limit = 200) {
     .orderBy(desc(recordings.createdAt))
     .limit(limit);
 
+  const sessionIds = [...new Set(rows.map((row) => row.recording.sessionId))];
+  const participantRows = sessionIds.length
+    ? await db
+        .select({
+          sessionId: classParticipants.sessionId,
+          id: users.id,
+          name: users.name,
+        })
+        .from(classParticipants)
+        .innerJoin(users, eq(users.id, classParticipants.userId))
+        .where(inArray(classParticipants.sessionId, sessionIds))
+    : [];
+  const studentsBySession = new Map<string, { id: string; name: string }[]>();
+  for (const row of participantRows) {
+    const list = studentsBySession.get(row.sessionId) ?? [];
+    list.push({ id: row.id, name: row.name });
+    studentsBySession.set(row.sessionId, list);
+  }
+
   return rows.map(
     (row): RecordingListEntry => ({
       id: row.recording.id,
@@ -212,6 +242,11 @@ export async function listRecordingsForActor(actor: AuthSession, limit = 200) {
       fileName: row.recording.fileName,
       sizeBytes: row.recording.sizeBytes,
       createdAt: row.recording.createdAt.toISOString(),
+      error: row.recording.error,
+      storage: row.recording.storage,
+      students: (studentsBySession.get(row.recording.sessionId) ?? []).filter(
+        (student) => student.id !== row.teacherId,
+      ),
     }),
   );
 }
@@ -220,4 +255,44 @@ export async function getRecordingForViewer(actor: AuthSession, recordingId: str
   const [row] = await db.select().from(recordings).where(eq(recordings.id, recordingId)).limit(1);
   if (!row || row.status !== "ready" || !row.objectKey) return null;
   return (await canWatchClass(actor, row.sessionId)) ? row : null;
+}
+
+export type ClassRecordingView = {
+  id: string;
+  status: "recording" | "uploading" | "ready" | "failed";
+  source: "egress" | "browser";
+  fileName: string | null;
+  contentType: string | null;
+  sizeBytes: number | null;
+  createdAt: string;
+};
+
+/**
+ * Recordings of one class for the class page, oldest first (a class recorded
+ * in two parts shows "Part 1", "Part 2"). Only people who may watch the class
+ * get them; failed attempts are left out.
+ */
+export async function listClassRecordings(actor: AuthSession, sessionId: string): Promise<ClassRecordingView[]> {
+  if (!(await canWatchClass(actor, sessionId))) return [];
+  await syncPendingEgressRecordings().catch(() => undefined);
+  const rows = await db
+    .select()
+    .from(recordings)
+    .where(
+      and(
+        eq(recordings.sessionId, sessionId),
+        or(isNull(recordings.egressKind), eq(recordings.egressKind, "file")),
+        inArray(recordings.status, ["recording", "uploading", "ready"]),
+      ),
+    )
+    .orderBy(asc(recordings.createdAt));
+  return rows.map((row) => ({
+    id: row.id,
+    status: row.status,
+    source: row.source,
+    fileName: row.fileName,
+    contentType: row.contentType,
+    sizeBytes: row.sizeBytes,
+    createdAt: row.createdAt.toISOString(),
+  }));
 }

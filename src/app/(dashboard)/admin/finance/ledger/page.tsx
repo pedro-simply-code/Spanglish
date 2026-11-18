@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { FinanceLedgerOverview } from "@/features/admin";
 import { getAdminDashboardCharts } from "@/server/admin/dashboard-charts";
 import { formatCents, getFinanceSummary } from "@/server/teaching/earnings";
 import { requestTime } from "@/server/request-time";
 
-export const metadata: Metadata = {
-  title: "Credit ledger",
-  description: "Revenue, prepaid credits and teacher pay from the database",
-};
+export const metadata: Metadata = adminStaticMetadata("ledger");
 
 export default function AdminFinanceLedgerPage() {
   return (
@@ -20,6 +19,7 @@ export default function AdminFinanceLedgerPage() {
 }
 
 async function Content() {
+  const t = await getTranslations("admin");
   await requestTime();
   const [summary, charts] = await Promise.all([getFinanceSummary(), getAdminDashboardCharts()]);
   const margin = summary.revenueCents - summary.deferredRevenueCents - summary.teacherEarnedCents;
@@ -27,11 +27,44 @@ async function Content() {
     <FinanceLedgerOverview
       charts={charts}
       snapshots={[
-        { id: "revenue", label: "Package revenue", value: formatCents(summary.revenueCents), trend: `${summary.orders} orders · ${summary.creditsSold} credits sold` },
-        { id: "deferred", label: "Prepaid, not taught", value: formatCents(summary.deferredRevenueCents), trend: `${summary.creditsOutstanding} credits in student accounts` },
-        { id: "earned", label: "Teacher pay earned", value: formatCents(summary.teacherEarnedCents), trend: `${summary.deliveredClasses} delivered classes · ${formatCents(summary.teacherEarnedThisMonthCents)} this month` },
-        { id: "paid", label: "Teacher pay sent", value: formatCents(summary.teacherPaidCents), trend: `${formatCents(summary.teacherUnbatchedCents)} not in a payout yet` },
-        { id: "margin", label: "Academy margin (delivered)", value: formatCents(margin), trend: "Revenue − prepaid − teacher pay" },
+        {
+          id: "revenue",
+          label: t("finance.ledger.snapshot.revenue"),
+          value: formatCents(summary.revenueCents),
+          trend: t("finance.ledger.snapshot.revenueTrend", {
+            orders: summary.orders,
+            credits: summary.creditsSold,
+          }),
+        },
+        {
+          id: "deferred",
+          label: t("finance.ledger.snapshot.deferred"),
+          value: formatCents(summary.deferredRevenueCents),
+          trend: t("finance.ledger.snapshot.deferredTrend", { credits: summary.creditsOutstanding }),
+        },
+        {
+          id: "earned",
+          label: t("finance.ledger.snapshot.earned"),
+          value: formatCents(summary.teacherEarnedCents),
+          trend: t("finance.ledger.snapshot.earnedTrend", {
+            classes: summary.deliveredClasses,
+            thisMonth: formatCents(summary.teacherEarnedThisMonthCents),
+          }),
+        },
+        {
+          id: "paid",
+          label: t("finance.ledger.snapshot.paid"),
+          value: formatCents(summary.teacherPaidCents),
+          trend: t("finance.ledger.snapshot.paidTrend", {
+            amount: formatCents(summary.teacherUnbatchedCents),
+          }),
+        },
+        {
+          id: "margin",
+          label: t("finance.ledger.snapshot.margin"),
+          value: formatCents(margin),
+          trend: t("finance.ledger.snapshot.marginTrend"),
+        },
       ]}
     />
   );

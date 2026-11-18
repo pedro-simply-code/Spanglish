@@ -8,31 +8,31 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { IconCheck, IconMinus, IconShield } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
-import {
-  hasPermission,
-  permissions,
-  roleCodes,
-  roleDefinitions,
-} from "@/features/auth";
+import { hasPermission, permissions, roleCodes, roleDefinitions } from "@/features/auth";
 import type { RoleCode } from "@/features/auth";
 
 export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, number> }) {
+  const t = useTranslations("admin");
+  const roleT = useTranslations("shell");
+  const locale = useLocale();
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Roles and permissions"
-        subtitle="Cumulative access: a higher role includes every permission below it."
+        title={t("management.roles.title")}
+        subtitle={t("management.roles.subtitle")}
         items={[
-          { title: "Admin", to: "/admin" },
-          { title: "Organization" },
-          { title: "Roles" },
+          { title: t("common.admin"), to: "/admin" },
+          { title: t("common.section.organization") },
+          { title: t("common.page.roles") },
         ]}
       >
         <LinkButton href="/settings" variant="contained">
-          Open access settings
+          {t("management.roles.openSettings")}
         </LinkButton>
       </Breadcrumb>
 
@@ -52,15 +52,15 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
                       justifyContent="space-between"
                     >
                       <Typography variant="h6">
-                        {roleDefinitions[role].name}
+                        {roleT(`roles.${role}`)}
                       </Typography>
                       <IconShield size={18} />
                     </Stack>
                     <Typography variant="h4" fontWeight={700} color="primary.main">
-                      {roleCounts[role].toLocaleString("en-US")}
+                      {roleCounts[role].toLocaleString(locale)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      accounts · priority {roleDefinitions[role].priority}
+                      {t("management.roles.cardHelper", { priority: roleDefinitions[role].priority })}
                     </Typography>
                   </Stack>
                 </CardContent>
@@ -70,13 +70,16 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
       </Grid>
 
       <SectionCard
-        title="Permission matrix"
-        subtitle={`${permissions.length} permissions across ${roleCodes.length} roles`}
+        title={t("management.roles.matrixTitle")}
+        subtitle={t("management.roles.matrixSubtitle", {
+          permissions: permissions.length,
+          roles: roleCodes.length,
+        })}
       >
         <Stack spacing={1.25}>
           <Stack direction="row" spacing={1} sx={{ px: 1 }}>
             <Typography variant="caption" sx={{ flexGrow: 1 }} fontWeight={700}>
-              Permission
+              {t("management.roles.permissionHeader")}
             </Typography>
             {roleCodes.map((role) => (
               <Typography
@@ -85,7 +88,7 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
                 fontWeight={700}
                 sx={{ width: 84, textAlign: "center" }}
               >
-                {roleDefinitions[role].name}
+                {roleT(`roles.${role}`)}
               </Typography>
             ))}
           </Stack>
@@ -110,7 +113,7 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
                     sx={{ width: 84, display: "flex", justifyContent: "center" }}
                   >
                     <Chip
-                      label={granted ? "Granted" : "—"}
+                      label={granted ? t("management.roles.granted") : "—"}
                       size="small"
                       variant="outlined"
                       color={granted ? "success" : "default"}
@@ -128,9 +131,7 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
 
       <Box sx={{ mt: 3, p: 2.5, bgcolor: "grey.100", borderRadius: 1.75 }}>
         <Typography variant="body2" color="text.secondary">
-          Server rules: the Student role cannot be removed, and the academy must
-          keep at least one administrator. Opening another role dashboard
-          redirects to the active dashboard instead of rendering two at once.
+          {t("management.roles.serverRules")}
         </Typography>
       </Box>
     </Box>

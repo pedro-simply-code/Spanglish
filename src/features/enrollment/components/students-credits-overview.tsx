@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -64,20 +66,32 @@ type Props = {
   mailFromName?: string;
 };
 
-const kindOptions = [
-  { value: "one-on-one-25", label: "Individual · 25 min" },
-  { value: "one-on-one-50", label: "Individual · 50 min" },
-  { value: "paired-25", label: "Paired · 25 min" },
-  { value: "paired-50", label: "Paired · 50 min" },
-];
+type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
+type StudentKey = Parameters<StudentTranslator>[0];
 
-const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+const kindOptions: Array<{ value: string; labelKey: StudentKey }> = [
+  { value: "one-on-one-25", labelKey: "credits.kind.individual25" },
+  { value: "one-on-one-50", labelKey: "credits.kind.individual50" },
+  { value: "paired-25", labelKey: "credits.kind.paired25" },
+  { value: "paired-50", labelKey: "credits.kind.paired50" },
+];
 
 type GrantForm = { email: string; kind: string; amount: string; note: string };
 
 export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoot, mailFromName }: Props) {
   const router = useRouter();
+  const t = useTranslations("student");
+  const locale = useLocale();
+  const appLocale = isAppLocale(locale) ? locale : defaultLocale;
+  const intlLocale = appLocale === "es" ? "es-ES" : "en-US";
+  const money = useMemo(
+    () => new Intl.NumberFormat(intlLocale, { style: "currency", currency: "USD" }),
+    [intlLocale],
+  );
+  const dateFormat = useMemo(
+    () => new Intl.DateTimeFormat(intlLocale, { month: "short", day: "numeric", year: "numeric" }),
+    [intlLocale],
+  );
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
   const [filter, setFilter] = useState("");
@@ -133,9 +147,9 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Students and credits"
-        subtitle={`${students.length} students · ${pairs.length} active pair${pairs.length === 1 ? "" : "s"}`}
-        items={[breadcrumbRoot, { title: "Students and credits" }]}
+        title={t("credits.title")}
+        subtitle={t("credits.subtitle", { students: students.length, pairs: pairs.length })}
+        items={[breadcrumbRoot, { title: t("credits.title") }]}
       >
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <Button
@@ -144,7 +158,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
             startIcon={<IconCoins size={16} />}
             onClick={() => openGrant()}
           >
-            Grant credits
+            {t("credits.grantCredits")}
           </Button>
           <Button
             size="small"
@@ -152,7 +166,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
             startIcon={<IconUsersGroup size={16} />}
             onClick={() => setPairsOpen(true)}
           >
-            Pairs ({pairs.length})
+            {t("credits.pairs", { count: pairs.length })}
           </Button>
           <Button
             size="small"
@@ -160,18 +174,18 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
             startIcon={<IconReceipt size={16} />}
             onClick={() => setOrdersOpen(true)}
           >
-            Purchases ({orders.length})
+            {t("credits.purchases", { count: orders.length })}
           </Button>
         </Stack>
       </Breadcrumb>
 
       <SectionCard
-        title="Roster"
-        subtitle="Search and adjust credits per student."
+        title={t("credits.rosterTitle")}
+        subtitle={t("credits.rosterSubtitle")}
         action={
           <TextField
             size="small"
-            placeholder="Search name or email"
+            placeholder={t("credits.searchPlaceholder")}
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
           />
@@ -181,9 +195,9 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Student</TableCell>
-                <TableCell>Partner</TableCell>
-                <TableCell>Credits</TableCell>
+                <TableCell>{t("credits.tableStudent")}</TableCell>
+                <TableCell>{t("credits.tablePartner")}</TableCell>
+                <TableCell>{t("credits.tableCredits")}</TableCell>
                 <TableCell align="right" />
               </TableRow>
             </TableHead>
@@ -192,7 +206,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                 <TableRow>
                   <TableCell colSpan={4}>
                     <Typography variant="body2" color="text.secondary">
-                      No students match this search.
+                      {t("credits.noStudents")}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -214,7 +228,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                               key={`${item.classType}-${item.durationMinutes}`}
                               size="small"
                               variant="outlined"
-                              label={`${classTypeLabel(item.classType)} ${item.durationMinutes}′: ${item.balance}`}
+                              label={`${classTypeLabel(item.classType, t)} ${item.durationMinutes}′: ${item.balance}`}
                             />
                           ))
                         : "—"}
@@ -226,10 +240,10 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                         to={student.email}
                         recipientName={student.name}
                         fromName={mailFromName}
-                        topic="classes and credits"
+                        topic={t("credits.topic")}
                       />
                       <Button size="small" variant="outlined" onClick={() => openGrant(student.email)}>
-                        Grant
+                        {t("credits.grantAction")}
                       </Button>
                     </Stack>
                   </TableCell>
@@ -241,40 +255,40 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
       </SectionCard>
 
       <Dialog open={grantOpen} onClose={() => setGrantOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Grant or remove credits</DialogTitle>
+        <DialogTitle>{t("credits.grantDialogTitle")}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} pt={0.5}>
             <Typography variant="body2" color="text.secondary">
-              Use a negative amount to remove credits. The note appears in the student history.
+              {t("credits.grantHelp")}
             </Typography>
             <TextField
-              label="Student email"
+              label={t("credits.studentEmail")}
               value={grant.email}
               onChange={(event) => setGrant({ ...grant, email: event.target.value })}
               fullWidth
             />
             <TextField
               select
-              label="Class type"
+              label={t("credits.classType")}
               value={grant.kind}
               onChange={(event) => setGrant({ ...grant, kind: event.target.value })}
               fullWidth
             >
               {kindOptions.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </MenuItem>
               ))}
             </TextField>
             <TextField
               type="number"
-              label="Credits"
+              label={t("credits.creditsLabel")}
               value={grant.amount}
               onChange={(event) => setGrant({ ...grant, amount: event.target.value })}
               fullWidth
             />
             <TextField
-              label="Note (optional)"
+              label={t("common.noteOptional")}
               value={grant.note}
               onChange={(event) => setGrant({ ...grant, note: event.target.value })}
               fullWidth
@@ -282,18 +296,18 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setGrantOpen(false)}>Cancel</Button>
+          <Button onClick={() => setGrantOpen(false)}>{t("common.cancel")}</Button>
           <Button variant="contained" disabled={pending || !grant.email} onClick={submitGrant}>
-            Apply
+            {t("credits.apply")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={pairsOpen} onClose={() => setPairsOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Paired students</DialogTitle>
+        <DialogTitle>{t("credits.pairedDialogTitle")}</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Paired students share one credit pool and can book paired classes together.
+            {t("credits.pairedHelp")}
           </Typography>
           {pairs.length ? (
             <Stack spacing={1} mb={2}>
@@ -310,7 +324,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                       {pair.students.map((student) => student.name).join(" + ")}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Since {dateFormat.format(new Date(pair.createdAt))}
+                      {t("credits.since", { date: dateFormat.format(new Date(pair.createdAt)) })}
                     </Typography>
                   </Box>
                   <Button
@@ -319,24 +333,24 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                     disabled={pending}
                     onClick={() => run(() => endPairAction(pair.id))}
                   >
-                    End
+                    {t("credits.end")}
                   </Button>
                 </Stack>
               ))}
             </Stack>
           ) : (
             <Typography variant="body2" color="text.secondary" mb={2}>
-              No active pairs.
+              {t("credits.noPairs")}
             </Typography>
           )}
           <Divider sx={{ my: 2 }} />
           <Typography variant="subtitle2" mb={1.5}>
-            Pair two unpaired students
+            {t("credits.pairTwo")}
           </Typography>
           <Stack spacing={2}>
             <TextField
               select
-              label="Student A"
+              label={t("credits.studentA")}
               value={pairForm.a}
               onChange={(event) => setPairForm({ ...pairForm, a: event.target.value })}
               fullWidth
@@ -349,7 +363,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
             </TextField>
             <TextField
               select
-              label="Student B"
+              label={t("credits.studentB")}
               value={pairForm.b}
               onChange={(event) => setPairForm({ ...pairForm, b: event.target.value })}
               fullWidth
@@ -365,7 +379,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPairsOpen(false)}>Close</Button>
+          <Button onClick={() => setPairsOpen(false)}>{t("credits.close")}</Button>
           <Button
             variant="contained"
             disabled={pending || !pairForm.a || !pairForm.b}
@@ -376,22 +390,22 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
               )
             }
           >
-            Pair students
+            {t("credits.pairStudents")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={ordersOpen} onClose={() => setOrdersOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle>Recent package purchases</DialogTitle>
+        <DialogTitle>{t("credits.ordersTitle")}</DialogTitle>
         <DialogContent dividers>
           {orders.length ? (
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Buyer</TableCell>
-                  <TableCell>Package</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell align="right">Total</TableCell>
+                  <TableCell>{t("credits.buyer")}</TableCell>
+                  <TableCell>{t("common.package")}</TableCell>
+                  <TableCell>{t("credits.date")}</TableCell>
+                  <TableCell align="right">{t("common.total")}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -399,8 +413,12 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
                   <TableRow key={order.id}>
                     <TableCell>{order.buyerName}</TableCell>
                     <TableCell>
-                      {order.credits} × {classTypeLabel(order.classType)} {order.durationMinutes}′
-                      {order.provider === "demo" ? " · demo" : order.provider === "stripe" ? " · Stripe" : ""}
+                      {order.credits} × {classTypeLabel(order.classType, t)} {order.durationMinutes}′
+                      {order.provider === "demo"
+                        ? t("credits.demo")
+                        : order.provider === "stripe"
+                          ? t("credits.stripe")
+                          : ""}
                     </TableCell>
                     <TableCell>{dateFormat.format(new Date(order.createdAt))}</TableCell>
                     <TableCell align="right">{money.format(order.totalCents / 100)}</TableCell>
@@ -410,12 +428,12 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
             </Table>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              No purchases yet.
+              {t("credits.noPurchases")}
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOrdersOpen(false)}>Close</Button>
+          <Button onClick={() => setOrdersOpen(false)}>{t("credits.close")}</Button>
         </DialogActions>
       </Dialog>
     </Box>

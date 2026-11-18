@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { randomUUID } from "node:crypto";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { getJoinState, loadClassForActor, type LiveClass } from "@/features/classes";
 import { ClassRoom } from "@/features/classroom";
@@ -35,10 +36,13 @@ import {
 } from "@/server/classes/class-teacher";
 import { getWaitingRoomStatus } from "@/server/classes/waiting-room";
 
-export const metadata: Metadata = {
-  title: "Classroom",
-  description: "Your live Spanglish class",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("classroom");
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 type ClassRoomPageProps = {
   params: Promise<{ id: string }>;
@@ -55,6 +59,7 @@ export default function ClassRoomPage({ params, searchParams }: ClassRoomPagePro
 
 async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
   await connection();
+  const t = await getTranslations("classroom");
   const { id } = await params;
   const query = await searchParams;
   const guestToken = query.join?.trim();
@@ -90,7 +95,7 @@ async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
         viewerName = actor.name;
       } else {
         viewerId = `guest-${randomUUID()}`;
-        viewerName = guestNameParam || "Guest";
+        viewerName = guestNameParam || t("guest.defaultName");
       }
     }
   } else if (actor) {
@@ -190,7 +195,7 @@ async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
       now={now}
       policy={policy}
       viewerName={viewerName}
-      providerLabel={getMeetingProviderLabel()}
+      providerLabel={getMeetingProviderLabel(t)}
       providerConfigured={isMeetingConfigured()}
       videoMode={video.mode}
       liveKit={video.liveKit}

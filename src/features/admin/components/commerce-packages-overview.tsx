@@ -18,6 +18,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { IconEdit, IconExternalLink } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { QueryPagination } from "@/components/ui/query-pagination";
@@ -48,10 +49,10 @@ const kindTab: Record<AdminPackageKindFilter, number> = {
 
 const tabKind: AdminPackageKindFilter[] = ["all", "one-on-one", "paired"];
 
-const tabLabels: Record<AdminPackageKindFilter, string> = {
-  all: "All",
-  "one-on-one": "Individual",
-  paired: "Paired",
+const tabKindKey: Record<AdminPackageKindFilter, string> = {
+  all: "common.all",
+  "one-on-one": "common.classType.individual",
+  paired: "common.classType.paired",
 };
 
 const showsKindRules = (kind: AdminPackageKindFilter): kind is "one-on-one" | "paired" =>
@@ -73,6 +74,7 @@ export function CommercePackagesOverview({
   pageSize = DEFAULT_PAGE_SIZE,
   kind = "all",
 }: CommercePackagesOverviewProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [importMessage, setImportMessage] = useState<string | null>(null);
@@ -102,7 +104,7 @@ export function CommercePackagesOverview({
         setImportError(result.message);
         return;
       }
-      setImportMessage(result.message ?? "Default catalog imported.");
+      setImportMessage(result.message ?? t("commerce.packages.importDone"));
       router.refresh();
     });
   };
@@ -110,13 +112,13 @@ export function CommercePackagesOverview({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Class packages"
+        title={t("commerce.packages.title")}
         subtitle={
           showsKindRules(kind)
-            ? "Credit bundles for this class type · teacher pay is revenue share on each credit (Finance → Teacher pay rates)."
-            : "Prices and credit bundles for English-speaking learners buying live Spanish."
+            ? t("commerce.packages.subtitleForKind")
+            : t("commerce.packages.subtitle")
         }
-        items={adminBreadcrumb("Commerce", "Packages", "/admin/commerce/packages")}
+        items={adminBreadcrumb(t, t("common.section.commerce"), t("common.page.packages"), "/admin/commerce/packages")}
       >
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
           {showsKindRules(kind) ? <PackageCommerceLinks /> : null}
@@ -127,7 +129,7 @@ export function CommercePackagesOverview({
             target="_blank"
             endIcon={<IconExternalLink size={16} />}
           >
-            View public pricing
+            {t("common.viewPublicPricing")}
           </LinkButton>
         </Stack>
       </Breadcrumb>
@@ -155,7 +157,7 @@ export function CommercePackagesOverview({
         sx={{ mb: 2 }}
       >
         {tabKind.map((value) => (
-          <Tab key={value} label={tabLabels[value]} />
+          <Tab key={value} label={t(tabKindKey[value])} />
         ))}
       </Tabs>
 
@@ -166,76 +168,90 @@ export function CommercePackagesOverview({
           </Grid>
         ) : null}
         <Grid size={{ xs: 12, lg: showsKindRules(kind) ? 8 : 12 }}>
-      <SectionCard
-        title="Catalog"
-        subtitle="USD list prices · Live packages are visible on /pricing and checkout (no separate publish step)"
-      >
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Package</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Duration</TableCell>
-              <TableCell align="right">Credits</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {packages.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7}>
-                  <Typography variant="body2" color="text.secondary">
-                    No packages yet. Add one or import the default catalog.
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : null}
-            {packages.map((row) => (
-              <TableRow key={row.id} hover>
-                <TableCell>
-                  <Typography fontWeight={600}>{row.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {row.id}
-                  </Typography>
-                </TableCell>
-                <TableCell>{row.classType}</TableCell>
-                <TableCell>{row.duration}</TableCell>
-                <TableCell align="right">{row.credits}</TableCell>
-                <TableCell align="right">{formatMoney(row.priceUsd)}</TableCell>
-                <TableCell>
-                  <Chip
-                    size="small"
-                    color={row.active ? "success" : "default"}
-                    label={row.active ? `Live · ${row.publishedAt ?? "now"}` : "Draft"}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton aria-label={`Edit ${row.name}`} onClick={() => openEdit(row)} size="small">
-                    <IconEdit size={18} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          <SectionCard
+            title={t("commerce.packages.catalog")}
+            subtitle={t("commerce.packages.catalogSubtitle")}
+          >
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t("commerce.packages.column.package")}</TableCell>
+                  <TableCell>{t("common.type")}</TableCell>
+                  <TableCell>{t("common.duration")}</TableCell>
+                  <TableCell align="right">{t("common.credits")}</TableCell>
+                  <TableCell align="right">{t("common.price")}</TableCell>
+                  <TableCell>{t("common.status")}</TableCell>
+                  <TableCell align="right">{t("common.actions")}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {packages.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography variant="body2" color="text.secondary">
+                        {t("commerce.packages.empty")}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : null}
+                {packages.map((row) => (
+                  <TableRow key={row.id} hover>
+                    <TableCell>
+                      <Typography fontWeight={600}>{row.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {row.id}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {row.classType === "Paired"
+                        ? t("common.classType.paired")
+                        : t("common.classType.individual")}
+                    </TableCell>
+                    <TableCell>{row.duration}</TableCell>
+                    <TableCell align="right">{row.credits}</TableCell>
+                    <TableCell align="right">{formatMoney(row.priceUsd)}</TableCell>
+                    <TableCell>
+                      <Chip
+                        size="small"
+                        color={row.active ? "success" : "default"}
+                        label={
+                          row.active
+                            ? t("commerce.packages.liveSince", { date: row.publishedAt ?? t("common.now") })
+                            : t("common.draft")
+                        }
+                      />
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        aria-label={t("commerce.packages.editPackage", { name: row.name })}
+                        onClick={() => openEdit(row)}
+                        size="small"
+                      >
+                        <IconEdit size={18} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={3}>
-          <Button variant="contained" onClick={openCreate}>
-            Add package
-          </Button>
-          <Button variant="outlined" onClick={runImport} disabled={pending}>
-            {kind === "all"
-              ? "Import default catalog"
-              : `Import default ${tabLabels[kind].toLowerCase()} catalog`}
-          </Button>
-        </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={3}>
+              <Button variant="contained" onClick={openCreate}>
+                {t("commerce.packages.addPackage")}
+              </Button>
+              <Button variant="outlined" onClick={runImport} disabled={pending}>
+                {kind === "all"
+                  ? t("commerce.packages.importDefault")
+                  : t("commerce.packages.importDefaultKind", {
+                      kind: t(tabKindKey[kind]).toLocaleLowerCase(),
+                    })}
+              </Button>
+            </Stack>
 
-        <Suspense fallback={null}>
-          <QueryPagination page={page} total={total} pageSize={pageSize} />
-        </Suspense>
-      </SectionCard>
+            <Suspense fallback={null}>
+              <QueryPagination page={page} total={total} pageSize={pageSize} />
+            </Suspense>
+          </SectionCard>
         </Grid>
       </Grid>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import Portal from "@mui/material/Portal";
@@ -27,6 +28,7 @@ import {
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
+import { isAppLocale, type AppLocale } from "@/i18n/config";
 import { useAppToast } from "@/lib/use-app-toast";
 import { ClassroomVideoStageLazy } from "@/features/classes/components/classroom-video-stage-lazy";
 import { useClassroomPageLifecycle } from "@/features/classes/components/use-classroom-page-lifecycle";
@@ -35,6 +37,7 @@ import { classDetailHref } from "@/features/classes/data";
 import {
   formatClassDateTime,
   formatClassTimeRange,
+  formatDuration,
 } from "@/features/classes/format";
 import { getClassStatus, getJoinState } from "@/features/classes/policy";
 import type { ClassPolicy } from "@/features/classes/policy";
@@ -94,6 +97,10 @@ export function ClassRoom({
   canEndLiveSession,
 }: ClassRoomProps) {
   const theme = useTheme();
+  const t = useTranslations("classroom.room");
+  const tStudent = useTranslations("student");
+  const rawLocale = useLocale();
+  const locale: AppLocale = isAppLocale(rawLocale) ? rawLocale : "en";
   const searchParams = useSearchParams();
   const guestJoinToken = guestViewer ? searchParams.get("join") : null;
   const { showInfo } = useAppToast();
@@ -101,7 +108,7 @@ export function ClassRoom({
   const [guestCopied, setGuestCopied] = useState(false);
   const [focusVideo, setFocusVideo] = useState(false);
   const status = getClassStatus(item, now);
-  const join = getJoinState(item, now, policy);
+  const join = getJoinState(item, now, policy, tStudent);
   const open = join.canJoin;
   const inLiveCall =
     open &&
@@ -116,7 +123,7 @@ export function ClassRoom({
     active: inLiveCall,
     onLeaveRoute: () => {
       setFocusVideo(false);
-      showInfo({ message: "You left the classroom. The call disconnected on this device." });
+      showInfo({ message: t("leftClassroom") });
     },
   });
 
@@ -135,7 +142,7 @@ export function ClassRoom({
 
     try {
       await navigator.clipboard.writeText(
-        `${value} (room: ${liveKit.roomName})`,
+        t("roomInfoClipboard", { url: value, name: liveKit.roomName }),
       );
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
@@ -159,12 +166,12 @@ export function ClassRoom({
     <Box sx={{ mt: focusVideo ? 0 : 3 }}>
       <Box sx={{ display: focusVideo ? "none" : "block" }}>
         <Breadcrumb
-          title="Classroom"
-          subtitle={`${item.topic} · ${formatClassTimeRange(item)}`}
+          title={t("breadcrumb")}
+          subtitle={`${item.topic} · ${formatClassTimeRange(item, locale)}`}
           items={[
-            { title: "My classes", to: "/classes" },
+            { title: t("myClasses"), to: "/classes" },
             { title: item.topic, to: classDetailHref(item.id) },
-            { title: "Classroom" },
+            { title: t("breadcrumb") },
           ]}
         />
       </Box>
@@ -213,7 +220,7 @@ export function ClassRoom({
                 }}
               >
                 <Typography variant="subtitle2" noWrap>
-                  {item.topic} · Focus mode
+                  {item.topic} · {t("focusMode")}
                 </Typography>
                 <Button
                   size="small"
@@ -221,7 +228,7 @@ export function ClassRoom({
                   startIcon={<IconMinimize size={16} />}
                   onClick={() => setFocusVideo(false)}
                 >
-                  Exit full view
+                  {t("exitFullView")}
                 </Button>
               </Box>
             ) : null}
@@ -258,7 +265,7 @@ export function ClassRoom({
                     "&:hover": { bgcolor: "rgba(0,0,0,0.75)" },
                   }}
                 >
-                  Full view
+                  {t("fullView")}
                 </Button>
               ) : null}
               {open ? (
@@ -301,7 +308,7 @@ export function ClassRoom({
                     <IconVideoOff size={34} />
                   </Avatar>
                   <Typography variant="h5" color="#fff">
-                    The room is not open yet
+                    {t("notOpenYet")}
                   </Typography>
                   <Typography
                     variant="body2"
@@ -315,7 +322,7 @@ export function ClassRoom({
                     color="primary"
                     startIcon={<IconArrowLeft size={16} />}
                   >
-                    Back to class details
+                    {t("backToDetails")}
                   </LinkButton>
                 </Stack>
               )}
@@ -344,13 +351,13 @@ export function ClassRoom({
                     >
                       <ClassStatusChip status={status} />
                       <Chip
-                        label={`${item.duration} min`}
+                        label={formatDuration(item.duration, tStudent)}
                         size="small"
                         variant="outlined"
                       />
                       {open && teacherMustStartSession ? (
                         <Chip
-                          label="Start the call"
+                          label={t("startTheCall")}
                           size="small"
                           color="warning"
                           variant="outlined"
@@ -358,7 +365,7 @@ export function ClassRoom({
                       ) : null}
                       {open && awaitingTeacherSession ? (
                         <Chip
-                          label="Waiting for teacher"
+                          label={t("waitingForTeacher")}
                           size="small"
                           color="warning"
                           variant="outlined"
@@ -366,7 +373,7 @@ export function ClassRoom({
                       ) : null}
                       {open && liveSessionActive && !teacherMustStartSession ? (
                         <Chip
-                          label="Live in app"
+                          label={t("liveInApp")}
                           size="small"
                           color="success"
                           variant="outlined"
@@ -377,7 +384,7 @@ export function ClassRoom({
                       {item.topic}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {item.teacherName} · {formatClassTimeRange(item)}
+                      {item.teacherName} · {formatClassTimeRange(item, locale)}
                     </Typography>
                   </Box>
                 </Stack>
@@ -393,7 +400,7 @@ export function ClassRoom({
                         copied ? <IconCheck size={15} /> : <IconCopy size={15} />
                       }
                     >
-                      {copied ? "Room copied" : "Copy room info"}
+                      {copied ? t("roomCopied") : t("copyRoomInfo")}
                     </Button>
                     {guestJoinUrl ? (
                       <Button
@@ -408,7 +415,7 @@ export function ClassRoom({
                           )
                         }
                       >
-                        {guestCopied ? "Guest link copied" : "Copy guest link"}
+                        {guestCopied ? t("guestLinkCopied") : t("copyGuestLink")}
                       </Button>
                     ) : null}
                   </Stack>
@@ -418,7 +425,7 @@ export function ClassRoom({
                     variant="outlined"
                     startIcon={<IconArrowLeft size={16} />}
                   >
-                    Class details
+                    {t("classDetails")}
                   </LinkButton>
                 )}
               </Stack>
@@ -433,8 +440,8 @@ export function ClassRoom({
         <Grid size={{ xs: 12, lg: 4 }} sx={{ display: focusVideo ? "none" : undefined }}>
           <Stack spacing={3}>
             <SectionCard
-              title="Room status"
-              subtitle={providerConfigured ? "Video in this page" : "Local preview"}
+              title={t("roomStatus")}
+              subtitle={providerConfigured ? t("videoInPage") : t("localPreview")}
               action={
                 <Avatar
                   sx={{
@@ -453,31 +460,31 @@ export function ClassRoom({
                   {open
                     ? guestViewer
                       ? guestSelfServeMedia
-                        ? "Staff guest: same classroom toolbar as a student; mic, camera, and screen are not blocked by mute-all."
-                        : "You joined with a signed guest link (view-only mic/camera)."
-                      : "Private classroom: enrolled students and the assigned teacher join here; visitors use the teacher's guest link."
+                        ? t("guestStaffAlert")
+                        : t("guestSignedAlert")
+                      : t("privateClassroomAlert")
                     : join.message}
                 </Alert>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Opens
+                    {t("opens")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {formatClassDateTime(join.opensAt)}
+                    {formatClassDateTime(join.opensAt, locale, tStudent)}
                   </Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Closes
+                    {t("closes")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {formatClassDateTime(join.closesAt)}
+                    {formatClassDateTime(join.closesAt, locale, tStudent)}
                   </Typography>
                 </Stack>
                 <Divider />
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Provider
+                    {t("provider")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
                     {providerLabel}
@@ -485,7 +492,7 @@ export function ClassRoom({
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
-                    Room
+                    {t("room")}
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
                     {item.meetingRoom}
@@ -494,39 +501,37 @@ export function ClassRoom({
                 {open && tokenExpiresAt ? (
                   <Stack direction="row" justifyContent="space-between">
                     <Typography variant="body2" color="text.secondary">
-                      Access expires
+                      {t("accessExpires")}
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {formatClassDateTime(tokenExpiresAt)}
+                      {formatClassDateTime(tokenExpiresAt, locale, tStudent)}
                     </Typography>
                   </Stack>
                 ) : null}
               </Stack>
             </SectionCard>
 
-            <SectionCard title="Before you join" subtitle="A smooth class">
+            <SectionCard title={t("beforeYouJoin")} subtitle={t("smoothClass")}>
               <Stack spacing={1.5} divider={<Divider />}>
                 <Typography variant="body2" color="text.secondary">
-                  Use headphones and test your microphone before the call.
+                  {t("tipHeadphones")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {providerConfigured
-                    ? "This room uses LiveKit for multi-participant video."
-                    : "Without LiveKit keys, the room falls back to a single-device preview."}{" "}
-                  Use the toolbar for screen share and recording.
+                  {providerConfigured ? t("tipLiveKit") : t("tipFallback")}{" "}
+                  {t("tipToolbar")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Zoom-style layout: large stage for screen share, filmstrip for participants, your camera in the corner.
+                  {t("tipLayout")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Access: signed-in students and teachers, plus optional{" "}
+                  {t("tipAccess")}{" "}
                   <Typography component="span" variant="body2" fontWeight={600}>
-                    guest links
+                    {t("tipGuestLinks")}
                   </Typography>{" "}
-                  (expire with the meeting token).{" "}
+                  {t("tipAccessSuffix")}{" "}
                   {recordingConfig.storage === "cloud"
-                    ? "Cloud recordings need B2_* when RECORDING_STORAGE=cloud."
-                    : "Local recordings do not require B2_*."}
+                    ? t("tipCloudRecording")
+                    : t("tipLocalRecording")}
                 </Typography>
               </Stack>
             </SectionCard>

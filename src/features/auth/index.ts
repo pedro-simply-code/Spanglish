@@ -31,6 +31,7 @@ export {
 export {
   authDemo,
   demoAccounts,
+  getDemoAccounts,
   getCodeError,
   getEmailError,
   getNameError,

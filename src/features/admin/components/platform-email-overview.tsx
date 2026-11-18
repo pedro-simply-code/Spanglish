@@ -10,6 +10,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SectionCard } from "@/components/ui/section-card";
 import { adminBreadcrumb } from "@/features/admin/components/admin-breadcrumb-items";
@@ -27,27 +28,28 @@ const statusColor = {
 };
 
 export function PlatformEmailOverview({ emailProvider, health }: PlatformEmailOverviewProps) {
+  const t = useTranslations("admin");
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Email deliverability"
-        subtitle="SMTP/Postmark is for login verification codes only. Other notices go to in-app Email."
-        items={adminBreadcrumb("Platform", "Email", "/admin/platform/email")}
+        title={t("common.page.email")}
+        subtitle={t("platform.email.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.platform"), t("common.page.email"), "/admin/platform/email")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Provider: <strong>{emailProvider}</strong> (sign-in / verify / password codes). Academy and
-        class notices are delivered in <strong>Email</strong> inside the app. Bounces update{" "}
-        <code>users.email_bounced_at</code> via the Postmark webhook when configured.
+        {t("platform.email.noticePrefix")} <strong>{emailProvider}</strong>{" "}
+        {t("platform.email.noticeMiddle")} <strong>{t("common.emailInApp")}</strong>.{" "}
+        {t("platform.email.noticeSuffix")}
       </Alert>
 
-      <SectionCard title="Health" subtitle="From users and audit_logs">
+      <SectionCard title={t("platform.email.health")} subtitle={t("platform.email.healthSubtitle")}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Metric</TableCell>
-              <TableCell align="right">Value</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell>{t("platform.email.metric")}</TableCell>
+              <TableCell align="right">{t("common.value")}</TableCell>
+              <TableCell>{t("common.status")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -58,7 +60,11 @@ export function PlatformEmailOverview({ emailProvider, health }: PlatformEmailOv
                   <Typography fontWeight={600}>{row.value}</Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip size="small" color={statusColor[row.status]} label={row.status} />
+                  <Chip
+                    size="small"
+                    color={statusColor[row.status]}
+                    label={t(`platform.email.status.${row.status}`)}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -66,8 +72,7 @@ export function PlatformEmailOverview({ emailProvider, health }: PlatformEmailOv
         </Table>
         <Stack mt={2}>
           <Typography variant="body2" color="text.secondary">
-            Configure SPF, DKIM, and DMARC on your sending domain before switching production
-            traffic to Postmark.
+            {t("platform.email.dnsHint")}
           </Typography>
         </Stack>
       </SectionCard>

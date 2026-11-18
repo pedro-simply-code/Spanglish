@@ -16,7 +16,10 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { formatDistanceToNowStrict } from "date-fns";
+import enUS from "date-fns/locale/en-US";
+import es from "date-fns/locale/es";
 import { IconChevronDown, IconSearch } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Scrollbar } from "@/components/custom-scroll/scrollbar";
 import type { Chat, ChatStatus } from "@/features/chats/types";
 
@@ -42,16 +45,15 @@ function getLastMessage(chat: Chat) {
   return chat.messages[chat.messages.length - 1];
 }
 
-function getDetails(chat: Chat): string {
+function getDetails(chat: Chat, youLabel: string, photoLabel: string): string {
   const lastMessage = getLastMessage(chat);
 
   if (!lastMessage) {
     return "";
   }
 
-  const sender = lastMessage.senderId === chat.id ? "" : "You: ";
-  const text =
-    lastMessage.type === "image" ? "Sent a photo" : lastMessage.msg;
+  const sender = lastMessage.senderId === chat.id ? "" : youLabel;
+  const text = lastMessage.type === "image" ? photoLabel : lastMessage.msg;
 
   return `${sender}${text}`;
 }
@@ -67,6 +69,9 @@ export function ChatListing({
   onSearchChange,
   onSelectChat,
 }: ChatListingProps) {
+  const locale = useLocale();
+  const t = useTranslations("apps");
+  const dateLocale = locale === "es" ? es : enUS;
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -90,7 +95,7 @@ export function ChatListing({
           <Typography variant="body1" fontWeight={600}>
             Mathew Anderson
           </Typography>
-          <Typography variant="body2">Designer</Typography>
+          <Typography variant="body2">{t("chat.sidebar.currentUserRole")}</Typography>
         </Box>
       </Box>
 
@@ -98,7 +103,7 @@ export function ChatListing({
       <Box px={3} py={1}>
         <TextField
           id="chat-search"
-          placeholder="Search contacts"
+          placeholder={t("chat.sidebar.searchPlaceholder")}
           size="small"
           type="search"
           variant="outlined"
@@ -129,7 +134,7 @@ export function ChatListing({
             color="inherit"
             endIcon={<IconChevronDown size={16} />}
           >
-            Recent Chats
+            {t("chat.sidebar.recentChats")}
           </Button>
           <Menu
             id="recent-chats-menu"
@@ -140,12 +145,14 @@ export function ChatListing({
               list: { "aria-labelledby": "recent-chats-button" },
             }}
           >
-            <MenuItem onClick={() => setAnchorEl(null)}>Sort By Time</MenuItem>
             <MenuItem onClick={() => setAnchorEl(null)}>
-              Sort By Unread
+              {t("chat.sidebar.sortByTime")}
             </MenuItem>
             <MenuItem onClick={() => setAnchorEl(null)}>
-              Mark as all Read
+              {t("chat.sidebar.sortByUnread")}
+            </MenuItem>
+            <MenuItem onClick={() => setAnchorEl(null)}>
+              {t("chat.sidebar.markAllRead")}
             </MenuItem>
           </Menu>
         </Box>
@@ -188,7 +195,11 @@ export function ChatListing({
                         {chat.name}
                       </Typography>
                     }
-                    secondary={getDetails(chat)}
+                    secondary={getDetails(
+                      chat,
+                      t("chat.sidebar.you"),
+                      t("chat.sidebar.sentPhoto"),
+                    )}
                     secondaryTypographyProps={{ noWrap: true }}
                     sx={{ my: 0 }}
                   />
@@ -197,7 +208,8 @@ export function ChatListing({
                     <Box sx={{ flexShrink: 0 }} mt={0.5}>
                       <Typography variant="body2">
                         {formatDistanceToNowStrict(activity, {
-                          addSuffix: false,
+                          addSuffix: true,
+                          locale: dateLocale,
                         })}
                       </Typography>
                     </Box>
@@ -208,7 +220,7 @@ export function ChatListing({
           ) : (
             <Box m={2}>
               <Alert severity="error" variant="filled" sx={{ color: "white" }}>
-                No Contacts Found!
+                {t("chat.sidebar.noContacts")}
               </Alert>
             </Box>
           )}

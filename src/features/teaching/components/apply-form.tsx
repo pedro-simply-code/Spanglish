@@ -17,6 +17,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SectionCard } from "@/components/ui/section-card";
 import {
@@ -24,9 +25,9 @@ import {
   withdrawApplicationAction,
 } from "@/features/teaching/actions";
 import {
-  credentialTypes,
-  teacherApplicationTracks,
-  teacherFluencyLevels,
+  localizedCredentialTypes,
+  localizedTeacherApplicationTracks,
+  localizedTeacherFluencyLevels,
   type TeacherApplicationTrack,
   type TeacherFluencyLevel,
 } from "@/lib/teacher-application";
@@ -39,8 +40,6 @@ export type MyApplication = {
   reviewNote: string | null;
 } | null;
 
-const dateFormat = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" });
-
 const emptyCredential = {
   type: "celta",
   label: "",
@@ -49,6 +48,8 @@ const emptyCredential = {
 };
 
 export function ApplyForm({ application }: { application: MyApplication }) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -71,6 +72,14 @@ export function ApplyForm({ application }: { application: MyApplication }) {
 
   const open = application?.status === "submitted";
   const certified = form.track === "certified";
+  const dateFormat = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const tracks = localizedTeacherApplicationTracks(t);
+  const fluencyLevels = localizedTeacherFluencyLevels(t);
+  const credentialOptions = localizedCredentialTypes(t);
 
   const submit = () => {
     setError(null);
@@ -120,8 +129,8 @@ export function ApplyForm({ application }: { application: MyApplication }) {
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Teach with us"
-        subtitle="Choose conversation practice or certified teaching — managers review every application."
+        title={t("teacher.apply.title")}
+        subtitle={t("teacher.apply.subtitle")}
       />
 
       {application ? (
@@ -131,33 +140,38 @@ export function ApplyForm({ application }: { application: MyApplication }) {
           action={
             open ? (
               <Button color="inherit" size="small" onClick={withdraw} disabled={pending}>
-                Withdraw
+                {t("teacher.apply.withdraw")}
               </Button>
             ) : undefined
           }
         >
           {open
-            ? `Your application from ${dateFormat.format(new Date(application.createdAt))} is under review. We will email you.`
+            ? t("teacher.apply.statusOpen", { date: dateFormat.format(new Date(application.createdAt)) })
             : application.status === "rejected"
-              ? `Your last application was not approved.${application.reviewNote ? ` ${application.reviewNote}` : ""} You can apply again.`
+              ? t("teacher.apply.statusRejected", {
+                  note: application.reviewNote ? ` ${application.reviewNote}` : "",
+                })
               : application.status === "withdrawn"
-                ? "You withdrew your last application. You can apply again."
-                : "Your application was approved."}
+                ? t("teacher.apply.statusWithdrawn")
+                : t("teacher.apply.statusApproved")}
         </Alert>
       ) : null}
 
       {!open ? (
-        <SectionCard title="Your application" subtitle="A manager reviews video, fluency, and credentials before approval.">
+        <SectionCard
+          title={t("teacher.apply.cardTitle")}
+          subtitle={t("teacher.apply.cardSubtitle")}
+        >
           <Stack spacing={2.5} maxWidth={720}>
             {error ? <Alert severity="error">{error}</Alert> : null}
 
             <FormControl>
-              <FormLabel>Track</FormLabel>
+              <FormLabel>{t("applications.track")}</FormLabel>
               <RadioGroup
                 value={form.track}
                 onChange={(event) => setForm({ ...form, track: event.target.value as TeacherApplicationTrack })}
               >
-                {teacherApplicationTracks.map((item) => (
+                {tracks.map((item) => (
                   <FormControlLabel
                     key={item.id}
                     value={item.id}
@@ -178,22 +192,22 @@ export function ApplyForm({ application }: { application: MyApplication }) {
             <Divider />
 
             <FormControl>
-              <FormLabel>Spanish / English fluency</FormLabel>
+              <FormLabel>{t("teacher.apply.fluency")}</FormLabel>
               <RadioGroup
                 value={form.fluency}
                 onChange={(event) => setForm({ ...form, fluency: event.target.value as TeacherFluencyLevel })}
               >
-                {teacherFluencyLevels.map((item) => (
+                {fluencyLevels.map((item) => (
                   <FormControlLabel key={item.id} value={item.id} control={<Radio />} label={item.label} />
                 ))}
               </RadioGroup>
             </FormControl>
             {form.fluency === "other" ? (
               <TextField
-                label="Fluency details"
+                label={t("teacher.apply.fluencyDetails")}
                 multiline
                 minRows={2}
-                helperText="e.g. Bilingual since childhood, 10 years in a Spanish-speaking country."
+                helperText={t("teacher.apply.fluencyDetailsHelper")}
                 value={form.fluencyNote}
                 onChange={(event) => setForm({ ...form, fluencyNote: event.target.value })}
                 slotProps={{ htmlInput: { maxLength: 500 } }}
@@ -202,7 +216,7 @@ export function ApplyForm({ application }: { application: MyApplication }) {
 
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <TextField
-                label="Years teaching (any context)"
+                label={t("teacher.apply.yearsTeaching")}
                 type="number"
                 value={form.yearsTeaching}
                 onChange={(event) => setForm({ ...form, yearsTeaching: event.target.value })}
@@ -216,61 +230,61 @@ export function ApplyForm({ application }: { application: MyApplication }) {
                     onChange={(event) => setForm({ ...form, taughtOnlineBefore: event.target.checked })}
                   />
                 }
-                label="I have taught live online before"
+                label={t("teacher.apply.taughtOnline")}
               />
             </Stack>
 
             <TextField
-              label="Headline"
-              placeholder="e.g. Conversation and pronunciation for beginners"
+              label={t("applications.headline")}
+              placeholder={t("teacher.apply.headlinePlaceholder")}
               value={form.headline}
               onChange={(event) => setForm({ ...form, headline: event.target.value })}
               slotProps={{ htmlInput: { maxLength: 120 } }}
             />
             <Box>
               <Typography variant="subtitle2" mb={0.5}>
-                I teach
+                {t("teacher.apply.iTeach")}
               </Typography>
               <FormGroup row>
                 <FormControlLabel
                   control={<Checkbox checked={form.spanish} onChange={(event) => setForm({ ...form, spanish: event.target.checked })} />}
-                  label="Spanish"
+                  label={t("applications.language.spanish")}
                 />
                 <FormControlLabel
                   control={<Checkbox checked={form.english} onChange={(event) => setForm({ ...form, english: event.target.checked })} />}
-                  label="English"
+                  label={t("applications.language.english")}
                 />
               </FormGroup>
             </Box>
             <TextField
-              label="About you"
+              label={t("teacher.apply.aboutYou")}
               multiline
               minRows={4}
-              helperText="At least 40 characters: how you teach and who you help best."
+              helperText={t("teacher.apply.aboutHelper")}
               value={form.bio}
               onChange={(event) => setForm({ ...form, bio: event.target.value })}
               slotProps={{ htmlInput: { maxLength: 2000 } }}
             />
             <TextField
-              label="Teaching experience"
+              label={t("teacher.apply.experience")}
               multiline
               minRows={3}
-              helperText="At least 20 characters: classrooms, tutoring, volunteer, etc."
+              helperText={t("teacher.apply.experienceHelper")}
               value={form.experience}
               onChange={(event) => setForm({ ...form, experience: event.target.value })}
               slotProps={{ htmlInput: { maxLength: 2000 } }}
             />
             <TextField
-              label="Where you live"
-              placeholder="City, country"
+              label={t("teacher.apply.location")}
+              placeholder={t("teacher.apply.locationPlaceholder")}
               value={form.country}
               onChange={(event) => setForm({ ...form, country: event.target.value })}
             />
             <TextField
-              label={certified ? "Intro video (recommended)" : "Intro video (required)"}
+              label={certified ? t("teacher.apply.videoRecommended") : t("teacher.apply.videoRequired")}
               placeholder="https://"
               required={!certified}
-              helperText="2–3 minute sample: introduce yourself and simulate a short lesson. YouTube, Vimeo, or Loom."
+              helperText={t("teacher.apply.videoHelper")}
               value={form.videoUrl}
               onChange={(event) => setForm({ ...form, videoUrl: event.target.value })}
             />
@@ -278,26 +292,26 @@ export function ApplyForm({ application }: { application: MyApplication }) {
             {certified ? (
               <Box>
                 <Typography variant="subtitle2" mb={1}>
-                  Primary credential
+                  {t("teacher.apply.credentialPrimary")}
                 </Typography>
                 <Stack spacing={2}>
                   <TextField
                     select
-                    label="Type"
+                    label={t("common.type")}
                     value={form.credential.type}
                     onChange={(event) =>
                       setForm({ ...form, credential: { ...form.credential, type: event.target.value } })
                     }
                   >
-                    {credentialTypes.map((item) => (
+                    {credentialOptions.map((item) => (
                       <MenuItem key={item.id} value={item.id}>
                         {item.label}
                       </MenuItem>
                     ))}
                   </TextField>
                   <TextField
-                    label="Certificate or degree name"
-                    placeholder="e.g. CELTA, DELE C2, BA in Education"
+                    label={t("teacher.apply.credentialName")}
+                    placeholder={t("teacher.apply.credentialNamePlaceholder")}
                     value={form.credential.label}
                     onChange={(event) =>
                       setForm({ ...form, credential: { ...form.credential, label: event.target.value } })
@@ -306,7 +320,7 @@ export function ApplyForm({ application }: { application: MyApplication }) {
                   />
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                     <TextField
-                      label="Year (optional)"
+                      label={t("teacher.apply.yearOptional")}
                       type="number"
                       value={form.credential.year}
                       onChange={(event) =>
@@ -315,7 +329,7 @@ export function ApplyForm({ application }: { application: MyApplication }) {
                       sx={{ width: { sm: 160 } }}
                     />
                     <TextField
-                      label="Link to scan or registry (optional)"
+                      label={t("teacher.apply.scanLink")}
                       placeholder="https://"
                       value={form.credential.url}
                       onChange={(event) =>
@@ -329,12 +343,11 @@ export function ApplyForm({ application }: { application: MyApplication }) {
             ) : null}
 
             <Typography variant="body2" color="text.secondary">
-              If you are approved, this account becomes a teacher account: you will no longer book classes as a
-              student.
+              {t("teacher.apply.approvalNote")}
             </Typography>
             <Box>
               <Button variant="contained" onClick={submit} disabled={pending}>
-                {pending ? "Sending…" : "Send application"}
+                {pending ? t("teacher.apply.sending") : t("teacher.apply.send")}
               </Button>
             </Box>
           </Stack>

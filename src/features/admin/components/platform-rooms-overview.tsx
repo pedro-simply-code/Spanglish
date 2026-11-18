@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SectionCard } from "@/components/ui/section-card";
 import { adminBreadcrumb } from "@/features/admin/components/admin-breadcrumb-items";
@@ -17,41 +18,44 @@ export type ClassroomPolicyFlags = {
 };
 
 export function PlatformRoomsOverview({ policy }: { policy: ClassroomPolicyFlags }) {
+  const t = useTranslations("admin");
   const rows = [
     {
       key: "waitingRoom",
-      label: "Waiting room",
+      label: t("platform.rooms.waitingRoom"),
       value: policy.waitingRoom,
-      description: "Students wait until the teacher admits them (when LiveKit supports it).",
+      description: t("platform.rooms.waitingRoomDetail"),
     },
     {
       key: "teacherStarts",
-      label: "Teacher starts session",
+      label: t("platform.rooms.teacherStarts"),
       value: policy.teacherStartsSession,
-      description: "Classroom stays locked until the assigned teacher starts the live session.",
+      description: t("platform.rooms.teacherStartsDetail"),
     },
     {
       key: "relaxJoin",
-      label: "Relax join window",
+      label: t("platform.rooms.relaxJoin"),
       value: policy.relaxJoinWindow,
-      description: "Allow joining outside the scheduled window (keep off in production).",
+      description: t("platform.rooms.relaxJoinDetail"),
     },
   ];
 
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Classroom defaults"
-        subtitle="Live session policy from environment (not per-class overrides yet)."
-        items={adminBreadcrumb("Platform", "Classroom", "/admin/platform/rooms")}
+        title={t("common.page.classroomDefaults")}
+        subtitle={t("platform.rooms.subtitle")}
+        items={adminBreadcrumb(t, t("common.section.platform"), t("common.page.classroom"), "/admin/platform/rooms")}
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Meeting provider: <strong>{policy.meetingProvider}</strong>. Operational room list for
-        managers stays on the manager dashboard.
+        {t("platform.rooms.notice", { provider: policy.meetingProvider })}
       </Alert>
 
-      <SectionCard title="Policy flags" subtitle="Change via deployment env, then redeploy">
+      <SectionCard
+        title={t("platform.rooms.policyFlags")}
+        subtitle={t("platform.rooms.policyFlagsSubtitle")}
+      >
         <Stack spacing={2} divider={<Box sx={{ borderTop: "1px solid", borderColor: "divider" }} />}>
           {rows.map((row) => (
             <Stack
@@ -72,7 +76,7 @@ export function PlatformRoomsOverview({ policy }: { policy: ClassroomPolicyFlags
               <Chip
                 size="small"
                 color={row.value ? "warning" : "success"}
-                label={row.value ? "Enabled" : "Disabled"}
+                label={t(row.value ? "common.enabled" : "common.disabled")}
               />
             </Stack>
           ))}

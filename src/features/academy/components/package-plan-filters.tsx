@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
@@ -27,11 +28,15 @@ export function PackagePlanFilters({
   showSavingsChip = true,
   sx,
 }: PackagePlanFiltersProps) {
+  const t = useTranslations("student");
+  const sessionLength = t("pricing.sessionLength");
+  const classFormat = t("pricing.classFormat");
+
   return (
     <Stack spacing={2.5} direction="column" alignItems="center" useFlexGap width="100%" sx={sx}>
       <Stack spacing={1} alignItems="center" width="100%">
         <Typography variant="overline" color="text.secondary" lineHeight={1.2}>
-          Session length
+          {sessionLength}
         </Typography>
         <ToggleButtonGroup
           exclusive
@@ -41,19 +46,19 @@ export function PackagePlanFilters({
           }}
           size="small"
           color="primary"
-          aria-label="Session length"
+          aria-label={sessionLength}
         >
           <ToggleButton value={25} sx={{ px: 2.5 }}>
-            25 min
+            {t("common.minutes", { count: 25 })}
           </ToggleButton>
           <ToggleButton value={50} sx={{ px: 2.5 }}>
-            50 min
+            {t("common.minutes", { count: 50 })}
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
       <Stack spacing={1} alignItems="center" width="100%">
         <Typography variant="overline" color="text.secondary" lineHeight={1.2}>
-          Class format
+          {classFormat}
         </Typography>
         <ToggleButtonGroup
           exclusive
@@ -63,18 +68,23 @@ export function PackagePlanFilters({
           }}
           size="small"
           color="primary"
-          aria-label="Class format"
+          aria-label={classFormat}
         >
           <ToggleButton value="one-on-one" sx={{ px: 2.5 }}>
-            Individual
+            {t("classTypes.individual")}
           </ToggleButton>
           <ToggleButton value="paired" sx={{ px: 2.5 }}>
-            Paired
+            {t("classTypes.paired")}
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
       {showSavingsChip && maxSavings > 0 ? (
-        <Chip label={`Save up to ${maxSavings}%`} color="success" size="small" variant="outlined" />
+        <Chip
+          label={t("pricing.saveUpTo", { percent: maxSavings })}
+          color="success"
+          size="small"
+          variant="outlined"
+        />
       ) : null}
     </Stack>
   );

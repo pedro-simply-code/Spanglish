@@ -3,13 +3,11 @@ export {
   reviewMaterialAction,
   setMaterialVisibilityAction,
   shareMaterialAction,
-  submitPracticeAction,
 } from "@/features/materials/actions";
-export { AssignmentsOverview } from "@/features/materials/components/assignments-overview";
-export { FormRunner } from "@/features/materials/components/form-runner";
 export { MaterialCard } from "@/features/materials/components/material-card";
 export { MaterialComposer } from "@/features/materials/components/material-composer";
 export { MaterialDetail } from "@/features/materials/components/material-detail";
+export { MaterialModerationReview } from "@/features/materials/components/material-moderation-review";
 export { MaterialVisibilityControl } from "@/features/materials/components/material-visibility-control";
 export { MaterialsModeration } from "@/features/materials/components/materials-moderation";
 export {
@@ -40,6 +38,17 @@ export {
   getStudentPracticeMaterials,
   getSubmissions,
   getTeacherMaterials,
+  localizeAssignment,
+  localizeAssignments,
+  localizeDemoClassTopic,
+  localizeFormQuestion,
+  localizeFormQuestions,
+  localizeMaterial,
+  localizeMaterialGrant,
+  localizeMaterialGrants,
+  localizeMaterials,
+  localizeSubmission,
+  localizeSubmissions,
   materialGrants,
   materialKindLabels,
   materialKindOptions,

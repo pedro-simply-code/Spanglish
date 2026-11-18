@@ -1,0 +1,1284 @@
+{
+  "student": {
+    "common": {
+      "progress": "Progreso",
+      "open": "Abrir",
+      "done": "Listo",
+      "start": "Empezar",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "apply": "Aplicar",
+      "email": "Correo",
+      "total": "Total",
+      "package": "Paquete",
+      "duration": "Duración",
+      "format": "Formato",
+      "pricePerClass": "Precio por clase",
+      "perStudent": "por estudiante",
+      "minutes": "{count} min",
+      "classes": "{count} clases",
+      "credits": "{count, plural, one {# crédito} other {# créditos}}",
+      "loading": "Cargando…",
+      "optional": "opcional",
+      "reasonOptional": "Motivo (opcional)",
+      "noteOptional": "Nota (opcional)",
+      "save": "Guardar"
+    },
+    "status": {
+      "upcoming": "Próximas",
+      "inProgress": "En curso",
+      "completed": "Completadas",
+      "canceled": "Canceladas",
+      "changesClosed": "Cambios cerrados",
+      "roomOpen": "Sala abierta",
+      "locked": "Bloqueada",
+      "paid": "Pago recibido",
+      "processing": "Pago en proceso",
+      "failed": "Pago fallido"
+    },
+    "classTypes": {
+      "individual": "Individual",
+      "paired": "En pareja",
+      "pairedWithStudents": "En pareja (2 estudiantes)"
+    },
+    "levels": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    },
+    "actions": {
+      "bookClass": "Reservar una clase",
+      "viewPlans": "Ver planes",
+      "myClasses": "Mis clases",
+      "seePackages": "Ver paquetes",
+      "scheduleClass": "Programar una clase",
+      "scheduleFirstClass": "Programar la primera clase",
+      "backToOverview": "Volver al resumen",
+      "backToPricing": "Volver a precios",
+      "continueCheckout": "Continuar al pago",
+      "join": "Unirse",
+      "details": "Detalles",
+      "viewAll": "Ver todo",
+      "reviewAll": "Repasar todo",
+      "openSettings": "Abrir ajustes",
+      "resumeLesson": "Continuar la lección",
+      "practiceMinutes": "Practicar {minutes} min"
+    },
+    "meta": {
+      "home": {
+        "title": "Panel del estudiante",
+        "description": "Tu plan de aprendizaje de Spanglish para hoy"
+      },
+      "classes": {
+        "title": "Mis clases",
+        "description": "Únete, revisa, reprograma o cancela tus clases en vivo"
+      },
+      "classDetails": {
+        "title": "Detalles de la clase",
+        "description": "Agenda, materiales y sala de clase en vivo"
+      },
+      "pricing": {
+        "title": "Precios",
+        "description": "Clases de español en vivo y paquetes de clases"
+      },
+      "schedule": {
+        "title": "Reservar una clase",
+        "description": "Programa una clase en vivo con un maestro de Spanglish"
+      },
+      "checkout": {
+        "title": "Pago",
+        "description": "Completa la compra de tu paquete de clases de Spanglish"
+      },
+      "payment": {
+        "title": "Pago",
+        "description": "Pago de tu paquete de Spanglish"
+      },
+      "lessons": {
+        "title": "Lecciones",
+        "description": "Lecciones de Spanglish"
+      },
+      "practice": {
+        "title": "Práctica",
+        "description": "Actividades de práctica de Spanglish"
+      },
+      "practiceForm": {
+        "title": "Práctica",
+        "description": "Formulario de práctica asignado"
+      },
+      "vocabulary": {
+        "title": "Vocabulario",
+        "description": "Vocabulario de Spanglish"
+      },
+      "progress": {
+        "title": "Progreso",
+        "description": "Tu progreso de aprendizaje en Spanglish"
+      },
+      "achievements": {
+        "title": "Logros",
+        "description": "Logros de Spanglish"
+      },
+      "teach": {
+        "title": "Enseña con nosotros",
+        "description": "Solicita enseñar clases en vivo en Spanglish"
+      }
+    },
+    "home": {
+      "breadcrumbTitle": "Bienvenido, {firstName}",
+      "subtitle": "Tu plan de hoy mientras el panel de {student} está activo. Cambia de rol en la barra superior para abrir {teacher}, {manager} o {admin}.",
+      "liveClassesChip": "Clases en vivo",
+      "nextClass": "Próxima clase con {teacher}",
+      "activePackage": "Paquete activo",
+      "classesLeft": "{count, plural, one {# clase restante} other {# clases restantes}}",
+      "renews": "Se renueva el {date}",
+      "continueLearning": "Sigue aprendiendo",
+      "lessonMeta": "{level} · {duration} · Lección {id}",
+      "lessonProgress": "Progreso de la lección",
+      "todayPlan": "Plan de hoy",
+      "todayPlanSubtitle": "Tres pequeños logros",
+      "tasksDone": "{done}/{total} listas",
+      "weeklyActivity": "Actividad semanal",
+      "minutesPerDay": "Minutos estudiados por día",
+      "todayGoal": "{done}/{target} min hoy",
+      "vocabularyReview": "Repaso de vocabulario",
+      "wordsDue": "{count} palabras para repasar hoy",
+      "achievements": "Logros",
+      "keepMomentum": "Mantén el ritmo",
+      "latestBadge": "Última insignia",
+      "nextBadge": "Siguiente insignia",
+      "skillSnapshot": "Resumen de habilidades",
+      "whereToFocus": "Dónde enfocarte ahora",
+      "stat": {
+        "streak": {
+          "title": "Racha de días",
+          "helper": "días seguidos"
+        },
+        "goal": {
+          "title": "Objetivo diario",
+          "helper": "minutos de hoy"
+        },
+        "review": {
+          "title": "Palabras por repasar",
+          "helper": "para hoy"
+        },
+        "lessons": {
+          "title": "Clases esta semana",
+          "helper": "mantén el ritmo"
+        }
+      },
+      "task": {
+        "review": {
+          "title": "Repasa 10 palabras",
+          "description": "Vocabulario pendiente hoy"
+        },
+        "lesson": {
+          "description": "Continúa tu lección actual"
+        },
+        "practice": {
+          "description": "Un calentamiento breve"
+        }
+      },
+      "fallback": {
+        "lesson": {
+          "title": "Empieza tu primera lección"
+        },
+        "achievement": {
+          "title": "Sigue aprendiendo",
+          "description": "Tu próxima insignia te espera."
+        }
+      }
+    },
+    "classes": {
+      "overview": {
+        "staffTitle": "Clases de la academia",
+        "staffSubtitle": "Todas las sesiones programadas de la academia. Cambia a Gerente en la barra superior para las operaciones diarias.",
+        "title": "Mis clases",
+        "subtitle": "Únete, revisa, reprograma o cancela tus clases en vivo.",
+        "creditsLeft": "{count, plural, one {# crédito de clase restante} other {# créditos de clase restantes}}",
+        "creditChip": "{minutes} min {type}: {balance}{shared}",
+        "shared": " (compartido)",
+        "noCredits": "Consigue un paquete para empezar a reservar clases.",
+        "statusTab": "{status} ({count})",
+        "emptyTitle": "No hay clases {status}",
+        "emptyUpcoming": "Reserva tu próxima clase en vivo y mantén el ritmo.",
+        "emptyOther": "Las clases aparecerán aquí a medida que avance tu horario.",
+        "policyTitle": "Política de clases",
+        "policySubtitle": "Verificada en el servidor",
+        "cancellations": "Cancelaciones",
+        "cancellationsBody": "Al menos {hours} horas antes de que empiece la clase.",
+        "rescheduling": "Reprogramaciones",
+        "reschedulingBody": "Al menos {hours} horas antes de que empiece la clase.",
+        "joinWindow": "Ventana de acceso",
+        "joinWindowBody": "Abre {before} minutos antes y permanece abierta {after} minutos después del inicio.",
+        "credits": "Créditos",
+        "creditsBody": "Un crédito por clase. Cancela al menos {hours} horas antes y el crédito vuelve a tu paquete.",
+        "atGlance": "De un vistazo",
+        "yourActivity": "Actividad de tus clases",
+        "total": "{count} en total",
+        "needHand": "¿Necesitas ayuda?",
+        "hereToHelp": "Estamos para ayudarte",
+        "outsideWindow": "¿Fuera del plazo de cambios?",
+        "outsideWindowBody": "Escribe a soporte desde Ajustes y el equipo de la academia revisará tu caso.",
+        "statusAria": "Estado de la clase"
+      },
+      "list": {
+        "changesClosed": "Cambios cerrados",
+        "roomOpen": "Sala abierta",
+        "canceledBy": "Cancelada por {by} · {reason} · {refund}",
+        "creditReturned": "crédito devuelto",
+        "creditNotReturned": "crédito no devuelto",
+        "join": "Unirse",
+        "details": "Detalles",
+        "byStaff": "personal",
+        "hasRecording": "Grabación",
+        "withTeacher": "Con {name}",
+        "withPartner": "En pareja con {name}",
+        "withStudents": "Con {names}",
+        "noStudents": "Aún sin estudiantes"
+      },
+      "detail": {
+        "decline": "Rechazar",
+        "accept": "Aceptar",
+        "waitingPartner": "Esperando a tu compañero",
+        "proposedTime": "{name} propuso una hora nueva",
+        "moveTo": "Mover a {date}.",
+        "waitingAnswer": "Si no responden en 24 horas, la clase mantiene su hora actual.",
+        "answerBefore": "Responde antes de {date}; si no, la clase mantiene su hora.",
+        "creditChip": "{count, plural, one {# crédito} other {# créditos}}",
+        "with": "Con {names}",
+        "students": "Estudiantes: {names}",
+        "rescheduledFrom": "Reprogramada desde {date}.",
+        "joinClass": "Unirse a la clase",
+        "coverTitle": "Qué veremos",
+        "coverSubtitle": "Agenda y objetivos de aprendizaje",
+        "agenda": "Agenda",
+        "outcomes": "Podrás",
+        "prepareTitle": "Prepárate para la clase",
+        "prepareSubtitle": "Materiales y notas de tu maestro",
+        "open": "Abrir",
+        "assignedPractice": "Práctica asignada",
+        "submitted": "{submitted} de {total} entregados{due}",
+        "submittedDue": " · vence el {date}",
+        "openForm": "Abrir formulario",
+        "teacherNote": "Nota del maestro",
+        "homework": "Tarea",
+        "recording": "Grabación",
+        "fullClass": "Clase completa",
+        "transcriptReady": "transcripción lista",
+        "transcriptProcessing": "transcripción en proceso",
+        "watchRecording": "Mira la grabación de la clase.",
+        "openRecording": "Abrir grabación",
+        "watchClass": "Ver la clase",
+        "recapTitle": "Resumen de la clase",
+        "recapSubtitle": "Lo que notó tu maestro y qué practicar después",
+        "meetingTitle": "Sala de reunión",
+        "meetingSubtitle": "Clase en vivo de {minutes} minutos",
+        "opens": "Abre",
+        "closes": "Cierra",
+        "enterClassroom": "Entrar al aula",
+        "manageTitle": "Gestionar esta clase",
+        "manageSubtitle": "Política aplicada en el servidor",
+        "cancelSection": "Cancelar",
+        "cancelClass": "Cancelar clase",
+        "rescheduleSection": "Reprogramar",
+        "partnerAccept": " Tu compañero debe aceptar la hora nueva.",
+        "chooseNewTime": "Elegir una hora nueva",
+        "changeNotice": "Los cambios requieren al menos {hours} horas de anticipación. El servidor vuelve a revisar el plazo al confirmar.",
+        "rateTitle": "Calificar esta clase",
+        "yourRating": "Tu calificación",
+        "ratingSubtitle": "Tu calificación ayuda a tu maestro y a otros estudiantes a elegir.",
+        "stars": "Estrellas",
+        "commentOptional": "Comentario (opcional)",
+        "updateRating": "Actualizar calificación",
+        "sendRating": "Enviar calificación",
+        "cancellationTitle": "Cancelación",
+        "cancellationSubtitle": "Qué pasó",
+        "canceledByOn": "Cancelada por {by} el {date}.",
+        "reason": "Motivo: {reason}",
+        "creditReturned": "Crédito devuelto",
+        "creditNotReturned": "Crédito no devuelto",
+        "cancelDialogTitle": "¿Cancelar esta clase?",
+        "cancelDialogBody": "{topic} con {teacher} el {date}. {detail}",
+        "cancelParticipant": "El crédito vuelve al paquete{paired}.",
+        "cancelPaired": " y la clase se cancela para ambos",
+        "cancelStaff": "Los estudiantes reciben su crédito y un correo.",
+        "keepClass": "Mantener la clase",
+        "canceling": "Cancelando…",
+        "confirmCancel": "Cancelar clase",
+        "rescheduleDialogTitle": "Elegir una hora nueva",
+        "pairedHelp": "Elige una hora en la que estén libres el maestro y ambos. Tu compañero tiene 24 horas para aceptar.",
+        "singleHelp": "Elige una hora disponible. La clase mantiene su hora actual hasta que confirmes.",
+        "loadingTimes": "Cargando horarios disponibles…",
+        "noTimes": "No hay horarios disponibles en las próximas tres semanas.",
+        "day": "Día",
+        "time": "Hora",
+        "timesInZone": "Horarios en tu zona horaria ({zone}).",
+        "keepCurrentTime": "Mantener la hora actual",
+        "saving": "Guardando…",
+        "proposeTime": "Proponer hora nueva",
+        "confirmTime": "Confirmar hora nueva",
+        "allClasses": "Todas las clases",
+        "recordingsTitle": "Grabación de la clase",
+        "recordingsSubtitle": "Vuelve a ver la clase para repasar vocabulario y pronunciación.",
+        "recordingPart": "Parte {part}",
+        "recordingDownload": "Descargar",
+        "recordingProcessing": "{count, plural, one {# grabación aún se está procesando} other {# grabaciones aún se están procesando}}",
+        "recordingAvailable": "Grabación",
+        "transcriptTitle": "Transcripción",
+        "transcriptSubtitle": "Transcripción automática de la clase (puede tener errores).",
+        "transcriptShowAll": "Ver todo ({count})",
+        "transcriptShowLess": "Ver menos"
+      }
+    },
+    "format": {
+      "at": "a las",
+      "startsInDays": "Empieza en {count, plural, one {# día} other {# días}}{hours}",
+      "startsInHours": "Empieza en {hours} h {minutes} min",
+      "startsInMinutes": "Empieza en {count} min",
+      "inProgress": "En curso",
+      "finished": "Terminada"
+    },
+    "policy": {
+      "alreadyCanceled": "Esta clase ya fue cancelada.",
+      "completedCannotChange": "Las clases completadas no se pueden cambiar.",
+      "inProgressCannotChange": "Las clases que ya están en curso no se pueden cambiar.",
+      "changeCutoff": "Los cambios deben solicitarse al menos {hours} horas antes de que empiece la clase.",
+      "freeCancellation": "Cancelación gratuita hasta el {date}.",
+      "freeRescheduling": "Reprogramación gratuita hasta el {date}.",
+      "joinCanceled": "Esta clase fue cancelada, así que la sala está cerrada.",
+      "joinCompleted": "Esta clase terminó. Mira la grabación en su lugar.",
+      "joinTooEarly": "El aula abre {minutes} minutos antes de que empiece la clase.",
+      "joinRelaxed": "Ventana de acceso ampliada para pruebas. La sala está abierta antes del horario habitual.",
+      "joinClosed": "La ventana de acceso cerró {minutes} minutos después de que empezara la clase.",
+      "joinOpen": "El aula está abierta. Tu maestro te espera."
+    },
+    "pricing": {
+      "breadcrumbTitle": "Precios",
+      "breadcrumbSubtitle": "Clases en vivo con maestros certificados, adaptadas a tu horario.",
+      "selectTitle": "Elige tu paquete",
+      "selectSubtitle": "Elige la duración y el formato de clase, y después un paquete de créditos",
+      "monthlyNote": "Hay opciones de pago mensual al momento de pagar.",
+      "yourPlan": "Tu plan",
+      "livePlan": "Clases {type} en vivo",
+      "packageOption": "{count} clases",
+      "durationOption": "{count} minutos",
+      "formatPaired": "En pareja (2 estudiantes)",
+      "formatIndividual": "Individual",
+      "total": "Total",
+      "perStudentTotal": "{amount} por estudiante",
+      "save": "Ahorra {percent}%",
+      "selectedPlan": "Plan seleccionado",
+      "selectPlan": "Seleccionar plan",
+      "finePrint": "Hay opciones de pago mensual al momento de pagar. Puedes reprogramar cualquier clase hasta 12 horas antes de que empiece.",
+      "includesTitle": "Todos los paquetes incluyen",
+      "includesSubtitle": "Todo lo que necesitas para sostener tu progreso",
+      "priceNote": "Todos los precios están en USD. Los paquetes se pagan una sola vez y los créditos son válidos durante 12 meses.",
+      "included": {
+        "teachers": {
+          "title": "Maestros certificados",
+          "description": "Hablantes nativos con experiencia real en el aula."
+        },
+        "scheduling": {
+          "title": "Horarios flexibles",
+          "description": "Reserva, mueve o cancela clases según tu semana."
+        },
+        "reports": {
+          "title": "Informes de progreso",
+          "description": "Mira qué mejoró y qué conviene practicar después."
+        },
+        "recordings": {
+          "title": "Grabaciones de clase",
+          "description": "Repasa cada lección y mantén el ritmo."
+        }
+      },
+      "plan": {
+        "audience": {
+          "eachStudent": "cada estudiante",
+          "you": "tú"
+        },
+        "description": {
+          "light": "Prueba las clases en vivo o recibe ayuda enfocada en un área, con {audience} manteniendo un ritmo ligero.",
+          "steady": "Dos clases por semana para que {audience} construya un progreso firme y duradero.",
+          "fluency": "Tres clases por semana para ganar fluidez más rápido y retener mejor el aprendizaje."
+        },
+        "name": {
+          "pairedStarter": "Inicio en pareja",
+          "pairedProgress": "Progreso en pareja",
+          "pairedFluency": "Fluidez en pareja",
+          "starterSupport": "Apoyo inicial",
+          "steadyProgress": "Progreso constante",
+          "fluencyBuilder": "Constructor de fluidez"
+        },
+        "label": {
+          "starter": "Inicial",
+          "popular": "Más popular",
+          "value": "Mejor valor"
+        }
+      },
+      "sessionLength": "Duración de la sesión",
+      "classFormat": "Formato de clase",
+      "saveUpTo": "Ahorra hasta {percent} %",
+      "perClass": "/ clase"
+    },
+    "checkout": {
+      "breadcrumbTitle": "Pago",
+      "breadcrumbSubtitle": "Revisa tu paquete y los datos de pago.",
+      "canceledNotice": "El pago se canceló en Stripe. No se cobró nada; puedes intentarlo de nuevo.",
+      "demoNotice": "Pago de demostración: no se cobrará ninguna tarjeta ni se procesará ningún pago.",
+      "orderTitle": "Resumen del pedido",
+      "orderSubtitle": "Clases en vivo con un maestro certificado",
+      "liveClassesChip": "Clases en vivo",
+      "planDetails": "{count} clases en vivo · {duration} min · {type}",
+      "taxes": "Impuestos",
+      "calculatedAtPayment": "Calculados al pagar",
+      "creditsValid": "Créditos vigentes por",
+      "twelveMonths": "12 meses",
+      "totalDueToday": "Total a pagar hoy",
+      "billingTitle": "Datos de facturación",
+      "billingSubtitle": "Aquí enviamos tu recibo y los enlaces de clase",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "emailHelper": "Aquí recibes los enlaces de clase y los recibos.",
+      "paymentTitle": "Método de pago",
+      "stripeSubtitle": "Pago con tarjeta en la página segura de Stripe",
+      "stripeBody": "Al presionar Pagar irás a Stripe para ingresar tu tarjeta. Spanglish nunca ve los datos de tu tarjeta. Tus créditos se agregan en cuanto se confirma el pago.",
+      "testMode": "Modo de prueba: no se cobra dinero real. Usa la tarjeta 4242 4242 4242 4242, cualquier fecha futura y cualquier CVC.",
+      "demoSubtitle": "Hay opciones de pago mensual al momento de pagar",
+      "card": "Tarjeta de crédito o débito",
+      "cardSubtitle": "Visa, Mastercard, American Express",
+      "paypal": "PayPal",
+      "paypalSubtitle": "Paga con tu saldo de PayPal",
+      "cardNumber": "Número de tarjeta",
+      "expiry": "Fecha de vencimiento",
+      "cvc": "CVC",
+      "paypalRedirect": "Te redirigiremos a PayPal para terminar el pago.",
+      "paymentSummary": "Resumen de pago",
+      "dueToday": "A pagar hoy",
+      "pay": "Pagar {amount}",
+      "openingStripe": "Abriendo Stripe…",
+      "processing": "Procesando…",
+      "stripeTestHint": "Modo de prueba de Stripe: no hay cargo real.",
+      "stripeFinishHint": "Terminarás el pago en Stripe.",
+      "demoHint": "Pago de demostración: no se realiza ningún cobro; los créditos se agregan a tu cuenta.",
+      "result": {
+        "titlePaid": "Inscripción confirmada",
+        "titleDefault": "Pago",
+        "subtitlePaid": "Tu paquete de clases está listo para usar.",
+        "subtitleDefault": "Pago con Stripe",
+        "paymentReceived": "Pago recibido",
+        "creditsAddedCount": "Se agregaron {count} créditos a tu cuenta.",
+        "creditsAddedGeneric": "Tus créditos fueron agregados.",
+        "scheduleNext": "Programa tu próxima clase en vivo cuando quieras.",
+        "processing": "Stripe aún no confirmó el pago. Tus créditos aparecerán en cuanto se confirme; actualiza en un minuto.",
+        "failed": "No encontramos este pago. Si te cobraron, contacta a la academia con tu recibo.",
+        "allSet": "¡Todo listo!",
+        "creditsAdded": "Se agregaron {count} créditos{suffix}. Programa tu primera clase en vivo cuando quieras.",
+        "pairedSuffix": " al fondo que compartes con tu compañero"
+      },
+      "secureNotice": "Pago seguro. Puedes cancelar o reprogramar cualquier clase hasta 12 horas antes de que empiece.",
+      "classesTimesPrice": "{count} clases × {amount}"
+    },
+    "schedule": {
+      "breadcrumbTitle": "Reservar una clase",
+      "breadcrumbSubtitle": "Elige un maestro y una hora que te funcione.",
+      "noCreditsTrial": "Aún no tienes créditos pagos. Reserva tu clase de prueba gratuita abajo o compra un paquete cuando quieras.",
+      "noCredits": "Aún no tienes créditos de clase. Consigue un paquete para reservar clases en vivo.",
+      "classTypeTitle": "1. Tipo de clase",
+      "trialSubtitle": "Tu primera clase de prueba es gratis (sin crédito). Las clases pagas usan un crédito cada una.",
+      "creditSubtitle": "Cada clase usa un crédito de este tipo.",
+      "trialLabel": "1 disponible",
+      "creditLabel": "{balance} restantes{shared}",
+      "sharedWith": " (compartido con {name})",
+      "noCreditsYet": "Aún no hay créditos.",
+      "teacherTitle": "{count} maestros con horarios libres",
+      "noTeachers": "Ningún maestro publicó disponibilidad todavía. Vuelve pronto.",
+      "timeTitle": "3. Hora",
+      "timeSubtitle": "Horarios mostrados en tu zona horaria ({zone}).",
+      "chooseFirst": "Elige primero un tipo de clase y un maestro.",
+      "noSlots": "{teacher} no tiene horarios libres de {minutes} minutos en las próximas tres semanas.",
+      "bookingTitle": "Tu reserva",
+      "classLabel": "Clase",
+      "partner": "Compañero",
+      "teacher": "Maestro",
+      "when": "Cuándo",
+      "cost": "Costo",
+      "creditsLeft": "Créditos restantes",
+      "freeTrialNoCredit": "Prueba gratuita (sin crédito)",
+      "focus": {
+        "conversation": "Práctica de conversación",
+        "grammar": "Repaso de gramática",
+        "travel": "Español para viajes",
+        "business": "Español de negocios",
+        "exam": "Preparación de exámenes",
+        "label": "Tema"
+      },
+      "bookClass": "Reservar clase",
+      "upcomingTitle": "Próximas clases",
+      "noUpcoming": "No hay clases próximas.",
+      "confirmTitle": "Confirma tu clase",
+      "confirmTrial": " Esta es tu clase de demostración gratuita: no se usará ningún crédito.",
+      "confirmCredit": " Se usará un crédito{paired}.",
+      "confirmPaired": " del fondo que compartes con {name}",
+      "back": "Atrás",
+      "booking": "Reservando…",
+      "confirmBooking": "Confirmar reserva",
+      "new": "Nuevo",
+      "teacherSectionTitle": "2. Profesor",
+      "freeTrial": "Clase de prueba gratuita",
+      "loadingTimes": "Cargando horarios disponibles…",
+      "confirmBody": "{kind} con {teacher} el {date}."
+    },
+    "credits": {
+      "title": "Estudiantes y créditos",
+      "subtitle": "{students} estudiantes · {pairs, plural, one {# pareja activa} other {# parejas activas}}",
+      "grantCredits": "Otorgar créditos",
+      "pairs": "Parejas ({count})",
+      "purchases": "Compras ({count})",
+      "rosterTitle": "Listado",
+      "rosterSubtitle": "Busca y ajusta los créditos de cada estudiante.",
+      "searchPlaceholder": "Buscar nombre o correo",
+      "tableStudent": "Estudiante",
+      "tablePartner": "Compañero",
+      "tableCredits": "Créditos",
+      "noStudents": "Ningún estudiante coincide con la búsqueda.",
+      "grantAction": "Otorgar",
+      "grantDialogTitle": "Otorgar o quitar créditos",
+      "grantHelp": "Usa una cantidad negativa para quitar créditos. La nota aparece en el historial del estudiante.",
+      "studentEmail": "Correo del estudiante",
+      "classType": "Tipo de clase",
+      "creditsLabel": "Créditos",
+      "apply": "Aplicar",
+      "pairedDialogTitle": "Estudiantes en pareja",
+      "pairedHelp": "Los estudiantes en pareja comparten un fondo de créditos y pueden reservar clases en pareja juntos.",
+      "since": "Desde {date}",
+      "end": "Terminar",
+      "noPairs": "No hay parejas activas.",
+      "pairTwo": "Empareja a dos estudiantes sin pareja",
+      "studentA": "Estudiante A",
+      "studentB": "Estudiante B",
+      "close": "Cerrar",
+      "pairStudents": "Emparejar estudiantes",
+      "ordersTitle": "Compras recientes de paquetes",
+      "buyer": "Comprador",
+      "date": "Fecha",
+      "demo": " · demo",
+      "stripe": " · Stripe",
+      "noPurchases": "Aún no hay compras.",
+      "topic": "clases y créditos",
+      "kind": {
+        "individual25": "Individual · 25 min",
+        "individual50": "Individual · 50 min",
+        "paired25": "En pareja · 25 min",
+        "paired50": "En pareja · 50 min"
+      }
+    },
+    "lessons": {
+      "breadcrumbTitle": "Lecciones",
+      "breadcrumbSubtitle": "Rutas de aprendizaje estructuradas",
+      "item": {
+        "greetings": "Saludos y presentaciones",
+        "everyday": "Frases cotidianas de Spanglish",
+        "store": "En la tienda",
+        "work": "Hablar del trabajo",
+        "family": "Familia y celebraciones",
+        "slang": "Jerga y expresiones"
+      },
+      "status": {
+        "notStarted": "Sin empezar"
+      }
+    },
+    "practice": {
+      "breadcrumbTitle": "Práctica",
+      "breadcrumbSubtitle": "Primero los formularios asignados por tu maestro, después la biblioteca de práctica.",
+      "fromTeacher": "De tu maestro",
+      "assigned": "Asignado",
+      "due": "Vence el {date}",
+      "start": "Empezar práctica",
+      "library": "Biblioteca de práctica",
+      "questions": "{count} preguntas",
+      "note": "La práctica abierta está disponible en los formularios de tu maestro. Las actividades de la biblioteca son una vista previa del catálogo futuro.",
+      "type": {
+        "listening": "Escucha",
+        "speaking": "Expresión oral",
+        "reading": "Lectura",
+        "writing": "Escritura"
+      },
+      "difficulty": {
+        "easy": "Fácil",
+        "medium": "Media",
+        "hard": "Difícil"
+      },
+      "activity": {
+        "listening": {
+          "title": "Ejercicio rápido de escucha",
+          "description": "Identifica frases comunes de Spanglish en conversaciones cortas."
+        },
+        "pronunciation": {
+          "title": "Práctica de pronunciación",
+          "description": "Repite y compara expresiones cotidianas en voz alta."
+        },
+        "reading": {
+          "title": "Comprensión lectora",
+          "description": "Lee diálogos cortos y responde preguntas de contexto."
+        },
+        "writing": {
+          "title": "Constructor de oraciones",
+          "description": "Escribe respuestas mezclando inglés y español de forma natural."
+        }
+      }
+    },
+    "vocabulary": {
+      "breadcrumbTitle": "Vocabulario",
+      "breadcrumbSubtitle": "Palabras que realmente usarás",
+      "category": {
+        "all": "Todo",
+        "everyday": "Cotidiano",
+        "work": "Trabajo",
+        "travel": "Viajes",
+        "food": "Comida"
+      },
+      "searchPlaceholder": "Buscar palabras",
+      "noMatches": "Ninguna palabra coincide con los filtros.",
+      "translation": {
+        "1": "¿Cómo estás?",
+        "2": "Te llamo luego",
+        "3": "Vamos al lunch",
+        "4": "La reunión",
+        "5": "¿Dónde queda?",
+        "6": "Un descanso",
+        "7": "La renta",
+        "8": "Un café"
+      },
+      "example": {
+        "1": "¿Cómo estás? Hace tiempo que no te veo.",
+        "2": "Te llamo luego después de la reunión.",
+        "3": "Vamos al lunch al lugar nuevo del centro.",
+        "4": "El meeting empieza a las 10, no llegues tarde.",
+        "5": "¿Dónde queda el hotel?",
+        "6": "Tomemos un break y compremos café.",
+        "7": "La renta vence a fin de mes.",
+        "8": "¿Quieres un coffee antes de empezar?"
+      }
+    },
+    "progress": {
+      "breadcrumbTitle": "Progreso",
+      "breadcrumbSubtitle": "Sigue tu camino de aprendizaje",
+      "stat": {
+        "streak": "Racha de días",
+        "words": "Palabras aprendidas",
+        "lessons": "Lecciones completadas",
+        "practice": "Tiempo de práctica"
+      },
+      "helper": {
+        "streak": "días seguidos",
+        "words": "este mes",
+        "lessons": "desde siempre",
+        "practice": "últimos 30 días"
+      },
+      "weeklyActivity": "Actividad semanal",
+      "minutesPerDay": "Minutos estudiados por día",
+      "skillBreakdown": "Habilidades",
+      "selfAssessed": "Nivel autoevaluado",
+      "milestones": "Hitos recientes",
+      "smallWins": "Los pequeños logros suman",
+      "skill": {
+        "listening": "Escucha",
+        "speaking": "Expresión oral",
+        "reading": "Lectura",
+        "writing": "Escritura"
+      },
+      "milestone": {
+        "beginner": {
+          "title": "Terminé la ruta de principiante",
+          "date": "12 nov 2026",
+          "description": "Completé las seis lecciones de principiante."
+        },
+        "words": {
+          "title": "Racha de 250 palabras",
+          "date": "08 nov 2026",
+          "description": "Aprendí más de 250 palabras de vocabulario."
+        },
+        "practice": {
+          "title": "Semana de práctica perfecta",
+          "date": "01 nov 2026",
+          "description": "Practiqué todos los días durante siete días."
+        }
+      }
+    },
+    "achievements": {
+      "breadcrumbTitle": "Logros",
+      "breadcrumbSubtitle": "Celebra tus hitos",
+      "trophyCase": "Tu vitrina de trofeos",
+      "unlocked": "{unlocked} de {total} logros desbloqueados",
+      "locked": "Bloqueado",
+      "unlockedLabel": "Desbloqueado"
+    },
+    "achievement": {
+      "firstSteps": {
+        "title": "Primeros pasos",
+        "description": "Completa tu primera lección.",
+        "date": "04 sep 2026"
+      },
+      "onFire": {
+        "title": "En llamas",
+        "description": "Mantén una racha de 7 días.",
+        "date": "18 oct 2026"
+      },
+      "wordCollector": {
+        "title": "Coleccionista de palabras",
+        "description": "Aprende 250 palabras de vocabulario.",
+        "date": "08 nov 2026"
+      },
+      "fastLearner": {
+        "title": "Aprendiz rápido",
+        "description": "Termina tres lecciones en un día."
+      },
+      "perfectWeek": {
+        "title": "Semana perfecta",
+        "description": "Practica todos los días durante dos semanas."
+      },
+      "master": {
+        "title": "Maestro de Spanglish",
+        "description": "Completa todas las lecciones avanzadas."
+      }
+    },
+    "fixtures": {
+      "home": {
+        "nextClassShortDate": "mar, 17 nov",
+        "nextClassTopic": "Conversación cotidiana",
+        "renewalDate": "16 de diciembre de 2026"
+      },
+      "academy": {
+        "monthNov": "nov",
+        "fullDate": {
+          "2026-11-17": "martes, 17 de noviembre",
+          "2026-11-18": "miércoles, 18 de noviembre",
+          "2026-11-19": "jueves, 19 de noviembre",
+          "2026-11-20": "viernes, 20 de noviembre",
+          "2026-11-21": "sábado, 21 de noviembre",
+          "2026-11-22": "domingo, 22 de noviembre",
+          "2026-11-23": "lunes, 23 de noviembre"
+        }
+      },
+      "classes": {
+        "class1003": {
+          "topic": "Calentamiento de español para viajes",
+          "description": "Una sesión breve y dinámica para activar el vocabulario de aeropuerto, hotel y restaurante antes de tu viaje.",
+          "agenda": [
+            "Calentamiento: cinco preguntas de viaje",
+            "Role-play: check-in en un hotel",
+            "Corregir tres hábitos de pronunciación",
+            "Mini cuestionario y próximos pasos"
+          ],
+          "outcomes": [
+            "Pedir una habitación y aclarar detalles",
+            "Usar peticiones educadas en el aeropuerto",
+            "Reaccionar con naturalidad cuando no entiendas"
+          ],
+          "materialTitles": [
+            "Mazo de frases de viaje",
+            "Ejercicio de escucha en el aeropuerto"
+          ],
+          "materialDescriptions": [
+            "Las 24 frases que usaremos en clase.",
+            "Cinco minutos de anuncios e indicaciones."
+          ],
+          "teacherNote": "Trae una situación real de viaje que quieras ensayar. La usaremos como role-play final."
+        },
+        "class1004": {
+          "topic": "Presentaciones de negocios",
+          "description": "Practica cómo presentarte, tu rol y tu empresa en un entorno profesional.",
+          "agenda": [
+            "Preséntate en 60 segundos",
+            "Registro formal e informal",
+            "Role-play de apertura de reunión",
+            "Comentarios y repaso de vocabulario"
+          ],
+          "outcomes": [
+            "Presenta tu rol con confianza",
+            "Abre una reunión y cede la palabra",
+            "Usa preguntas de seguimiento con naturalidad"
+          ],
+          "materialTitles": [
+            "Presentaciones de negocios",
+            "Vocabulario profesional"
+          ],
+          "materialDescriptions": [
+            "La lección que apoya la clase de hoy.",
+            "Doce palabras para repasar después de clase."
+          ],
+          "teacherNote": "Tu clase está en curso. La sala permanece abierta unos minutos después del inicio."
+        },
+        "class1001": {
+          "topic": "Conversación cotidiana",
+          "description": "Una clase de conversación relajada sobre tu semana, con correcciones solo donde importan.",
+          "agenda": [
+            "Habla de tu semana",
+            "El pasado en historias reales",
+            "Tres correcciones y un segundo intento",
+            "Define una meta para la próxima clase"
+          ],
+          "outcomes": [
+            "Cuenta una historia breve en pasado",
+            "Usa conectores para sonar más natural",
+            "Corrígete con una lista sencilla"
+          ],
+          "materialTitles": [
+            "Frases cotidianas de Spanglish",
+            "Práctica de pasado"
+          ],
+          "materialDescriptions": [
+            "La lección relacionada con esta clase.",
+            "Un ejercicio rápido antes de encontrarnos."
+          ],
+          "teacherNote": "Pasaremos los primeros cinco minutos hablando de tu semana y luego pasaremos a la historia en pasado."
+        },
+        "class1002": {
+          "topic": "Repaso de pasado",
+          "description": "Un repaso estructurado del pasado con ejercicios cortos y una conversación guiada.",
+          "agenda": [
+            "Revisar la tarea de la clase anterior",
+            "Pasado regular e irregular",
+            "Reconstrucción guiada de una historia",
+            "Boleto de salida: cinco oraciones"
+          ],
+          "outcomes": [
+            "Elige la forma correcta del pasado",
+            "Corrige los tres errores que más repites",
+            "Cuenta una historia breve sin notas"
+          ],
+          "materialTitles": [
+            "Hoja de trucos del pasado"
+          ],
+          "materialDescriptions": [
+            "Una página con los patrones que importan."
+          ],
+          "homework": "Escribe cinco oraciones sobre el fin de semana pasado y marca los verbos que te hicieron pensar."
+        },
+        "class0901": {
+          "topic": "Pedir comida con confianza",
+          "description": "Una clase completada sobre vocabulario de restaurante, peticiones educadas y cómo manejar sorpresas en el menú.",
+          "agenda": [
+            "Calentamiento de vocabulario del menú",
+            "Role-play de pedido",
+            "Alergias y cambios",
+            "Repaso y tarea"
+          ],
+          "outcomes": [
+            "Pedir una comida completa con cortesía",
+            "Preguntar qué contiene un plato",
+            "Resolver un pedido equivocado con calma"
+          ],
+          "materialTitles": [
+            "Vocabulario de restaurante"
+          ],
+          "materialDescriptions": [
+            "Repasa las palabras de esta clase."
+          ],
+          "teacherNote": "Mejoraste mucho con las peticiones educadas. Sigue practicando la diferencia entre pedir y preguntar.",
+          "homework": "Graba un pedido de restaurante de 60 segundos y escúchalo una vez.",
+          "recap": "Manejaste el role-play del pedido sin cambiar a inglés. Mantén activas las fórmulas de petición educada y ensaya una vez la corrección de un pedido equivocado antes de la próxima clase."
+        },
+        "class0902": {
+          "topic": "Clínica de pronunciación",
+          "description": "Una clase enfocada en vocales, ritmo y los sonidos que hacen que el español parezca rápido.",
+          "agenda": [
+            "Calentamiento de vocales",
+            "Patrones de acento",
+            "Imitar un diálogo corto",
+            "Grabar y comparar"
+          ],
+          "outcomes": [
+            "Mantener vocales más limpias",
+            "Acentuar la sílaba correcta",
+            "Hablar con un ritmo más firme"
+          ],
+          "materialTitles": [
+            "Notas de clínica de pronunciación"
+          ],
+          "materialDescriptions": [
+            "Los sonidos y ejercicios de clase."
+          ],
+          "teacherNote": "Tu ritmo mejoró mucho. Mantén la rutina de imitación cinco minutos antes de cada clase.",
+          "homework": "Imita el mismo diálogo tres veces esta semana.",
+          "recap": "Las vocales están más limpias y el ritmo es más firme. El siguiente paso es mantener el mismo ritmo cuando improvises en lugar de leer."
+        },
+        "class0801": {
+          "topic": "Cultura y jerga de viajes",
+          "description": "Una clase cancelada sobre expresiones regionales y cultura de viaje en Argentina.",
+          "agenda": [
+            "Calentamiento de expresiones regionales",
+            "Historia de viaje",
+            "Jerga que puedes usar con seguridad",
+            "Repaso"
+          ],
+          "outcomes": [
+            "Reconocer expresiones comunes rioplatenses",
+            "Elegir cuándo es apropiada la jerga"
+          ],
+          "materialTitles": [
+            "Notas de cultura de viaje"
+          ],
+          "materialDescriptions": [
+            "Lectura opcional para preparar la nueva fecha."
+          ],
+          "cancellationReason": "Conflicto de horario"
+        },
+        "class0802": {
+          "topic": "Práctica de entrevistas",
+          "description": "Una clase cancelada sobre cómo responder preguntas de entrevista por competencias en español.",
+          "agenda": [
+            "Calentamiento de entrevista",
+            "Respuestas STAR en español",
+            "Entrevista simulada",
+            "Comentarios"
+          ],
+          "outcomes": [
+            "Estructurar una respuesta con STAR",
+            "Describir la experiencia con precisión"
+          ],
+          "materialTitles": [
+            "Banco de preguntas de entrevista"
+          ],
+          "materialDescriptions": [
+            "Diez preguntas para preparar la nueva fecha."
+          ],
+          "cancellationReason": "Enfermedad del maestro"
+        }
+      }
+    },
+    "learn": {
+      "actions": {
+        "errors": {
+          "not_found": "No encontramos ese elemento.",
+          "forbidden": "No tienes permiso para hacer esto.",
+          "invalid": "Revisa los datos e inténtalo de nuevo.",
+          "already_graded": "Esta tarea ya fue calificada."
+        },
+        "notesSaved": "Resumen de la clase guardado.",
+        "wordsAdded": "{count, plural, one {# palabra agregada} other {# palabras agregadas}} a la clase y a la lista de los estudiantes.",
+        "wordRemoved": "Palabra eliminada.",
+        "materialsSaved": "Materiales de la clase actualizados.",
+        "assigned": "Práctica asignada a los estudiantes de la clase.",
+        "assignmentRemoved": "Práctica eliminada.",
+        "graded": "Calificación guardada.",
+        "submittedGraded": "¡Entregado! Obtuviste {score} de {total} puntos.",
+        "submittedPending": "¡Entregado! Tu maestro revisará tus respuestas.",
+        "wordSaved": "Palabra guardada en tu vocabulario."
+      },
+      "status": {
+        "graded": "{score}/{total} pts",
+        "submitted": "Entregada",
+        "late": "Atrasada",
+        "todo": "Pendiente"
+      },
+      "class": {
+        "editTitle": "Contenido de la clase",
+        "editSubtitle": "Resumen, tarea, vocabulario, materiales y práctica para tus estudiantes",
+        "title": "Lo que dejó esta clase",
+        "subtitle": "Materiales, vocabulario y práctica de tu maestro",
+        "notesTitle": "Resumen y tarea",
+        "recap": "Resumen de la clase",
+        "recapHelp": "Lo que vieron, lo que salió bien y en qué enfocarse. Lo verán en Lecciones.",
+        "homework": "Tarea",
+        "teacherNote": "Nota para el estudiante",
+        "teacherNoteHelp": "Un comentario personal antes o después de la clase.",
+        "saveNotes": "Guardar resumen",
+        "materialsTitle": "Materiales",
+        "pickMaterials": "Materiales de tu biblioteca",
+        "noLibrary": "Tu biblioteca está vacía. Crea materiales en Materiales.",
+        "saveMaterials": "Guardar materiales",
+        "open": "Abrir",
+        "vocabularyTitle": "Vocabulario ({count})",
+        "term": "Palabra o frase",
+        "translation": "Traducción",
+        "example": "Ejemplo",
+        "addWord": "Agregar",
+        "removeWord": "Quitar palabra",
+        "noWords": "Aún no hay vocabulario en esta clase.",
+        "reviewWords": "Repasar en Vocabulario",
+        "practiceTitle": "Práctica",
+        "pickForm": "Formulario de tu biblioteca",
+        "noForms": "Crea un formulario en Materiales para poder asignarlo.",
+        "dueAt": "Fecha límite",
+        "assign": "Asignar",
+        "due": "Entrega: {date}",
+        "noDue": "Sin fecha límite",
+        "questions": "{count, plural, one {# pregunta} other {# preguntas}}",
+        "submittedCount": "{submitted}/{total} entregadas",
+        "view": "Ver",
+        "start": "Empezar",
+        "review": "Revisar",
+        "removeAssignment": "Quitar práctica",
+        "noPractice": "Sin práctica asignada."
+      },
+      "teacher": {
+        "listTitle": "Prácticas asignadas",
+        "listSubtitle": "Formularios que asignaste desde tus clases",
+        "form": "Formulario",
+        "class": "Clase",
+        "due": "Fecha límite",
+        "submitted": "Entregas",
+        "toGrade": "Por calificar",
+        "empty": "Aún no asignas prácticas. Asígnalas desde la página de una clase.",
+        "detailSubtitle": "{topic} · {count, plural, one {# pregunta} other {# preguntas}} · {total} puntos",
+        "noSubmissions": "Nadie ha entregado todavía.",
+        "score": "{score}/{total} pts",
+        "needsGrading": "Por calificar",
+        "correctWas": "correcta: {answer}",
+        "points": "{points}/{max} pts",
+        "pointsOf": "Puntos (de {max})",
+        "feedback": "Comentario para el estudiante",
+        "updateGrade": "Actualizar calificación",
+        "saveGrade": "Guardar calificación"
+      },
+      "lessons": {
+        "title": "Lecciones",
+        "subtitle": "Todo lo que viste en tus clases: resumen, tarea, grabación y vocabulario.",
+        "search": "Buscar tema, maestro o resumen",
+        "pendingOnly": "Solo con práctica pendiente",
+        "with": "con {name}",
+        "attended": "Asististe · {minutes} min",
+        "missed": "No asististe",
+        "recording": "Grabación",
+        "transcript": "Transcripción",
+        "words": "{count, plural, one {# palabra} other {# palabras}}",
+        "practicePending": "{count, plural, one {# práctica pendiente} other {# prácticas pendientes}}",
+        "practiceDone": "Práctica completa",
+        "open": "Ver lección",
+        "noMatches": "Ninguna lección coincide con tu búsqueda.",
+        "empty": "Aún no tienes clases terminadas. Cuando tomes tu primera clase, aparecerá aquí.",
+        "book": "Reservar una clase"
+      },
+      "practice": {
+        "title": "Práctica",
+        "subtitle": "Formularios que tus maestros te asignaron después de cada clase.",
+        "tabTodo": "Pendientes ({count})",
+        "tabSubmitted": "Entregadas ({count})",
+        "tabGraded": "Calificadas ({count})",
+        "fromClass": "De la clase «{topic}» con {teacher}",
+        "questions": "{count, plural, one {# pregunta} other {# preguntas}}",
+        "due": "entrega {date}",
+        "view": "Ver resultado",
+        "start": "Empezar",
+        "empty": {
+          "todo": "No tienes práctica pendiente. ¡Bien hecho!",
+          "submitted": "No tienes entregas esperando calificación.",
+          "graded": "Aún no tienes prácticas calificadas."
+        },
+        "emptyAll": "Tus maestros aún no te han asignado práctica."
+      },
+      "runner": {
+        "subtitle": "De la clase «{topic}» con {teacher}",
+        "practice": "Práctica",
+        "questionsTitle": "{count, plural, one {# pregunta} other {# preguntas}} · {total} puntos",
+        "due": "Fecha límite: {date}",
+        "gradedSummary": "Calificada: {score} de {total} puntos",
+        "waiting": "Entregada. Tu maestro revisará las respuestas abiertas; puedes cambiarlas hasta que califique.",
+        "points": "{count, plural, one {# punto} other {# puntos}}",
+        "earned": "{points}/{max}",
+        "placeholder": {
+          "text": "Escribe tu respuesta",
+          "speaking": "Escribe lo que dirías en voz alta",
+          "listening": "Escribe lo que entendiste"
+        },
+        "resubmit": "Actualizar entrega",
+        "submit": "Entregar",
+        "progress": "{answered} de {total} respondidas",
+        "back": "Volver a Práctica"
+      },
+      "vocabulary": {
+        "title": "Vocabulario",
+        "subtitle": "Las palabras de tus clases y las que tú agregas, con repaso espaciado.",
+        "reviewTitle": "{count, plural, =0 {Nada por repasar hoy} one {# palabra por repasar} other {# palabras por repasar}}",
+        "stats": "{total, plural, one {# palabra} other {# palabras}} en tu lista · {learned} aprendidas",
+        "startReview": "Repasar ahora",
+        "addTitle": "Agregar palabra",
+        "term": "Palabra o frase",
+        "translation": "Traducción",
+        "example": "Ejemplo",
+        "add": "Agregar",
+        "listTitle": "Mi lista",
+        "search": "Buscar",
+        "source": "Origen",
+        "sourceAll": "Todas",
+        "sourceClass": "De mis clases",
+        "sourceMine": "Agregadas por mí",
+        "from": "De",
+        "stageLabel": "Estado",
+        "aClass": "una clase",
+        "mine": "Mía",
+        "remove": "Quitar",
+        "noMatches": "Ninguna palabra coincide.",
+        "empty": "Tu lista está vacía. Las palabras que tu maestro agregue en clase aparecerán aquí.",
+        "stage": {
+          "learned": "Aprendida",
+          "learning": "Aprendiendo",
+          "new": "Nueva"
+        },
+        "reviewing": "Repaso",
+        "reviewHint": "Piensa en el significado y luego revélalo.",
+        "cardCount": "{current} de {total}",
+        "didntKnow": "No lo sabía",
+        "knewIt": "Lo sabía",
+        "reveal": "Mostrar significado",
+        "doneTitle": "¡Repaso terminado!",
+        "doneSummary": "Sabías {knew} de {total}. Las que fallaste volverán pronto.",
+        "backToList": "Volver a mi lista"
+      },
+      "achievements": {
+        "firstClass": {
+          "title": "Primera clase",
+          "description": "Toma tu primera clase en vivo."
+        },
+        "tenClasses": {
+          "title": "Diez clases",
+          "description": "Completa 10 clases."
+        },
+        "fourWeeks": {
+          "title": "Constancia",
+          "description": "Toma clases 4 semanas seguidas."
+        },
+        "tenHours": {
+          "title": "Diez horas",
+          "description": "Acumula 10 horas en clase."
+        },
+        "fiftyWords": {
+          "title": "Coleccionista de palabras",
+          "description": "Aprende 50 palabras en tu vocabulario."
+        },
+        "firstPractice": {
+          "title": "Primera práctica",
+          "description": "Entrega tu primera práctica."
+        }
+      },
+      "progress": {
+        "title": "Progreso",
+        "subtitle": "Tu avance con datos reales de tus clases, vocabulario y práctica.",
+        "stat": {
+          "classes": "Clases tomadas",
+          "hours": "Horas en clase",
+          "streak": "Semanas seguidas",
+          "words": "Palabras aprendidas"
+        },
+        "helper": {
+          "classes": "desde que empezaste",
+          "hours": "tiempo en vivo con tu maestro",
+          "streak": "con al menos una clase",
+          "words": "dominadas en el repaso"
+        },
+        "weekTitle": "Esta semana",
+        "weekSubtitle": "Minutos en clase por día",
+        "minutesLabel": "Minutos en clase",
+        "weeksTitle": "Últimas 8 semanas",
+        "weeksSubtitle": "Clases por semana",
+        "classesLabel": "Clases",
+        "wordsTitle": "Vocabulario",
+        "wordsSubtitle": "Palabras aprendidas de tu lista",
+        "learned": "Aprendidas",
+        "due": "{count, plural, =0 {Nada por repasar hoy.} one {# palabra por repasar hoy.} other {# palabras por repasar hoy.}}",
+        "goVocabulary": "Ir a Vocabulario",
+        "practiceTitle": "Práctica",
+        "practiceSubtitle": "Promedio en prácticas calificadas",
+        "average": "Promedio",
+        "practiceCounts": "{submitted} entregadas · {pending} pendientes",
+        "goPractice": "Ir a Práctica",
+        "milestones": "Logros recientes",
+        "milestonesSubtitle": "Lo último que desbloqueaste",
+        "noMilestones": "Aún no desbloqueas logros. ¡Tu primera clase te da el primero!"
+      },
+      "home": {
+        "subtitle": "Tu próxima clase, tus créditos y lo que te toca hoy.",
+        "liveNow": "En vivo ahora",
+        "nextClassChip": "Próxima clase",
+        "noNextClass": "No tienes clases próximas",
+        "with": "con {name}",
+        "moreUpcoming": "{count, plural, one {# clase más} other {# clases más}} reservadas",
+        "noNextClassHint": "Reserva tu próxima clase para seguir avanzando.",
+        "join": "Entrar a la clase",
+        "viewClass": "Ver clase",
+        "credits": "Tus créditos",
+        "classesLeft": "{count, plural, =0 {Sin clases disponibles} one {# clase disponible} other {# clases disponibles}}",
+        "balanceLine": "{count} × {type} de {minutes} min",
+        "shared": "compartidos con tu pareja",
+        "buy": "Comprar clases",
+        "history": "Ver historial",
+        "stat": {
+          "classes": "Clases tomadas",
+          "streak": "Semanas seguidas",
+          "words": "Palabras por repasar",
+          "practice": "Prácticas pendientes"
+        },
+        "todoTitle": "Para hoy",
+        "todoSubtitle": "Lo que te toca ahora",
+        "todo": {
+          "join": "Tu clase «{topic}» está abierta",
+          "practiceDue": "Entregar «{title}» antes del {date}",
+          "practice": "Entregar «{title}»",
+          "words": "Repasar {count, plural, one {# palabra} other {# palabras}}",
+          "homework": "Hacer la tarea de «{topic}»",
+          "book": "Reservar tu próxima clase"
+        },
+        "go": "Ir",
+        "allDone": "¡Estás al día!",
+        "weekTitle": "Tu semana",
+        "weekSubtitle": "{minutes} minutos en clase en los últimos 7 días",
+        "minutesLabel": "Minutos en clase",
+        "lastLessonTitle": "Tu última lección",
+        "noRecap": "Tu maestro aún no ha escrito el resumen.",
+        "openLesson": "Ver lección",
+        "allLessons": "Todas las lecciones",
+        "noLessons": "Aquí verás el resumen de tu última clase.",
+        "nextAchievementTitle": "Tu próximo logro",
+        "allAchievements": "Ver logros",
+        "allAchievementsDone": "¡Desbloqueaste todos los logros!"
+      },
+      "credits": {
+        "title": "Mis créditos",
+        "subtitle": "Tus clases disponibles, cada movimiento y tus compras.",
+        "available": "Clases disponibles",
+        "buy": "Comprar clases",
+        "book": "Reservar",
+        "byKind": "Por tipo de clase",
+        "shared": "Compartidos",
+        "credits": "{count, plural, one {# clase} other {# clases}}",
+        "noBalances": "No tienes créditos todavía.",
+        "historyTitle": "Movimientos",
+        "historySubtitle": "Compras, clases reservadas y devoluciones",
+        "date": "Fecha",
+        "movement": "Movimiento",
+        "kind": "Tipo",
+        "change": "Cambio",
+        "reason": {
+          "purchase": "Compra",
+          "grant": "Créditos otorgados",
+          "booking": "Clase reservada",
+          "refund": "Devolución",
+          "adjustment": "Ajuste"
+        },
+        "seeClass": "ver clase",
+        "noHistory": "Aún no hay movimientos.",
+        "pagination": "{from}–{to} de {count}",
+        "ordersTitle": "Compras",
+        "package": "Paquete",
+        "total": "Total",
+        "status": "Estado",
+        "orderStatus": {
+          "paid": "Pagada",
+          "pending": "Pendiente",
+          "canceled": "Cancelada",
+          "refunded": "Reembolsada"
+        },
+        "noOrders": "Aún no has comprado paquetes."
+      }
+    }
+  }
+}

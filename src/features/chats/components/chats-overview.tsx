@@ -4,6 +4,7 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ChatContent } from "@/features/chats/components/chat-content";
 import { ChatMsgSent } from "@/features/chats/components/chat-msg-sent";
@@ -14,7 +15,8 @@ import type { Chat } from "@/features/chats/types";
 const CURRENT_USER_ID = "me";
 
 export function ChatsOverview() {
-  const [chats, setChats] = useState<Chat[]>(createChats);
+  const t = useTranslations("apps");
+  const [chats, setChats] = useState<Chat[]>(() => createChats(t));
   const [activeChatId, setActiveChatId] = useState(1);
   const [search, setSearch] = useState("");
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -50,7 +52,10 @@ export function ChatsOverview() {
 
   return (
     <Box mt={3}>
-      <Breadcrumb title="Chat app" subtitle="Messenger" />
+      <Breadcrumb
+        title={t("chat.breadcrumb.title")}
+        subtitle={t("chat.breadcrumb.subtitle")}
+      />
 
       <Card
         elevation={9}

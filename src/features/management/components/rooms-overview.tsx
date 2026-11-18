@@ -27,6 +27,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconEye } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { ListPagination } from "@/components/ui/list-pagination";
@@ -34,11 +35,11 @@ import { SectionCard } from "@/components/ui/section-card";
 import { DEFAULT_PAGE_SIZE, sliceForPage } from "@/lib/pagination";
 import type { ClassroomSessionStatus, ManagerClassroomRow } from "@/features/management/data";
 
-const sessionStatusLabel: Record<ClassroomSessionStatus, string> = {
-  upcoming: "Scheduled",
-  "in-progress": "In progress",
-  completed: "Ended",
-  canceled: "Canceled",
+const sessionStatusKeys: Record<ClassroomSessionStatus, string> = {
+  upcoming: "management.rooms.sessionStatus.scheduled",
+  "in-progress": "management.rooms.sessionStatus.inProgress",
+  completed: "management.rooms.sessionStatus.ended",
+  canceled: "management.rooms.sessionStatus.canceled",
 };
 
 const sessionStatusColor: Record<
@@ -67,18 +68,19 @@ function normalizeSearch(value: string) {
   return value.trim().toLowerCase();
 }
 
-function studentSummary(students: ManagerClassroomRow["students"]) {
-  if (!students.length) return "No students enrolled";
+type RoomTranslator = (key: string, values?: Record<string, string | number>) => string;
+
+function studentSummary(students: ManagerClassroomRow["students"], t: RoomTranslator) {
+  if (!students.length) return t("management.rooms.noStudentsEnrolled");
   if (students.length === 1) return students[0]!.name;
-  return `${students.length} students`;
+  return t("management.rooms.studentsCount", { count: students.length });
 }
 
-function enterBlockedReason(room: ManagerClassroomRow) {
-  if (room.sessionStatus === "completed") return "This class has ended.";
-  if (room.sessionStatus === "canceled") return "This class was canceled.";
-  if (room.sessionStatus === "upcoming") return "You can enter only while the class is live.";
-  if (isWaitingForTeacher(room)) return "Waiting for the teacher to start the live session.";
-  return "You can enter only while the class is live.";
+function enterBlockedReason(room: ManagerClassroomRow, t: RoomTranslator) {
+  if (room.sessionStatus === "completed") return t("management.rooms.enterBlocked.ended");
+  if (room.sessionStatus === "canceled") return t("management.rooms.enterBlocked.canceled");
+  if (isWaitingForTeacher(room)) return t("management.rooms.enterBlocked.waitingTeacher");
+  return t("management.rooms.enterBlocked.onlyLive");
 }
 
 function RoomDetailDialog({
@@ -90,6 +92,7 @@ function RoomDetailDialog({
   room: ManagerClassroomRow | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("admin");
   if (!room) return null;
 
   return (
@@ -101,22 +104,34 @@ function RoomDetailDialog({
             <Chip size="small" label={room.classTypeLabel} variant="outlined" />
             <Chip
               size="small"
-              label={sessionStatusLabel[room.sessionStatus]}
+              label={t(sessionStatusKeys[room.sessionStatus])}
               color={sessionStatusColor[room.sessionStatus]}
               variant="outlined"
             />
-            {room.isLive ? <Chip size="small" label="Live now" color="success" /> : null}
+            {room.isLive ? (
+              <Chip size="small" label={t("management.rooms.liveNow")} color="success" />
+            ) : null}
             {isWaitingForTeacher(room) ? (
-              <Chip size="small" label="Waiting for teacher" color="warning" variant="outlined" />
+              <Chip
+                size="small"
+                label={t("management.rooms.waitingForTeacher")}
+                color="warning"
+                variant="outlined"
+              />
             ) : null}
             {room.teacherSessionActive && !room.isLive ? (
-              <Chip size="small" label="Teacher session open" color="info" variant="outlined" />
+              <Chip
+                size="small"
+                label={t("management.rooms.teacherSessionOpen")}
+                color="info"
+                variant="outlined"
+              />
             ) : null}
           </Stack>
 
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Schedule
+              {t("management.rooms.detail.schedule")}
             </Typography>
             <Typography variant="body2" fontWeight={600}>
               {room.scheduleLabel} · {room.timeRangeLabel} ({room.durationMinutes} min)
@@ -125,7 +140,7 @@ function RoomDetailDialog({
 
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Teacher
+              {t("management.rooms.detail.teacher")}
             </Typography>
             <Typography variant="body2" fontWeight={600}>
               {room.teacherName}
@@ -134,11 +149,11 @@ function RoomDetailDialog({
 
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Students
+              {t("management.rooms.detail.students")}
             </Typography>
             {!room.students.length ? (
               <Typography variant="body2" color="text.secondary">
-                No students enrolled yet.
+                {t("management.rooms.noStudentsEnrolledYet")}
               </Typography>
             ) : (
               <List dense disablePadding>
@@ -146,13 +161,17 @@ function RoomDetailDialog({
                   <ListItem key={student.name} disableGutters sx={{ py: 0.25 }}>
                     <ListItemText
                       primary={student.name}
-                      secondary={student.joined ? "Joined the classroom" : "Not joined yet"}
+                      secondary={student.joined
+                        ? t("management.rooms.detail.joined")
+                        : t("management.rooms.detail.notJoined")}
                     />
                     <Chip
                       size="small"
                       variant="outlined"
                       color={student.joined ? "success" : "default"}
-                      label={student.joined ? "In room" : "Absent"}
+                      label={student.joined
+                        ? t("management.rooms.detail.inRoom")
+                        : t("management.rooms.detail.absent")}
                     />
                   </ListItem>
                 ))}
@@ -162,26 +181,29 @@ function RoomDetailDialog({
 
           <Box>
             <Typography variant="caption" color="text.secondary">
-              Classroom
+              {t("management.rooms.detail.classroom")}
             </Typography>
             <Typography variant="body2">
-              Provider: {room.provider} · Room id: {room.meetingRoom}
+              {t("management.rooms.detail.provider", {
+                provider: room.provider,
+                roomId: room.meetingRoom,
+              })}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {room.joinMessage}
             </Typography>
             {room.teacherStartsRequired ? (
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Teacher live session:{" "}
+                {t("management.rooms.detail.teacherLiveSession")}{" "}
                 {room.teacherSessionActive
-                  ? "started — room is broadcasting."
+                  ? t("management.rooms.detail.sessionStarted")
                   : room.sessionStatus === "in-progress"
-                    ? "not started yet — students wait for the teacher."
-                    : "not started."}
+                    ? t("management.rooms.detail.sessionNotStartedWaiting")
+                    : t("management.rooms.detail.sessionNotStarted")}
               </Typography>
             ) : (
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Teacher start gate is off — the room follows the schedule window only.
+                {t("management.rooms.detail.startGateOff")}
               </Typography>
             )}
           </Box>
@@ -189,7 +211,7 @@ function RoomDetailDialog({
           {room.description ? (
             <Box>
               <Typography variant="caption" color="text.secondary">
-                Description
+                {t("management.rooms.detail.description")}
               </Typography>
               <Typography variant="body2">{room.description}</Typography>
             </Box>
@@ -198,7 +220,7 @@ function RoomDetailDialog({
           {room.agenda.length ? (
             <Box>
               <Typography variant="caption" color="text.secondary">
-                Agenda
+                {t("management.rooms.detail.agenda")}
               </Typography>
               <List dense disablePadding sx={{ listStyleType: "disc", pl: 2 }}>
                 {room.agenda.map((line) => (
@@ -213,7 +235,7 @@ function RoomDetailDialog({
           {room.outcomes.length ? (
             <Box>
               <Typography variant="caption" color="text.secondary">
-                Outcomes
+                {t("management.rooms.detail.outcomes")}
               </Typography>
               <List dense disablePadding sx={{ listStyleType: "disc", pl: 2 }}>
                 {room.outcomes.map((line) => (
@@ -227,16 +249,16 @@ function RoomDetailDialog({
         </Stack>
       </DialogContent>
       <DialogActions sx={{ flexWrap: "wrap", gap: 1 }}>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t("management.rooms.close")}</Button>
         {room.isLive ? (
           <LinkButton href={room.roomHref} variant="contained" color="success">
-            Enter room
+            {t("management.rooms.enterRoom")}
           </LinkButton>
         ) : (
-          <Tooltip title={enterBlockedReason(room)}>
+          <Tooltip title={enterBlockedReason(room, t)}>
             <span>
               <Button variant="outlined" disabled>
-                Enter room
+                {t("management.rooms.enterRoom")}
               </Button>
             </span>
           </Tooltip>
@@ -248,6 +270,7 @@ function RoomDetailDialog({
 
 export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; day: string }) {
   const router = useRouter();
+  const t = useTranslations("admin");
   const [search, setSearch] = useState("");
   const [sessionFilter, setSessionFilter] = useState<SessionFilter>("");
   const [liveFilter, setLiveFilter] = useState<LiveFilter>("");
@@ -268,14 +291,14 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
         room.topic,
         room.teacherName,
         room.classTypeLabel,
-        sessionStatusLabel[room.sessionStatus],
+        t(sessionStatusKeys[room.sessionStatus]),
         ...room.students.map((student) => student.name),
       ]
         .join(" ")
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [rooms, search, sessionFilter, liveFilter, enterFilter]);
+  }, [rooms, search, sessionFilter, liveFilter, enterFilter, t]);
 
   const pageRows = sliceForPage(filtered, listPage, DEFAULT_PAGE_SIZE);
   const detail = detailId ? rooms.find((room) => room.id === detailId) ?? null : null;
@@ -290,26 +313,31 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Rooms"
-        subtitle="Scheduled classes for the day — you can enter the classroom only while it is live."
+        title={t("management.rooms.title")}
+        subtitle={t("management.rooms.subtitle")}
         items={[
-          { title: "Manager", to: "/manager" },
-          { title: "Rooms" },
+          { title: t("management.breadcrumb.manager"), to: "/manager" },
+          { title: t("management.rooms.title") },
         ]}
       />
 
       <SectionCard
-        title="Classrooms"
+        title={t("management.rooms.classrooms")}
         subtitle={
           filtered.length === rooms.length
-            ? `${rooms.length} class${rooms.length === 1 ? "" : "es"} on ${day}`
-            : `${filtered.length} of ${rooms.length} match filters`
+            ? rooms.length === 1
+              ? t("management.rooms.subtitleOne", { day })
+              : t("management.rooms.subtitleMany", { count: rooms.length, day })
+            : t("management.rooms.subtitleFiltered", {
+                shown: filtered.length,
+                total: rooms.length,
+              })
         }
       >
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} mb={2} useFlexGap flexWrap="wrap">
           <TextField
             size="small"
-            label="Day"
+            label={t("management.rooms.filter.day")}
             type="date"
             value={day}
             onChange={(event) => pushDay(event.target.value)}
@@ -318,8 +346,8 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
           />
           <TextField
             size="small"
-            label="Search"
-            placeholder="Topic, teacher, student…"
+            label={t("management.rooms.filter.search")}
+            placeholder={t("management.rooms.filter.searchPlaceholder")}
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -328,65 +356,65 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
             sx={{ minWidth: { md: 200 }, flex: { md: 1 } }}
           />
           <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel id="rooms-session-filter">Status</InputLabel>
+            <InputLabel id="rooms-session-filter">{t("management.rooms.filter.status")}</InputLabel>
             <Select
               labelId="rooms-session-filter"
-              label="Status"
+              label={t("management.rooms.filter.status")}
               value={sessionFilter}
               onChange={(event) => {
                 setSessionFilter(event.target.value as SessionFilter);
                 resetPage();
               }}
             >
-              <MenuItem value="">Any</MenuItem>
-              {(Object.keys(sessionStatusLabel) as ClassroomSessionStatus[]).map((status) => (
+              <MenuItem value="">{t("management.rooms.filter.any")}</MenuItem>
+              {(Object.keys(sessionStatusKeys) as ClassroomSessionStatus[]).map((status) => (
                 <MenuItem key={status} value={status}>
-                  {sessionStatusLabel[status]}
+                  {t(sessionStatusKeys[status])}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 140 }}>
-            <InputLabel id="rooms-live-filter">Live</InputLabel>
+            <InputLabel id="rooms-live-filter">{t("management.rooms.filter.live")}</InputLabel>
             <Select
               labelId="rooms-live-filter"
-              label="Live"
+              label={t("management.rooms.filter.live")}
               value={liveFilter}
               onChange={(event) => {
                 setLiveFilter(event.target.value as LiveFilter);
                 resetPage();
               }}
             >
-              <MenuItem value="">Any</MenuItem>
-              <MenuItem value="live">Live now</MenuItem>
-              <MenuItem value="not-live">Not live</MenuItem>
-              <MenuItem value="waiting-teacher">Waiting for teacher</MenuItem>
+              <MenuItem value="">{t("management.rooms.filter.any")}</MenuItem>
+              <MenuItem value="live">{t("management.rooms.liveNow")}</MenuItem>
+              <MenuItem value="not-live">{t("management.rooms.notLive")}</MenuItem>
+              <MenuItem value="waiting-teacher">{t("management.rooms.waitingForTeacher")}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel id="rooms-enter-filter">Can enter</InputLabel>
+            <InputLabel id="rooms-enter-filter">{t("management.rooms.filter.canEnter")}</InputLabel>
             <Select
               labelId="rooms-enter-filter"
-              label="Can enter"
+              label={t("management.rooms.filter.canEnter")}
               value={enterFilter}
               onChange={(event) => {
                 setEnterFilter(event.target.value as EnterFilter);
                 resetPage();
               }}
             >
-              <MenuItem value="">Any</MenuItem>
-              <MenuItem value="open">Live only</MenuItem>
+              <MenuItem value="">{t("management.rooms.filter.any")}</MenuItem>
+              <MenuItem value="open">{t("management.rooms.liveOnly")}</MenuItem>
             </Select>
           </FormControl>
         </Stack>
 
         {!rooms.length ? (
           <Typography variant="body2" color="text.secondary">
-            No classes scheduled on this day. Pick another date or check the academy calendar.
+            {t("management.rooms.empty.noClasses")}
           </Typography>
         ) : !filtered.length ? (
           <Typography variant="body2" color="text.secondary">
-            No classes match the current filters.
+            {t("management.rooms.empty.filtered")}
           </Typography>
         ) : (
           <>
@@ -394,12 +422,12 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Time</TableCell>
-                    <TableCell>Class</TableCell>
-                    <TableCell>Live</TableCell>
-                    <TableCell>Teacher</TableCell>
-                    <TableCell>Students</TableCell>
-                    <TableCell align="right">Actions</TableCell>
+                    <TableCell>{t("management.rooms.column.time")}</TableCell>
+                    <TableCell>{t("management.rooms.column.class")}</TableCell>
+                    <TableCell>{t("management.rooms.filter.live")}</TableCell>
+                    <TableCell>{t("management.rooms.detail.teacher")}</TableCell>
+                    <TableCell>{t("management.rooms.detail.students")}</TableCell>
+                    <TableCell align="right">{t("management.rooms.column.actions")}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -423,17 +451,17 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
                             size="small"
                             variant="outlined"
                             color={sessionStatusColor[room.sessionStatus]}
-                            label={sessionStatusLabel[room.sessionStatus]}
+                            label={t(sessionStatusKeys[room.sessionStatus])}
                           />
                         </Stack>
                       </TableCell>
                       <TableCell>
                         {room.isLive ? (
-                          <Chip size="small" color="success" label="Live" />
+                          <Chip size="small" color="success" label={t("management.rooms.live")} />
                         ) : isWaitingForTeacher(room) ? (
-                          <Chip size="small" color="warning" variant="outlined" label="Waiting" />
+                          <Chip size="small" color="warning" variant="outlined" label={t("management.rooms.waiting")} />
                         ) : room.sessionStatus === "in-progress" ? (
-                          <Chip size="small" color="primary" variant="outlined" label="On schedule" />
+                          <Chip size="small" color="primary" variant="outlined" label={t("management.rooms.onSchedule")} />
                         ) : (
                           <Typography variant="body2" color="text.secondary">
                             —
@@ -442,16 +470,16 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
                       </TableCell>
                       <TableCell>{room.teacherName}</TableCell>
                       <TableCell>
-                        <Typography variant="body2" noWrap title={studentSummary(room.students)}>
-                          {studentSummary(room.students)}
+                        <Typography variant="body2" noWrap title={studentSummary(room.students, t)}>
+                          {studentSummary(room.students, t)}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
-                          <Tooltip title="Class details">
+                          <Tooltip title={t("management.rooms.classDetails")}>
                             <IconButton
                               size="small"
-                              aria-label="View class details"
+                              aria-label={t("management.rooms.viewClassDetails")}
                               onClick={() => setDetailId(room.id)}
                             >
                               <IconEye size={18} />
@@ -459,13 +487,13 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
                           </Tooltip>
                           {room.isLive ? (
                             <LinkButton href={room.roomHref} size="small" variant="contained" color="success">
-                              Enter
+                              {t("management.rooms.enter")}
                             </LinkButton>
                           ) : (
-                            <Tooltip title={enterBlockedReason(room)}>
+                            <Tooltip title={enterBlockedReason(room, t)}>
                               <span>
                                 <Button size="small" variant="outlined" disabled>
-                                  Enter
+                                  {t("management.rooms.enter")}
                                 </Button>
                               </span>
                             </Tooltip>

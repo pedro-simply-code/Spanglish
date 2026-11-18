@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { educatorStaticMetadata } from "@/i18n/static-page-metadata";
 import { notFound } from "next/navigation";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
-import { MaterialModerationReview } from "@/features/materials/components/material-moderation-review";
-import { getFormQuestions } from "@/features/materials";
+import { getFormQuestions, MaterialModerationReview } from "@/features/materials";
 import { getActorWithPermission } from "@/server/auth/session";
-import { getMaterialForViewer } from "@/server/materials/library";
+import { getMaterialForViewer, getMaterialQuestions } from "@/server/materials/library";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  return {
-    title: `Review material ${id}`,
-    description: "Preview and publish an academy library post",
-  };
-}
+export const metadata: Metadata = educatorStaticMetadata("managerMaterialReview");
 
 export default function ManagerMaterialReviewPage({ params }: PageProps) {
   return (
@@ -33,5 +27,10 @@ async function ReviewContent({ params }: PageProps) {
   const material = await getMaterialForViewer(actor, id);
   if (!material || material.visibility !== "global") notFound();
 
-  return <MaterialModerationReview material={material} questions={getFormQuestions(id)} />;
+  return <MaterialModerationReview material={material} questions={await questionsFor(id)} />;
+}
+/** Stored questions; demo materials fall back to their fixture questions. */
+async function questionsFor(id: string) {
+  const stored = await getMaterialQuestions(id);
+  return stored.length ? stored : getFormQuestions(id);
 }

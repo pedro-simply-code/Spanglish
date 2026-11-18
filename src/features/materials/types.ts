@@ -143,7 +143,13 @@ export type CreateMaterialInput = {
   audience: MaterialAudience;
   classId?: string;
   dueAt?: string;
-  questions?: { prompt: string; type: FormQuestionType }[];
+  questions?: {
+    prompt: string;
+    type: FormQuestionType;
+    options?: string[];
+    correctOption?: number;
+    points?: number;
+  }[];
 };
 
 export type ShareMaterialInput = {

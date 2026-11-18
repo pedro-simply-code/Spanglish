@@ -1,4 +1,5 @@
 import { and, eq, gte } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { AdminDashboardCharts, AdminDaySeries } from "@/features/admin";
 import { getAcademyEconomicsSnapshot } from "@/server/admin/class-economics";
 import { db } from "@/server/db";
@@ -6,18 +7,18 @@ import { auditLogs, classSessions, orders, teacherEarnings } from "@/server/db/s
 import { getFinanceSummary } from "@/server/teaching/earnings";
 import { requestTime } from "@/server/request-time";
 
-function shortWeekday(date: Date) {
-  return date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+function shortWeekday(date: Date, locale: string) {
+  return date.toLocaleDateString(locale, { weekday: "short", timeZone: "UTC" });
 }
 
-function buildWeekBuckets(): Array<{ key: string; label: string }> {
+function buildWeekBuckets(locale: string): Array<{ key: string; label: string }> {
   const start = new Date();
   start.setUTCHours(0, 0, 0, 0);
   start.setUTCDate(start.getUTCDate() - 6);
   return Array.from({ length: 7 }, (_, index) => {
     const day = new Date(start);
     day.setUTCDate(start.getUTCDate() + index);
-    return { key: day.toISOString().slice(0, 10), label: shortWeekday(day) };
+    return { key: day.toISOString().slice(0, 10), label: shortWeekday(day, locale) };
   });
 }
 
@@ -64,8 +65,9 @@ function fillDayAmounts(
 
 export async function getAdminDashboardCharts(): Promise<AdminDashboardCharts> {
   await requestTime();
+  const [t, locale] = await Promise.all([getTranslations("admin"), getLocale()]);
 
-  const buckets = buildWeekBuckets();
+  const buckets = buildWeekBuckets(locale);
   const rangeStart = new Date();
   rangeStart.setUTCHours(0, 0, 0, 0);
   rangeStart.setUTCDate(rangeStart.getUTCDate() - 6);
@@ -98,10 +100,10 @@ export async function getAdminDashboardCharts(): Promise<AdminDashboardCharts> {
 
   return {
     classStatus: [
-      { label: "Upcoming", value: snapshot.upcoming },
-      { label: "In progress", value: snapshot.inProgress },
-      { label: "Completed", value: snapshot.completed },
-      { label: "Canceled", value: snapshot.canceled },
+      { label: t("classStatus.upcoming"), value: snapshot.upcoming },
+      { label: t("classStatus.inProgress"), value: snapshot.inProgress },
+      { label: t("classStatus.completed"), value: snapshot.completed },
+      { label: t("classStatus.canceled"), value: snapshot.canceled },
     ],
     classesByDay,
     classTypeMix: {

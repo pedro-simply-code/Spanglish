@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTranslations } from "next-intl";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import type { AuthSession, DashboardOption } from "@/features/auth";
@@ -26,6 +27,7 @@ export function AppShell({
   unreadInboxCount,
   children,
 }: AppShellProps) {
+  const t = useTranslations("shell");
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
@@ -78,7 +80,7 @@ export function AppShell({
             color: "text.secondary",
           }}
         >
-          <Link href="/">Spanglish</Link> · Live Spanish with native teachers from Guatemala.
+          <Link href="/">Spanglish</Link> · {t("footer.tagline")}
         </Box>
       </Box>
     </Box>

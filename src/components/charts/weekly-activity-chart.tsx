@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@mui/material/styles";
+import { useTranslations } from "next-intl";
 import type { ApexOptions } from "apexcharts";
 import { ApexChart } from "@/components/charts/apex-chart";
 
@@ -9,15 +10,20 @@ type WeeklyActivityChartProps = {
   data: number[];
   height?: number;
   label?: string;
+  /** Suffix for the y-axis values ("m" for minutes, "" for counts). */
+  unitSuffix?: string;
 };
 
 export function WeeklyActivityChart({
   categories,
   data,
   height = 300,
-  label = "Study minutes",
+  label,
+  unitSuffix = "m",
 }: WeeklyActivityChartProps) {
+  const t = useTranslations("shell");
   const theme = useTheme();
+  const seriesLabel = label ?? t("chart.studyMinutes");
 
   const options: ApexOptions = {
     chart: {
@@ -28,7 +34,8 @@ export function WeeklyActivityChart({
       height,
     },
     colors: [theme.palette.primary.main],
-    stroke: { curve: "smooth", width: 3 },
+    // monotoneCubic keeps the line from dipping below zero between points.
+    stroke: { curve: "monotoneCubic", width: 3 },
     fill: {
       type: "gradient",
       gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05 },
@@ -39,14 +46,18 @@ export function WeeklyActivityChart({
       categories,
       axisBorder: { show: false },
     },
-    yaxis: { labels: { formatter: (value: number) => `${value}m` } },
+    yaxis: {
+      min: 0,
+      forceNiceScale: true,
+      labels: { formatter: (value: number) => `${Math.round(value)}${unitSuffix}` },
+    },
     tooltip: { theme: "light", fillSeriesColor: false },
   };
 
   return (
     <ApexChart
       options={options}
-      series={[{ name: label, data }]}
+      series={[{ name: seriesLabel, data }]}
       type="area"
       height={height}
       width="100%"

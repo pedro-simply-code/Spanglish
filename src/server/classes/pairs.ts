@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray, or } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { normalizeRoles } from "@/lib/auth-roles";
 import { recordAuditEvent } from "@/server/audit/audit-log";
 import { db } from "@/server/db";
@@ -18,6 +19,7 @@ export type ActivePair = {
 };
 
 export async function getActivePairForUser(userId: string): Promise<ActivePair | null> {
+  const t = await getTranslations("ops.pairs");
   const [pair] = await db
     .select()
     .from(studentPairs)
@@ -40,7 +42,7 @@ export async function getActivePairForUser(userId: string): Promise<ActivePair |
   return {
     id: pair.id,
     partnerId,
-    partnerName: partner?.name ?? "Partner",
+    partnerName: partner?.name ?? t("partnerFallback"),
     partnerEmail: partner?.email ?? "",
   };
 }
@@ -88,11 +90,12 @@ export async function createPair(input: {
   studentBEmail: string;
   actorUserId: string;
 }): Promise<{ ok: true; pairId: string } | { ok: false; code: PairErrorCode; message: string }> {
+  const t = await getTranslations("ops.pairs");
   const emails = [input.studentAEmail, input.studentBEmail].map((email) =>
     email.trim().toLowerCase(),
   );
   if (emails[0] === emails[1]) {
-    return { ok: false, code: "SAME_STUDENT", message: "Pick two different students." };
+    return { ok: false, code: "SAME_STUDENT", message: t("sameStudent") };
   }
 
   const found = await db
@@ -101,17 +104,17 @@ export async function createPair(input: {
     .where(inArray(users.email, emails));
   const students = emails.map((email) => found.find((row) => row.email === email));
   if (students.some((row) => !row)) {
-    return { ok: false, code: "STUDENT_NOT_FOUND", message: "Both students need an account." };
+    return { ok: false, code: "STUDENT_NOT_FOUND", message: t("studentNotFound") };
   }
   if (students.some((row) => !normalizeRoles(row!.roles).includes("student"))) {
-    return { ok: false, code: "NOT_A_STUDENT", message: "Only student accounts can be paired." };
+    return { ok: false, code: "NOT_A_STUDENT", message: t("notAStudent") };
   }
   for (const student of students) {
     if (await getActivePairForUser(student!.id)) {
       return {
         ok: false,
         code: "ALREADY_PAIRED",
-        message: `${student!.email} is already in a pair. End that pair first.`,
+        message: t("alreadyPaired", { email: student!.email }),
       };
     }
   }
@@ -126,7 +129,7 @@ export async function createPair(input: {
     });
   } catch {
     // A concurrent request paired one of them (partial unique index).
-    return { ok: false, code: "ALREADY_PAIRED", message: "One of them was just paired." };
+    return { ok: false, code: "ALREADY_PAIRED", message: t("justPaired") };
   }
 
   await recordAuditEvent({

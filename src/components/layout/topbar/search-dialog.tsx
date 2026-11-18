@@ -14,7 +14,8 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconSearch, IconX } from "@tabler/icons-react";
-import { getNavSections } from "@/components/layout/nav-data";
+import { useTranslations } from "next-intl";
+import { getNavSections, type NavTranslator } from "@/components/layout/nav-data";
 import type { RoleCode } from "@/lib/auth-roles";
 
 type SearchMenuProps = {
@@ -22,10 +23,11 @@ type SearchMenuProps = {
 };
 
 export function SearchMenu({ activeRole }: SearchMenuProps) {
+  const t = useTranslations("shell");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const searchItems = getNavSections(activeRole).flatMap((section) =>
+  const searchItems = getNavSections(activeRole, t as NavTranslator).flatMap((section) =>
     section.items.map((item) => ({ label: section.label, ...item })),
   );
 
@@ -40,7 +42,7 @@ export function SearchMenu({ activeRole }: SearchMenuProps) {
   return (
     <>
       <IconButton
-        aria-label="Search"
+        aria-label={t("search.ariaLabel")}
         color="inherit"
         onClick={() => setOpen(true)}
         sx={{ color: "text.secondary" }}
@@ -61,10 +63,10 @@ export function SearchMenu({ activeRole }: SearchMenuProps) {
             <TextField
               autoFocus
               fullWidth
-              placeholder="Search here"
+              placeholder={t("search.placeholder")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              inputProps={{ "aria-label": "Search here" }}
+              inputProps={{ "aria-label": t("search.placeholder") }}
               sx={{
                 "& .MuiOutlinedInput-root": { height: 45 },
                 "& .MuiOutlinedInput-input": { py: 0 },
@@ -72,7 +74,7 @@ export function SearchMenu({ activeRole }: SearchMenuProps) {
             />
             <IconButton
               size="small"
-              aria-label="Close search"
+              aria-label={t("search.close")}
               onClick={() => setOpen(false)}
               sx={{ color: "text.secondary" }}
             >
@@ -83,7 +85,7 @@ export function SearchMenu({ activeRole }: SearchMenuProps) {
         <Divider />
         <Box p={2} sx={{ maxHeight: "60vh", overflow: "auto" }}>
           <Typography variant="h5" p={1}>
-            Quick Page Links
+            {t("search.quickLinks")}
           </Typography>
           <List component="nav">
             {results.map((item) => (
@@ -103,7 +105,7 @@ export function SearchMenu({ activeRole }: SearchMenuProps) {
             ))}
             {results.length === 0 ? (
               <Typography variant="subtitle2" color="text.secondary" p={1}>
-                No results found
+                {t("search.noResults")}
               </Typography>
             ) : null}
           </List>

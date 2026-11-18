@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PayoutsBoard } from "@/features/payouts";
 import { appNowDate } from "@/lib/app-clock";
 import { stripeLinesForBatch } from "@/server/payments/connect";
@@ -16,6 +17,7 @@ export async function PayoutsContent({
   root: { title: string; to: string };
 }) {
   await requestTime();
+  const t = await getTranslations("educator.payouts");
   const [listed, payoutRails] = await Promise.all([listPayoutBatches(), getPayoutRailsUi()]);
   // Stripe readiness per teacher for batches that can still be paid.
   const batches = payoutRails.enabled
@@ -47,7 +49,10 @@ export async function PayoutsContent({
         manualTransferEnabled: payoutRails.manualTransferEnabled,
         testMode: payoutRails.testMode,
       }}
-      processingWindow={payoutProcessingWindowPhrase()}
+      processingWindow={payoutProcessingWindowPhrase(undefined, {
+        one: t("processingDayOne"),
+        other: t("processingDays", { days: "{days}" }),
+      })}
     />
   );
 }

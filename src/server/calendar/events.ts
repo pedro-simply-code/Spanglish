@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { and, asc, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import type { RoleCode } from "@/lib/auth-roles";
 import type { AuthSession } from "@/lib/auth-types";
 import { addLocalDays, zonedParts, zonedTimeToUtc } from "@/lib/timezone";
@@ -26,6 +27,7 @@ export type CalendarClass = {
   teacherId: string;
   teacherName: string;
   students: string[];
+  icsDescription: string;
 };
 
 export type CalendarBlock = { start: string; end: string };
@@ -50,6 +52,7 @@ export async function listCalendarClasses(
   range: { from: Date; to: Date },
   teacherId?: string,
 ): Promise<CalendarClass[]> {
+  const t = await getTranslations("apps");
   const inRange = and(lt(classSessions.startsAt, range.to), gte(classSessions.endsAt, range.from));
   let where;
   if (role === "student") {
@@ -93,7 +96,7 @@ export async function listCalendarClasses(
   const now = Date.now();
   return rows.map((row) => {
     const students = people.filter((person) => person.sessionId === row.id).map((person) => person.name);
-    const who = role === "student" ? row.teacherName : students.join(" & ") || "Student";
+    const who = role === "student" ? row.teacherName : students.join(" & ") || t("calendar.event.student");
     return {
       id: row.id,
       title: `${row.topic} · ${who}`,
@@ -104,6 +107,7 @@ export async function listCalendarClasses(
       teacherId: row.teacherId,
       teacherName: row.teacherName,
       students,
+      icsDescription: t("calendar.ics.description"),
     };
   });
 }
@@ -219,7 +223,7 @@ export function buildIcs(input: { name: string; classes: CalendarClass[]; baseUr
       `DTSTART:${icsDate(item.start)}`,
       `DTEND:${icsDate(item.end)}`,
       `SUMMARY:${icsText(item.title)}`,
-      `DESCRIPTION:${icsText(`Open the class: ${input.baseUrl}/classes/${item.id}`)}`,
+      `DESCRIPTION:${icsText(`${item.icsDescription} ${input.baseUrl}/classes/${item.id}`)}`,
       `URL:${input.baseUrl}/classes/${item.id}`,
       `STATUS:${item.status === "canceled" ? "CANCELLED" : "CONFIRMED"}`,
       "END:VEVENT",

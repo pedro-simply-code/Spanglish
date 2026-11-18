@@ -17,16 +17,13 @@ import {
   IconStar,
   IconVideo,
 } from "@tabler/icons-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
-import { ClassStatusChip } from "@/features/classes/components/class-status-chip";
-import type { LiveClass } from "@/features/classes/types";
-import {
-  formatClassDateShort,
-  formatClassTimeRange,
-  formatClassType,
-} from "@/features/classes/format";
+import type { LiveClass, LiveClassStatus } from "@/features/classes/types";
+import { localizeDemoClassTopic } from "@/features/materials/data";
+import { classTimeZone } from "@/lib/class-policy";
 import { getClassStatus } from "@/features/classes/policy";
 import { countClassesToday } from "@/features/staff/data";
 
@@ -51,8 +48,15 @@ type TeacherOverviewProps = {
   extras: TeacherOverviewExtras;
 };
 
-const usd = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+const classStatusMeta: Record<
+  LiveClassStatus,
+  { color: "primary" | "success" | "default" | "error"; labelKey: string }
+> = {
+  upcoming: { color: "primary", labelKey: "status.upcoming" },
+  "in-progress": { color: "success", labelKey: "status.inProgress" },
+  completed: { color: "default", labelKey: "status.completed" },
+  canceled: { color: "error", labelKey: "status.canceled" },
+};
 
 /** Students from the teacher's classes, with the next and last class. */
 function rosterFrom(classes: LiveClass[], now: string) {
@@ -81,6 +85,8 @@ export function TeacherOverview({
   now,
   extras,
 }: TeacherOverviewProps) {
+  const t = useTranslations("educator");
+  const locale = useLocale();
   const roster = rosterFrom(ownClasses, now);
   const todayCount = countClassesToday(ownClasses, now);
   const upcoming = ownClasses
@@ -93,46 +99,85 @@ export function TeacherOverview({
         new Date(first.startsAt).getTime() - new Date(second.startsAt).getTime(),
     );
 
+  const money = (cents: number) =>
+    new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(cents / 100);
+  const shortDate = new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: classTimeZone,
+  });
+  const timeOfDay = new Intl.DateTimeFormat(locale, {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: classTimeZone,
+  });
+  const formatTimeRange = (item: LiveClass) => {
+    const start = new Date(item.startsAt).getTime();
+    const end = new Date(start + item.duration * 60_000).toISOString();
+    return `${timeOfDay.format(new Date(item.startsAt))} – ${timeOfDay.format(new Date(end))}`;
+  };
+  const classTypeLabel = (type: LiveClass["type"]) =>
+    t(type === "paired" ? "classType.paired" : "classType.individual");
+  const classTopic = (item: LiveClass) =>
+    localizeDemoClassTopic(item.id, item.topic, (key) => t(`materials.${key}`));
+
   const stats = [
     {
       id: "today",
-      label: "Classes today",
+      label: t("teacher.dashboard.classesToday"),
       value: `${todayCount}`,
-      helper: "Eastern Time",
+      helper: t("teacher.dashboard.easternTime"),
       icon: IconCalendarEvent,
       color: "primary",
     },
     {
       id: "upcoming",
-      label: "Upcoming classes",
+      label: t("teacher.dashboard.upcomingClasses"),
       value: `${upcoming.length}`,
-      helper: "Next seven days",
+      helper: t("teacher.dashboard.nextSevenDays"),
       icon: IconVideo,
       color: "success",
     },
     {
       id: "earnings",
-      label: "Earned this month",
-      value: usd(extras.earnedThisMonthCents),
-      helper: `${usd(extras.unpaidCents)} not paid yet`,
+      label: t("teacher.dashboard.earnedThisMonth"),
+      value: money(extras.earnedThisMonthCents),
+      helper: t("teacher.dashboard.notPaidYet", { amount: money(extras.unpaidCents) }),
       icon: IconCash,
       color: "secondary",
     },
     {
       id: "rating",
-      label: "Teacher rating",
+      label: t("teacher.dashboard.teacherRating"),
       value: extras.ratingCount ? extras.ratingAverage.toFixed(1) : "—",
-      helper: extras.ratingCount ? `${extras.ratingCount} ratings` : "No ratings yet",
+      helper: extras.ratingCount
+        ? t("teacher.dashboard.ratings", { count: extras.ratingCount })
+        : t("teacher.dashboard.noRatingsYet"),
       icon: IconStar,
       color: "warning",
     },
   ] as const;
 
+  const nextLevelDetails = extras.nextLevel
+    ? [
+        extras.nextLevel.classes
+          ? t("teacher.dashboard.moreClasses", { count: extras.nextLevel.classes })
+          : null,
+        extras.nextLevel.ratings
+          ? t("teacher.dashboard.moreRatings", { count: extras.nextLevel.ratings })
+          : null,
+        t("teacher.dashboard.averageRating", { rating: extras.nextLevel.rating }),
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
   return (
     <Box mt={3}>
       <Breadcrumb
-        title={`Good morning, ${firstName}`}
-        subtitle="Here is your teaching rhythm for today. Student dashboards are paused while the Teacher dashboard is active."
+        title={t("teacher.dashboard.greeting", { firstName })}
+        subtitle={t("teacher.dashboard.subtitle")}
       />
 
       <Grid container spacing={3}>
@@ -178,21 +223,22 @@ export function TeacherOverview({
 
         <Grid size={{ xs: 12, lg: 7 }}>
           <SectionCard
-            title="Your next live classes"
-            subtitle="Roster, time, and room status"
+            title={t("teacher.dashboard.nextLiveClasses")}
+            subtitle={t("teacher.dashboard.rosterTimeRoom")}
             action={
               <LinkButton
                 size="small"
                 href="/classes"
                 endIcon={<IconArrowRight size={14} />}
               >
-                All classes
+                {t("teacher.dashboard.allClasses")}
               </LinkButton>
             }
           >
             <Stack spacing={2}>
               {upcoming.map((item) => {
                 const status = getClassStatus(item, now);
+                const statusMeta = classStatusMeta[status];
 
                 return (
                   <Stack
@@ -204,25 +250,30 @@ export function TeacherOverview({
                   >
                     <Avatar
                       src={item.teacherAvatar}
-                      alt={item.topic}
+                      alt={classTopic(item)}
                       variant="rounded"
                       sx={{ width: 44, height: 44 }}
                     />
                     <Box flexGrow={1} minWidth={0}>
                       <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                        <ClassStatusChip status={status} />
                         <Chip
-                          label={`${item.duration} min`}
+                          label={t(statusMeta.labelKey)}
+                          color={statusMeta.color}
+                          size="small"
+                          variant="outlined"
+                        />
+                        <Chip
+                          label={t("teacher.dashboard.minutes", { count: item.duration })}
                           size="small"
                           variant="outlined"
                         />
                       </Stack>
                       <Typography variant="subtitle1" fontWeight={600} mt={0.5}>
-                        {item.topic}
+                        {classTopic(item)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {formatClassDateShort(item.startsAt)} ·{" "}
-                        {formatClassTimeRange(item)} · {formatClassType(item.type)}
+                        {shortDate.format(new Date(item.startsAt))} ·{" "}
+                        {formatTimeRange(item)} · {classTypeLabel(item.type)}
                       </Typography>
                     </Box>
                     <LinkButton
@@ -230,14 +281,14 @@ export function TeacherOverview({
                       size="small"
                       variant="outlined"
                     >
-                      Open
+                      {t("teacher.dashboard.open")}
                     </LinkButton>
                   </Stack>
                 );
               })}
               {!upcoming.length ? (
                 <Typography variant="body2" color="text.secondary">
-                  No live classes scheduled. Keep your availability up to date so students can book you.
+                  {t("teacher.dashboard.noClassesScheduled")}
                 </Typography>
               ) : null}
             </Stack>
@@ -247,7 +298,10 @@ export function TeacherOverview({
         <Grid size={{ xs: 12, lg: 5 }}>
           <SectionCard
             title={extras.levelName}
-            subtitle={`Teacher share: ${extras.levelPercent}% of each credit · ${extras.classesTaught} classes taught`}
+            subtitle={t("teacher.dashboard.teacherShare", {
+              percent: extras.levelPercent,
+              count: extras.classesTaught,
+            })}
             action={
               <Avatar
                 sx={{
@@ -264,19 +318,14 @@ export function TeacherOverview({
             <Stack spacing={2}>
               {extras.nextLevel ? (
                 <Typography variant="body2" color="text.secondary" data-testid="next-level">
-                  Next: {extras.nextLevel.name} —{" "}
-                  {[
-                    extras.nextLevel.classes ? `${extras.nextLevel.classes} more classes` : null,
-                    extras.nextLevel.ratings ? `${extras.nextLevel.ratings} more ratings` : null,
-                    `an average of ${extras.nextLevel.rating}★`,
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                  .
+                  {t("teacher.dashboard.nextLevel", {
+                    name: extras.nextLevel.name,
+                    details: nextLevelDetails,
+                  })}
                 </Typography>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  You are at the top level.
+                  {t("teacher.dashboard.topLevel")}
                 </Typography>
               )}
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -286,12 +335,12 @@ export function TeacherOverview({
                   ))
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    Badges appear as you teach and collect ratings.
+                    {t("teacher.dashboard.badgesAppear")}
                   </Typography>
                 )}
               </Stack>
               <Divider />
-              <Typography variant="subtitle2">Latest ratings</Typography>
+              <Typography variant="subtitle2">{t("teacher.dashboard.latestRatings")}</Typography>
               {extras.recentRatings.length ? (
                 extras.recentRatings.map((rating, index) => (
                   <Box key={`${rating.createdAt}-${index}`}>
@@ -308,11 +357,11 @@ export function TeacherOverview({
                 ))
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  No ratings yet.
+                  {t("teacher.dashboard.noRatingsYet")}
                 </Typography>
               )}
               <LinkButton size="small" href="/teacher/earnings" endIcon={<IconArrowRight size={14} />}>
-                Earnings
+                {t("common.earnings")}
               </LinkButton>
             </Stack>
           </SectionCard>
@@ -320,9 +369,9 @@ export function TeacherOverview({
 
         <Grid size={12}>
           <SectionCard
-            title="Student roster"
-            subtitle="Students from your classes"
-            action={<Chip label={`${roster.length} students`} size="small" variant="outlined" />}
+            title={t("teacher.dashboard.studentRoster")}
+            subtitle={t("teacher.dashboard.studentsFromClasses")}
+            action={<Chip label={t("teacher.dashboard.studentsCount", { count: roster.length })} size="small" variant="outlined" />}
           >
             <Grid container spacing={3}>
               {roster.map((student) => (
@@ -335,15 +384,22 @@ export function TeacherOverview({
                           {student.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {student.classes} class{student.classes === 1 ? "" : "es"} with you
+                          {t("teacher.dashboard.classesWithYou", {
+                            count: student.classes,
+                            plural: student.classes === 1 ? "" : locale === "es" ? "s" : "es",
+                          })}
                         </Typography>
                       </Box>
                     </Stack>
                     <Typography variant="body2" color="text.secondary">
-                      Next: {student.next ? formatClassDateShort(student.next) : "not booked"}
+                      {t("teacher.dashboard.next", {
+                        value: student.next ? shortDate.format(new Date(student.next)) : t("teacher.dashboard.notBooked"),
+                      })}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Last: {student.last ? formatClassDateShort(student.last) : "—"}
+                      {t("teacher.dashboard.last", {
+                        value: student.last ? shortDate.format(new Date(student.last)) : "—",
+                      })}
                     </Typography>
                   </Box>
                 </Grid>
@@ -351,7 +407,7 @@ export function TeacherOverview({
               {!roster.length ? (
                 <Grid size={12}>
                   <Typography variant="body2" color="text.secondary">
-                    Students appear here once they book a class with you.
+                    {t("teacher.dashboard.studentsAppear")}
                   </Typography>
                 </Grid>
               ) : null}

@@ -3,6 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import { canChangeRole, hasRole, type RoleCode } from "@/lib/auth-roles";
 import { recordAuditEvent, requestContextFromHeaders } from "@/server/audit/audit-log";
@@ -78,12 +79,15 @@ async function applyManagerRole(
   targetUserId: string,
   audit: { actorUserId: string; metadata: Record<string, unknown> },
 ) {
+  const t = await getTranslations("admin");
   const target = await db.select().from(users).where(eq(users.id, targetUserId)).limit(1);
   const row = target[0];
-  if (!row) return { ok: false as const, message: "Account not found." };
+  if (!row) return { ok: false as const, message: t("actions.managers.accountNotFound") };
 
-  if (hasRole(row.roles, "admin")) return { ok: false as const, message: "The admin account cannot become a manager." };
-  if (hasRole(row.roles, "manager")) return { ok: false as const, message: "This account is already a manager." };
+  if (hasRole(row.roles, "admin"))
+    return { ok: false as const, message: t("actions.managers.adminCannotBecomeManager") };
+  if (hasRole(row.roles, "manager"))
+    return { ok: false as const, message: t("actions.managers.alreadyManager") };
 
   await db.update(users).set({ roles: ["manager"], updatedAt: new Date() }).where(eq(users.id, targetUserId));
 
@@ -97,45 +101,48 @@ async function applyManagerRole(
     ...ctx,
   });
 
-  return { ok: true as const, message: "Manager role granted." };
+  return { ok: true as const, message: t("actions.managers.roleGranted") };
 }
 
 async function grantManagerRole(actor: AuthSession, targetUserId: string, metadata: Record<string, unknown>) {
+  const t = await getTranslations("admin");
   const target = await db.select().from(users).where(eq(users.id, targetUserId)).limit(1);
   const row = target[0];
-  if (!row) return { ok: false as const, message: "Account not found." };
+  if (!row) return { ok: false as const, message: t("actions.managers.accountNotFound") };
 
   const decision = canChangeRole(actor.roles, row.roles, { role: "manager", action: "grant" });
-  if (!decision.allowed) return { ok: false as const, message: decision.reason };
+  if (!decision.allowed) return { ok: false as const, message: t("actions.managers.roleChangeDenied") };
 
   return applyManagerRole(targetUserId, { actorUserId: actor.userId, metadata });
 }
 
 export async function promoteUserToManagerByEmail(actor: AuthSession, email: string) {
+  const t = await getTranslations("admin");
   if (!hasRole(actor.roles, "admin")) {
-    return { ok: false as const, message: "Only the admin can grant the manager role." };
+    return { ok: false as const, message: t("actions.managers.onlyAdminGrant") };
   }
 
   const user = await findUserByEmail(email);
-  if (!user) return { ok: false as const, message: "No account with that email." };
+  if (!user) return { ok: false as const, message: t("actions.managers.noAccountWithEmail") };
   if (!user.emailVerified) {
-    return { ok: false as const, message: "The account must verify email before becoming a manager." };
+    return { ok: false as const, message: t("actions.managers.emailNotVerified") };
   }
 
   return grantManagerRole(actor, user.id, { method: "direct_promote", email: user.email });
 }
 
 export async function inviteManager(actor: AuthSession, input: { email: string; note?: string }) {
+  const t = await getTranslations("admin");
   if (!hasRole(actor.roles, "admin")) {
-    return { ok: false as const, message: "Only the admin can invite managers." };
+    return { ok: false as const, message: t("actions.managers.onlyAdminInvite") };
   }
 
   const email = normalizeEmail(input.email);
-  if (!email.includes("@")) return { ok: false as const, message: "Enter a valid email address." };
+  if (!email.includes("@")) return { ok: false as const, message: t("actions.managers.invalidEmail") };
 
   const existing = await findUserByEmail(email);
   if (existing && (hasRole(existing.roles, "manager") || hasRole(existing.roles, "admin"))) {
-    return { ok: false as const, message: "This person already has manager or admin access." };
+    return { ok: false as const, message: t("actions.managers.alreadyHasAccess") };
   }
 
   await db
@@ -190,19 +197,20 @@ export async function inviteManager(actor: AuthSession, input: { email: string; 
   if (inboxDelivered) {
     return {
       ok: true as const,
-      message: "Invitation saved and sent to their Spanglish inbox (Email in the app).",
+      message: t("actions.managers.inviteInboxSent"),
     };
   }
 
   return {
     ok: true as const,
-    message: `Invitation saved for ${email}. When they register with that address, sign in and open Email or /join/manager with their token.`,
+    message: t("actions.managers.inviteSaved", { email }),
   };
 }
 
 export async function revokeManagerInvitation(actor: AuthSession, invitationId: string) {
+  const t = await getTranslations("admin");
   if (!hasRole(actor.roles, "admin")) {
-    return { ok: false as const, message: "Only the admin can revoke invitations." };
+    return { ok: false as const, message: t("actions.managers.onlyAdminRevokeInvite") };
   }
 
   await db
@@ -210,28 +218,29 @@ export async function revokeManagerInvitation(actor: AuthSession, invitationId: 
     .set({ status: "revoked" })
     .where(and(eq(managerInvitations.id, invitationId), eq(managerInvitations.status, "pending")));
 
-  return { ok: true as const, message: "Invitation revoked." };
+  return { ok: true as const, message: t("actions.managers.inviteRevoked") };
 }
 
 export async function acceptManagerInvitation(
   actor: AuthSession,
   input: { token: string; experienceNote: string },
 ) {
+  const t = await getTranslations("admin");
   const invitation = await getManagerInvitationByToken(input.token);
   if (!invitation?.open) {
-    return { ok: false as const, message: "This invitation is missing, expired, or already used." };
+    return { ok: false as const, message: t("actions.managers.inviteUnavailable") };
   }
 
   if (normalizeEmail(actor.email) !== normalizeEmail(invitation.email)) {
     return {
       ok: false as const,
-      message: "Sign in with the same email address that received the invitation.",
+      message: t("actions.managers.signInWithInvitedEmail"),
     };
   }
 
   const experienceNote = input.experienceNote.trim();
   if (experienceNote.length < 20) {
-    return { ok: false as const, message: "Describe your operations experience (at least 20 characters)." };
+    return { ok: false as const, message: t("actions.managers.experienceTooShort") };
   }
 
   const grant = await applyManagerRole(actor.userId, {
@@ -250,22 +259,23 @@ export async function acceptManagerInvitation(
     })
     .where(eq(managerInvitations.id, invitation.id));
 
-  return { ok: true as const, message: "Welcome to the manager dashboard. Switch your dashboard from the top bar." };
+  return { ok: true as const, message: t("actions.managers.welcomeManager") };
 }
 
 export async function revokeManagerRole(actor: AuthSession, userId: string) {
+  const t = await getTranslations("admin");
   if (!hasRole(actor.roles, "admin")) {
-    return { ok: false as const, message: "Only the admin can remove manager access." };
+    return { ok: false as const, message: t("actions.managers.onlyAdminRemove") };
   }
 
   const row = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   const target = row[0];
-  if (!target) return { ok: false as const, message: "Account not found." };
+  if (!target) return { ok: false as const, message: t("actions.managers.accountNotFound") };
 
   const decision = canChangeRole(actor.roles, target.roles, { role: "manager", action: "revoke" });
-  if (!decision.allowed) return { ok: false as const, message: decision.reason };
+  if (!decision.allowed) return { ok: false as const, message: t("actions.managers.roleChangeDenied") };
   if (!hasRole(target.roles, "manager")) {
-    return { ok: false as const, message: "This account is not a manager." };
+    return { ok: false as const, message: t("actions.managers.notManager") };
   }
 
   const nextRoles: RoleCode[] = ["student"];
@@ -280,5 +290,5 @@ export async function revokeManagerRole(actor: AuthSession, userId: string) {
     ...ctx,
   });
 
-  return { ok: true as const, message: "Manager access removed; account is a student again." };
+  return { ok: true as const, message: t("actions.managers.accessRemoved") };
 }

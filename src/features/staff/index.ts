@@ -12,6 +12,7 @@ export {
   countClassesToday,
   getTeacherByName,
   getTeacherClasses,
+  localizedTeacherStudents,
   managerEscalations,
   managerStats,
   teacherFollowUps,

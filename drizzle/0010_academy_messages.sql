@@ -12,9 +12,19 @@ CREATE TABLE IF NOT EXISTS "academy_messages" (
   "external_delivered" boolean DEFAULT false NOT NULL,
   "created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
-
-ALTER TABLE "academy_messages" ADD CONSTRAINT "academy_messages_sender_user_id_users_id_fk" FOREIGN KEY ("sender_user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "academy_messages" ADD CONSTRAINT "academy_messages_recipient_user_id_users_id_fk" FOREIGN KEY ("recipient_user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action;
-
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "academy_messages" ADD CONSTRAINT "academy_messages_sender_user_id_users_id_fk" FOREIGN KEY ("sender_user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "academy_messages" ADD CONSTRAINT "academy_messages_recipient_user_id_users_id_fk" FOREIGN KEY ("recipient_user_id") REFERENCES "users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "academy_messages_recipient_idx" ON "academy_messages" ("recipient_user_id", "created_at");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "academy_messages_sender_idx" ON "academy_messages" ("sender_user_id", "created_at");

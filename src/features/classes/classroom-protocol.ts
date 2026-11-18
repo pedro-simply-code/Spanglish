@@ -1,4 +1,12 @@
 export { isStaffGuestIdentity, STAFF_GUEST_IDENTITY_PREFIX } from "@/lib/classroom-identities";
+import type { ClassCaptionsState } from "@/lib/class-captions";
+export {
+  CAPTION_LANGS,
+  isCaptionLang,
+  type CaptionLang,
+  type ClassCaptionsState,
+  type ClassTranscriptLine,
+} from "@/lib/class-captions";
 
 export const CLASSROOM_TOPIC_CHAT = "spanglish.chat";
 export const CLASSROOM_TOPIC_RAISED_HAND = "spanglish.raised_hand";
@@ -6,6 +14,21 @@ export const CLASSROOM_TOPIC_HOST = "spanglish.host";
 export const CLASSROOM_TOPIC_PROFILE = "spanglish.profile";
 export const CLASSROOM_TOPIC_SCREEN_SHARE = "spanglish.screen_share";
 export const CLASSROOM_TOPIC_LOCAL_RECORDING = "spanglish.local_recording";
+export const CLASSROOM_TOPIC_CAPTIONS = "spanglish.captions";
+
+/** Packets on the captions topic: the teacher's on/off switch, or a spoken line. */
+export type ClassroomCaptionPacket =
+  | ({ kind: "state" } & ClassCaptionsState)
+  | {
+      kind: "line";
+      /** Stable per utterance; interim updates reuse it until the line is final. */
+      id: string;
+      identity: string;
+      name: string;
+      text: string;
+      final: boolean;
+    };
+
 
 export type ClassroomChatMessage = {
   id: string;

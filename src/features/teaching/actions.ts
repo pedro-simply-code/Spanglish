@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { recordAuditEvent } from "@/server/audit/audit-log";
 import { getActorWithPermission } from "@/server/auth/session";
 import { replaceAvailability, type AvailabilityWindow } from "@/server/classes/availability";
@@ -19,17 +20,13 @@ import { promoteUserToTeacherByEmail } from "@/server/teaching/teacher-promote";
 
 export type TeachingActionResult = { ok: boolean; message: string };
 
-const errorMessages = {
-  WINDOW_INVALID: "Each window needs a start before its end and at least 25 minutes.",
-  WINDOW_OVERLAP: "Two windows on the same day overlap. Merge or move them.",
-} as const;
-
 /** Replaces the teacher's weekly availability. Booked classes are not touched. */
 export async function saveAvailabilityAction(windows: AvailabilityWindow[]): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("classes:manage");
-  if (!actor) return { ok: false, message: "Only teachers can set availability." };
+  if (!actor) return { ok: false, message: t("onlyTeachersAvailability") };
   if (!Array.isArray(windows) || windows.length > 70) {
-    return { ok: false, message: "Too many windows." };
+    return { ok: false, message: t("tooManyWindows") };
   }
 
   const clean = windows.map((window) => ({
@@ -38,7 +35,7 @@ export async function saveAvailabilityAction(windows: AvailabilityWindow[]): Pro
     endMinute: Number(window.endMinute),
   }));
   const result = await replaceAvailability(actor.userId, clean);
-  if (!result.ok) return { ok: false, message: errorMessages[result.code] };
+  if (!result.ok) return { ok: false, message: t(result.code === "WINDOW_OVERLAP" ? "windowOverlap" : "windowInvalid") };
 
   await recordAuditEvent({
     action: "availability.updated",
@@ -49,12 +46,13 @@ export async function saveAvailabilityAction(windows: AvailabilityWindow[]): Pro
   });
   revalidatePath("/teacher/availability");
   revalidatePath("/schedule");
-  return { ok: true, message: "Availability saved. Students see the new times right away." };
+  return { ok: true, message: t("availabilitySaved") };
 }
 
 export async function saveTeacherProfileAction(input: TeacherProfileInput): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("classes:manage");
-  if (!actor) return { ok: false, message: "Only teachers have a public profile." };
+  if (!actor) return { ok: false, message: t("onlyTeachersProfile") };
   await saveTeacherProfile(actor.userId, {
     headline: String(input.headline ?? ""),
     bio: String(input.bio ?? ""),
@@ -63,27 +61,29 @@ export async function saveTeacherProfileAction(input: TeacherProfileInput): Prom
   });
   revalidatePath("/teacher/availability");
   revalidatePath("/schedule");
-  return { ok: true, message: "Profile saved." };
+  return { ok: true, message: t("profileSaved") };
 }
 
 /* Teacher applications */
 
 export async function submitApplicationAction(input: ApplicationInput): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("classes:book");
-  if (!actor) return { ok: false, message: "Sign in with a student account to apply." };
+  if (!actor) return { ok: false, message: t("signInStudentToApply") };
   const result = await submitApplication(actor, input);
   if (result.ok) revalidatePath("/apply");
   return result;
 }
 
 export async function withdrawApplicationAction(): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("classes:book");
-  if (!actor) return { ok: false, message: "Sign in to manage your application." };
+  if (!actor) return { ok: false, message: t("signInManageApplication") };
   const done = await withdrawApplication(actor);
   revalidatePath("/apply");
   return done
-    ? { ok: true, message: "Application withdrawn." }
-    : { ok: false, message: "There is no open application." };
+    ? { ok: true, message: t("applicationWithdrawn") }
+    : { ok: false, message: t("noOpenApplication") };
 }
 
 export async function reviewApplicationAction(input: {
@@ -91,8 +91,9 @@ export async function reviewApplicationAction(input: {
   approve: boolean;
   note?: string;
 }): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("teachers:approve");
-  if (!actor) return { ok: false, message: "Only managers and the admin review applications." };
+  if (!actor) return { ok: false, message: t("onlyManagersReview") };
   const result = await reviewApplication(actor, input);
   revalidatePath("/manager/applications");
   revalidatePath("/admin/organization/applications");
@@ -100,8 +101,9 @@ export async function reviewApplicationAction(input: {
 }
 
 export async function inviteTeacherApplicantAction(input: { email: string; note?: string }): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("teachers:approve");
-  if (!actor) return { ok: false, message: "Only managers and the admin can invite teachers." };
+  if (!actor) return { ok: false, message: t("onlyManagersInvite") };
   const result = await inviteTeacherApplicant(actor, input);
   if (result.ok) {
     revalidatePath("/manager/applications");
@@ -111,8 +113,9 @@ export async function inviteTeacherApplicantAction(input: { email: string; note?
 }
 
 export async function revokeTeacherInvitationAction(invitationId: string): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("teachers:approve");
-  if (!actor) return { ok: false, message: "Only managers and the admin can revoke invitations." };
+  if (!actor) return { ok: false, message: t("onlyManagersRevoke") };
   const result = await revokeTeacherInvitation(actor, invitationId);
   if (result.ok) {
     revalidatePath("/manager/applications");
@@ -122,8 +125,9 @@ export async function revokeTeacherInvitationAction(invitationId: string): Promi
 }
 
 export async function promoteTeacherByEmailAction(email: string): Promise<TeachingActionResult> {
+  const t = await getTranslations("educator.teachingActions");
   const actor = await getActorWithPermission("roles:manage");
-  if (!actor) return { ok: false, message: "Only the admin can promote a user directly to teacher." };
+  if (!actor) return { ok: false, message: t("onlyAdminPromote") };
   const result = await promoteUserToTeacherByEmail(actor, email);
   if (result.ok) {
     revalidatePath("/manager/applications");

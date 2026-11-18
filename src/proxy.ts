@@ -40,6 +40,7 @@ export const config = {
     "/progress/:path*",
     "/achievements/:path*",
     "/checkout/:path*",
+    "/credits/:path*",
     "/apps/:path*",
   ],
 };

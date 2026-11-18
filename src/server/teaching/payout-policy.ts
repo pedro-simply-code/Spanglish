@@ -5,6 +5,10 @@ export function payoutProcessingBusinessDays() {
   return env.PAYOUT_PROCESSING_BUSINESS_DAYS;
 }
 
-export function payoutProcessingWindowPhrase(days = payoutProcessingBusinessDays()) {
-  return days === 1 ? "1 business day" : `${days} business days`;
+export function payoutProcessingWindowPhrase(
+  days = payoutProcessingBusinessDays(),
+  labels = { one: "BUSINESS_DAY_ONE", other: "BUSINESS_DAYS_{days}" },
+) {
+  const template = days === 1 ? labels.one : labels.other;
+  return template.replace("{days}", String(days));
 }

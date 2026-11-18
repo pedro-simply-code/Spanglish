@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
@@ -38,14 +39,14 @@ type AvailabilityEditorProps = {
 
 /** Monday first, as most calendars show it. */
 const weekdays = [
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-  { value: 0, label: "Sunday" },
-];
+  { value: 1, key: "monday" },
+  { value: 2, key: "tuesday" },
+  { value: 3, key: "wednesday" },
+  { value: 4, key: "thursday" },
+  { value: 5, key: "friday" },
+  { value: 6, key: "saturday" },
+  { value: 0, key: "sunday" },
+] as const;
 
 type Row = { key: string; weekday: number; start: string; end: string };
 
@@ -63,6 +64,7 @@ export function AvailabilityEditor({
   timeZone,
   upcomingClasses,
 }: AvailabilityEditorProps) {
+  const t = useTranslations("educator");
   const { showError, showSuccess } = useAppToast();
   const [rows, setRows] = useState<Row[]>(() => windows.map(toRow));
   const [form, setForm] = useState({ ...profile, tagsText: profile.tags.join(", ") });
@@ -82,7 +84,7 @@ export function AvailabilityEditor({
       const startMinute = parseTimeOfDay(row.start);
       const endMinute = parseTimeOfDay(row.end);
       if (startMinute === null || endMinute === null) {
-        setError("Use times like 09:00.");
+        setError(t("teacher.availability.useTimeFormat"));
         return;
       }
       parsed.push({ weekday: row.weekday, startMinute, endMinute });
@@ -113,14 +115,21 @@ export function AvailabilityEditor({
   return (
     <Box mt={3}>
       <Breadcrumb
-        title="Availability"
-        subtitle="Weekly times students can book. Booked classes stay as they are when you change this."
-        items={[{ title: "Teacher", to: "/teacher" }, { title: "Availability" }]}
+        title={t("teacher.availability.title")}
+        subtitle={t("teacher.availability.subtitle")}
+        items={[
+          { title: t("shell.roles.teacher"), to: "/teacher" },
+          { title: t("teacher.availability.title") },
+        ]}
       />
 
-      <Alert severity="info" sx={{ mb: 3 }} action={<LinkButton href="/settings" color="inherit" size="small">Change</LinkButton>}>
-        Times are in your time zone: <strong>{timeZone}</strong>. Students see them converted to theirs.
-        {upcomingClasses ? ` You have ${upcomingClasses} upcoming classes.` : ""}
+      <Alert
+        severity="info"
+        sx={{ mb: 3 }}
+        action={<LinkButton href="/settings" color="inherit" size="small">{t("teacher.availability.change")}</LinkButton>}
+      >
+        {t("teacher.availability.timeZoneNote", { timeZone })}
+        {upcomingClasses ? t("teacher.availability.upcomingNote", { count: upcomingClasses }) : ""}
       </Alert>
 
       {error ? (
@@ -132,25 +141,26 @@ export function AvailabilityEditor({
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <SectionCard
-            title="Weekly schedule"
-            subtitle="Classes start every 30 minutes inside these windows."
+            title={t("teacher.availability.weeklySchedule")}
+            subtitle={t("teacher.availability.scheduleSubtitle")}
             action={
               <Button variant="contained" onClick={saveAvailability} disabled={saving}>
-                {saving ? "Saving…" : "Save availability"}
+                {saving ? t("teacher.availability.saving") : t("teacher.availability.saveAvailability")}
               </Button>
             }
           >
             <Stack spacing={2.5}>
               {weekdays.map((day) => {
+                const dayLabel = t(`weekdays.${day.key}`);
                 const dayRows = rows.filter((row) => row.weekday === day.value);
                 return (
                   <Box key={day.value}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
                       <Typography variant="subtitle1" fontWeight={600}>
-                        {day.label}
+                        {dayLabel}
                       </Typography>
                       <Button size="small" startIcon={<IconPlus size={15} />} onClick={() => addWindow(day.value)}>
-                        Add window
+                        {t("teacher.availability.addWindow")}
                       </Button>
                     </Stack>
                     {dayRows.length ? (
@@ -160,7 +170,7 @@ export function AvailabilityEditor({
                             <TextField
                               type="time"
                               size="small"
-                              label="From"
+                              label={t("teacher.availability.from")}
                               value={row.start}
                               onChange={(event) => update(row.key, { start: event.target.value })}
                               slotProps={{ htmlInput: { step: 1800 } }}
@@ -168,13 +178,13 @@ export function AvailabilityEditor({
                             <TextField
                               type="time"
                               size="small"
-                              label="To"
+                              label={t("teacher.availability.to")}
                               value={row.end}
                               onChange={(event) => update(row.key, { end: event.target.value })}
                               slotProps={{ htmlInput: { step: 1800 } }}
                             />
                             <IconButton
-                              aria-label={`Remove ${day.label} window`}
+                              aria-label={t("teacher.availability.removeWindow", { day: dayLabel })}
                               onClick={() => setRows((current) => current.filter((item) => item.key !== row.key))}
                             >
                               <IconTrash size={18} />
@@ -184,7 +194,7 @@ export function AvailabilityEditor({
                       </Stack>
                     ) : (
                       <Typography variant="body2" color="text.secondary">
-                        Not available.
+                        {t("teacher.availability.notAvailable")}
                       </Typography>
                     )}
                   </Box>
@@ -195,22 +205,22 @@ export function AvailabilityEditor({
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard title="Public profile" subtitle="What students see when they book.">
+          <SectionCard title={t("teacher.availability.publicProfile")} subtitle={t("teacher.availability.profileSubtitle")}>
             <Stack spacing={2}>
               <TextField
-                label="Headline"
+                label={t("teacher.availability.headline")}
                 value={form.headline}
                 onChange={(event) => setForm({ ...form, headline: event.target.value })}
                 slotProps={{ htmlInput: { maxLength: 120 } }}
               />
               <TextField
-                label="Location"
+                label={t("teacher.availability.location")}
                 value={form.country}
                 onChange={(event) => setForm({ ...form, country: event.target.value })}
                 slotProps={{ htmlInput: { maxLength: 80 } }}
               />
               <TextField
-                label="About you"
+                label={t("teacher.availability.aboutYou")}
                 multiline
                 minRows={3}
                 value={form.bio}
@@ -218,13 +228,13 @@ export function AvailabilityEditor({
                 slotProps={{ htmlInput: { maxLength: 1000 } }}
               />
               <TextField
-                label="Tags"
-                helperText="Separate with commas (up to 8)."
+                label={t("teacher.availability.tags")}
+                helperText={t("teacher.availability.tagsHelper")}
                 value={form.tagsText}
                 onChange={(event) => setForm({ ...form, tagsText: event.target.value })}
               />
               <Button variant="outlined" onClick={saveProfile} disabled={saving}>
-                Save profile
+                {t("teacher.availability.saveProfile")}
               </Button>
             </Stack>
           </SectionCard>

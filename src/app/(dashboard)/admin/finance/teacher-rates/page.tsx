@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { TeacherRatesEditor } from "@/features/payouts";
 import { teacherLevelFor } from "@/lib/teacher-levels";
 import { listTeachers } from "@/server/classes/teachers";
@@ -8,10 +9,7 @@ import { getPayoutSettings } from "@/server/teaching/earnings";
 import { getTeacherStats } from "@/server/teaching/stats";
 import { requestTime } from "@/server/request-time";
 
-export const metadata: Metadata = {
-  title: "Teacher pay rates",
-  description: "Pay per delivered class and teacher levels",
-};
+export const metadata: Metadata = adminStaticMetadata("teacherRates");
 
 export default function AdminFinanceTeacherRatesPage() {
   return (

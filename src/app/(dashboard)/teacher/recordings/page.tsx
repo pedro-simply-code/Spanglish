@@ -1,23 +1,31 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { connection } from "next/server";
+import { Suspense } from "react";
+import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import {
   RecordingsOverview,
   loadStoredClassRecordingsForActor,
 } from "@/features/recordings";
-import { requireDashboard } from "@/server/auth/session";
+import { getActor } from "@/server/auth/session";
 
-export const metadata: Metadata = {
-  title: "Recordings",
-  description: "Class recordings and transcripts",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("educator.metadata.recordings");
+  return { title: t("title"), description: t("description") };
+}
 
-export default async function TeacherRecordingsPage() {
-  const actor = await requireDashboard("teacher");
+export default function TeacherRecordingsPage() {
+  return (
+    <Suspense fallback={<AppCardSkeleton />}>
+      <TeacherRecordingsContent />
+    </Suspense>
+  );
+}
+
+async function TeacherRecordingsContent() {
+  await connection();
+  const actor = await getActor();
   const storedRecordings = await loadStoredClassRecordingsForActor(actor);
 
-  return (
-    <RecordingsOverview
-      ownerName={actor.name}
-      storedRecordings={storedRecordings}
-    />
-  );
+  return <RecordingsOverview storedRecordings={storedRecordings} />;
 }

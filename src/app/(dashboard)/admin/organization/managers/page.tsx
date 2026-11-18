@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
+import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { OrganizationManagersOverview } from "@/features/admin";
 import { listPendingManagerInvitations } from "@/server/admin/manager-access";
 import { listManagers } from "@/server/admin/insights";
 import { requireDashboard } from "@/server/auth/session";
 
-export const metadata: Metadata = {
-  title: "Managers",
-  description: "Operations managers for the academy",
-};
+export const metadata: Metadata = adminStaticMetadata("managers");
 
 export default function AdminOrganizationManagersPage() {
   return (

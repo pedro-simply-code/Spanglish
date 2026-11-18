@@ -64,6 +64,7 @@ export async function POST(request: Request) {
           status: done ? "ready" : "failed",
           sizeBytes: file ? Number(file.size) : null,
           completedAt: new Date(),
+          error: done ? null : (info.error || "LiveKit egress did not produce a file").slice(0, 500),
         })
         .where(
           and(
