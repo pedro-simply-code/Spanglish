@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
-import { AuthShell, LoginForm, LoginResetNotice, getDemoAccounts } from "@/features/auth";
+import { AuthShell, LoginForm, LoginResetNotice } from "@/features/auth";
 import { googleSignInEnabled } from "@/server/auth/auth";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,10 +12,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("loginDescription"),
   };
 }
-
-/** Demo accounts are listed only on a dev server or when explicitly enabled. */
-const showDemoAccounts =
-  env.NODE_ENV === "development" || env.ENABLE_DEMO_ACCOUNTS;
 
 type LoginPageProps = {
   searchParams: Promise<{ error?: string; reset?: string; next?: string }>;
@@ -41,7 +37,6 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
 
 async function LoginContent({ searchParams }: LoginPageProps) {
   const query = await searchParams;
-  const t = await getTranslations("shell");
 
   return (
     <>
@@ -51,7 +46,7 @@ async function LoginContent({ searchParams }: LoginPageProps) {
         codeTtlMinutes={env.EMAIL_CODE_TTL_MINUTES}
         googleFailed={query.error === "google"}
         redirectTo={safeNext(query.next)}
-        demoAccounts={showDemoAccounts ? getDemoAccounts(t) : []}
+        demoAccounts={[]}
       />
     </>
   );

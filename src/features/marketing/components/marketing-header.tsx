@@ -10,6 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
 import { useTranslations } from "next-intl";
 import { SpanglishLogo } from "@/components/brand/spanglish-logo";
+import { LanguageMenu } from "@/components/layout/topbar/language-menu";
 import { LinkButton } from "@/components/ui/link-button";
 import { getMarketingHeaderNav } from "@/features/marketing/data";
 
@@ -87,7 +88,8 @@ function AuthActions() {
   const t = useTranslations("marketing");
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="nowrap" useFlexGap>
+    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="nowrap" useFlexGap>
+      <LanguageMenu />
       <LinkButton
         href="/login"
         variant="outlined"
