@@ -13,6 +13,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/seed.ts",
+    "demo-accounts:export": "tsx scripts/export-demo-accounts.ts",
     "db:reset": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/reset-db.ts",
     "admin:promote": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/promote-admin.ts",
     "test": "vitest run",

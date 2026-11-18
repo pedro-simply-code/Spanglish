@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { after } from "next/server";
 import { env } from "@/env";
 import { normalizeEmail } from "@/lib/auth-validation";
+import { resolveAppBaseUrl } from "@/lib/app-url";
 import {
   authRateLimitRules,
   checkRateLimits,
@@ -113,7 +114,7 @@ function sessionStartsPending(path: string | undefined, twoFactorEnabled: boolea
 function createAuth() {
   return betterAuth({
   appName: "Spanglish Academy",
-  baseURL: env.NEXT_PUBLIC_APP_URL,
+  baseURL: resolveAppBaseUrl(env.NEXT_PUBLIC_APP_URL),
   secret: getBetterAuthSecret(),
   database: drizzleAdapter(db, {
     provider: "pg",

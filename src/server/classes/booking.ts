@@ -92,13 +92,23 @@ function idList(ids: string[]) {
   )}]::text[]`;
 }
 
-/** Whether this student has not used their one trial lesson yet. */
+/** Whether this student has not used their one trial lesson yet (including canceled trial bookings). */
 export async function studentTrialLessonAvailable(studentId: string) {
   const [row] = await db
-    .select({ sessionId: classSessions.id })
-    .from(classParticipants)
-    .innerJoin(classSessions, eq(classSessions.id, classParticipants.sessionId))
-    .where(and(eq(classParticipants.userId, studentId), eq(classSessions.billingKind, "trial")))
+    .select({ id: classSessions.id })
+    .from(classSessions)
+    .where(
+      and(
+        eq(classSessions.billingKind, "trial"),
+        sql`(
+          ${classSessions.bookedByUserId} = ${studentId}
+          OR EXISTS (
+            SELECT 1 FROM ${classParticipants} cp
+            WHERE cp.session_id = ${classSessions.id} AND cp.user_id = ${studentId}
+          )
+        )`,
+      ),
+    )
     .limit(1);
   return !row;
 }
