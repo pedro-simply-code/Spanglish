@@ -5,7 +5,22 @@ import {
   localeFromAcceptLanguage,
   type AppLocale,
 } from "@/i18n/config";
-import { getSession } from "@/server/auth/session";
+
+async function localeFromSignedInProfile(): Promise<AppLocale | null> {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return null;
+  }
+  try {
+    const { getSession } = await import("@/server/auth/session");
+    const session = await getSession();
+    if (session?.locale === "es" || session?.locale === "en") {
+      return session.locale;
+    }
+  } catch {
+    // Auth may be unavailable during CI/build without production secrets.
+  }
+  return null;
+}
 
 /**
  * Language for this request: signed-in profile locale, then the cookie (profile
@@ -13,8 +28,8 @@ import { getSession } from "@/server/auth/session";
  * profile locale via `<LocaleProvider>`; server `getTranslations()` must match.
  */
 export async function getRequestLocale(): Promise<AppLocale> {
-  const session = await getSession();
-  if (session?.locale) return session.locale;
+  const fromProfile = await localeFromSignedInProfile();
+  if (fromProfile) return fromProfile;
 
   const cookieStore = await cookies();
   const fromCookie = cookieStore.get(LOCALE_COOKIE)?.value;

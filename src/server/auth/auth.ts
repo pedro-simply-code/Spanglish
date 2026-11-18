@@ -110,7 +110,8 @@ function sessionStartsPending(path: string | undefined, twoFactorEnabled: boolea
   return !(path === "/sign-in/email" || path.startsWith("/two-factor/"));
 }
 
-export const auth = betterAuth({
+function createAuth() {
+  return betterAuth({
   appName: "Spanglish Academy",
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: getBetterAuthSecret(),
@@ -344,6 +345,32 @@ export const auth = betterAuth({
     // Must stay last: lets Server Actions set auth cookies.
     nextCookies(),
   ],
+  });
+}
+
+type AuthInstance = ReturnType<typeof createAuth>;
+
+let authInstance: AuthInstance | undefined;
+
+export function getAuth(): AuthInstance {
+  authInstance ??= createAuth();
+  return authInstance;
+}
+
+/** Lazily initialized so importing this module during `next build` does not require secrets. */
+export const auth: AuthInstance = new Proxy({} as AuthInstance, {
+  // `toNextJsHandler` uses `"handler" in auth`; without `has`, `in` only sees the empty target.
+  has(_target, prop) {
+    return Reflect.has(getAuth() as object, prop);
+  },
+  get(_target, prop, receiver) {
+    const instance = getAuth();
+    const value = Reflect.get(instance as object, prop, receiver);
+    if (typeof value === "function") {
+      return (value as (...args: unknown[]) => unknown).bind(instance);
+    }
+    return value;
+  },
 });
 
-export type Auth = typeof auth;
+export type Auth = AuthInstance;
