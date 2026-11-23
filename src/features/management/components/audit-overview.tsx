@@ -49,7 +49,7 @@ export function AuditOverview({ entries }: { entries: AuditEntryView[] }) {
   const warnings = entries.filter((entry) => entry.severity !== "info").length;
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.audit")}
         subtitle={t("management.audit.subtitle")}

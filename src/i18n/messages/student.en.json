@@ -132,7 +132,7 @@
       }
     },
     "home": {
-      "breadcrumbTitle": "Welcome, {firstName}",
+      "breadcrumbTitle": "Hi, {firstName}! 👋",
       "subtitle": "Your plan for today while the {student} dashboard is active. Switch roles from the top bar to open {teacher}, {manager}, or {admin}.",
       "liveClassesChip": "Live classes",
       "nextClass": "Next class with {teacher}",
@@ -226,8 +226,10 @@
         "needHand": "Need a hand?",
         "hereToHelp": "We are here to help",
         "outsideWindow": "Outside the change window?",
-        "outsideWindowBody": "Message support from Settings and the academy team will review your case.",
-        "statusAria": "Class status"
+        "outsideWindowBody": "Write to the academy from the site’s Email and the team will review your case.",
+        "statusAria": "Class status",
+        "writeAcademy": "Write to the academy",
+        "supportTopic": "Class change outside the window"
       },
       "list": {
         "changesClosed": "Changes closed",
@@ -336,6 +338,26 @@
         "transcriptSubtitle": "Automatic transcript of the class (may contain mistakes).",
         "transcriptShowAll": "Show all ({count})",
         "transcriptShowLess": "Show less"
+      },
+      "summary": {
+        "title": "Automatic class summary",
+        "subtitle": "Written by Claude from the class transcript.",
+        "pending": "Writing the summary… it appears here a minute after the class ends.",
+        "failed": "The summary could not be written.",
+        "skipped": "The class was too short to summarize.",
+        "none": "No summary yet. It is written when the class ends, from the live transcript.",
+        "overview": "What we covered",
+        "topics": "Topics",
+        "vocabulary": "New words",
+        "corrections": "To say it better",
+        "said": "Said",
+        "better": "Better",
+        "nextSteps": "Before the next class",
+        "regenerate": "Write it again",
+        "regenerating": "Writing…",
+        "regenerated": "Summary updated.",
+        "forbidden": "Only the teacher can do this.",
+        "notConfigured": "Summaries are not turned on (ANTHROPIC_API_KEY)."
       }
     },
     "format": {
@@ -358,17 +380,17 @@
       "joinTooEarly": "The classroom opens {minutes} minutes before the class starts.",
       "joinRelaxed": "Join window relaxed for testing. The room is open before the usual pre-start window.",
       "joinClosed": "The join window closed {minutes} minutes after the class started.",
-      "joinOpen": "The classroom is open. Your teacher is waiting."
+      "joinOpen": "The classroom is open. If your teacher hasn't started the class yet, you'll wait there until they do."
     },
     "pricing": {
-      "breadcrumbTitle": "Pricing",
-      "breadcrumbSubtitle": "Live classes with certified teachers, built around your schedule.",
+      "breadcrumbTitle": "Buy credits",
+      "breadcrumbSubtitle": "Live classes with native teachers, or AI credits to practice with Luna and the chat.",
       "selectTitle": "Select your package",
       "selectSubtitle": "Choose session length and class format, then pick a credit bundle",
       "monthlyNote": "Monthly payment options available at checkout.",
       "yourPlan": "Your plan",
       "livePlan": "Live {type} classes",
-      "packageOption": "{count} classes",
+      "packageOption": "{count, plural, one {# class} other {# classes}}",
       "durationOption": "{count} minutes",
       "formatPaired": "Paired (2 students)",
       "formatIndividual": "Individual",
@@ -407,7 +429,8 @@
         "description": {
           "light": "Try live classes or get focused help in one area, with {audience} keeping a light schedule.",
           "steady": "Two classes a week so {audience} can build steady, lasting progress.",
-          "fluency": "Three classes a week for faster fluency gains and stronger long-term retention."
+          "fluency": "Three classes a week for faster fluency gains and stronger long-term retention.",
+          "single": "One class when you need it, no commitment."
         },
         "name": {
           "pairedStarter": "Paired starter",
@@ -415,18 +438,92 @@
           "pairedFluency": "Paired fluency",
           "starterSupport": "Starter support",
           "steadyProgress": "Steady progress",
-          "fluencyBuilder": "Fluency builder"
+          "fluencyBuilder": "Fluency builder",
+          "single": "Single class",
+          "pairedSingle": "Single paired class"
         },
         "label": {
           "starter": "Starter",
           "popular": "Most popular",
-          "value": "Best value"
+          "value": "Best value",
+          "single": "Single"
         }
       },
       "sessionLength": "Session length",
       "classFormat": "Class format",
       "saveUpTo": "Save up to {percent}%",
-      "perClass": "/ class"
+      "perClass": "/ class",
+      "classesUnit": "{count, plural, one {class} other {classes}}",
+      "summary": {
+        "credits": "Classes you have left",
+        "from": "Lowest price per class",
+        "save": "Save up to",
+        "valid": "Credits are valid",
+        "validValue": "12 months"
+      },
+      "product": "What to buy",
+      "productClasses": "Classes",
+      "productAi": "AI credits",
+      "ai": {
+        "filterHint": "1 credit = 1 new conversation with Luna or in the chat.",
+        "empty": "No AI credit packs on sale right now.",
+        "creditsUnit": "{count, plural, one {credit} other {credits}}",
+        "bestValue": "Best value",
+        "luna": "Luna",
+        "chat": "Chat",
+        "save": "Save {percent}%",
+        "description": "{count, plural, one {# conversation} other {# conversations}} with Luna (voice) or in the chat, up to {tokens} tokens each. Credits don't expire.",
+        "perConversation": "{amount} per conversation",
+        "select": "Select pack",
+        "selected": "Selected pack",
+        "yourPack": "Your AI pack",
+        "yourPackSubtitle": "Practice speaking and writing between classes",
+        "pack": "Pack",
+        "conversations": "Conversations",
+        "pricePerConversation": "Price per conversation",
+        "total": "Total",
+        "buy": "Buy AI credits",
+        "buying": "Opening payment…",
+        "finePrint": "Free conversations are used first; a credit is spent only when you start a new conversation.",
+        "pickOne": "Pick a pack on the left.",
+        "howTitle": "How it works",
+        "howSubtitle": "Free with every class, then credits",
+        "howFree": "Each class you attend gives you {perClass} conversations with Luna and {perClass} chats for free.",
+        "freeLuna": "Free with Luna left",
+        "freeChat": "Free chats left",
+        "creditsLeft": "AI credits left",
+        "summary": {
+          "credits": "AI credits left",
+          "freeLuna": "Free with Luna",
+          "freeChat": "Free chats",
+          "perClass": "Free per class attended",
+          "tokens": "Tokens per conversation"
+        },
+        "tokensEach": "Tokens per conversation",
+        "howTokens": "Each conversation can use up to {tokens} tokens. A credit is spent only when you start a new one; free conversations go first."
+      },
+      "steps": {
+        "product": "What to buy",
+        "format": "Format",
+        "package": "Package",
+        "pack": "AI pack",
+        "review": "Review"
+      },
+      "stepHints": {
+        "product": "Classes with a teacher or credits to practice with the AI.",
+        "format": "Class length and whether you take it alone or with a partner.",
+        "package": "Bigger packages lower the price per class.",
+        "pack": "1 credit = 1 conversation of up to {tokens} tokens. Bigger packs cost less per conversation.",
+        "review": "Check your purchase before paying."
+      },
+      "productClassesDetail": "Live classes with native teachers, from 1 to 90 classes.",
+      "productAiDetail": "Conversations with Luna (voice) or in the chat, up to {tokens} tokens each.",
+      "duration25Detail": "Short and focused, easy to fit in your day.",
+      "duration50Detail": "More time for conversation and practice.",
+      "individualDetail": "Just you and your teacher.",
+      "pairedDetail": "With your study partner; you share the credits.",
+      "classesLabel": "Classes",
+      "yourPurchase": "Your purchase"
     },
     "checkout": {
       "breadcrumbTitle": "Checkout",
@@ -436,7 +533,7 @@
       "orderTitle": "Order summary",
       "orderSubtitle": "Live classes with a certified teacher",
       "liveClassesChip": "Live classes",
-      "planDetails": "{count} live classes · {duration} min · {type}",
+      "planDetails": "{count, plural, one {# live class} other {# live classes}} · {duration} min · {type}",
       "taxes": "Taxes",
       "calculatedAtPayment": "Calculated at payment",
       "creditsValid": "Credits valid for",
@@ -481,10 +578,12 @@
         "failed": "We could not find this payment. If you were charged, contact the academy with your receipt.",
         "allSet": "You’re all set!",
         "creditsAdded": "{count} credits were added{suffix}. Schedule your first live class whenever you are ready.",
-        "pairedSuffix": " to the pool you share with your partner"
+        "pairedSuffix": " to the pool you share with your partner",
+        "aiCreditsAdded": "{count, plural, one {# AI credit was} other {# AI credits were}} added. Each one starts a new conversation with Luna or in the chat.",
+        "talkWithLuna": "Talk with Luna"
       },
       "secureNotice": "Secure checkout. Cancel or reschedule any class up to 12 hours before it starts.",
-      "classesTimesPrice": "{count} classes × {amount}"
+      "classesTimesPrice": "{count, plural, one {# class} other {# classes}} × {amount}"
     },
     "schedule": {
       "breadcrumbTitle": "Book a class",
@@ -738,7 +837,25 @@
       "trophyCase": "Your trophy case",
       "unlocked": "{unlocked} of {total} achievements unlocked",
       "locked": "Locked",
-      "unlockedLabel": "Unlocked"
+      "unlockedLabel": "Unlocked",
+      "summary": {
+        "unlocked": "Unlocked",
+        "percent": "Of the trophy case",
+        "locked": "To unlock",
+        "next": "Closest one"
+      },
+      "tabs": {
+        "all": "All ({count})",
+        "unlocked": "Unlocked ({count})",
+        "locked": "To unlock ({count})"
+      },
+      "empty": {
+        "unlocked": "No achievements yet. Your first class unlocks one!",
+        "locked": "You unlocked every achievement!"
+      },
+      "latest": "Latest unlocked",
+      "nextTitle": "Next achievement",
+      "nextSubtitle": "The one you are closest to"
     },
     "achievement": {
       "firstSteps": {
@@ -1063,7 +1180,6 @@
         "title": "Lessons",
         "subtitle": "Everything from your classes: recap, homework, recording and vocabulary.",
         "search": "Search topic, teacher or recap",
-        "pendingOnly": "Only with pending practice",
         "with": "with {name}",
         "attended": "Attended · {minutes} min",
         "missed": "Missed",
@@ -1075,7 +1191,39 @@
         "open": "Open lesson",
         "noMatches": "No lessons match your search.",
         "empty": "No finished classes yet. Your first class will show up here.",
-        "book": "Book a class"
+        "book": "Book a class",
+        "recapLabel": "Teacher’s recap",
+        "summaryLabel": "Automatic summary",
+        "count": "{shown} of {total} lessons",
+        "filters": {
+          "teacher": "Teacher",
+          "allTeachers": "All teachers",
+          "type": "Class type",
+          "allTypes": "All types",
+          "status": "Show",
+          "allLessons": "All lessons",
+          "attended": "Attended",
+          "missed": "Missed",
+          "pending": "With pending practice",
+          "clear": "Clear filters"
+        },
+        "minutes": "{minutes} min",
+        "summary": {
+          "attendedValue": "{attended} of {total}",
+          "attended": "Classes attended",
+          "minutesValue": "{minutes} min",
+          "minutes": "Time in class",
+          "words": "Words from your classes",
+          "pending": "Practice to do",
+          "title": "Your summary",
+          "all": "All your lessons",
+          "filtered": "Based on your filters"
+        },
+        "teachers": {
+          "title": "Your teachers",
+          "subtitle": "Tap one to see only their lessons",
+          "detail": "{lessons, plural, one {# lesson} other {# lessons}} · {minutes} min in class"
+        }
       },
       "practice": {
         "title": "Practice",
@@ -1093,7 +1241,24 @@
           "submitted": "No submissions waiting for a grade.",
           "graded": "No graded practice yet."
         },
-        "emptyAll": "Your teachers have not assigned practice yet."
+        "emptyAll": "Your teachers have not assigned practice yet.",
+        "score": "{score}/{max} pts",
+        "feedbackLabel": "Teacher's feedback:",
+        "graded": "Graded",
+        "summary": {
+          "todo": "To do",
+          "overdue": "Overdue",
+          "submitted": "Waiting for a grade",
+          "average": "Average score"
+        },
+        "next": {
+          "title": "Next due",
+          "subtitle": "The practice to do first",
+          "none": "Nothing pending. Well done!"
+        },
+        "recent": {
+          "title": "Latest grades"
+        }
       },
       "runner": {
         "subtitle": "From “{topic}” with {teacher}",
@@ -1151,7 +1316,21 @@
         "reveal": "Show meaning",
         "doneTitle": "Review done!",
         "doneSummary": "You knew {knew} of {total}. The ones you missed come back soon.",
-        "backToList": "Back to my list"
+        "backToList": "Back to my list",
+        "stageAll": "All stages",
+        "summary": {
+          "total": "Words",
+          "due": "To review today"
+        },
+        "progress": {
+          "title": "Your progress",
+          "learned": "Learned"
+        },
+        "games": {
+          "title": "Practice with games",
+          "subtitle": "Flashcards, memory, listening and dictation with your words.",
+          "play": "Play"
+        }
       },
       "achievements": {
         "firstClass": {
@@ -1212,10 +1391,20 @@
         "goPractice": "Go to Practice",
         "milestones": "Recent achievements",
         "milestonesSubtitle": "The latest you unlocked",
-        "noMilestones": "No achievements yet. Your first class unlocks one!"
+        "noMilestones": "No achievements yet. Your first class unlocks one!",
+        "seeAll": "See all",
+        "chart": {
+          "weekTotal": "{minutes} min in class this week",
+          "weeksTotal": "{classes, plural, one {# class} other {# classes}} in 8 weeks"
+        },
+        "next": {
+          "title": "Next achievement",
+          "subtitle": "The one you are closest to",
+          "progress": "Progress"
+        }
       },
       "home": {
-        "subtitle": "Your next class, your credits and what to do today.",
+        "subtitle": "Here's what you've got today. Let's go!",
         "liveNow": "Live now",
         "nextClassChip": "Next class",
         "noNextClass": "No upcoming classes",
@@ -1224,7 +1413,7 @@
         "noNextClassHint": "Book your next class to keep going.",
         "join": "Join class",
         "viewClass": "View class",
-        "credits": "Your credits",
+        "credits": "You have",
         "classesLeft": "{count, plural, =0 {No classes available} one {# class available} other {# classes available}}",
         "balanceLine": "{count} × {minutes}-min {type}",
         "shared": "shared with your partner",
@@ -1236,33 +1425,35 @@
           "words": "Words to review",
           "practice": "Practice to do"
         },
-        "todoTitle": "For today",
-        "todoSubtitle": "What is up next",
+        "todoTitle": "Your to-do for today ✅",
+        "todoSubtitle": "Small steps, big progress",
         "todo": {
           "join": "Your class “{topic}” is open",
           "practiceDue": "Submit “{title}” by {date}",
           "practice": "Submit “{title}”",
           "words": "Review {count, plural, one {# word} other {# words}}",
           "homework": "Do the homework from “{topic}”",
-          "book": "Book your next class"
+          "book": "Book your next class",
+          "profileGoal": "Tell your teacher your goal 🎯",
+          "profilePhoto": "Add a photo so your teacher recognizes you 📸"
         },
         "go": "Go",
-        "allDone": "You are all caught up!",
-        "weekTitle": "Your week",
+        "allDone": "All done for today! 🎉",
+        "weekTitle": "Your week 📅",
         "weekSubtitle": "{minutes} minutes in class in the last 7 days",
         "minutesLabel": "Minutes in class",
-        "lastLessonTitle": "Your last lesson",
+        "lastLessonTitle": "Your last class 📝",
         "noRecap": "Your teacher has not written the recap yet.",
         "openLesson": "Open lesson",
         "allLessons": "All lessons",
         "noLessons": "Your last class recap will show up here.",
-        "nextAchievementTitle": "Your next achievement",
+        "nextAchievementTitle": "Your next achievement 🏆",
         "allAchievements": "See achievements",
         "allAchievementsDone": "You unlocked every achievement!"
       },
       "credits": {
         "title": "My credits",
-        "subtitle": "Your available classes, every movement and your purchases.",
+        "subtitle": "Your class and AI credits, every movement and your purchases.",
         "available": "Classes available",
         "buy": "Buy classes",
         "book": "Book",
@@ -1296,7 +1487,355 @@
           "canceled": "Canceled",
           "refunded": "Refunded"
         },
-        "noOrders": "No packages bought yet."
+        "noOrders": "No packages bought yet.",
+        "summary": {
+          "added": "Classes added",
+          "booked": "Classes used"
+        },
+        "tabs": {
+          "movements": "Movements ({count})",
+          "orders": "Purchases ({count})"
+        },
+        "byKindSubtitle": "What you can book right now",
+        "spending": {
+          "title": "Your purchases",
+          "subtitle": "Paid packages",
+          "total": "Total paid",
+          "packages": "Packages bought",
+          "last": "Latest purchase"
+        },
+        "noAiHistory": "No AI credit movements yet.",
+        "aiReason": {
+          "purchase": "Purchase",
+          "grant": "Credits granted",
+          "use": "Conversation started",
+          "refund": "Refund",
+          "adjustment": "Adjustment"
+        },
+        "aiUse": {
+          "voice": "Conversation with Luna",
+          "chat": "Chat with Luna"
+        },
+        "aiPanel": {
+          "title": "AI credits",
+          "subtitle": "Every class you attend adds {perClass} free with Luna and {perClass} free chats",
+          "credits": "Credits bought",
+          "freeLuna": "Free with Luna",
+          "freeChat": "Free chats",
+          "buy": "Buy AI credits",
+          "talk": "Talk with Luna",
+          "used": "Conversations paid with credits"
+        },
+        "product": {
+          "classes": "Class credits",
+          "ai": "AI credits"
+        },
+        "aiSummary": {
+          "credits": "AI credits",
+          "freeLuna": "Free with Luna",
+          "freeChat": "Free chats"
+        },
+        "noAiOrders": "No AI credit packs bought yet.",
+        "aiOrderKind": "AI pack · {tokens} tokens each",
+        "aiConversations": "{count, plural, one {# conversation} other {# conversations}}",
+        "aiMath": {
+          "title": "How AI credits work",
+          "subtitle": "Your AI purchases",
+          "tokens": "1 credit = 1 conversation with Luna or in the chat, up to {tokens} tokens.",
+          "free": "Each class you attend adds {perClass} free with Luna and {perClass} free chats; they are used first.",
+          "packs": "Packs bought"
+        },
+        "pending": {
+          "finish": "Finish payment",
+          "checking": "Checking…",
+          "buyAgain": "Buy again",
+          "opening": "Taking you back to the payment page…",
+          "paid": "Payment confirmed: {count, plural, one {# credit was} other {# credits were}} added.",
+          "expired": "That payment page expired, so this purchase was canceled. You can buy again.",
+          "processing": "The bank is still confirming this payment; the credits arrive when it clears.",
+          "failed": "We couldn't check this payment right now. Try again in a few minutes.",
+          "notFound": "This purchase is no longer pending."
+        }
+      }
+    },
+    "hub": {
+      "classes": {
+        "title": "My classes 🎥",
+        "subtitle": "Your upcoming classes, what you've covered, and where to book the next one.",
+        "tabs": {
+          "classes": "My classes",
+          "lessons": "What I've learned",
+          "book": "Book a class"
+        }
+      },
+      "study": {
+        "title": "Let's study 📚",
+        "subtitle": "Your homework, your words and your teachers' materials, all in one place.",
+        "tabs": {
+          "practice": "Homework",
+          "vocabulary": "Vocabulary",
+          "materials": "Materials"
+        }
+      },
+      "progress": {
+        "title": "My progress 🌱",
+        "subtitle": "See how far you've come and the achievements you're unlocking.",
+        "tabs": {
+          "progress": "How I'm doing",
+          "achievements": "Achievements"
+        }
+      },
+      "credits": {
+        "title": "My credits 💳",
+        "subtitle": "Your class and AI credits, every movement and packs to keep learning.",
+        "tabs": {
+          "credits": "My credits",
+          "buy": "Buy credits"
+        }
+      }
+    },
+    "ai": {
+      "notConfigured": "AI practice is not turned on for the academy yet.",
+      "intro": "Pick a scene and write to Luna in Spanish. She corrects you with a 💡.",
+      "noneLeft": {
+        "speak": "You used today’s voice practices. Come back tomorrow!",
+        "chat": "You used today’s AI chats. Come back tomorrow!"
+      },
+      "customTitle": "Your own topic ✨",
+      "customSubtitle": "Describe the situation you want to practice.",
+      "customLabel": "What do you want to practice?",
+      "customPlaceholder": "e.g. Renting a car in Antigua",
+      "startCustom": "Start",
+      "starting": "Getting ready…",
+      "historyTitle": "My conversations",
+      "active": "In progress",
+      "usage": "{used} / {limit} tokens",
+      "cost": "Cost: {cost}",
+      "back": "Back to scenes",
+      "finish": "Close for now",
+      "sceneAlt": "Scene illustration: {title}",
+      "typing": "Luna is typing…",
+      "placeholder": "Type your answer…",
+      "budgetReached": "This conversation reached its limit. Great job!",
+      "errors": {
+        "forbidden": "Sign in to practice.",
+        "not_configured": "AI practice is not turned on.",
+        "daily_limit": "You used today's conversations.",
+        "not_found": "We could not find that conversation.",
+        "finished": "This conversation has ended (limit reached).",
+        "invalid": "Write a message or a slightly longer topic.",
+        "ai_error": "Luna did not answer. Try again in a moment.",
+        "ai_auth": "The Anthropic key is not valid. Check ANTHROPIC_API_KEY.",
+        "ai_model": "The configured model does not exist for your account. Check ANTHROPIC_MODEL (run pnpm check:ai).",
+        "ai_credit": "The Anthropic account has no balance. Add credits at console.anthropic.com.",
+        "ai_rate": "Luna is receiving many requests. Wait a moment and try again.",
+        "voice_too_short": "Answer at least 2 questions to get your report.",
+        "no_credits": "You used your free conversations. Buy AI credits to keep practicing."
+      },
+      "paused": "Paused",
+      "spent": "No tokens left",
+      "resume": "Resume",
+      "pausedNote": "You closed this conversation, but it still has tokens left. You can resume it any time.",
+      "spentNote": "This conversation is out of tokens. Great job! It can’t be opened again.",
+      "reportReady": "Report ready",
+      "reportPending": "Report pending",
+      "luna": {
+        "cardTitle": "Practice speaking with Luna",
+        "cardText": "Pick a topic and talk out loud with Luna: she speaks, you answer with the mic. Luna follows your ideas, asks for what’s missing and gives you a report at the end; new words go to your vocabulary.",
+        "start": "Start talking",
+        "leave": "Leave for now",
+        "back": "Back",
+        "finish": "Finish and see my report",
+        "progress": "Practice progress",
+        "status": {
+          "speaking": "Luna is speaking…",
+          "listening": "Listening… answer in Spanish.",
+          "thinking": "Luna is thinking…",
+          "reporting": "Luna is preparing your report…",
+          "yourTurn": "Your turn: press the mic and answer in Spanish.",
+          "done": "Practice finished.",
+          "ready": "Luna is ready to talk with you.",
+          "paused": "Paused.",
+          "hearing": "Listening… pause when you’re done.",
+          "missed": "I didn’t catch that. Try again.",
+          "waiting": "One moment…"
+        },
+        "voice": "Luna’s voice",
+        "noMic": "Your browser can’t talk with Luna. Open it in Chrome, Edge or Safari.",
+        "micErrors": {
+          "permission": "Allow the microphone in your browser to talk with Luna.",
+          "network": "Speech recognition isn’t available. Check your connection or type your answer.",
+          "other": "The microphone didn’t work. Try again or type your answer.",
+          "no-speech": ""
+        },
+        "retryReport": "Create report",
+        "reportMissing": "The interview ended, but the report couldn’t be created. Please try again.",
+        "report": {
+          "title": "Your report from Luna",
+          "subtitle": "How your Spanish did in this practice.",
+          "strengths": "What you did well",
+          "improve": "To improve",
+          "corrections": "Better ways to say it",
+          "words": "Words added to your vocabulary",
+          "wordsLink": "Review them in Vocabulary"
+        },
+        "intro": "Speak Spanish with Luna about a topic.",
+        "customTitle": "Your own topic ✨",
+        "customSubtitle": "Want to talk about something else? Type it.",
+        "customLabel": "What do you want to talk about?",
+        "customPlaceholder": "E.g. Mi deporte favorito",
+        "gate": "Everything here is spoken: Luna talks to you and you answer with your microphone. Your browser will ask for permission to use it.",
+        "allowAndStart": "Allow microphone and start",
+        "doneTalking": "I’m done",
+        "tryAgain": "Listen again",
+        "repeat": "Repeat",
+        "pause": "Pause",
+        "resume": "Continue",
+        "voiceSettings": "Voice and speed",
+        "voiceAuto": "Automatic (Marta, Guatemala, if available)",
+        "voiceHelp": "These are the Spanish voices on your device; Edge usually has the most natural ones.",
+        "noVoices": "Your device has no Spanish voices installed.",
+        "speed": "Speed",
+        "speeds": {
+          "slow": "Slow",
+          "normal": "Normal",
+          "fast": "Fast"
+        },
+        "testVoice": "Test voice",
+        "sample": "¡Hola! Soy Luna. ¿Cómo estás hoy?",
+        "help": "Help",
+        "turnError": "Couldn’t reach Luna. Check your connection and try again.",
+        "transcript": {
+          "title": "Conversation",
+          "answers": "{count, plural, =0 {No answers yet} one {# answer} other {# answers}}",
+          "helpAsked": "🆘 I asked for help"
+        }
+      },
+      "left": {
+        "speak": "You have {left} of {perDay} voice practices left today.",
+        "chat": "You have {left} of {perDay} chats left today."
+      },
+      "pages": {
+        "speak": {
+          "title": "Talk with Luna 🎙️",
+          "subtitle": "Practice speaking Spanish out loud with Luna and get a report at the end."
+        },
+        "chat": {
+          "title": "Chat with Luna 💬",
+          "subtitle": "Write in Spanish inside real-life scenes and learn from your mistakes."
+        }
+      },
+      "allowance": {
+        "buy": "Buy AI credits",
+        "left": {
+          "speak": "You have {free, plural, =0 {no free voice practices} one {# free voice practice} other {# free voice practices}} and {credits, plural, =0 {no AI credits} one {# AI credit} other {# AI credits}}.",
+          "chat": "You have {free, plural, =0 {no free chats} one {# free chat} other {# free chats}} and {credits, plural, =0 {no AI credits} one {# AI credit} other {# AI credits}}."
+        },
+        "none": {
+          "speak": "You used your free voice practices. Each class you attend gives you {perClass} more, or buy AI credits to keep talking with Luna.",
+          "chat": "You used your free chats. Each class you attend gives you {perClass} more, or buy AI credits to keep chatting."
+        },
+        "tokens": "Each one can use up to {tokens} tokens."
+      },
+      "lunaHome": {
+        "summary": {
+          "free": "Free practices left",
+          "credits": "AI credits",
+          "done": "Practices done",
+          "reports": "Reports ready"
+        },
+        "pickTitle": "Pick a topic",
+        "pickSubtitle": "Luna speaks first and you answer out loud. Each practice can use up to {tokens} tokens.",
+        "tapToStart": "Tap to start",
+        "tabs": {
+          "all": "All ({count})",
+          "reports": "Reports ready ({count})",
+          "active": "In progress ({count})"
+        },
+        "goals": "{done}/{total} goals",
+        "continue": "Continue",
+        "seeReport": "See report",
+        "empty": {
+          "all": "No practices yet.",
+          "reports": "No reports yet: finish a practice to get one.",
+          "active": "No practices in progress."
+        },
+        "tagline": "Your Spanish conversation partner. She listens, follows your ideas and helps when you get stuck.",
+        "how": {
+          "pick": {
+            "title": "Pick a topic",
+            "text": "One of the suggested ones or your own."
+          },
+          "talk": {
+            "title": "Talk out loud",
+            "text": "Answer with the mic; ask for help whenever you need it."
+          },
+          "report": {
+            "title": "Get your report",
+            "text": "What went well, what to fix, and new words for your vocabulary."
+          }
+        },
+        "balance": {
+          "title": "What you have",
+          "subtitle": "Every class you attend adds {perClass} free practices",
+          "free": "Free practices",
+          "credits": "AI credits",
+          "tokens": "Tokens per practice"
+        }
+      },
+      "chatHome": {
+        "summary": {
+          "free": "Free chats left",
+          "credits": "AI credits",
+          "done": "Chats started",
+          "open": "Open chats"
+        },
+        "pickTitle": "Pick a scene",
+        "pickSubtitle": "Write to Luna in Spanish inside a real-life scene. Each chat can use up to {tokens} tokens.",
+        "tabs": {
+          "all": "All ({count})",
+          "open": "Open ({count})",
+          "done": "Finished ({count})"
+        },
+        "continue": "Continue",
+        "resume": "Resume",
+        "spentNote": "This chat used all its tokens.",
+        "empty": {
+          "all": "No chats yet.",
+          "open": "No open chats.",
+          "done": "No finished chats yet."
+        },
+        "cardTitle": "Chat with Luna",
+        "how": {
+          "pick": {
+            "title": "Pick a scene",
+            "text": "A store, a restaurant, the airport… or your own topic."
+          },
+          "write": {
+            "title": "Write in Spanish",
+            "text": "Luna plays the other role and keeps the conversation going."
+          },
+          "learn": {
+            "title": "Learn from mistakes",
+            "text": "A 💡 shows how to say it better when something is off."
+          }
+        },
+        "balance": {
+          "subtitle": "Every class you attend adds {perClass} free chats",
+          "free": "Free chats",
+          "tokens": "Tokens per chat"
+        }
+      },
+      "chatRoom": {
+        "role": "Playing the scene: {title}",
+        "tip1": "Write in Spanish, even if it's short.",
+        "tip2": "A 💡 under Luna's reply shows how to say it better.",
+        "tip3": "End it when you like and resume it later while it has tokens."
+      },
+      "translate": {
+        "toEnglish": "English",
+        "toSpanish": "Español",
+        "loading": "Translating…"
       }
     }
   }

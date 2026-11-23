@@ -36,6 +36,8 @@ function refreshClass(sessionId: string) {
   revalidatePath("/lessons");
   revalidatePath("/practice");
   revalidatePath("/vocabulary");
+  revalidatePath("/study");
+  revalidatePath("/classes");
 }
 
 /* ---------- Teacher: after the class ---------- */

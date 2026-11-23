@@ -92,7 +92,7 @@ export function StaffOverview({ teachers }: { teachers: StaffTeacherCard[] }) {
   const resetPage = () => setListPage(1);
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("management.staff.title")}
         subtitle={t("management.staff.subtitle")}

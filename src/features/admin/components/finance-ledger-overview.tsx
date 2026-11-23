@@ -20,7 +20,7 @@ type Props = {
 export function FinanceLedgerOverview({ snapshots, charts }: Props) {
   const t = useTranslations("admin");
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.ledger")}
         subtitle={t("finance.ledger.subtitle")}

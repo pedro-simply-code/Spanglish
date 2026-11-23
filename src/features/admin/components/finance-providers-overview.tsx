@@ -69,7 +69,7 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.providers")}
         subtitle={t("finance.providers.subtitle")}

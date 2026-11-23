@@ -25,9 +25,11 @@ import {
   IconPin,
   IconUsers,
 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   ConnectionState,
+  DisconnectReason,
   Room,
   RoomEvent,
   Track,
@@ -55,13 +57,13 @@ import {
   parseClassroomParticipantMetadata,
 } from "@/features/classes/classroom-protocol";
 import {
+  getClassLiveSessionStatusAction,
   listClassroomChatMessagesAction,
   muteClassroomParticipantAction,
   sendClassroomChatMessageAction,
 } from "@/features/classes/classroom-actions";
 import { ClassroomChat } from "@/features/classes/components/classroom-chat";
 import {
-  ClassroomCaptionsButton,
   ClassroomTranscriptPanel,
 } from "@/features/classes/components/classroom-captions";
 import { useClassroomCaptions } from "@/features/classes/components/use-classroom-captions";
@@ -144,6 +146,8 @@ function readRoster(room: Room, t: (key: string) => string): RosterPerson[] {
 
   const list = [mapParticipant(room.localParticipant, true)];
   room.remoteParticipants.forEach((participant) => {
+    // The classroom agent only listens (live transcript): no tile, not in the list.
+    if (participant.isAgent) return;
     list.push(mapParticipant(participant, false));
   });
   return list.sort((a, b) => Number(b.isLocal) - Number(a.isLocal));
@@ -279,6 +283,20 @@ export function ClassroomLiveKitStage({
 }: ClassroomLiveKitStageProps) {
   const { showError, showInfo, showSuccess } = useAppToast();
   const t = useTranslations("classroom");
+  const router = useRouter();
+  /** Set once the teacher ends the class, so the ending is handled once. */
+  const classEndedRef = useRef(false);
+  const handleClassEnded = useCallback(() => {
+    if (classEndedRef.current) return;
+    classEndedRef.current = true;
+    // The teacher who ended it already got a confirmation.
+    if (!canEndLiveSession) showInfo({ message: t("signals.classEnded") });
+    router.refresh();
+  }, [canEndLiveSession, router, showInfo, t]);
+  const handleClassEndedRef = useRef(handleClassEnded);
+  useEffect(() => {
+    handleClassEndedRef.current = handleClassEnded;
+  }, [handleClassEnded]);
   const guestViewOnly = guestViewer && !guestSelfServeMedia;
   const showMediaDeviceControls = !guestViewOnly || guestSelfServeMedia;
   const mayPresentWithoutAsk = canModerate || guestSelfServeMedia;
@@ -404,16 +422,22 @@ export function ClassroomLiveKitStage({
     localOnly: !canModerate && localRecordingGranted,
   });
 
-  const captions = useClassroomCaptions({
-    room: liveRoom,
-    classId,
-    localName: viewerName,
-    canModerate: Boolean(canModerate),
-    micOn,
-    canSpeak: !guestViewOnly,
-    canSave: true,
-    guestJoinToken,
-  });
+  // Fallback when the room could not be deleted: students check every few
+  // seconds whether the teacher ended the class.
+  useEffect(() => {
+    if (canModerate || !liveRoom) return;
+    const id = window.setInterval(() => {
+      void getClassLiveSessionStatusAction(classId).then(({ active }) => {
+        if (!active) {
+          liveRoom.disconnect().catch(() => undefined);
+          handleClassEndedRef.current();
+        }
+      });
+    }, 10_000);
+    return () => window.clearInterval(id);
+  }, [canModerate, classId, liveRoom]);
+
+  const captions = useClassroomCaptions({ room: liveRoom, classId, guestJoinToken });
 
   const resolveStageCameraIdentity = useCallback((layout: LayoutSnapshot) => {
     if (layout.viewMode === "speaker" && layout.pinnedIdentity) {
@@ -1364,7 +1388,11 @@ export function ClassroomLiveKitStage({
       });
       bump();
     });
-    room.on(RoomEvent.Disconnected, () => {
+    room.on(RoomEvent.Disconnected, (reason?: DisconnectReason) => {
+      // The teacher ended the class: the server deleted the LiveKit room.
+      if (reason === DisconnectReason.ROOM_DELETED) {
+        handleClassEndedRef.current();
+      }
       setSharingScreen(false);
       setCameraOn(false);
       setMicOn(false);
@@ -1843,7 +1871,7 @@ export function ClassroomLiveKitStage({
                 <Badge
                   variant="dot"
                   color="primary"
-                  invisible={!captions.state.enabled || sidebarTab === "transcript"}
+                  invisible={!captions.active || sidebarTab === "transcript"}
                 >
                   <IconFileText size={18} />
                 </Badge>
@@ -1859,11 +1887,7 @@ export function ClassroomLiveKitStage({
             </Box>
           ) : sidebarTab === "transcript" ? (
             <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
-              <ClassroomTranscriptPanel
-                lines={captions.lines}
-                state={captions.state}
-                canModerate={Boolean(canModerate)}
-              />
+              <ClassroomTranscriptPanel lines={captions.lines} active={captions.active} />
             </Box>
           ) : (
             <>
@@ -2028,15 +2052,6 @@ export function ClassroomLiveKitStage({
           followHostLayout={studentAudienceTools ? followHostLayout : undefined}
           onFollowHostLayout={studentAudienceTools ? followTeacherLayout : undefined}
         />
-        {canModerate ? (
-          <ClassroomCaptionsButton
-            state={captions.state}
-            busy={captions.busy}
-            onSetCaptions={(enabled, lang) => {
-              void captions.setCaptions(enabled, lang);
-            }}
-          />
-        ) : null}
         {canModerate ? (
           <>
             <Divider

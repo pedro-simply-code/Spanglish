@@ -86,6 +86,7 @@ export type LessonEntry = {
   id: string;
   topic: string;
   teacherName: string;
+  teacherAvatar: string | null;
   startsAt: string;
   durationMinutes: number;
   classType: string;
@@ -95,6 +96,8 @@ export type LessonEntry = {
   homework: string | null;
   hasRecording: boolean;
   hasTranscript: boolean;
+  /** Overview from Claude's class summary, in the viewer's language. */
+  summary: string | null;
   vocabularyCount: number;
   assignmentCount: number;
   pendingAssignments: number;

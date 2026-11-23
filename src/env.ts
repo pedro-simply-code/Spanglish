@@ -85,6 +85,15 @@ export const env = createEnv({
     CLASS_TEACHER_STARTS_SESSION: z.stringbool().default(true),
     /** RTMP ingest URL for LiveKit egress (e.g. YouTube Live). */
     LIVEKIT_RTMP_URL: z.string().url().optional(),
+    /**
+     * Name the classroom agent registers with (agent/classroom-agent.ts). When set,
+     * every class room asks LiveKit to send that agent in to transcribe it.
+     */
+    CLASSROOM_AGENT_NAME: z.string().min(1).max(60).optional(),
+    /** Shared secret the agent sends to /api/agent/transcript (32+ characters). */
+    CLASSROOM_AGENT_SECRET: z.string().min(32).optional(),
+    /** Claude writes a summary of each class from its transcript when it ends. */
+    LESSON_SUMMARY_ENABLED: z.stringbool().default(true),
 
     // Recordings: Backblaze B2 (https://www.backblaze.com/b2/cloud-storage.html)
     B2_KEY_ID: z.string().min(1).optional(),
@@ -105,6 +114,29 @@ export const env = createEnv({
     STRIPE_CONNECT_COUNTRY: z.string().length(2).default("US"),
     /** Shown to teachers: typical review + bank settlement time after a payout is sent. */
     PAYOUT_PROCESSING_BUSINESS_DAYS: z.coerce.number().int().positive().max(30).default(5),
+
+    // AI conversation practice (Anthropic Claude)
+    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    /** Cheapest current Claude model by default; change without a deploy of code. */
+    ANTHROPIC_MODEL: z.string().min(1).default("claude-haiku-5-5"),
+    /** Total tokens (input + output, scene included) one practice conversation may use. */
+    AI_CONVERSATION_TOKEN_LIMIT: z.coerce.number().int().min(2000).max(200000).default(10000),
+    /** USD per million tokens for ANTHROPIC_MODEL; used to show the cost of each conversation. */
+    AI_PRICE_INPUT_PER_MTOK: z.coerce.number().min(0).default(0.1),
+    AI_PRICE_OUTPUT_PER_MTOK: z.coerce.number().min(0).default(0.5),
+    /** Optional safety cap on new practice conversations per day and mode (0 = no cap; free and paid both count). */
+    AI_CONVERSATIONS_PER_DAY: z.coerce.number().int().min(0).max(100).default(0),
+    /** Free conversations per attended class, for each practice (Luna and chat). */
+    AI_FREE_CONVERSATIONS_PER_CLASS: z.coerce.number().int().min(0).max(20).default(2),
+    /** AI credit packs: conservative model price (USD per million tokens, input and output mixed). */
+    AI_CREDIT_USD_PER_MTOK: z.coerce.number().positive().max(100).default(0.3),
+    /** AI credit packs: each conversation is priced at this many times its model cost. */
+    AI_CREDIT_COST_MULTIPLIER: z.coerce.number().min(1).max(20).default(2),
+    /** Card fee taken by the payment provider, used to price AI credit packs. */
+    PAYMENT_FEE_PERCENT: z.coerce.number().min(0).max(20).default(2.9),
+    PAYMENT_FEE_FIXED_CENTS: z.coerce.number().int().min(0).max(500).default(30),
+    /** Protects /api/cron/* (scheduled jobs send `Authorization: Bearer <CRON_SECRET>`). */
+    CRON_SECRET: z.string().min(16).optional(),
 
     // Live classes: student policy
     CLASS_CANCEL_CUTOFF_HOURS: z.coerce.number().int().positive().default(24),
@@ -170,6 +202,9 @@ export const env = createEnv({
     LIVEKIT_API_KEY: process.env.LIVEKIT_API_KEY,
     LIVEKIT_API_SECRET: process.env.LIVEKIT_API_SECRET,
     MEETING_TOKEN_TTL_MINUTES: process.env.MEETING_TOKEN_TTL_MINUTES,
+    CLASSROOM_AGENT_NAME: process.env.CLASSROOM_AGENT_NAME,
+    CLASSROOM_AGENT_SECRET: process.env.CLASSROOM_AGENT_SECRET,
+    LESSON_SUMMARY_ENABLED: process.env.LESSON_SUMMARY_ENABLED,
     CLASS_WAITING_ROOM: process.env.CLASS_WAITING_ROOM,
     CLASS_TEACHER_STARTS_SESSION: process.env.CLASS_TEACHER_STARTS_SESSION,
     LIVEKIT_RTMP_URL: process.env.LIVEKIT_RTMP_URL,
@@ -184,6 +219,18 @@ export const env = createEnv({
     STRIPE_ALLOW_LIVE: process.env.STRIPE_ALLOW_LIVE,
     STRIPE_CONNECT_COUNTRY: process.env.STRIPE_CONNECT_COUNTRY,
     PAYOUT_PROCESSING_BUSINESS_DAYS: process.env.PAYOUT_PROCESSING_BUSINESS_DAYS,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL,
+    AI_CONVERSATION_TOKEN_LIMIT: process.env.AI_CONVERSATION_TOKEN_LIMIT,
+    AI_CONVERSATIONS_PER_DAY: process.env.AI_CONVERSATIONS_PER_DAY,
+    AI_FREE_CONVERSATIONS_PER_CLASS: process.env.AI_FREE_CONVERSATIONS_PER_CLASS,
+    AI_CREDIT_USD_PER_MTOK: process.env.AI_CREDIT_USD_PER_MTOK,
+    AI_CREDIT_COST_MULTIPLIER: process.env.AI_CREDIT_COST_MULTIPLIER,
+    PAYMENT_FEE_PERCENT: process.env.PAYMENT_FEE_PERCENT,
+    PAYMENT_FEE_FIXED_CENTS: process.env.PAYMENT_FEE_FIXED_CENTS,
+    CRON_SECRET: process.env.CRON_SECRET,
+    AI_PRICE_INPUT_PER_MTOK: process.env.AI_PRICE_INPUT_PER_MTOK,
+    AI_PRICE_OUTPUT_PER_MTOK: process.env.AI_PRICE_OUTPUT_PER_MTOK,
     CLASS_CANCEL_CUTOFF_HOURS: process.env.CLASS_CANCEL_CUTOFF_HOURS,
     CLASS_RESCHEDULE_CUTOFF_HOURS: process.env.CLASS_RESCHEDULE_CUTOFF_HOURS,
     CLASS_JOIN_WINDOW_BEFORE_MINUTES:

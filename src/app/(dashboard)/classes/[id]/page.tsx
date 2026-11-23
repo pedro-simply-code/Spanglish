@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { getClassRelation, loadClassForActor } from "@/features/classes";
 import { ClassDetail } from "@/features/classroom";
@@ -12,6 +12,7 @@ import { getUserProfile } from "@/server/auth/user-repository";
 import { resolveTimeZone } from "@/lib/timezone";
 import { listClassRecordings } from "@/server/classes/recordings";
 import { listClassTranscript } from "@/server/classes/class-transcript-repository";
+import { getLessonSummary } from "@/server/ai/lesson-summary";
 import { getClassLearning } from "@/server/learning/class-learning";
 import { listLibraryForStaffOrTeacher } from "@/server/materials/library";
 import { getMyRating } from "@/server/teaching/ratings";
@@ -39,7 +40,8 @@ export default function ClassDetailPage({ params }: ClassDetailPageProps) {
 async function ClassDetailContent({ params }: ClassDetailPageProps) {
   const { id } = await params;
   const actor = await getActor();
-  const [item, relation, profile, myRating, recordings, transcript, learning] = await Promise.all([
+  const locale = (await getLocale()) === "es" ? "es" : "en";
+  const [item, relation, profile, myRating, recordings, transcript, learning, summary] = await Promise.all([
     loadClassForActor(id, actor),
     getClassRelation(id, actor),
     getUserProfile(actor.userId),
@@ -47,6 +49,7 @@ async function ClassDetailContent({ params }: ClassDetailPageProps) {
     listClassRecordings(actor, id),
     listClassTranscript(actor, id),
     getClassLearning(actor, id),
+    getLessonSummary(actor, id, locale),
   ]);
 
   if (!item || !relation) {
@@ -71,6 +74,7 @@ async function ClassDetailContent({ params }: ClassDetailPageProps) {
       myRating={myRating}
       recordings={recordings}
       transcript={transcript}
+      summary={summary}
       learning={learning}
       library={library}
     />

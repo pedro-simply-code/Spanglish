@@ -17,6 +17,7 @@ export const materialKindLabels: Record<MaterialKind, string> = {
   audio: "Audio",
   form: "Form",
   recording: "Recording",
+  practice: "Practice games",
 };
 
 export const materialKindOptions: MaterialKind[] = [
@@ -26,6 +27,7 @@ export const materialKindOptions: MaterialKind[] = [
   "audio",
   "form",
   "recording",
+  "practice",
 ];
 
 /**

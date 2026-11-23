@@ -76,7 +76,7 @@ export function OrganizationManagersOverview({ managers, invitations, mailFromNa
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.managers")}
         subtitle={t("organization.managers.subtitle")}

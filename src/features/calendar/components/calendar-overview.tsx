@@ -209,7 +209,7 @@ export function CalendarOverview({
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb title={t("calendar.breadcrumb")} subtitle={subtitles[role]} />
 
       <Card variant="outlined" sx={{ p: 0 }}>
@@ -285,7 +285,7 @@ export function CalendarOverview({
               ) : null}
               {role === "student" ? (
                 <LinkButton
-                  href="/schedule"
+                  href="/classes?tab=book"
                   variant="contained"
                   size="small"
                   startIcon={<IconCalendarPlus size={16} />}
@@ -336,7 +336,7 @@ export function CalendarOverview({
               reload(date, next, teacherId);
             }}
             selectable={role === "student"}
-            onSelectSlot={() => router.push("/schedule")}
+            onSelectSlot={() => router.push("/classes?tab=book")}
             onSelectEvent={(event) => {
               if ("item" in event) router.push(`/classes/${event.id}`);
             }}

@@ -112,3 +112,29 @@ export async function deleteRecordingObject(key: string) {
   await client.send(new DeleteObjectCommand({ Bucket: env.B2_BUCKET_NAME, Key: key }));
   return true;
 }
+
+/** Uploads a small object from the server (e.g. a practice recording). */
+export async function putB2Object(input: { key: string; body: Buffer; contentType: string }) {
+  const client = getB2Client();
+  if (!client || !env.B2_BUCKET_NAME) throw new Error("Backblaze B2 is not configured.");
+  await client.send(
+    new PutObjectCommand({
+      Bucket: env.B2_BUCKET_NAME,
+      Key: input.key,
+      Body: input.body,
+      ContentType: input.contentType,
+      ContentLength: input.body.length,
+    }),
+  );
+}
+
+/** Short-lived link to play an object inline (not as a download). */
+export async function getB2PlaybackUrl(key: string, expiresInSeconds = 60 * 10) {
+  const client = getB2Client();
+  if (!client || !env.B2_BUCKET_NAME) return null;
+  return getSignedUrl(
+    client,
+    new GetObjectCommand({ Bucket: env.B2_BUCKET_NAME, Key: key, ResponseContentDisposition: "inline" }),
+    { expiresIn: expiresInSeconds },
+  );
+}

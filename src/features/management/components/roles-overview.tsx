@@ -21,7 +21,7 @@ export function RolesOverview({ roleCounts }: { roleCounts: Record<RoleCode, num
   const locale = useLocale();
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("management.roles.title")}
         subtitle={t("management.roles.subtitle")}

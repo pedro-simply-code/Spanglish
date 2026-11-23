@@ -2,7 +2,8 @@ import { suggestedPackageId } from "@/lib/pricing-package-schema";
 
 export type ClassDuration = 25 | 50;
 export type ClassType = "one-on-one" | "paired";
-export type PackageSize = 30 | 60 | 90;
+/** 1 = a single class (no bundle discount). */
+export type PackageSize = 1 | 30 | 60 | 90;
 
 export type AcademyPlan = {
   id: string;
@@ -19,7 +20,7 @@ export type AcademyPlan = {
   savings: number;
 };
 
-const packageSizes: PackageSize[] = [30, 60, 90];
+const packageSizes: PackageSize[] = [1, 30, 60, 90];
 const classTypes: ClassType[] = ["one-on-one", "paired"];
 const classDurations: ClassDuration[] = [25, 50];
 
@@ -28,16 +29,17 @@ const prices: Record<
   Record<ClassDuration, Record<PackageSize, number>>
 > = {
   "one-on-one": {
-    25: { 30: 16, 60: 12, 90: 11 },
-    50: { 30: 23, 60: 17, 90: 16 },
+    25: { 1: 18, 30: 16, 60: 12, 90: 11 },
+    50: { 1: 26, 30: 23, 60: 17, 90: 16 },
   },
   paired: {
-    25: { 30: 24, 60: 18, 90: 16 },
-    50: { 30: 34, 60: 26, 90: 23 },
+    25: { 1: 27, 30: 24, 60: 18, 90: 16 },
+    50: { 1: 38, 30: 34, 60: 26, 90: 23 },
   },
 };
 
 function getPlanName(type: ClassType, classes: PackageSize) {
+  if (classes === 1) return type === "paired" ? "Single paired class" : "Single class";
   if (type === "paired") {
     if (classes === 30) return "Paired starter";
     if (classes === 60) return "Paired progress";
@@ -50,6 +52,7 @@ function getPlanName(type: ClassType, classes: PackageSize) {
 }
 
 function getPlanLabel(classes: PackageSize) {
+  if (classes === 1) return "Single";
   if (classes === 30) return "Starter";
   if (classes === 60) return "Most popular";
   return "Best value";
@@ -57,6 +60,10 @@ function getPlanLabel(classes: PackageSize) {
 
 function getPlanDescription(type: ClassType, classes: PackageSize) {
   const audience = type === "paired" ? "each student" : "you";
+
+  if (classes === 1) {
+    return "One class when you need it, no commitment.";
+  }
 
   if (classes === 30) {
     return `Try live classes or get focused help in one area, with ${audience} keeping a light schedule.`;
@@ -90,7 +97,8 @@ function createPlan(
     total,
     perStudentTotal: type === "paired" ? total / 2 : null,
     perStudentPerClass: type === "paired" ? pricePerClass / 2 : null,
-    savings: Math.round(((starterPrice - pricePerClass) / starterPrice) * 100),
+    // The single class costs more than the starter bundle: no savings there.
+    savings: Math.max(0, Math.round(((starterPrice - pricePerClass) / starterPrice) * 100)),
   };
 }
 

@@ -33,7 +33,7 @@ async function Result({ searchParams }: Props) {
   // The webhook usually got here first; this makes the page right either way.
   const result = await fulfillFromReturn(actor, sessionId).catch(() => ({ status: "not-found" as const }));
   if (result.status === "paid" || result.status === "already-paid") {
-    return <CheckoutResult state="paid" credits={result.credits} />;
+    return <CheckoutResult state="paid" credits={result.credits} aiCredits={"aiCredits" in result && result.aiCredits === true} />;
   }
   return <CheckoutResult state={result.status === "unpaid" ? "processing" : "failed"} />;
 }

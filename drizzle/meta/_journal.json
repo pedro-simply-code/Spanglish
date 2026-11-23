@@ -113,6 +113,83 @@
       "when": 1795023974408,
       "tag": "0015_learning",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1795039164874,
+      "tag": "0016_ai_conversations",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795040979582,
+      "tag": "0017_ai_scenarios",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795042021615,
+      "tag": "0018_ai_scenes_animated",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795045779259,
+      "tag": "0019_ai_interview",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795124597060,
+      "tag": "0020_ai_voice_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795211978258,
+      "tag": "0021_ai_credits",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1795213638754,
+      "tag": "0022_ai_pack_margin",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795213639596,
+      "tag": "0023_ai_pack_drop_credits",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795216896552,
+      "tag": "0024_ai_message_translation",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795216956552,
+      "tag": "0025_ai_scenes_luna",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795454640793,
+      "tag": "0026_class_agent_transcript_summaries",
+      "breakpoints": true
     }
   ]
 }

@@ -28,7 +28,7 @@ export function CommercePublishOverview({
   const draftCount = packages.length - liveCount;
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("commerce.publish.title")}
         subtitle={t("commerce.publish.subtitle")}

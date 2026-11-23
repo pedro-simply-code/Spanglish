@@ -116,7 +116,9 @@
         "twoFactorBackupCodesRegenerated": "New 2FA backup codes",
         "twoFactorDisabled": "2FA turned off",
         "twoFactorEnabled": "2FA turned on",
-        "twoFactorLockout": "2FA locked after failed codes"
+        "twoFactorLockout": "2FA locked after failed codes",
+        "aiCreditsPurchased": "AI credits purchased",
+        "aiPackSaved": "AI credit pack saved"
       },
       "unknownAccount": "Unknown account"
     },
@@ -956,6 +958,60 @@
         "beginner": "Beginner cohort",
         "intermediate": "Intermediate cohort",
         "notSet": "Level not set"
+      }
+    },
+    "aiPacks": {
+      "title": "AI credit packs",
+      "subtitle": "Set the price and your margin; the conversations each pack gives are calculated from the settings below (env). 1 credit = 1 conversation.",
+      "name": "Name",
+      "price": "Price (USD)",
+      "active": "On sale",
+      "add": "Add pack",
+      "save": "Save",
+      "delete": "Delete",
+      "empty": "No AI credit packs yet.",
+      "saved": "Pack saved.",
+      "deleted": "Pack deleted.",
+      "invalid": "Check the name, the price (at least $1) and the margin (0–90%): the pack must give at least 1 conversation.",
+      "forbidden": "Only admins can change AI credit packs.",
+      "confirmDelete": "Delete?",
+      "margin": "Margin %",
+      "config": {
+        "tokens": "{tokens} tokens per conversation",
+        "rate": "${rate} per million tokens",
+        "multiplier": "×{times} safety",
+        "fee": "Card fee {percent}% + {fixed}",
+        "perConversation": "Cost per conversation {amount}"
+      },
+      "math": {
+        "conversations": "Conversations",
+        "fee": "Card fee",
+        "margin": "Your margin",
+        "ai": "Reserved for the AI",
+        "perConversation": "Student pays per conversation"
+      }
+    },
+    "pendingPayments": {
+      "title": "Pending payments",
+      "subtitle": "Stripe payments still waiting for confirmation. They are checked every hour; check them now if a student says they paid.",
+      "checkAll": "Check all with Stripe",
+      "check": "Check with Stripe",
+      "pending": "Pending",
+      "aiItem": "{count} AI conversations",
+      "classItem": "{count, plural, one {# class} other {# classes}} · {minutes} min",
+      "empty": "No pending payments.",
+      "stripeOff": "Stripe checkout is off: demo purchases are never pending.",
+      "forbidden": "Only admins can check payments.",
+      "notPending": "That payment is no longer pending.",
+      "summary": "Checked {checked}: {paid} paid, {canceled} canceled, {open} still open.",
+      "outcome": {
+        "paid": "Paid: {count} credits added.",
+        "canceled": "The payment page expired: canceled.",
+        "open": "Still open: the student hasn't paid yet.",
+        "processing": "The bank is still confirming it.",
+        "not-found": "Stripe doesn't know this payment.",
+        "mismatch": "The amount paid doesn't match: check it in Stripe.",
+        "error": "Couldn't reach Stripe. Try again."
       }
     }
   }

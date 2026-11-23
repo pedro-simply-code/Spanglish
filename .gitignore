@@ -22,6 +22,7 @@
 
 # class recordings (local dev storage)
 /storage/recordings/
+/storage/practice-audio/
 
 # misc
 .DS_Store

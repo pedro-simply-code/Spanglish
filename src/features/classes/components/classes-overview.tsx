@@ -17,6 +17,7 @@ import {
   IconCalendarPlus,
   IconCreditCard,
   IconHelpCircle,
+  IconMail,
   IconShieldCheck,
   IconVideo,
 } from "@tabler/icons-react";
@@ -24,6 +25,8 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { useTranslations } from "next-intl";
 import { classTypeLabel } from "@/lib/class-type-label";
 import { LinkButton } from "@/components/ui/link-button";
+import { ListPagination } from "@/components/ui/list-pagination";
+import { buildAcademyComposeUrl } from "@/lib/academy-contact";
 import { SectionCard } from "@/components/ui/section-card";
 import { ClassListCard } from "@/features/classes/components/class-list-card";
 import { getClassStatus, type ClassPolicy } from "@/features/classes/policy";
@@ -62,7 +65,12 @@ type ClassesOverviewProps = {
   credits: ClassCreditSummary[] | null;
   /** Signed-in user, so each card can say who the class is with. */
   viewerId?: string;
+  /** Students: who to write to about a change outside the window (opens the site's Email). */
+  support?: { email: string; name: string; fromName: string } | null;
 };
+
+/** Classes shown per page in each status tab. */
+const CLASSES_PER_PAGE = 5;
 
 export function ClassesOverview({
   policy,
@@ -71,8 +79,10 @@ export function ClassesOverview({
   viewMode = "student",
   credits,
   viewerId,
+  support = null,
 }: ClassesOverviewProps) {
   const [tab, setTab] = useState<LiveClassStatus>("upcoming");
+  const [page, setPage] = useState(1);
   const t = useTranslations("student");
   const statusLabels: Record<LiveClassStatus, string> = {
     upcoming: t(statusKeys.upcoming),
@@ -101,13 +111,18 @@ export function ClassesOverview({
         : second - first;
     });
 
+  // A page left past the end (e.g. a class changed tab) falls back to the last one.
+  const pageCount = Math.max(1, Math.ceil(visible.length / CLASSES_PER_PAGE));
+  const currentPage = Math.min(page, pageCount);
+  const pageItems = visible.slice((currentPage - 1) * CLASSES_PER_PAGE, currentPage * CLASSES_PER_PAGE);
+
   const totalCredits = (credits ?? []).reduce(
     (sum, item) => sum + item.balance,
     0,
   );
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={
           viewMode === "staff"
@@ -129,7 +144,8 @@ export function ClassesOverview({
             background: "linear-gradient(120deg, #FFFFFF 0%, #FBF2EF 100%)",
           }}
         >
-          <CardContent sx={{ p: { xs: "30px", md: "35px" } }}>
+          {/* 15px on each side (30px in total per axis); MUI adds extra bottom padding to the last CardContent otherwise. */}
+          <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
             <Grid container spacing={3} alignItems="center">
               <Grid size={{ xs: 12, md: 7 }}>
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -179,14 +195,14 @@ export function ClassesOverview({
                   justifyContent={{ xs: "flex-start", md: "flex-end" }}
                 >
                   <LinkButton
-                    href="/schedule"
+                    href="/classes?tab=book"
                     variant="contained"
                     startIcon={<IconCalendarPlus size={18} />}
                   >
                     {t("actions.bookClass")}
                   </LinkButton>
                   <LinkButton
-                    href="/pricing"
+                    href="/credits?tab=buy"
                     variant="outlined"
                     startIcon={<IconCreditCard size={18} />}
                   >
@@ -203,10 +219,13 @@ export function ClassesOverview({
         <Grid size={{ xs: 12, lg: 8 }}>
           <Stack spacing={3}>
             <Card elevation={9}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}>
+              <Box sx={{ px: 2 }}>
                 <Tabs
                   value={tab}
-                  onChange={(_, value: LiveClassStatus) => setTab(value)}
+                  onChange={(_, value: LiveClassStatus) => {
+                    setTab(value);
+                    setPage(1);
+                  }}
                   variant="scrollable"
                   allowScrollButtonsMobile
                   aria-label={t("classes.overview.statusAria")}
@@ -227,7 +246,7 @@ export function ClassesOverview({
 
             {visible.length ? (
               <Stack spacing={2}>
-                {visible.map((item) => (
+                {pageItems.map((item) => (
                   <ClassListCard
                     key={item.id}
                     item={item}
@@ -236,10 +255,19 @@ export function ClassesOverview({
                     viewerId={viewerId}
                   />
                 ))}
+                <ListPagination
+                  page={currentPage}
+                  total={visible.length}
+                  pageSize={CLASSES_PER_PAGE}
+                  onPageChange={(next) => {
+                    setPage(next);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
               </Stack>
             ) : (
               <Card elevation={9}>
-                <CardContent sx={{ p: "40px", textAlign: "center" }}>
+                <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" }, textAlign: "center" }}>
                   <Avatar
                     sx={{
                       width: 56,
@@ -268,7 +296,7 @@ export function ClassesOverview({
                       : t("classes.overview.emptyOther")}
                   </Typography>
                   {tab === "upcoming" || tab === "canceled" ? (
-                    <LinkButton href="/schedule" variant="contained">
+                    <LinkButton href="/classes?tab=book" variant="contained">
                       {t("actions.bookClass")}
                     </LinkButton>
                   ) : null}
@@ -281,6 +309,7 @@ export function ClassesOverview({
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <SectionCard
+              padding="15px"
               title={t("classes.overview.policyTitle")}
               subtitle={t("classes.overview.policySubtitle")}
               action={
@@ -343,6 +372,7 @@ export function ClassesOverview({
             </SectionCard>
 
             <SectionCard
+              padding="15px"
               title={t("classes.overview.atGlance")}
               subtitle={t("classes.overview.yourActivity")}
               action={
@@ -375,39 +405,49 @@ export function ClassesOverview({
               </Stack>
             </SectionCard>
 
-            <SectionCard
-              title={t("classes.overview.needHand")}
-              subtitle={t("classes.overview.hereToHelp")}
-            >
-              <Stack direction="row" spacing={2} alignItems="flex-start">
-                <Avatar
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    bgcolor: "warning.light",
-                    color: "warning.main",
-                  }}
-                >
-                  <IconHelpCircle size={20} />
-                </Avatar>
-                <Box>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {t("classes.overview.outsideWindow")}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" mt={0.5}>
-                    {t("classes.overview.outsideWindowBody")}
-                  </Typography>
-                  <LinkButton
-                    href="/settings"
-                    size="small"
-                    sx={{ mt: 1.5, px: 0 }}
-                    endIcon={null}
+            {support ? (
+              <SectionCard
+                padding="15px"
+                title={t("classes.overview.needHand")}
+                subtitle={t("classes.overview.hereToHelp")}
+              >
+                <Stack direction="row" spacing={2} alignItems="flex-start">
+                  <Avatar
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      bgcolor: "warning.light",
+                      color: "warning.main",
+                    }}
                   >
-                    {t("actions.openSettings")}
-                  </LinkButton>
-                </Box>
-              </Stack>
-            </SectionCard>
+                    <IconHelpCircle size={20} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      {t("classes.overview.outsideWindow")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" mt={0.5}>
+                      {t("classes.overview.outsideWindowBody")}
+                    </Typography>
+                    <LinkButton
+                      href={buildAcademyComposeUrl({
+                        to: support.email,
+                        recipientName: support.name,
+                        fromName: support.fromName,
+                        topic: t("classes.overview.supportTopic"),
+                      })}
+                      size="small"
+                      variant="contained"
+                      sx={{ mt: 1.5 }}
+                      startIcon={<IconMail size={16} />}
+                      endIcon={null}
+                    >
+                      {t("classes.overview.writeAcademy")}
+                    </LinkButton>
+                  </Box>
+                </Stack>
+              </SectionCard>
+            ) : null}
           </Stack>
         </Grid>
       </Grid>

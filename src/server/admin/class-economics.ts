@@ -40,6 +40,8 @@ async function buildPricePerClassUsd(): Promise<Map<string, number>> {
   const map = new Map<string, number>();
 
   for (const row of rows) {
+    // The single-class row would skew the per-class estimate; bundles only.
+    if (row.credits === 1) continue;
     const key = `${row.classType}-${row.durationMinutes}`;
     if (!map.has(key)) {
       map.set(key, row.pricePerClassCents / 100);
@@ -48,6 +50,7 @@ async function buildPricePerClassUsd(): Promise<Map<string, number>> {
 
   if (map.size === 0) {
     for (const plan of academyPlans) {
+      if (plan.classes === 1) continue;
       const key = `${plan.type}-${plan.duration}`;
       if (!map.has(key)) {
         map.set(key, plan.pricePerClass);

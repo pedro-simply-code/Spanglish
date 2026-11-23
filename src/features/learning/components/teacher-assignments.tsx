@@ -52,7 +52,7 @@ export function TeacherAssignments({
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={tRoot("teacher.assignments.title")}
         subtitle={tRoot("teacher.assignments.subtitle")}

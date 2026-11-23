@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
-import { ProfileCompletionCard } from "@/features/auth";
 import { getClassStatus, getJoinState, loadClassesForActor } from "@/features/classes";
 import { HomeOverview } from "@/features/home";
 import { appNow } from "@/lib/app-clock";
@@ -45,7 +44,7 @@ async function HomeContent() {
     listBalancesForStudent(actor.userId),
     getStudentInsights(actor.userId, timeZone),
     listAssignmentsForStudent(actor.userId),
-    listLessonHistory(actor.userId),
+    listLessonHistory(actor.userId, (await getLocale()) === "es" ? "es" : "en"),
   ]);
 
   const upcoming = classes
@@ -63,7 +62,6 @@ async function HomeContent() {
 
   return (
     <>
-      <ProfileCompletionCard completion={completion} />
       <HomeOverview
         firstName={firstName}
         timeZone={timeZone}
@@ -78,6 +76,8 @@ async function HomeContent() {
                 durationMinutes: next.duration,
                 type: next.type,
                 canJoin: getJoinState(next, now, policy).canJoin,
+                // "Live now" only inside the real window, even when early entry is allowed.
+                live: getJoinState(next, now, { ...policy, relaxJoinWindow: false }).canJoin,
               }
             : null
         }
@@ -93,6 +93,9 @@ async function HomeContent() {
         insights={insights}
         pendingAssignments={pendingAssignments}
         lastLesson={lessons[0] ?? null}
+        profileReminder={
+          !completion.hasGoal ? "goal" : !completion.hasPhoto ? "photo" : null
+        }
       />
     </>
   );

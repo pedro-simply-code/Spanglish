@@ -17,7 +17,11 @@ import {
   startRoomRtmpStream,
   stopActiveEgress,
 } from "@/server/classes/livekit-egress";
-import { muteAllRemoteTracks, muteParticipantMicrophone } from "@/server/classes/livekit-moderation";
+import {
+  closeLiveKitRoom,
+  muteAllRemoteTracks,
+  muteParticipantMicrophone,
+} from "@/server/classes/livekit-moderation";
 import { sanitizeLiveKitRoomName } from "@/server/classes/livekit";
 import {
   endClassLiveSession,
@@ -47,18 +51,12 @@ import {
 import { classRoomName, getClassView } from "@/server/classes/class-repository";
 import { parseGuestJoinToken } from "@/server/classes/guest-join";
 import { env } from "@/env";
+import { isClassOpenForStudents } from "@/server/classes/teacher-presence";
 import {
-  isCaptionLang,
-  type ClassCaptionsState,
   type ClassroomChatMessage,
   type ClassTranscriptLine,
 } from "@/features/classes/classroom-protocol";
-import {
-  getClassCaptions,
-  insertTranscriptSegments,
-  listTranscriptSegments,
-  setClassCaptions,
-} from "@/server/classes/class-transcript-repository";
+import { listTranscriptSegments } from "@/server/classes/class-transcript-repository";
 
 export type ClassroomActionResult = {
   ok: boolean;
@@ -149,12 +147,18 @@ export async function createStaffGuestJoinLinkAction(
   return { ok: true, message: t("actions.staffLinkReady"), url };
 }
 
-export async function getClassLiveSessionStatusAction(classId: string) {
+/**
+ * Is the live class on? `entering` (the waiting screen) also asks that the
+ * teacher be in the room, so a student never finds an empty call; students
+ * already inside only check that the class was not ended.
+ */
+export async function getClassLiveSessionStatusAction(classId: string, options: { entering?: boolean } = {}) {
   if (!env.CLASS_TEACHER_STARTS_SESSION) {
     return { active: true, session: null as Awaited<ReturnType<typeof getClassLiveSession>> };
   }
 
   const session = await getClassLiveSession(classId);
+  if (session && options.entering) return { active: await isClassOpenForStudents(classId), session };
   return { active: Boolean(session), session };
 }
 
@@ -194,7 +198,13 @@ export async function endClassLiveSessionAction(
     return { ok: false, message: t("actions.startDisabled") };
   }
 
+  // Ending the class closes it for everyone: stop a cloud recording, mark the
+  // session ended, then delete the LiveKit room so every participant is
+  // disconnected. (A teacher who only loses connection does not end it; the
+  // room stays open and they can rejoin.)
+  await stopActiveEgress(classId).catch(() => undefined);
   await endClassLiveSession(classId);
+  await closeLiveKitRoom(sanitizeLiveKitRoomName(classRoomName(classId)));
   revalidatePath(`/classes/${classId}/room`);
   return {
     ok: true,
@@ -484,16 +494,6 @@ export async function sendClassroomChatMessageAction(
   }
 }
 
-/** Captions switch for the room (late joiners read it here). */
-export async function getClassroomCaptionsAction(
-  classId: string,
-  guestJoinToken?: string | null,
-): Promise<ClassCaptionsState | null> {
-  const gate = await assertClassroomRoomOpen(classId, guestJoinToken);
-  if (!gate.ok) return null;
-  return getClassCaptions(classId);
-}
-
 /** Transcript so far, for the room's transcript panel (late joiners, reloads). */
 export async function getClassroomTranscriptAction(
   classId: string,
@@ -505,92 +505,5 @@ export async function getClassroomTranscriptAction(
     return await listTranscriptSegments(classId, 2000);
   } catch {
     return [];
-  }
-}
-
-/** The teacher turns live captions on or off and picks the spoken language. */
-export async function setClassroomCaptionsAction(
-  classId: string,
-  input: { enabled: boolean; lang: string },
-): Promise<ClassroomActionResult & { state?: ClassCaptionsState }> {
-  const t = await getTranslations("classroom");
-  const { error } = await assertModerator(classId);
-  if (error) return { ok: false, message: error };
-  const state: ClassCaptionsState = {
-    enabled: Boolean(input.enabled),
-    lang: isCaptionLang(input.lang) ? input.lang : "es-ES",
-  };
-  try {
-    await setClassCaptions(classId, state);
-    return {
-      ok: true,
-      message: state.enabled ? t("captions.turnedOn") : t("captions.turnedOff"),
-      state,
-    };
-  } catch {
-    return { ok: false, message: t("captions.saveFailed") };
-  }
-}
-
-const MAX_SEGMENTS_PER_SAVE = 40;
-const MAX_SEGMENT_CHARS = 2000;
-
-/**
- * Saves the speaker's own final caption lines to the class transcript.
- * Speaker identity and name come from the server session; lines are only
- * accepted while the teacher has captions on.
- */
-export async function saveClassroomTranscriptAction(
-  classId: string,
-  segments: { id: string; text: string; at: string }[],
-  guestJoinToken?: string | null,
-): Promise<ClassroomActionResult> {
-  const t = await getTranslations("classroom");
-  const gate = await assertClassroomRoomOpen(classId, guestJoinToken);
-  if (!gate.ok) return { ok: false, message: gate.message };
-
-  const actor = await getActorWithPermission("classes:join-own");
-  if (!actor) return { ok: false, message: t("actions.signInChat") };
-
-  const captions = await getClassCaptions(classId);
-  if (!captions.enabled) return { ok: false, message: t("captions.off") };
-
-  const identity = isStaffClassAudience(actor, gate.item)
-    ? `${STAFF_GUEST_IDENTITY_PREFIX}${actor.userId}`
-    : actor.userId;
-  const now = Date.now();
-
-  const rows = (Array.isArray(segments) ? segments : [])
-    .slice(0, MAX_SEGMENTS_PER_SAVE)
-    .map((segment) => {
-      const text = String(segment?.text ?? "").trim().slice(0, MAX_SEGMENT_CHARS);
-      const clientId = String(segment?.id ?? "");
-      const spoken = Date.parse(String(segment?.at ?? ""));
-      // Trust the client clock only within a few minutes of the server's.
-      const spokenAt =
-        Number.isFinite(spoken) && Math.abs(spoken - now) < 10 * 60_000
-          ? new Date(spoken)
-          : new Date(now);
-      return {
-        id:
-          clientId.startsWith(`${identity}-`) && clientId.length <= 160
-            ? clientId
-            : `${identity}-${randomUUID()}`,
-        sessionId: classId,
-        speakerIdentity: identity,
-        speakerUserId: actor.userId,
-        speakerName: actor.name,
-        body: text,
-        lang: captions.lang,
-        spokenAt,
-      };
-    })
-    .filter((row) => row.body);
-
-  try {
-    await insertTranscriptSegments(rows);
-    return { ok: true, message: t("captions.saved", { count: rows.length }) };
-  } catch {
-    return { ok: false, message: t("captions.saveFailed") };
   }
 }

@@ -43,7 +43,7 @@ export function FinancePayoutsOverview({
   const pending = batches.filter((batch) => batch.status === "awaiting-approval");
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.payouts")}
         subtitle={t("finance.payouts.subtitle")}

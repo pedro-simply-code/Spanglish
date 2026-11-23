@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { adminStaticMetadata } from "@/i18n/static-page-metadata";
-import { CommercePackagesOverview } from "@/features/admin";
+import Stack from "@mui/material/Stack";
+import { AiCreditPacksCard, CommercePackagesOverview } from "@/features/admin";
+import { aiPricingConfig, listAiCreditPacks } from "@/server/ai/credits";
 import { adminPackageKindToClassType, parseAdminPackageKindParam } from "@/lib/admin-package-filter";
 import { DEFAULT_PAGE_SIZE, pageOffset, parsePageParam } from "@/lib/pagination";
 import { countCommercePackages, listAdminPackageDetailsPaginated } from "@/server/admin/insights";
@@ -29,18 +31,23 @@ async function Content({ searchParams }: PageProps) {
   const pageSize = DEFAULT_PAGE_SIZE;
   const offset = pageOffset(page, pageSize);
 
-  const [total, packages] = await Promise.all([
+  const [total, packages, aiPacks] = await Promise.all([
     countCommercePackages(undefined, classType),
     listAdminPackageDetailsPaginated({ offset, limit: pageSize, classType }),
+    listAiCreditPacks(),
   ]);
 
   return (
-    <CommercePackagesOverview
-      packages={packages}
-      page={page}
-      total={total}
-      pageSize={pageSize}
-      kind={kind}
-    />
+    <Stack spacing={3}>
+      <CommercePackagesOverview
+        packages={packages}
+        page={page}
+        total={total}
+        pageSize={pageSize}
+        kind={kind}
+      />
+      {/* Keyed by the saved packs so the editor resets after each save. */}
+      <AiCreditPacksCard key={JSON.stringify(aiPacks)} packs={aiPacks} config={aiPricingConfig()} />
+    </Stack>
   );
 }

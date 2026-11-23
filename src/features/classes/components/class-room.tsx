@@ -67,6 +67,8 @@ type ClassRoomProps = {
   viewerAvatarUrl: string;
   teacherMustStartSession: boolean;
   awaitingTeacherSession: boolean;
+  /** The teacher ended the call (students see "class ended", not "waiting"). */
+  liveSessionEnded?: boolean;
   liveSessionActive: boolean;
   canEndLiveSession: boolean;
 };
@@ -93,6 +95,7 @@ export function ClassRoom({
   viewerAvatarUrl,
   teacherMustStartSession,
   awaitingTeacherSession,
+  liveSessionEnded = false,
   liveSessionActive,
   canEndLiveSession,
 }: ClassRoomProps) {
@@ -285,6 +288,7 @@ export function ClassRoom({
                   viewerAvatarUrl={viewerAvatarUrl}
                   teacherMustStartSession={teacherMustStartSession}
                   awaitingTeacherSession={awaitingTeacherSession}
+                  liveSessionEnded={liveSessionEnded}
                   canEndLiveSession={canEndLiveSession}
                   guestJoinToken={guestJoinToken}
                 />
@@ -365,7 +369,7 @@ export function ClassRoom({
                       ) : null}
                       {open && awaitingTeacherSession ? (
                         <Chip
-                          label={t("waitingForTeacher")}
+                          label={liveSessionEnded ? t("classEnded") : t("waitingForTeacher")}
                           size="small"
                           color="warning"
                           variant="outlined"

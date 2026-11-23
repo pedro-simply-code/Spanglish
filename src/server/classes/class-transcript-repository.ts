@@ -1,33 +1,11 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/server/db";
-import { classSessions, classTranscriptSegments } from "@/server/db/schema";
+import { classTranscriptSegments } from "@/server/db/schema";
 
-import {
-  isCaptionLang,
-  type ClassCaptionsState,
-  type ClassTranscriptLine,
-} from "@/lib/class-captions";
+import type { ClassTranscriptLine } from "@/lib/class-captions";
 import type { AuthSession } from "@/lib/auth-types";
+import type { TranscriptSpeakerRole } from "@/lib/lesson-summary";
 import { canWatchClass } from "@/server/classes/recordings";
-
-export async function getClassCaptions(sessionId: string): Promise<ClassCaptionsState> {
-  const [row] = await db
-    .select({ enabled: classSessions.captionsEnabled, lang: classSessions.captionsLang })
-    .from(classSessions)
-    .where(eq(classSessions.id, sessionId))
-    .limit(1);
-  return {
-    enabled: Boolean(row?.enabled),
-    lang: isCaptionLang(row?.lang) ? row.lang : "es-ES",
-  };
-}
-
-export async function setClassCaptions(sessionId: string, state: ClassCaptionsState) {
-  await db
-    .update(classSessions)
-    .set({ captionsEnabled: state.enabled, captionsLang: state.lang, updatedAt: new Date() })
-    .where(eq(classSessions.id, sessionId));
-}
 
 export type TranscriptSegmentInput = {
   id: string;
@@ -35,6 +13,7 @@ export type TranscriptSegmentInput = {
   speakerIdentity: string;
   speakerUserId: string | null;
   speakerName: string;
+  speakerRole?: TranscriptSpeakerRole | null;
   body: string;
   lang: string;
   spokenAt: Date;
@@ -59,6 +38,7 @@ export async function listTranscriptSegments(
     id: row.id,
     speakerIdentity: row.speakerIdentity,
     speakerName: row.speakerName,
+    speakerRole: row.speakerRole ?? null,
     text: row.body,
     lang: row.lang,
     at: row.spokenAt.toISOString(),

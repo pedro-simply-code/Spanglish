@@ -174,7 +174,7 @@ export function TeacherOverview({
     : "";
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("teacher.dashboard.greeting", { firstName })}
         subtitle={t("teacher.dashboard.subtitle")}

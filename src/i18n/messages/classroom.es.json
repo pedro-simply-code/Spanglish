@@ -10,7 +10,8 @@
     "lobby": {
       "await": {
         "teacherNotStarted": "{teacherName} aún no ha iniciado la clase en vivo. Puedes entrar al aula durante el periodo de acceso, pero la videollamada se abre cuando el profesor la inicie.",
-        "waitingForTeacher": "Esperando a que el profesor inicie la clase…"
+        "waitingForTeacher": "Esperando a que el profesor inicie la clase…",
+        "teacherEnded": "{teacherName} cerró la clase. Si la vuelve a abrir mientras dure el horario, entrarás automáticamente."
       },
       "waiting": {
         "waitingRoomOn": "La sala de espera está activada. El profesor te admitirá antes de que entres a la videollamada de LiveKit.",
@@ -172,7 +173,8 @@
       "micLocked": "Levanta la mano para que te llamen o espera a que el profesor use «Permitir micrófono».",
       "shareWaiting": "Esperando a que el profesor permita compartir la pantalla.",
       "shareRequested": "Solicitud para compartir la pantalla enviada al profesor.",
-      "micUnlocked": "Los estudiantes pueden volver a activar sus micrófonos."
+      "micUnlocked": "Los estudiantes pueden volver a activar sus micrófonos.",
+      "classEnded": "El maestro cerró la clase."
     },
     "errors": {
       "connectionTitle": "Falló la conexión con LiveKit",
@@ -279,30 +281,14 @@
       "tipCloudRecording": "Las grabaciones en la nube necesitan B2_* cuando RECORDING_STORAGE=cloud.",
       "tipLocalRecording": "Las grabaciones locales no requieren B2_*.",
       "roomInfoClipboard": "{url} (sala: {name})",
-      "leftClassroom": "Saliste del aula. La llamada se desconectó en este dispositivo."
+      "leftClassroom": "Saliste del aula. La llamada se desconectó en este dispositivo.",
+      "classEnded": "Clase cerrada"
     },
     "captions": {
-      "label": "Transcribir",
-      "on": "Transcribiendo",
-      "hostTooltip": "Transcribe la clase en vivo para todos (gratis, se hace en cada navegador). Aparece en la pestaña Transcripción y se guarda con la clase.",
-      "menuHint": "Idioma en que se hablará:",
-      "spanish": "Español",
-      "english": "Inglés",
-      "turnOff": "Detener transcripción",
-      "turnedOn": "Transcripción activada. Todos pueden seguirla en la pestaña Transcripción; se guarda con la clase.",
-      "turnedOff": "Transcripción detenida.",
-      "saveFailed": "No se pudo guardar la transcripción.",
-      "off": "La transcripción está desactivada en esta clase.",
-      "saved": "{count, plural, one {# línea guardada} other {# líneas guardadas}}",
-      "unsupported": "La transcripción está activa, pero este navegador no puede transcribir tu voz. Usa Chrome o Edge para que lo que dices aparezca en la transcripción.",
-      "micBlocked": "La transcripción necesita acceso al micrófono en este navegador. Permítelo para que lo que dices aparezca.",
-      "network": "La transcripción no pudo conectarse al servicio de voz de este navegador, así que tu voz no se está transcribiendo. Usa Google Chrome o Microsoft Edge (Brave, Opera y Chromium no lo soportan) y revisa que ninguna VPN o firewall lo bloquee.",
-      "braveUnsupported": "Brave no soporta el reconocimiento de voz, así que tu voz no se transcribirá. Abre la clase en Google Chrome o Microsoft Edge; igual puedes leer la transcripción.",
-      "activeIn": "Transcribiendo en vivo · {lang}",
-      "offHost": "La transcripción está apagada. Actívala con el botón Transcribir de la barra.",
-      "offStudent": "El maestro no ha activado la transcripción.",
+      "active": "Transcribiendo en vivo (español e inglés)",
+      "waitingAgent": "La transcripción en vivo empieza cuando el transcriptor entra a la clase.",
       "empty": "Esperando a que alguien hable…",
-      "emptyOff": "Aún no hay nada transcrito."
+      "emptyWaiting": "Todavía no hay nada transcrito."
     }
   }
 }

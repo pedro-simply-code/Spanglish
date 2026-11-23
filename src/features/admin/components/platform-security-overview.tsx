@@ -58,7 +58,7 @@ export function PlatformSecurityOverview({
   ];
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.security")}
         subtitle={t("platform.security.subtitle")}

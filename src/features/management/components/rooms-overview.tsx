@@ -311,7 +311,7 @@ export function RoomsOverview({ rooms, day }: { rooms: ManagerClassroomRow[]; da
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("management.rooms.title")}
         subtitle={t("management.rooms.subtitle")}

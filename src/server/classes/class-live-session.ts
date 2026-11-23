@@ -31,6 +31,16 @@ export async function getClassLiveSession(classId: string): Promise<ClassLiveSes
   };
 }
 
+/** The teacher ended the call on purpose (it was started and then closed). */
+export async function wasClassLiveSessionEnded(classId: string) {
+  const [row] = await db
+    .select({ startedAt: classSessions.liveStartedAt, endedAt: classSessions.liveEndedAt })
+    .from(classSessions)
+    .where(eq(classSessions.id, classId))
+    .limit(1);
+  return Boolean(row?.startedAt && row.endedAt);
+}
+
 export async function isClassLiveSessionActive(classId: string) {
   return Boolean(await getClassLiveSession(classId));
 }

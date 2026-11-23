@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NewMaterialPage() {
   const t = await getTranslations("educator");
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("metadata.newMaterial.title")}
         subtitle={t("teacher.dashboard.newMaterialSubtitle")}

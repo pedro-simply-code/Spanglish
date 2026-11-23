@@ -2,32 +2,32 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
-import { ProgressOverview } from "@/features/progress";
-import { resolveTimeZone } from "@/lib/timezone";
+import { StudentHubPage, pickTab } from "@/app/(dashboard)/_student/hub";
+import { AchievementsSection } from "@/app/(dashboard)/_student/achievements-section";
+import { ProgressSection } from "@/app/(dashboard)/_student/progress-section";
 import { requireDashboard } from "@/server/auth/session";
-import { getUserProfile } from "@/server/auth/user-repository";
-import { getStudentInsights } from "@/server/learning/insights";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("student");
-  return {
-    title: t("meta.progress.title"),
-    description: t("meta.progress.description"),
-  };
+  const t = await getTranslations("student.hub.progress");
+  return { title: t("title"), description: t("subtitle") };
 }
 
-export default function ProgressPage() {
+type PageProps = { searchParams: Promise<{ tab?: string | string[] }> };
+
+export default function Page({ searchParams }: PageProps) {
   return (
     <Suspense fallback={<AppCardSkeleton />}>
-      <ProgressContent />
+      <HubContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function ProgressContent() {
-  const actor = await requireDashboard("student");
-  const profile = await getUserProfile(actor.userId);
-  const timeZone = resolveTimeZone(profile?.timezone);
-  const insights = await getStudentInsights(actor.userId, timeZone);
-  return <ProgressOverview insights={insights} timeZone={timeZone} />;
+async function HubContent({ searchParams }: PageProps) {
+  const [, query] = await Promise.all([requireDashboard("student"), searchParams]);
+  const tab = pickTab("progress", query.tab);
+  return (
+    <StudentHubPage hub="progress" active={tab}>
+      {tab === "progress" ? <ProgressSection /> : <AchievementsSection />}
+    </StudentHubPage>
+  );
 }

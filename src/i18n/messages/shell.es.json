@@ -80,7 +80,16 @@
       "emailDeliverability": "Entrega de correo",
       "classroomDefaults": "Valores de aula",
       "auditLog": "Registro de auditoría",
-      "myCredits": "Mis créditos"
+      "myCredits": "Mis créditos",
+      "studentHome": "Inicio",
+      "studentClasses": "Mis clases",
+      "studentSpeak": "Habla con Luna",
+      "studentChat": "Chatea con Luna",
+      "studentStudy": "Estudiar",
+      "studentProgress": "Mi progreso",
+      "studentCredits": "Mis créditos",
+      "studentAi": "Practica con Luna",
+      "studentLearning": "Mi aprendizaje"
     },
     "notifications": {
       "classReminder": {
@@ -126,7 +135,8 @@
         "payoutsSubtitle": "Prepara los pagos mensuales",
         "payoutApprovalsSubtitle": "Aprueba y envía el pago a los maestros",
         "auditSubtitle": "Eventos de seguridad y gobernanza",
-        "integrationsSubtitle": "Correo, Google, Stripe y LiveKit"
+        "integrationsSubtitle": "Correo, Google, Stripe y LiveKit",
+        "teachSubtitle": "¿Hablas español o inglés? Da clases con nosotros"
       }
     },
     "search": {

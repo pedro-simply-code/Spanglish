@@ -6,6 +6,7 @@ export {
   bookTrialClassAction,
   getTrialLessonAvailabilityAction,
   listBookingSlotsAction,
+  purchaseAiCreditPackAction,
   purchasePackageAction,
 } from "@/features/academy/actions";
 export { ScheduleOverview } from "@/features/academy/components/schedule-overview";

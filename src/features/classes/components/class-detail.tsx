@@ -43,6 +43,8 @@ import {
   type ClassRecordingItem,
 } from "@/features/classes/components/class-recordings";
 import { ClassTranscript } from "@/features/classes/components/class-transcript";
+import { LessonSummaryCard } from "@/features/classes/components/lesson-summary-card";
+import type { LessonSummaryView } from "@/lib/lesson-summary";
 import type { ClassTranscriptLine } from "@/lib/class-captions";
 import {
   cancelClassAction,
@@ -93,6 +95,8 @@ type ClassDetailProps = {
   recordings?: ClassRecordingItem[];
   /** Saved live captions (only for people who may watch the class). */
   transcript?: ClassTranscriptLine[];
+  /** Claude's summary of the class, in the viewer's language. */
+  summary?: LessonSummaryView | null;
   /** Materials, vocabulary and practice of the class (null when not visible). */
   learning?: ClassLearning | null;
   /** Teacher's library for attaching materials and assigning forms. */
@@ -224,6 +228,7 @@ export function ClassDetail({
   myRating = null,
   recordings = [],
   transcript = [],
+  summary = null,
   learning = null,
   library = [],
 }: ClassDetailProps) {
@@ -418,7 +423,7 @@ export function ClassDetail({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={topic}
         subtitle={`${formatClassDate(item.startsAt, appLocale)} · ${formatClassTimeRange(item, appLocale)}`}
@@ -790,6 +795,13 @@ export function ClassDetail({
             ) : null}
 
             <ClassRecordings recordings={recordings} timeZone={viewerTimeZone} />
+
+            <LessonSummaryCard
+              summary={summary}
+              classId={item.id}
+              canRegenerate={relation === "teacher" || relation === "staff"}
+              classEnded={status === "completed"}
+            />
 
             <ClassTranscript lines={transcript} timeZone={viewerTimeZone} />
 

@@ -34,7 +34,7 @@ export async function TeacherStudents() {
   });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("teacher.students.title")}
         subtitle={t("teacher.students.subtitle")}

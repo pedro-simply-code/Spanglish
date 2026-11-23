@@ -186,7 +186,7 @@ export function RecordingsOverview({ storedRecordings }: RecordingsOverviewProps
   const classHref = (classId: string) => `/classes/${classId}#class-recording`;
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("teacher.recordings.title")}
         subtitle={t("teacher.recordings.subtitle")}

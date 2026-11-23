@@ -51,7 +51,7 @@ export function ChatsOverview() {
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("chat.breadcrumb.title")}
         subtitle={t("chat.breadcrumb.subtitle")}

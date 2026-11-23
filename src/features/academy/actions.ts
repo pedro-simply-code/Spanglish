@@ -6,6 +6,7 @@ import { bookClassForActor, bookTrialClassForActor, studentTrialLessonAvailable 
 import { getActorWithPermission } from "@/server/auth/session";
 import { listFreeSlots } from "@/server/classes/availability";
 import { getActivePairForUser } from "@/server/classes/pairs";
+import { purchaseAiCreditPack } from "@/server/ai/credits";
 import { purchasePackage } from "@/server/credits/orders";
 import type { ClassType } from "@/server/db/schema";
 
@@ -140,5 +141,34 @@ export async function purchasePackageAction(packageId: string): Promise<Purchase
     credits: result.credits,
     balance: result.balance,
     shared: result.shared,
+  };
+}
+
+/** Buys an AI credit pack: Stripe Checkout when configured, otherwise a demo purchase. */
+export async function purchaseAiCreditPackAction(packId: string): Promise<PurchaseActionResult> {
+  const [actor, t] = await Promise.all([
+    getActorWithPermission("classes:book"),
+    getTranslations("ops.academy"),
+  ]);
+  if (!actor) return { ok: false, message: t("notAllowedPackage") };
+
+  let result;
+  try {
+    result = await purchaseAiCreditPack(actor, String(packId));
+  } catch (error) {
+    console.error("[ai-checkout]", error);
+    return { ok: false, message: t("paymentOpenFailed") };
+  }
+  if (!result.ok) return { ok: false, message: t("aiPackNotOnSale") };
+  if ("redirectUrl" in result) return { ok: true, message: t("redirectingToStripe"), redirectUrl: result.redirectUrl };
+
+  revalidatePath("/credits");
+  revalidatePath("/speak");
+  revalidatePath("/chat");
+  return {
+    ok: true,
+    message: t("aiCreditsAdded", { count: result.credits }),
+    credits: result.credits,
+    balance: result.balance,
   };
 }

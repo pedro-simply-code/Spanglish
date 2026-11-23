@@ -220,7 +220,7 @@ export function PayoutsBoard({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={mode === "admin" ? t("payouts.board.approvalTitle") : t("payouts.board.prepareTitle")}
         subtitle={t("payouts.board.subtitle")}

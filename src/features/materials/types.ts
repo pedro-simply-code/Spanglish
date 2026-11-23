@@ -1,10 +1,14 @@
+import type { PracticeItem } from "@/lib/practice-games";
+
 export type MaterialKind =
   | "document"
   | "link"
   | "video"
   | "audio"
   | "form"
-  | "recording";
+  | "recording"
+  /** Interactive games (cards, memory, listening, dictation, sentence order). */
+  | "practice";
 
 export type MaterialStatus = "draft" | "published" | "archived";
 
@@ -54,6 +58,8 @@ export type Material = {
   views?: number;
   questionCount?: number;
   estimatedMinutes?: number;
+  /** Practice games: the words and phrases (with optional teacher recordings). */
+  practiceItems?: PracticeItem[];
   /** private (author), shared (teachers and staff), global (students too). */
   visibility?: "private" | "shared" | "global";
   /** Global materials need a manager's approval. */
@@ -150,6 +156,8 @@ export type CreateMaterialInput = {
     correctOption?: number;
     points?: number;
   }[];
+  /** Practice games: words and phrases. */
+  practiceItems?: PracticeItem[];
 };
 
 export type ShareMaterialInput = {

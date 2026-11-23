@@ -76,7 +76,7 @@ export function TeacherMaterialsOverview({
   ];
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.materials")}
         subtitle={t("materials.teacherOverview.subtitle")}

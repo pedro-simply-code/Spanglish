@@ -212,7 +212,7 @@ export function MaterialsModeration({ materials }: { materials: Material[] }) {
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("moderation.title")}
         subtitle={t("moderation.subtitle")}

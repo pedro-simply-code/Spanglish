@@ -41,6 +41,8 @@ export const config = {
     "/achievements/:path*",
     "/checkout/:path*",
     "/credits/:path*",
+    "/study/:path*",
+    "/pricing/:path*",
     "/apps/:path*",
   ],
 };

@@ -137,16 +137,10 @@ const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = 
     profileLinkDefinitions.profile,
     profileLinkDefinitions.messages,
     {
-      href: "/progress",
-      titleKey: "nav.progress",
-      subtitleKey: "profileMenu.links.progressSubtitle",
+      href: "/apply",
+      titleKey: "nav.teachWithUs",
+      subtitleKey: "profileMenu.links.teachSubtitle",
       icon: "/images/svgs/icon-tasks.svg",
-    },
-    {
-      href: "/classes",
-      titleKey: "nav.myClasses",
-      subtitleKey: "profileMenu.links.classesStudentSubtitle",
-      icon: "/images/svgs/icon-dd-date.svg",
     },
   ],
   teacher: [

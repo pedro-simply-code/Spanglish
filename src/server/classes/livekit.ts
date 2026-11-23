@@ -1,4 +1,4 @@
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, RoomAgentDispatch, RoomConfiguration } from "livekit-server-sdk";
 import { env } from "@/env";
 
 export function sanitizeLiveKitRoomName(room: string) {
@@ -7,6 +7,11 @@ export function sanitizeLiveKitRoomName(room: string) {
     .replace(/[^a-z0-9-_]/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 64);
+}
+
+/** The classroom agent transcribes the class when it is deployed and named here. */
+export function isClassroomAgentConfigured() {
+  return Boolean(env.CLASSROOM_AGENT_NAME && env.CLASSROOM_AGENT_SECRET);
 }
 
 export function isLiveKitConfigured() {
@@ -59,6 +64,23 @@ export async function createLiveKitRoomToken(input: LiveKitGrantInput) {
     canPublishData: !guest,
     canUpdateOwnMetadata: !guest,
   });
+
+  // The room is created by whoever joins first; it asks LiveKit to send the
+  // classroom agent in (once per room) to transcribe everyone.
+  if (isClassroomAgentConfigured()) {
+    token.roomConfig = new RoomConfiguration({
+      // Spelled out: a room configuration replaces LiveKit's defaults, and a
+      // 0 here could close the room as soon as someone reloads the page.
+      emptyTimeout: 300,
+      departureTimeout: 20,
+      agents: [
+        new RoomAgentDispatch({
+          agentName: env.CLASSROOM_AGENT_NAME!,
+          metadata: JSON.stringify({ classId: input.classId }),
+        }),
+      ],
+    });
+  }
 
   const jwt = await token.toJwt();
 

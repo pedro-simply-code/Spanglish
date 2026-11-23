@@ -34,6 +34,7 @@ export function formatMaterialKind(kind: string, t?: Translator) {
     "audio",
     "form",
     "recording",
+    "practice",
   ] as const;
   if (t && known.includes(kind as (typeof known)[number])) {
     return t(`kind.${kind}`);

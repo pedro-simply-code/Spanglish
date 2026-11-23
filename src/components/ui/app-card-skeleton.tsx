@@ -11,7 +11,7 @@ import Stack from "@mui/material/Stack";
  */
 export function AppCardSkeleton() {
   return (
-    <Box mt={3}>
+    <Box>
       <Skeleton variant="rounded" height={130} sx={{ mb: "30px" }} />
 
       <Card elevation={9} sx={{ p: 3 }}>

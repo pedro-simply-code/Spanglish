@@ -116,7 +116,9 @@
         "twoFactorBackupCodesRegenerated": "Nuevos códigos de respaldo 2FA",
         "twoFactorDisabled": "2FA desactivado",
         "twoFactorEnabled": "2FA activado",
-        "twoFactorLockout": "2FA bloqueado tras códigos fallidos"
+        "twoFactorLockout": "2FA bloqueado tras códigos fallidos",
+        "aiCreditsPurchased": "Créditos de IA comprados",
+        "aiPackSaved": "Pack de créditos de IA guardado"
       },
       "unknownAccount": "Cuenta desconocida"
     },
@@ -956,6 +958,60 @@
         "beginner": "Grupo principiante",
         "intermediate": "Grupo intermedio",
         "notSet": "Nivel no definido"
+      }
+    },
+    "aiPacks": {
+      "title": "Packs de créditos de IA",
+      "subtitle": "Pon el precio y tu margen; las conversaciones de cada pack se calculan con los ajustes de abajo (env). 1 crédito = 1 conversación.",
+      "name": "Nombre",
+      "price": "Precio (USD)",
+      "active": "A la venta",
+      "add": "Agregar pack",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "empty": "Aún no hay packs de créditos de IA.",
+      "saved": "Pack guardado.",
+      "deleted": "Pack eliminado.",
+      "invalid": "Revisa el nombre, el precio (mínimo $1) y el margen (0–90%): el pack debe dar al menos 1 conversación.",
+      "forbidden": "Solo los administradores pueden cambiar los packs de IA.",
+      "confirmDelete": "¿Eliminar?",
+      "margin": "Margen %",
+      "config": {
+        "tokens": "{tokens} tokens por conversación",
+        "rate": "${rate} por millón de tokens",
+        "multiplier": "×{times} de seguridad",
+        "fee": "Comisión de tarjeta {percent}% + {fixed}",
+        "perConversation": "Costo por conversación {amount}"
+      },
+      "math": {
+        "conversations": "Conversaciones",
+        "fee": "Comisión de tarjeta",
+        "margin": "Tu margen",
+        "ai": "Reservado para la IA",
+        "perConversation": "El alumno paga por conversación"
+      }
+    },
+    "pendingPayments": {
+      "title": "Pagos pendientes",
+      "subtitle": "Pagos de Stripe que aún esperan confirmación. Se revisan cada hora; revísalos ahora si un alumno dice que ya pagó.",
+      "checkAll": "Revisar todos con Stripe",
+      "check": "Revisar con Stripe",
+      "pending": "Pendiente",
+      "aiItem": "{count} conversaciones de IA",
+      "classItem": "{count, plural, one {# clase} other {# clases}} · {minutes} min",
+      "empty": "No hay pagos pendientes.",
+      "stripeOff": "El pago con Stripe está apagado: las compras demo nunca quedan pendientes.",
+      "forbidden": "Solo los administradores pueden revisar pagos.",
+      "notPending": "Ese pago ya no está pendiente.",
+      "summary": "Revisados {checked}: {paid} pagados, {canceled} cancelados, {open} aún abiertos.",
+      "outcome": {
+        "paid": "Pagado: se agregaron {count} créditos.",
+        "canceled": "La página de pago venció: cancelado.",
+        "open": "Sigue abierto: el alumno aún no paga.",
+        "processing": "El banco aún lo está confirmando.",
+        "not-found": "Stripe no reconoce este pago.",
+        "mismatch": "El monto pagado no coincide: revísalo en Stripe.",
+        "error": "No se pudo contactar a Stripe. Intenta de nuevo."
       }
     }
   }

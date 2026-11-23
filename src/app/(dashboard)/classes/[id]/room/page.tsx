@@ -27,13 +27,17 @@ import { getRecordingClientConfig } from "@/server/storage/recordings";
 import { getAccountAvatarUrl } from "@/lib/account-avatar";
 import { env } from "@/env";
 import { isClassBroadcastLive } from "@/server/classes/broadcast-live";
-import { isClassLiveSessionActive } from "@/server/classes/class-live-session";
+import {
+  isClassLiveSessionActive,
+  wasClassLiveSessionEnded,
+} from "@/server/classes/class-live-session";
 import { academyDayKey } from "@/server/classes/manager-rooms";
 import {
   canModerateClassroom,
   isAssignedClassTeacher,
   isStaffClassAudience,
 } from "@/server/classes/class-teacher";
+import { isClassOpenForStudents } from "@/server/classes/teacher-presence";
 import { getWaitingRoomStatus } from "@/server/classes/waiting-room";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -134,14 +138,19 @@ async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
   const isAssignedTeacher = Boolean(actor && isAssignedClassTeacher(actor, item));
   const requireTeacherStart = env.CLASS_TEACHER_STARTS_SESSION;
   const canEndLiveSession = Boolean(isAssignedTeacher && requireTeacherStart);
+  // The teacher (and staff) go in once the class is started; students also
+  // need the teacher to be in the room right now.
   const liveSessionActive =
-    !requireTeacherStart || (await isClassLiveSessionActive(id));
+    !requireTeacherStart ||
+    (isAssignedTeacher || staffAudience ? await isClassLiveSessionActive(id) : await isClassOpenForStudents(id));
   const teacherMustStartSession = Boolean(
     join.canJoin && requireTeacherStart && !liveSessionActive && isAssignedTeacher,
   );
   const awaitingTeacherSession = Boolean(
     join.canJoin && requireTeacherStart && !liveSessionActive && !isAssignedTeacher,
   );
+  // The teacher closed the call on purpose (not a dropped connection).
+  const liveSessionEnded = awaitingTeacherSession && (await wasClassLiveSessionEnded(id));
 
   const waitingRoomEnabled = env.CLASS_WAITING_ROOM && join.canJoin && liveSessionActive;
   const admittedToLiveKit =
@@ -209,6 +218,7 @@ async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
       viewerAvatarUrl={viewerAvatarUrl}
       teacherMustStartSession={teacherMustStartSession}
       awaitingTeacherSession={awaitingTeacherSession}
+      liveSessionEnded={liveSessionEnded}
       liveSessionActive={liveSessionActive}
       canEndLiveSession={canEndLiveSession}
     />

@@ -10,7 +10,8 @@
     "lobby": {
       "await": {
         "teacherNotStarted": "{teacherName} has not started the live class yet. You can enter the classroom during the join window, but the video call opens once the teacher starts it.",
-        "waitingForTeacher": "Waiting for the teacher to start…"
+        "waitingForTeacher": "Waiting for the teacher to start…",
+        "teacherEnded": "{teacherName} ended the class. If they reopen it while the class is on, you will rejoin automatically."
       },
       "waiting": {
         "waitingRoomOn": "Waiting room is on. The teacher will admit you before you join the LiveKit call.",
@@ -172,7 +173,8 @@
       "micLocked": "Raise your hand to be called on, or wait until the teacher uses Allow unmute.",
       "shareWaiting": "Waiting for the teacher to allow screen share.",
       "shareRequested": "Screen share request sent to the teacher.",
-      "micUnlocked": "Students can turn their microphones on again."
+      "micUnlocked": "Students can turn their microphones on again.",
+      "classEnded": "The teacher ended the class."
     },
     "errors": {
       "connectionTitle": "LiveKit connection failed",
@@ -279,30 +281,14 @@
       "tipCloudRecording": "Cloud recordings need B2_* when RECORDING_STORAGE=cloud.",
       "tipLocalRecording": "Local recordings do not require B2_*.",
       "roomInfoClipboard": "{url} (room: {name})",
-      "leftClassroom": "You left the classroom. The call disconnected on this device."
+      "leftClassroom": "You left the classroom. The call disconnected on this device.",
+      "classEnded": "Class ended"
     },
     "captions": {
-      "label": "Transcribe",
-      "on": "Transcribing",
-      "hostTooltip": "Transcribe the class live for everyone (free, done in each browser). It appears in the Transcript tab and is saved with the class.",
-      "menuHint": "Language people will speak:",
-      "spanish": "Spanish",
-      "english": "English",
-      "turnOff": "Stop transcription",
-      "turnedOn": "Transcription is on. Everyone can follow it in the Transcript tab; it is saved with the class.",
-      "turnedOff": "Transcription is off.",
-      "saveFailed": "Could not save the transcript.",
-      "off": "Transcription is off for this class.",
-      "saved": "{count, plural, one {# line saved} other {# lines saved}}",
-      "unsupported": "Transcription is on, but this browser cannot transcribe your voice. Use Chrome or Edge so your words appear in the transcript.",
-      "micBlocked": "Transcription needs microphone access in this browser. Allow it so your words appear in the transcript.",
-      "network": "Transcription could not reach this browser's speech service, so your voice is not being transcribed. Use Google Chrome or Microsoft Edge (Brave, Opera and Chromium builds do not support it) and check that no VPN or firewall blocks it.",
-      "braveUnsupported": "Brave does not support speech recognition, so your voice will not be transcribed. Open the class in Google Chrome or Microsoft Edge; you can still read the transcript.",
-      "activeIn": "Transcribing live · {lang}",
-      "offHost": "Transcription is off. Start it with the Transcribe button in the toolbar.",
-      "offStudent": "The teacher has not turned on transcription.",
+      "active": "Transcribing live (Spanish and English)",
+      "waitingAgent": "The live transcript starts when the transcriber joins the class.",
       "empty": "Waiting for someone to speak…",
-      "emptyOff": "Nothing transcribed yet."
+      "emptyWaiting": "Nothing transcribed yet."
     }
   }
 }

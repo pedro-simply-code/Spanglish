@@ -45,3 +45,5 @@ export type {
   TeacherEarningsRow,
   TeacherRateTier,
 } from "@/features/admin/types";
+export { AiCreditPacksCard } from "@/features/admin/components/ai-credit-packs-card";
+export { PendingPaymentsCard } from "@/features/admin/components/pending-payments-card";

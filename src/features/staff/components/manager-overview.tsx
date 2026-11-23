@@ -51,7 +51,7 @@ export function ManagerOverview({ firstName, snapshot }: ManagerOverviewProps) {
   ];
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("manager.dashboard.title", { firstName })}
         subtitle={t("manager.dashboard.subtitle")}

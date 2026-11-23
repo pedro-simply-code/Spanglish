@@ -35,6 +35,7 @@ export type ClassroomVideoStageProps = {
   viewerAvatarUrl: string;
   teacherMustStartSession?: boolean;
   awaitingTeacherSession?: boolean;
+  liveSessionEnded?: boolean;
   canEndLiveSession?: boolean;
   guestJoinToken?: string | null;
 };
@@ -50,6 +51,7 @@ export function ClassroomVideoStage(props: ClassroomVideoStageProps) {
         classId={props.classId}
         topic={props.topic}
         teacherName={props.teacherName}
+        ended={Boolean(props.liveSessionEnded)}
       />
     );
   }

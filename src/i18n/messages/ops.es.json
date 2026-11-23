@@ -138,7 +138,8 @@
       "checkoutProductDescription": "{credits} créditos de clase {kind} de {minutes} minutos",
       "stripeNoUrl": "Stripe no devolvió una URL de pago.",
       "stripePaymentNote": "Pago con Stripe",
-      "unknownStripeError": "Error desconocido de Stripe"
+      "unknownStripeError": "Error desconocido de Stripe",
+      "aiCheckoutProductDescription": "{credits} créditos de práctica con IA (Luna y chat)"
     },
     "teaching": {
       "validateTrack": "Elige una modalidad de solicitud.",
@@ -270,7 +271,9 @@
       "notAllowedPackage": "Inicia sesión como estudiante para comprar un paquete.",
       "paymentOpenFailed": "No se pudo abrir la página de pago. Inténtalo de nuevo en un momento.",
       "redirectingToStripe": "Redirigiendo a Stripe…",
-      "creditsAdded": "{count, plural, one {Se agregó # crédito} other {Se agregaron # créditos}}."
+      "creditsAdded": "{count, plural, one {Se agregó # crédito} other {Se agregaron # créditos}}.",
+      "aiPackNotOnSale": "Este pack de créditos de IA ya no está a la venta.",
+      "aiCreditsAdded": "{count, plural, one {Se agregó # crédito de IA} other {Se agregaron # créditos de IA}}."
     }
   }
 }

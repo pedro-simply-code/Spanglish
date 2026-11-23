@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { adminStaticMetadata } from "@/i18n/static-page-metadata";
-import { FinanceProvidersOverview } from "@/features/admin";
+import Stack from "@mui/material/Stack";
+import { FinanceProvidersOverview, PendingPaymentsCard } from "@/features/admin";
+import { listPendingPayments } from "@/server/payments/reconcile";
+import { stripeEnabled } from "@/server/payments/stripe";
 import { buildPaymentProviders } from "@/server/payments/provider-settings";
 import { requestTime } from "@/server/request-time";
 
@@ -18,6 +21,14 @@ export default function AdminFinanceProvidersPage() {
 
 async function ProvidersContent() {
   await requestTime();
-  const { providers, settings } = await buildPaymentProviders();
-  return <FinanceProvidersOverview providers={providers} settings={settings} />;
+  const [{ providers, settings }, pending] = await Promise.all([
+    buildPaymentProviders(),
+    stripeEnabled ? listPendingPayments() : Promise.resolve([]),
+  ]);
+  return (
+    <Stack spacing={3}>
+      <FinanceProvidersOverview providers={providers} settings={settings} />
+      <PendingPaymentsCard payments={pending} stripeOn={stripeEnabled} />
+    </Stack>
+  );
 }

@@ -132,7 +132,7 @@
       }
     },
     "home": {
-      "breadcrumbTitle": "Bienvenido, {firstName}",
+      "breadcrumbTitle": "¡Hola, {firstName}! 👋",
       "subtitle": "Tu plan de hoy mientras el panel de {student} está activo. Cambia de rol en la barra superior para abrir {teacher}, {manager} o {admin}.",
       "liveClassesChip": "Clases en vivo",
       "nextClass": "Próxima clase con {teacher}",
@@ -226,8 +226,10 @@
         "needHand": "¿Necesitas ayuda?",
         "hereToHelp": "Estamos para ayudarte",
         "outsideWindow": "¿Fuera del plazo de cambios?",
-        "outsideWindowBody": "Escribe a soporte desde Ajustes y el equipo de la academia revisará tu caso.",
-        "statusAria": "Estado de la clase"
+        "outsideWindowBody": "Escríbele a la academia por el Correo del sitio y el equipo revisará tu caso.",
+        "statusAria": "Estado de la clase",
+        "writeAcademy": "Escribir a la academia",
+        "supportTopic": "Cambio de clase fuera de plazo"
       },
       "list": {
         "changesClosed": "Cambios cerrados",
@@ -336,6 +338,26 @@
         "transcriptSubtitle": "Transcripción automática de la clase (puede tener errores).",
         "transcriptShowAll": "Ver todo ({count})",
         "transcriptShowLess": "Ver menos"
+      },
+      "summary": {
+        "title": "Resumen automático de la clase",
+        "subtitle": "Escrito por Claude a partir de la transcripción de la clase.",
+        "pending": "Escribiendo el resumen… aparece aquí un minuto después de que termina la clase.",
+        "failed": "No se pudo escribir el resumen.",
+        "skipped": "La clase fue demasiado corta para resumirla.",
+        "none": "Todavía no hay resumen. Se escribe cuando termina la clase, a partir de la transcripción en vivo.",
+        "overview": "Lo que vimos",
+        "topics": "Temas",
+        "vocabulary": "Palabras nuevas",
+        "corrections": "Para decirlo mejor",
+        "said": "Se dijo",
+        "better": "Mejor",
+        "nextSteps": "Antes de la próxima clase",
+        "regenerate": "Escribirlo de nuevo",
+        "regenerating": "Escribiendo…",
+        "regenerated": "Resumen actualizado.",
+        "forbidden": "Solo el maestro puede hacer esto.",
+        "notConfigured": "Los resúmenes no están activados (ANTHROPIC_API_KEY)."
       }
     },
     "format": {
@@ -358,17 +380,17 @@
       "joinTooEarly": "El aula abre {minutes} minutos antes de que empiece la clase.",
       "joinRelaxed": "Ventana de acceso ampliada para pruebas. La sala está abierta antes del horario habitual.",
       "joinClosed": "La ventana de acceso cerró {minutes} minutos después de que empezara la clase.",
-      "joinOpen": "El aula está abierta. Tu maestro te espera."
+      "joinOpen": "El aula está abierta. Si tu maestro aún no inicia la clase, esperarás ahí hasta que la inicie."
     },
     "pricing": {
-      "breadcrumbTitle": "Precios",
-      "breadcrumbSubtitle": "Clases en vivo con maestros certificados, adaptadas a tu horario.",
+      "breadcrumbTitle": "Comprar créditos",
+      "breadcrumbSubtitle": "Clases en vivo con maestros nativos, o créditos de IA para practicar con Luna y el chat.",
       "selectTitle": "Elige tu paquete",
       "selectSubtitle": "Elige la duración y el formato de clase, y después un paquete de créditos",
       "monthlyNote": "Hay opciones de pago mensual al momento de pagar.",
       "yourPlan": "Tu plan",
       "livePlan": "Clases {type} en vivo",
-      "packageOption": "{count} clases",
+      "packageOption": "{count, plural, one {# clase} other {# clases}}",
       "durationOption": "{count} minutos",
       "formatPaired": "En pareja (2 estudiantes)",
       "formatIndividual": "Individual",
@@ -407,7 +429,8 @@
         "description": {
           "light": "Prueba las clases en vivo o recibe ayuda enfocada en un área, con {audience} manteniendo un ritmo ligero.",
           "steady": "Dos clases por semana para que {audience} construya un progreso firme y duradero.",
-          "fluency": "Tres clases por semana para ganar fluidez más rápido y retener mejor el aprendizaje."
+          "fluency": "Tres clases por semana para ganar fluidez más rápido y retener mejor el aprendizaje.",
+          "single": "Una clase cuando la necesites, sin compromiso."
         },
         "name": {
           "pairedStarter": "Inicio en pareja",
@@ -415,18 +438,92 @@
           "pairedFluency": "Fluidez en pareja",
           "starterSupport": "Apoyo inicial",
           "steadyProgress": "Progreso constante",
-          "fluencyBuilder": "Constructor de fluidez"
+          "fluencyBuilder": "Constructor de fluidez",
+          "single": "Clase suelta",
+          "pairedSingle": "Clase suelta en pareja"
         },
         "label": {
           "starter": "Inicial",
           "popular": "Más popular",
-          "value": "Mejor valor"
+          "value": "Mejor valor",
+          "single": "Suelta"
         }
       },
       "sessionLength": "Duración de la sesión",
       "classFormat": "Formato de clase",
       "saveUpTo": "Ahorra hasta {percent} %",
-      "perClass": "/ clase"
+      "perClass": "/ clase",
+      "classesUnit": "{count, plural, one {clase} other {clases}}",
+      "summary": {
+        "credits": "Clases que te quedan",
+        "from": "Precio más bajo por clase",
+        "save": "Ahorra hasta",
+        "valid": "Validez de los créditos",
+        "validValue": "12 meses"
+      },
+      "product": "Qué comprar",
+      "productClasses": "Clases",
+      "productAi": "Créditos de IA",
+      "ai": {
+        "filterHint": "1 crédito = 1 conversación nueva con Luna o en el chat.",
+        "empty": "No hay packs de créditos de IA a la venta ahora.",
+        "creditsUnit": "{count, plural, one {crédito} other {créditos}}",
+        "bestValue": "Mejor precio",
+        "luna": "Luna",
+        "chat": "Chat",
+        "save": "Ahorra {percent}%",
+        "description": "{count, plural, one {# conversación} other {# conversaciones}} con Luna (voz) o en el chat, de hasta {tokens} tokens cada una. Los créditos no vencen.",
+        "perConversation": "{amount} por conversación",
+        "select": "Elegir pack",
+        "selected": "Pack elegido",
+        "yourPack": "Tu pack de IA",
+        "yourPackSubtitle": "Practica hablando y escribiendo entre clases",
+        "pack": "Pack",
+        "conversations": "Conversaciones",
+        "pricePerConversation": "Precio por conversación",
+        "total": "Total",
+        "buy": "Comprar créditos de IA",
+        "buying": "Abriendo el pago…",
+        "finePrint": "Primero se usan las conversaciones gratis; un crédito se gasta solo al empezar una conversación nueva.",
+        "pickOne": "Elige un pack a la izquierda.",
+        "howTitle": "Cómo funciona",
+        "howSubtitle": "Gratis con cada clase, luego créditos",
+        "howFree": "Cada clase a la que asistes te da {perClass} conversaciones con Luna y {perClass} chats gratis.",
+        "freeLuna": "Gratis con Luna",
+        "freeChat": "Chats gratis",
+        "creditsLeft": "Créditos de IA",
+        "summary": {
+          "credits": "Créditos de IA",
+          "freeLuna": "Gratis con Luna",
+          "freeChat": "Chats gratis",
+          "perClass": "Gratis por clase asistida",
+          "tokens": "Tokens por conversación"
+        },
+        "tokensEach": "Tokens por conversación",
+        "howTokens": "Cada conversación puede usar hasta {tokens} tokens. Un crédito se gasta solo al empezar una nueva; primero se usan las gratis."
+      },
+      "steps": {
+        "product": "Qué comprar",
+        "format": "Formato",
+        "package": "Paquete",
+        "pack": "Pack de IA",
+        "review": "Revisar"
+      },
+      "stepHints": {
+        "product": "Clases con un maestro o créditos para practicar con la IA.",
+        "format": "Duración de la clase y si la tomas solo o en pareja.",
+        "package": "Los paquetes grandes bajan el precio por clase.",
+        "pack": "1 crédito = 1 conversación de hasta {tokens} tokens. Los packs grandes cuestan menos por conversación.",
+        "review": "Revisa tu compra antes de pagar."
+      },
+      "productClassesDetail": "Clases en vivo con maestros nativos, de 1 a 90 clases.",
+      "productAiDetail": "Conversaciones con Luna (voz) o en el chat, de hasta {tokens} tokens cada una.",
+      "duration25Detail": "Corta y enfocada, fácil de acomodar en tu día.",
+      "duration50Detail": "Más tiempo para conversar y practicar.",
+      "individualDetail": "Solo tú y tu maestro.",
+      "pairedDetail": "Con tu compañero de estudio; comparten los créditos.",
+      "classesLabel": "Clases",
+      "yourPurchase": "Tu compra"
     },
     "checkout": {
       "breadcrumbTitle": "Pago",
@@ -436,7 +533,7 @@
       "orderTitle": "Resumen del pedido",
       "orderSubtitle": "Clases en vivo con un maestro certificado",
       "liveClassesChip": "Clases en vivo",
-      "planDetails": "{count} clases en vivo · {duration} min · {type}",
+      "planDetails": "{count, plural, one {# clase en vivo} other {# clases en vivo}} · {duration} min · {type}",
       "taxes": "Impuestos",
       "calculatedAtPayment": "Calculados al pagar",
       "creditsValid": "Créditos vigentes por",
@@ -481,10 +578,12 @@
         "failed": "No encontramos este pago. Si te cobraron, contacta a la academia con tu recibo.",
         "allSet": "¡Todo listo!",
         "creditsAdded": "Se agregaron {count} créditos{suffix}. Programa tu primera clase en vivo cuando quieras.",
-        "pairedSuffix": " al fondo que compartes con tu compañero"
+        "pairedSuffix": " al fondo que compartes con tu compañero",
+        "aiCreditsAdded": "Se {count, plural, one {agregó # crédito} other {agregaron # créditos}} de IA. Cada uno inicia una conversación nueva con Luna o en el chat.",
+        "talkWithLuna": "Hablar con Luna"
       },
       "secureNotice": "Pago seguro. Puedes cancelar o reprogramar cualquier clase hasta 12 horas antes de que empiece.",
-      "classesTimesPrice": "{count} clases × {amount}"
+      "classesTimesPrice": "{count, plural, one {# clase} other {# clases}} × {amount}"
     },
     "schedule": {
       "breadcrumbTitle": "Reservar una clase",
@@ -738,7 +837,25 @@
       "trophyCase": "Tu vitrina de trofeos",
       "unlocked": "{unlocked} de {total} logros desbloqueados",
       "locked": "Bloqueado",
-      "unlockedLabel": "Desbloqueado"
+      "unlockedLabel": "Desbloqueado",
+      "summary": {
+        "unlocked": "Desbloqueados",
+        "percent": "De la vitrina",
+        "locked": "Por desbloquear",
+        "next": "El más cercano"
+      },
+      "tabs": {
+        "all": "Todos ({count})",
+        "unlocked": "Desbloqueados ({count})",
+        "locked": "Por desbloquear ({count})"
+      },
+      "empty": {
+        "unlocked": "Aún no tienes logros. ¡Tu primera clase desbloquea uno!",
+        "locked": "¡Desbloqueaste todos los logros!"
+      },
+      "latest": "Último desbloqueado",
+      "nextTitle": "Próximo logro",
+      "nextSubtitle": "El que tienes más cerca"
     },
     "achievement": {
       "firstSteps": {
@@ -1063,7 +1180,6 @@
         "title": "Lecciones",
         "subtitle": "Todo lo que viste en tus clases: resumen, tarea, grabación y vocabulario.",
         "search": "Buscar tema, maestro o resumen",
-        "pendingOnly": "Solo con práctica pendiente",
         "with": "con {name}",
         "attended": "Asististe · {minutes} min",
         "missed": "No asististe",
@@ -1075,7 +1191,39 @@
         "open": "Ver lección",
         "noMatches": "Ninguna lección coincide con tu búsqueda.",
         "empty": "Aún no tienes clases terminadas. Cuando tomes tu primera clase, aparecerá aquí.",
-        "book": "Reservar una clase"
+        "book": "Reservar una clase",
+        "recapLabel": "Resumen del maestro",
+        "summaryLabel": "Resumen automático",
+        "count": "{shown} de {total} lecciones",
+        "filters": {
+          "teacher": "Maestro",
+          "allTeachers": "Todos los maestros",
+          "type": "Tipo de clase",
+          "allTypes": "Todos los tipos",
+          "status": "Mostrar",
+          "allLessons": "Todas las lecciones",
+          "attended": "Asistí",
+          "missed": "No asistí",
+          "pending": "Con práctica pendiente",
+          "clear": "Quitar filtros"
+        },
+        "minutes": "{minutes} min",
+        "summary": {
+          "attendedValue": "{attended} de {total}",
+          "attended": "Clases asistidas",
+          "minutesValue": "{minutes} min",
+          "minutes": "Tiempo en clase",
+          "words": "Palabras de tus clases",
+          "pending": "Prácticas pendientes",
+          "title": "Tu resumen",
+          "all": "Todas tus lecciones",
+          "filtered": "Según tus filtros"
+        },
+        "teachers": {
+          "title": "Tus maestros",
+          "subtitle": "Toca uno para ver solo sus lecciones",
+          "detail": "{lessons, plural, one {# lección} other {# lecciones}} · {minutes} min en clase"
+        }
       },
       "practice": {
         "title": "Práctica",
@@ -1093,7 +1241,24 @@
           "submitted": "No tienes entregas esperando calificación.",
           "graded": "Aún no tienes prácticas calificadas."
         },
-        "emptyAll": "Tus maestros aún no te han asignado práctica."
+        "emptyAll": "Tus maestros aún no te han asignado práctica.",
+        "score": "{score}/{max} pts",
+        "feedbackLabel": "Comentario del maestro:",
+        "graded": "Calificada",
+        "summary": {
+          "todo": "Por hacer",
+          "overdue": "Atrasadas",
+          "submitted": "Esperando calificación",
+          "average": "Promedio"
+        },
+        "next": {
+          "title": "Próxima entrega",
+          "subtitle": "La práctica que debes hacer primero",
+          "none": "Nada pendiente. ¡Bien hecho!"
+        },
+        "recent": {
+          "title": "Últimas calificaciones"
+        }
       },
       "runner": {
         "subtitle": "De la clase «{topic}» con {teacher}",
@@ -1151,7 +1316,21 @@
         "reveal": "Mostrar significado",
         "doneTitle": "¡Repaso terminado!",
         "doneSummary": "Sabías {knew} de {total}. Las que fallaste volverán pronto.",
-        "backToList": "Volver a mi lista"
+        "backToList": "Volver a mi lista",
+        "stageAll": "Todas las etapas",
+        "summary": {
+          "total": "Palabras",
+          "due": "Para repasar hoy"
+        },
+        "progress": {
+          "title": "Tu progreso",
+          "learned": "Aprendidas"
+        },
+        "games": {
+          "title": "Practica con juegos",
+          "subtitle": "Tarjetas, memoria, escucha y dictado con tus palabras.",
+          "play": "Jugar"
+        }
       },
       "achievements": {
         "firstClass": {
@@ -1212,10 +1391,20 @@
         "goPractice": "Ir a Práctica",
         "milestones": "Logros recientes",
         "milestonesSubtitle": "Lo último que desbloqueaste",
-        "noMilestones": "Aún no desbloqueas logros. ¡Tu primera clase te da el primero!"
+        "noMilestones": "Aún no desbloqueas logros. ¡Tu primera clase te da el primero!",
+        "seeAll": "Ver todos",
+        "chart": {
+          "weekTotal": "{minutes} min en clase esta semana",
+          "weeksTotal": "{classes, plural, one {# clase} other {# clases}} en 8 semanas"
+        },
+        "next": {
+          "title": "Próximo logro",
+          "subtitle": "El que tienes más cerca",
+          "progress": "Progreso"
+        }
       },
       "home": {
-        "subtitle": "Tu próxima clase, tus créditos y lo que te toca hoy.",
+        "subtitle": "Esto es lo que tienes hoy. ¡Vamos con todo!",
         "liveNow": "En vivo ahora",
         "nextClassChip": "Próxima clase",
         "noNextClass": "No tienes clases próximas",
@@ -1224,7 +1413,7 @@
         "noNextClassHint": "Reserva tu próxima clase para seguir avanzando.",
         "join": "Entrar a la clase",
         "viewClass": "Ver clase",
-        "credits": "Tus créditos",
+        "credits": "Te quedan",
         "classesLeft": "{count, plural, =0 {Sin clases disponibles} one {# clase disponible} other {# clases disponibles}}",
         "balanceLine": "{count} × {type} de {minutes} min",
         "shared": "compartidos con tu pareja",
@@ -1236,33 +1425,35 @@
           "words": "Palabras por repasar",
           "practice": "Prácticas pendientes"
         },
-        "todoTitle": "Para hoy",
-        "todoSubtitle": "Lo que te toca ahora",
+        "todoTitle": "Lo que te toca hoy ✅",
+        "todoSubtitle": "Pequeños pasos, gran avance",
         "todo": {
           "join": "Tu clase «{topic}» está abierta",
           "practiceDue": "Entregar «{title}» antes del {date}",
           "practice": "Entregar «{title}»",
           "words": "Repasar {count, plural, one {# palabra} other {# palabras}}",
           "homework": "Hacer la tarea de «{topic}»",
-          "book": "Reservar tu próxima clase"
+          "book": "Reservar tu próxima clase",
+          "profileGoal": "Cuéntale a tu maestro tu meta 🎯",
+          "profilePhoto": "Agrega una foto para que tu maestro te reconozca 📸"
         },
         "go": "Ir",
-        "allDone": "¡Estás al día!",
-        "weekTitle": "Tu semana",
+        "allDone": "¡Todo listo por hoy! 🎉",
+        "weekTitle": "Tu semana 📅",
         "weekSubtitle": "{minutes} minutos en clase en los últimos 7 días",
         "minutesLabel": "Minutos en clase",
-        "lastLessonTitle": "Tu última lección",
+        "lastLessonTitle": "Tu última clase 📝",
         "noRecap": "Tu maestro aún no ha escrito el resumen.",
         "openLesson": "Ver lección",
         "allLessons": "Todas las lecciones",
         "noLessons": "Aquí verás el resumen de tu última clase.",
-        "nextAchievementTitle": "Tu próximo logro",
+        "nextAchievementTitle": "Tu próximo logro 🏆",
         "allAchievements": "Ver logros",
         "allAchievementsDone": "¡Desbloqueaste todos los logros!"
       },
       "credits": {
         "title": "Mis créditos",
-        "subtitle": "Tus clases disponibles, cada movimiento y tus compras.",
+        "subtitle": "Tus créditos de clases y de IA, cada movimiento y tus compras.",
         "available": "Clases disponibles",
         "buy": "Comprar clases",
         "book": "Reservar",
@@ -1296,7 +1487,355 @@
           "canceled": "Cancelada",
           "refunded": "Reembolsada"
         },
-        "noOrders": "Aún no has comprado paquetes."
+        "noOrders": "Aún no has comprado paquetes.",
+        "summary": {
+          "added": "Clases agregadas",
+          "booked": "Clases usadas"
+        },
+        "tabs": {
+          "movements": "Movimientos ({count})",
+          "orders": "Compras ({count})"
+        },
+        "byKindSubtitle": "Lo que puedes reservar ahora",
+        "spending": {
+          "title": "Tus compras",
+          "subtitle": "Paquetes pagados",
+          "total": "Total pagado",
+          "packages": "Paquetes comprados",
+          "last": "Última compra"
+        },
+        "noAiHistory": "Aún no hay movimientos de créditos de IA.",
+        "aiReason": {
+          "purchase": "Compra",
+          "grant": "Créditos regalados",
+          "use": "Conversación iniciada",
+          "refund": "Reembolso",
+          "adjustment": "Ajuste"
+        },
+        "aiUse": {
+          "voice": "Conversación con Luna",
+          "chat": "Chat con Luna"
+        },
+        "aiPanel": {
+          "title": "Créditos de IA",
+          "subtitle": "Cada clase a la que asistes suma {perClass} gratis con Luna y {perClass} chats gratis",
+          "credits": "Créditos comprados",
+          "freeLuna": "Gratis con Luna",
+          "freeChat": "Chats gratis",
+          "buy": "Comprar créditos de IA",
+          "talk": "Hablar con Luna",
+          "used": "Conversaciones pagadas con créditos"
+        },
+        "product": {
+          "classes": "Créditos de clases",
+          "ai": "Créditos de IA"
+        },
+        "aiSummary": {
+          "credits": "Créditos de IA",
+          "freeLuna": "Gratis con Luna",
+          "freeChat": "Chats gratis"
+        },
+        "noAiOrders": "Aún no compraste packs de IA.",
+        "aiOrderKind": "Pack de IA · {tokens} tokens cada una",
+        "aiConversations": "{count, plural, one {# conversación} other {# conversaciones}}",
+        "aiMath": {
+          "title": "Cómo funcionan los créditos de IA",
+          "subtitle": "Tus compras de IA",
+          "tokens": "1 crédito = 1 conversación con Luna o en el chat, de hasta {tokens} tokens.",
+          "free": "Cada clase a la que asistes suma {perClass} gratis con Luna y {perClass} chats gratis; se usan primero.",
+          "packs": "Packs comprados"
+        },
+        "pending": {
+          "finish": "Terminar pago",
+          "checking": "Revisando…",
+          "buyAgain": "Comprar de nuevo",
+          "opening": "Te llevamos de vuelta a la página de pago…",
+          "paid": "Pago confirmado: {count, plural, one {se agregó # crédito} other {se agregaron # créditos}}.",
+          "expired": "La página de pago venció, así que esta compra se canceló. Puedes comprar de nuevo.",
+          "processing": "El banco aún está confirmando este pago; los créditos llegan cuando se acredite.",
+          "failed": "No pudimos revisar este pago ahora. Intenta de nuevo en unos minutos.",
+          "notFound": "Esta compra ya no está pendiente."
+        }
+      }
+    },
+    "hub": {
+      "classes": {
+        "title": "Mis clases 🎥",
+        "subtitle": "Tus próximas clases, lo que ya viste y dónde reservar la siguiente.",
+        "tabs": {
+          "classes": "Mis clases",
+          "lessons": "Lo que he aprendido",
+          "book": "Reservar una clase"
+        }
+      },
+      "study": {
+        "title": "A estudiar 📚",
+        "subtitle": "Tus tareas, tus palabras y los materiales de tus maestros, todo en un lugar.",
+        "tabs": {
+          "practice": "Tareas",
+          "vocabulary": "Vocabulario",
+          "materials": "Materiales"
+        }
+      },
+      "progress": {
+        "title": "Mi progreso 🌱",
+        "subtitle": "Mira cuánto has avanzado y los logros que vas desbloqueando.",
+        "tabs": {
+          "progress": "Cómo voy",
+          "achievements": "Logros"
+        }
+      },
+      "credits": {
+        "title": "Mis créditos 💳",
+        "subtitle": "Tus créditos de clases y de IA, tus movimientos y paquetes para seguir aprendiendo.",
+        "tabs": {
+          "credits": "Mis créditos",
+          "buy": "Comprar créditos"
+        }
+      }
+    },
+    "ai": {
+      "notConfigured": "La práctica con IA aún no está activada en la academia.",
+      "intro": "Elige una escena y escríbele a Luna en español. Te corrige con un 💡 cuando te equivocas.",
+      "noneLeft": {
+        "speak": "Ya usaste tus prácticas de voz de hoy. ¡Vuelve mañana!",
+        "chat": "Ya usaste tus chats con IA de hoy. ¡Vuelve mañana!"
+      },
+      "customTitle": "Tema libre ✨",
+      "customSubtitle": "Escribe tú la situación que quieres practicar.",
+      "customLabel": "¿Qué quieres practicar?",
+      "customPlaceholder": "Ej.: Rentar un carro en Antigua",
+      "startCustom": "Empezar",
+      "starting": "Preparando…",
+      "historyTitle": "Mis conversaciones",
+      "active": "En curso",
+      "usage": "{used} / {limit} tokens",
+      "cost": "Costo: {cost}",
+      "back": "Volver a las escenas",
+      "finish": "Cerrar por ahora",
+      "sceneAlt": "Ilustración de la escena: {title}",
+      "typing": "Luna está escribiendo…",
+      "placeholder": "Escribe tu respuesta…",
+      "budgetReached": "Se acabó el límite de esta conversación. ¡Buen trabajo!",
+      "errors": {
+        "forbidden": "Inicia sesión para practicar.",
+        "not_configured": "La práctica con IA no está activada.",
+        "daily_limit": "Ya usaste tus conversaciones de hoy.",
+        "not_found": "No encontramos esa conversación.",
+        "finished": "Esta conversación ya terminó (se alcanzó el límite).",
+        "invalid": "Escribe un mensaje o un tema un poco más largo.",
+        "ai_error": "Luna no respondió. Inténtalo de nuevo en un momento.",
+        "ai_auth": "La clave de Anthropic no es válida. Revisa ANTHROPIC_API_KEY.",
+        "ai_model": "El modelo configurado no existe en tu cuenta. Revisa ANTHROPIC_MODEL (corre pnpm check:ai).",
+        "ai_credit": "La cuenta de Anthropic no tiene saldo. Agrega créditos en console.anthropic.com.",
+        "ai_rate": "Luna está recibiendo muchas solicitudes. Espera un momento e inténtalo de nuevo.",
+        "voice_too_short": "Responde al menos 2 preguntas para recibir tu informe.",
+        "no_credits": "Ya usaste tus conversaciones gratis. Compra créditos de IA para seguir practicando."
+      },
+      "paused": "En pausa",
+      "spent": "Sin tokens",
+      "resume": "Reanudar",
+      "pausedNote": "Cerraste esta conversación, pero aún le quedan tokens. Puedes reanudarla cuando quieras.",
+      "spentNote": "Se acabaron los tokens de esta conversación. ¡Buen trabajo! Ya no se podrá abrir de nuevo.",
+      "reportReady": "Informe listo",
+      "reportPending": "Informe pendiente",
+      "luna": {
+        "cardTitle": "Practica hablando con Luna",
+        "cardText": "Elige un tema y conversa en voz alta con Luna: ella te habla, tú respondes con el micrófono. Luna sigue tus ideas, te pide lo que falta y al final te da un informe; las palabras nuevas van a tu vocabulario.",
+        "start": "Empezar a hablar",
+        "leave": "Salir por ahora",
+        "back": "Volver",
+        "finish": "Terminar y ver mi informe",
+        "progress": "Progreso de la práctica",
+        "status": {
+          "speaking": "Luna está hablando…",
+          "listening": "Te escucho… responde en español.",
+          "thinking": "Luna está pensando…",
+          "reporting": "Luna está preparando tu informe…",
+          "yourTurn": "Tu turno: pulsa el micrófono y responde en español.",
+          "done": "Práctica terminada.",
+          "ready": "Luna está lista para hablar contigo.",
+          "paused": "En pausa.",
+          "hearing": "Te escucho… haz una pausa cuando termines.",
+          "missed": "No te escuché bien. Inténtalo de nuevo.",
+          "waiting": "Un momento…"
+        },
+        "voice": "Voz de Luna",
+        "noMic": "Tu navegador no permite hablar con Luna. Ábrelo en Chrome, Edge o Safari.",
+        "micErrors": {
+          "permission": "Permite el micrófono en tu navegador para hablar con Luna.",
+          "network": "No se pudo usar el reconocimiento de voz. Revisa tu conexión o escribe tu respuesta.",
+          "other": "El micrófono no funcionó. Inténtalo de nuevo o escribe tu respuesta.",
+          "no-speech": ""
+        },
+        "retryReport": "Generar informe",
+        "reportMissing": "La entrevista terminó, pero el informe no se pudo generar. Inténtalo de nuevo.",
+        "report": {
+          "title": "Tu informe de Luna",
+          "subtitle": "Cómo te fue con tu español en esta práctica.",
+          "strengths": "Lo que hiciste bien",
+          "improve": "Para mejorar",
+          "corrections": "Frases para decir mejor",
+          "words": "Palabras agregadas a tu vocabulario",
+          "wordsLink": "Repasarlas en Vocabulario"
+        },
+        "intro": "Habla en español con Luna sobre un tema.",
+        "customTitle": "Tu propio tema ✨",
+        "customSubtitle": "¿Quieres hablar de otra cosa? Escríbelo.",
+        "customLabel": "¿De qué quieres hablar?",
+        "customPlaceholder": "Ej.: Mi deporte favorito",
+        "gate": "Aquí todo es hablado: Luna te habla y tú le respondes con el micrófono. Tu navegador te pedirá permiso para usarlo.",
+        "allowAndStart": "Permitir micrófono y empezar",
+        "doneTalking": "Ya terminé",
+        "tryAgain": "Volver a escuchar",
+        "repeat": "Repetir",
+        "pause": "Pausar",
+        "resume": "Continuar",
+        "voiceSettings": "Voz y velocidad",
+        "voiceAuto": "Automática (Marta, Guatemala, si está disponible)",
+        "voiceHelp": "Son las voces en español de tu dispositivo; Edge suele tener las más naturales.",
+        "noVoices": "Tu dispositivo no tiene voces en español instaladas.",
+        "speed": "Velocidad",
+        "speeds": {
+          "slow": "Lenta",
+          "normal": "Normal",
+          "fast": "Rápida"
+        },
+        "testVoice": "Probar voz",
+        "sample": "¡Hola! Soy Luna. ¿Cómo estás hoy?",
+        "help": "Ayuda",
+        "turnError": "No se pudo hablar con Luna. Revisa tu conexión e inténtalo de nuevo.",
+        "transcript": {
+          "title": "Conversación",
+          "answers": "{count, plural, =0 {Aún sin respuestas} one {# respuesta} other {# respuestas}}",
+          "helpAsked": "🆘 Pedí ayuda"
+        }
+      },
+      "left": {
+        "speak": "Te quedan {left} de {perDay} prácticas de voz hoy.",
+        "chat": "Te quedan {left} de {perDay} chats hoy."
+      },
+      "pages": {
+        "speak": {
+          "title": "Habla con Luna 🎙️",
+          "subtitle": "Practica tu español en voz alta con Luna y recibe un informe al final."
+        },
+        "chat": {
+          "title": "Chatea con Luna 💬",
+          "subtitle": "Escribe en español dentro de escenas de la vida real y aprende de tus errores."
+        }
+      },
+      "allowance": {
+        "buy": "Comprar créditos de IA",
+        "left": {
+          "speak": "Tienes {free, plural, =0 {0 prácticas de voz gratis} one {# práctica de voz gratis} other {# prácticas de voz gratis}} y {credits, plural, =0 {0 créditos de IA} one {# crédito de IA} other {# créditos de IA}}.",
+          "chat": "Tienes {free, plural, =0 {0 chats gratis} one {# chat gratis} other {# chats gratis}} y {credits, plural, =0 {0 créditos de IA} one {# crédito de IA} other {# créditos de IA}}."
+        },
+        "none": {
+          "speak": "Ya usaste tus prácticas de voz gratis. Cada clase a la que asistes te da {perClass} más, o compra créditos de IA para seguir hablando con Luna.",
+          "chat": "Ya usaste tus chats gratis. Cada clase a la que asistes te da {perClass} más, o compra créditos de IA para seguir chateando."
+        },
+        "tokens": "Cada una puede usar hasta {tokens} tokens."
+      },
+      "lunaHome": {
+        "summary": {
+          "free": "Prácticas gratis",
+          "credits": "Créditos de IA",
+          "done": "Prácticas hechas",
+          "reports": "Informes listos"
+        },
+        "pickTitle": "Elige un tema",
+        "pickSubtitle": "Luna habla primero y tú respondes en voz alta. Cada práctica puede usar hasta {tokens} tokens.",
+        "tapToStart": "Toca para empezar",
+        "tabs": {
+          "all": "Todas ({count})",
+          "reports": "Informes listos ({count})",
+          "active": "En curso ({count})"
+        },
+        "goals": "{done}/{total} objetivos",
+        "continue": "Continuar",
+        "seeReport": "Ver informe",
+        "empty": {
+          "all": "Aún no tienes prácticas.",
+          "reports": "Aún no hay informes: termina una práctica para recibir uno.",
+          "active": "No tienes prácticas en curso."
+        },
+        "tagline": "Tu compañera para conversar en español. Te escucha, sigue tus ideas y te ayuda cuando te trabas.",
+        "how": {
+          "pick": {
+            "title": "Elige un tema",
+            "text": "Uno de los sugeridos o el tuyo."
+          },
+          "talk": {
+            "title": "Habla en voz alta",
+            "text": "Responde con el micrófono; pide ayuda cuando la necesites."
+          },
+          "report": {
+            "title": "Recibe tu informe",
+            "text": "Qué salió bien, qué mejorar y palabras nuevas para tu vocabulario."
+          }
+        },
+        "balance": {
+          "title": "Lo que tienes",
+          "subtitle": "Cada clase a la que asistes suma {perClass} prácticas gratis",
+          "free": "Prácticas gratis",
+          "credits": "Créditos de IA",
+          "tokens": "Tokens por práctica"
+        }
+      },
+      "chatHome": {
+        "summary": {
+          "free": "Chats gratis",
+          "credits": "Créditos de IA",
+          "done": "Chats iniciados",
+          "open": "Chats abiertos"
+        },
+        "pickTitle": "Elige una escena",
+        "pickSubtitle": "Escríbele a Luna en español dentro de una escena de la vida real. Cada chat puede usar hasta {tokens} tokens.",
+        "tabs": {
+          "all": "Todos ({count})",
+          "open": "Abiertos ({count})",
+          "done": "Terminados ({count})"
+        },
+        "continue": "Continuar",
+        "resume": "Retomar",
+        "spentNote": "Este chat usó todos sus tokens.",
+        "empty": {
+          "all": "Aún no tienes chats.",
+          "open": "No tienes chats abiertos.",
+          "done": "Aún no tienes chats terminados."
+        },
+        "cardTitle": "Chatea con Luna",
+        "how": {
+          "pick": {
+            "title": "Elige una escena",
+            "text": "Una tienda, un restaurante, el aeropuerto… o tu propio tema."
+          },
+          "write": {
+            "title": "Escribe en español",
+            "text": "Luna hace el otro papel y mantiene la conversación."
+          },
+          "learn": {
+            "title": "Aprende de tus errores",
+            "text": "Un 💡 te muestra cómo decirlo mejor cuando algo no está bien."
+          }
+        },
+        "balance": {
+          "subtitle": "Cada clase a la que asistes suma {perClass} chats gratis",
+          "free": "Chats gratis",
+          "tokens": "Tokens por chat"
+        }
+      },
+      "chatRoom": {
+        "role": "Actuando la escena: {title}",
+        "tip1": "Escribe en español, aunque sea corto.",
+        "tip2": "Un 💡 debajo de la respuesta de Luna te muestra cómo decirlo mejor.",
+        "tip3": "Termínalo cuando quieras y retómalo después mientras tenga tokens."
+      },
+      "translate": {
+        "toEnglish": "English",
+        "toSpanish": "Español",
+        "loading": "Traduciendo…"
       }
     }
   }

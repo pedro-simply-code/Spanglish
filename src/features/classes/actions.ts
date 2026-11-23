@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
+import { lessonSummariesEnabled, summarizeLesson } from "@/server/ai/lesson-summary";
 import {
   cancelClassForActor,
   rescheduleClassForActor,
@@ -188,4 +190,20 @@ export async function rateClassAction(input: {
   const result = await rateClass(actor, input);
   if (result.ok) revalidatePath(`/classes/${input.classId}`);
   return { ok: result.ok, title: result.ok ? "Rating saved" : "Could not rate", message: result.message };
+}
+
+/**
+ * The teacher (or staff) asks Claude to write the class summary again, e.g.
+ * when it failed or the class was too short when it ended.
+ */
+export async function regenerateLessonSummaryAction(classId: string): Promise<{ ok: boolean; message: string }> {
+  const t = await getTranslations("student.classes.summary");
+  const actor = await getActorWithPermission("classes:join-own");
+  if (!actor) return { ok: false, message: t("forbidden") };
+  const relation = await getClassRelation(classId, actor);
+  if (relation !== "teacher" && relation !== "staff") return { ok: false, message: t("forbidden") };
+  if (!lessonSummariesEnabled()) return { ok: false, message: t("notConfigured") };
+  await summarizeLesson(classId, { again: true });
+  revalidatePath(`/classes/${classId}`);
+  return { ok: true, message: t("regenerated") };
 }

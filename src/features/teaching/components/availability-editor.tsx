@@ -113,7 +113,7 @@ export function AvailabilityEditor({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("teacher.availability.title")}
         subtitle={t("teacher.availability.subtitle")}

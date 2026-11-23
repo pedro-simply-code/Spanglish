@@ -138,7 +138,8 @@
       "checkoutProductDescription": "{credits} {minutes}-minute {kind} class credits",
       "stripeNoUrl": "Stripe did not return a checkout URL.",
       "stripePaymentNote": "Stripe payment",
-      "unknownStripeError": "Unknown Stripe error"
+      "unknownStripeError": "Unknown Stripe error",
+      "aiCheckoutProductDescription": "{credits} AI practice credits (Luna and chat)"
     },
     "teaching": {
       "validateTrack": "Choose an application track.",
@@ -270,7 +271,9 @@
       "notAllowedPackage": "Sign in as a student to buy a package.",
       "paymentOpenFailed": "The payment page could not be opened. Try again in a moment.",
       "redirectingToStripe": "Redirecting to Stripe…",
-      "creditsAdded": "{count, plural, one {# credit} other {# credits}} added."
+      "creditsAdded": "{count, plural, one {# credit} other {# credits}} added.",
+      "aiPackNotOnSale": "This AI credit pack is no longer on sale.",
+      "aiCreditsAdded": "{count, plural, one {# AI credit added} other {# AI credits added}}."
     }
   }
 }

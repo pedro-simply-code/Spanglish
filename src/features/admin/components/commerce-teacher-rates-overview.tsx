@@ -16,7 +16,7 @@ import type { TeacherRateTier } from "@/features/admin/types";
 export function CommerceTeacherRatesOverview({ tiers }: { tiers: TeacherRateTier[] }) {
   const t = useTranslations("admin");
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("commerce.teacherRates.title")}
         subtitle={t("commerce.teacherRates.subtitle")}

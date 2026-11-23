@@ -90,7 +90,7 @@ export function TeacherEarnings(props: Props) {
   const paid = props.earnings.filter((item) => item.status === "paid").reduce((sum, item) => sum + item.amountCents, 0);
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.earnings")}
         subtitle={t("teacher.earnings.subtitle")}

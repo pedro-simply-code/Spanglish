@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Grid from "@mui/material/Grid";
@@ -23,6 +23,13 @@ type BreadcrumbProps = {
   children?: ReactNode;
 };
 
+/** Inside a page with its own header and tabs, sections hide their breadcrumb. */
+const BreadcrumbHiddenContext = createContext(false);
+
+export function HideBreadcrumb({ children }: { children: ReactNode }) {
+  return <BreadcrumbHiddenContext.Provider value>{children}</BreadcrumbHiddenContext.Provider>;
+}
+
 export function Breadcrumb({
   title,
   subtitle,
@@ -31,6 +38,8 @@ export function Breadcrumb({
   children,
 }: BreadcrumbProps) {
   const t = useTranslations("shell");
+  const hidden = useContext(BreadcrumbHiddenContext);
+  if (hidden) return null;
   const rightSlot =
     children ??
     (image ? (

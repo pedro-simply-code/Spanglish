@@ -127,7 +127,7 @@ export function PeopleOverview({
   const locale = useLocale();
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.users")}
         subtitle={t("management.people.subtitle")}

@@ -24,6 +24,7 @@ import {
   IconStar,
   IconTargetArrow,
   IconTrophy,
+  IconUserCircle,
   IconVideo,
 } from "@tabler/icons-react";
 import { useFormatter, useTranslations } from "next-intl";
@@ -57,8 +58,10 @@ export type HomeNextClass = {
   startsAt: string;
   durationMinutes: number;
   type: ClassType;
-  /** The classroom is open now. */
+  /** The classroom can be entered (early entry may be allowed by the academy policy). */
   canJoin: boolean;
+  /** The class is actually happening now (inside its real join window). */
+  live: boolean;
 };
 
 export type HomeBalance = {
@@ -77,6 +80,8 @@ type HomeOverviewProps = {
   insights: StudentInsights;
   pendingAssignments: AssignmentSummary[];
   lastLesson: LessonEntry | null;
+  /** A gentle profile nudge at the end of the to-do list (goal first, then photo). */
+  profileReminder?: "goal" | "photo" | null;
 };
 
 /** The student's home: next class, credits, what to do now, and real progress. */
@@ -89,6 +94,7 @@ export function HomeOverview({
   insights,
   pendingAssignments,
   lastLesson,
+  profileReminder = null,
 }: HomeOverviewProps) {
   const t = useTranslations("student.learn.home");
   const tStudent = useTranslations("student");
@@ -107,7 +113,7 @@ export function HomeOverview({
   ] as const;
 
   const todo: { key: string; label: string; href: string; icon: ComponentType<{ size?: number }> }[] = [];
-  if (nextClass?.canJoin) {
+  if (nextClass?.live) {
     todo.push({ key: "join", label: t("todo.join", { topic: nextClass.topic }), href: `/classes/${nextClass.id}/room`, icon: IconVideo });
   }
   for (const assignment of pendingAssignments) {
@@ -121,17 +127,26 @@ export function HomeOverview({
     });
   }
   if (insights.wordsDue) {
-    todo.push({ key: "words", label: t("todo.words", { count: insights.wordsDue }), href: "/vocabulary", icon: IconCards });
+    todo.push({ key: "words", label: t("todo.words", { count: insights.wordsDue }), href: "/study?tab=vocabulary", icon: IconCards });
   }
   if (lastLesson?.homework) {
     todo.push({ key: "homework", label: t("todo.homework", { topic: lastLesson.topic }), href: `/classes/${lastLesson.id}`, icon: IconNotebook });
   }
   if (!nextClass) {
-    todo.push({ key: "book", label: t("todo.book"), href: "/schedule", icon: IconCalendarEvent });
+    todo.push({ key: "book", label: t("todo.book"), href: "/classes?tab=book", icon: IconCalendarEvent });
+  }
+  // Low priority: always last, and only one at a time.
+  if (profileReminder) {
+    todo.push({
+      key: "profile",
+      label: t(profileReminder === "goal" ? "todo.profileGoal" : "todo.profilePhoto"),
+      href: "/settings",
+      icon: profileReminder === "goal" ? IconTargetArrow : IconUserCircle,
+    });
   }
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb title={tStudent("home.breadcrumbTitle", { firstName })} subtitle={t("subtitle")} />
 
       <Grid container spacing={3}>
@@ -149,10 +164,10 @@ export function HomeOverview({
                     </Avatar>
                     <Box>
                       <Chip
-                        label={nextClass?.canJoin ? t("liveNow") : t("nextClassChip")}
-                        color={nextClass?.canJoin ? "error" : "primary"}
+                        label={nextClass?.live ? t("liveNow") : t("nextClassChip")}
+                        color={nextClass?.live ? "error" : "primary"}
                         size="small"
-                        variant={nextClass?.canJoin ? "filled" : "outlined"}
+                        variant={nextClass?.live ? "filled" : "outlined"}
                       />
                       <Typography variant="h5" mt={0.75}>
                         {nextClass ? nextClass.topic : t("noNextClass")}
@@ -181,7 +196,7 @@ export function HomeOverview({
                         {nextClass.canJoin ? t("join") : t("viewClass")}
                       </LinkButton>
                     ) : null}
-                    <LinkButton href="/schedule" variant="outlined" startIcon={<IconCalendarEvent size={18} />}>
+                    <LinkButton href="/classes?tab=book" variant="outlined" startIcon={<IconCalendarEvent size={18} />}>
                       {tStudent("actions.bookClass")}
                     </LinkButton>
                   </Stack>
@@ -207,7 +222,7 @@ export function HomeOverview({
                       ))}
                     </Stack>
                     <Stack direction="row" spacing={1}>
-                      <LinkButton href="/pricing" size="small" variant={credits ? "outlined" : "contained"}>
+                      <LinkButton href="/credits?tab=buy" size="small" variant={credits ? "outlined" : "contained"}>
                         {t("buy")}
                       </LinkButton>
                       <LinkButton href="/credits" size="small" variant="text">
@@ -246,7 +261,20 @@ export function HomeOverview({
           );
         })}
 
-        <Grid size={{ xs: 12, lg: 5 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <SectionCard title={t("weekTitle")} subtitle={t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })}>
+            <WeeklyActivityChart
+              categories={insights.weeklyMinutes.map((day) =>
+                format.dateTime(new Date(`${day.date}T12:00:00Z`), { weekday: "short", timeZone: "UTC" }),
+              )}
+              data={insights.weeklyMinutes.map((day) => day.minutes)}
+              height={240}
+              label={t("minutesLabel")}
+            />
+          </SectionCard>
+        </Grid>
+
+        <Grid size={{ xs: 12, lg: 6 }}>
           <SectionCard title={t("todoTitle")} subtitle={t("todoSubtitle")}>
             {todo.length ? (
               <Stack spacing={1.5}>
@@ -273,19 +301,6 @@ export function HomeOverview({
           </SectionCard>
         </Grid>
 
-        <Grid size={{ xs: 12, lg: 7 }}>
-          <SectionCard title={t("weekTitle")} subtitle={t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })}>
-            <WeeklyActivityChart
-              categories={insights.weeklyMinutes.map((day) =>
-                format.dateTime(new Date(`${day.date}T12:00:00Z`), { weekday: "short", timeZone: "UTC" }),
-              )}
-              data={insights.weeklyMinutes.map((day) => day.minutes)}
-              height={240}
-              label={t("minutesLabel")}
-            />
-          </SectionCard>
-        </Grid>
-
         <Grid size={{ xs: 12, md: 6 }}>
           <SectionCard title={t("lastLessonTitle")}>
             {lastLesson ? (
@@ -308,7 +323,7 @@ export function HomeOverview({
                   <LinkButton href={`/classes/${lastLesson.id}`} size="small" variant="outlined">
                     {t("openLesson")}
                   </LinkButton>
-                  <LinkButton href="/lessons" size="small" variant="text">
+                  <LinkButton href="/classes?tab=lessons" size="small" variant="text">
                     {t("allLessons")}
                   </LinkButton>
                 </Stack>
@@ -348,7 +363,7 @@ export function HomeOverview({
                       </Stack>
                       <LinearProgress variant="determinate" value={nextAchievement.progress} sx={{ height: 8, borderRadius: 4 }} />
                     </Box>
-                    <LinkButton href="/achievements" size="small" variant="text" sx={{ alignSelf: "flex-start" }}>
+                    <LinkButton href="/progress?tab=achievements" size="small" variant="text" sx={{ alignSelf: "flex-start" }}>
                       {t("allAchievements")}
                     </LinkButton>
                   </Stack>

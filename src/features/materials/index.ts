@@ -84,3 +84,4 @@ export type {
   SubmissionStatus,
   SubmitPracticeInput,
 } from "@/features/materials/types";
+export { PracticeGames } from "@/features/materials/components/practice-games";

@@ -200,6 +200,16 @@ B2 notes:
 - Limits: one language at a time, quality depends on the browser, and without headphones a speaker's mic can also pick up other voices.
 - Upgrade path: replace the in-browser recognizer with a LiveKit agent using a cloud STT model (e.g. AssemblyAI / Deepgram multilingual via LiveKit Inference). The data packets, panel and transcript table stay the same.
 
+### Ending the class
+
+- **End class** (teacher's toolbar) closes the call for everyone:
+  - Stops a cloud recording.
+  - Marks the session ended (`class_sessions.live_ended_at`).
+  - Deletes the LiveKit room, so every participant is disconnected (`ROOM_DELETED`).
+- Students then see "the teacher ended the class". They rejoin automatically if the teacher reopens the call while the class is still on.
+- As a fallback, students also poll the session state every 10 seconds.
+- A teacher who only loses connection (closed tab, no internet) does **not** end the class. The room stays open with the students and the teacher can rejoin.
+
 ## Camera and microphone
 
 The `Permissions-Policy` header allows camera, microphone and screen sharing

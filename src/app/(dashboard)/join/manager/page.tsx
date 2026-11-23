@@ -64,7 +64,7 @@ async function Content({ searchParams }: PageProps) {
   if (auth.status !== "signed-in") {
     const loginHref = `/login?next=${encodeURIComponent(`/join/manager?token=${encodeURIComponent(token)}`)}`;
     return (
-      <Box mt={3}>
+      <Box>
         <Breadcrumb
           title={t("join.title")}
           subtitle={t("join.signInSubtitle", { email: invitation.email })}
@@ -85,7 +85,7 @@ async function Content({ searchParams }: PageProps) {
     invitation.email.trim().toLowerCase() === auth.session.email.trim().toLowerCase();
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("join.title")}
         subtitle={t("join.acceptSubtitle")}

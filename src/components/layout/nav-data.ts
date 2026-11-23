@@ -8,12 +8,12 @@ import {
   IconChartLine,
   IconClipboardList,
   IconCoin,
-  IconCreditCard,
   IconFileText,
   IconHome2,
   IconMail,
+  IconMessageChatbot,
+  IconMicrophone,
   IconMovie,
-  IconPencil,
   IconPlugConnected,
   IconReceipt2,
   IconScale,
@@ -23,7 +23,6 @@ import {
   IconServer,
   IconSettings,
   IconShieldCheck,
-  IconTrophy,
   IconUserShield,
   IconUsers,
   IconUsersGroup,
@@ -46,6 +45,8 @@ export type NavItem = {
   icon: NavIcon;
   chip?: string;
   chipColor?: "secondary";
+  /** Other paths that belong to this item (marks it active there too). */
+  matches?: string[];
 };
 
 export type NavSection = {
@@ -66,36 +67,46 @@ type NavSectionDefinition = {
  * workspace, and Insights. Labels are translation keys resolved by the caller.
  */
 const navigationByRole: Record<RoleCode, NavSectionDefinition[]> = {
+  // Students get two friendly groups ("Mi aprendizaje" and "Practica con IA");
+  // most pages group related views as tabs (see src/app/(dashboard)/_student/hub.tsx). The two AI
+  // practices close the menu in their own group.
   student: [
     {
-      labelKey: "nav.dashboard",
-      items: [{ titleKey: "nav.overview", href: "/home", icon: IconHome2 }],
-    },
-    {
-      labelKey: "nav.academy",
+      labelKey: "nav.studentLearning",
       items: [
-        { titleKey: "nav.myClasses", href: "/classes", icon: IconVideo },
-        { titleKey: "nav.bookAClass", href: "/schedule", icon: IconCalendarEvent },
-        { titleKey: "nav.pricing", href: "/pricing", icon: IconCreditCard },
-        { titleKey: "nav.myCredits", href: "/credits", icon: IconWallet },
+        { titleKey: "nav.studentHome", href: "/home", icon: IconHome2 },
+        {
+          titleKey: "nav.studentClasses",
+          href: "/classes",
+          icon: IconVideo,
+          matches: ["/classes/", "/lessons", "/schedule"],
+        },
+        {
+          titleKey: "nav.studentStudy",
+          href: "/study",
+          icon: IconBook,
+          matches: ["/practice", "/vocabulary", "/materials"],
+        },
+        {
+          titleKey: "nav.studentProgress",
+          href: "/progress",
+          icon: IconChartLine,
+          matches: ["/achievements"],
+        },
+        {
+          titleKey: "nav.studentCredits",
+          href: "/credits",
+          icon: IconWallet,
+          matches: ["/pricing", "/checkout"],
+        },
       ],
     },
     {
-      labelKey: "nav.learning",
+      // The two AI practices, last and in their own group: different products.
+      labelKey: "nav.studentAi",
       items: [
-        { titleKey: "nav.lessons", href: "/lessons", icon: IconBook },
-        { titleKey: "nav.practice", href: "/practice", icon: IconPencil },
-        { titleKey: "nav.vocabulary", href: "/vocabulary", icon: IconCards },
-        { titleKey: "nav.materials", href: "/materials", icon: IconFileText },
-      ],
-    },
-    {
-      labelKey: "nav.insights",
-      items: [
-        { titleKey: "nav.progress", href: "/progress", icon: IconChartLine },
-        { titleKey: "nav.achievements", href: "/achievements", icon: IconTrophy },
-        { titleKey: "nav.teachWithUs", href: "/apply", icon: IconSchool },
-        { titleKey: "nav.settings", href: "/settings", icon: IconSettings },
+        { titleKey: "nav.studentSpeak", href: "/speak", icon: IconMicrophone },
+        { titleKey: "nav.studentChat", href: "/chat", icon: IconMessageChatbot },
       ],
     },
   ],
@@ -200,7 +211,7 @@ const navigationByRole: Record<RoleCode, NavSectionDefinition[]> = {
 
 export function getNavSections(role: RoleCode, t: NavTranslator): NavSection[] {
   return navigationByRole[role].map((section) => ({
-    label: t(section.labelKey),
+    label: section.labelKey ? t(section.labelKey) : "",
     items: section.items.map(({ titleKey, ...item }) => ({
       ...item,
       title: t(titleKey),

@@ -366,7 +366,7 @@ export function ApplicationsReview({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("applications.title")}
         subtitle={t("applications.subtitle")}

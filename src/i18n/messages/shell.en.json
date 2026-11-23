@@ -80,7 +80,16 @@
       "emailDeliverability": "Email deliverability",
       "classroomDefaults": "Classroom defaults",
       "auditLog": "Audit log",
-      "myCredits": "My credits"
+      "myCredits": "My credits",
+      "studentHome": "Home",
+      "studentClasses": "My classes",
+      "studentSpeak": "Talk with Luna",
+      "studentChat": "Chat with Luna",
+      "studentStudy": "Study",
+      "studentProgress": "My progress",
+      "studentCredits": "My credits",
+      "studentAi": "Practice with Luna",
+      "studentLearning": "My learning"
     },
     "notifications": {
       "classReminder": {
@@ -126,7 +135,8 @@
         "payoutsSubtitle": "Prepare monthly payouts",
         "payoutApprovalsSubtitle": "Approve and send teacher pay",
         "auditSubtitle": "Security and governance events",
-        "integrationsSubtitle": "Email, Google, Stripe, LiveKit"
+        "integrationsSubtitle": "Email, Google, Stripe, LiveKit",
+        "teachSubtitle": "Speak Spanish or English? Teach with us"
       }
     },
     "search": {

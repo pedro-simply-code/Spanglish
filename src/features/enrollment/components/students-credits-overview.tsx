@@ -145,7 +145,7 @@ export function StudentsCreditsOverview({ students, pairs, orders, breadcrumbRoo
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("credits.title")}
         subtitle={t("credits.subtitle", { students: students.length, pairs: pairs.length })}

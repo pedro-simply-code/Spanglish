@@ -7,6 +7,7 @@ import {
   assignments,
   classParticipants,
   classSessions,
+  classSummaries,
   classTranscriptSegments,
   classVocabulary,
   recordings,
@@ -56,6 +57,7 @@ async function pastClassRows(studentId: string) {
       recap: classSessions.recap,
       homework: classSessions.homework,
       teacherName: users.name,
+      teacherAvatar: users.image,
       firstJoinedAt: classParticipants.firstJoinedAt,
       secondsPresent: classParticipants.secondsPresent,
     })
@@ -83,12 +85,12 @@ function minutesOf(row: PastClassRow) {
 const attendedRow = (row: PastClassRow) => Boolean(row.firstJoinedAt) || row.secondsPresent > 0;
 
 /** The student's lesson history: one entry per past class, with what it left behind. */
-export async function listLessonHistory(studentId: string): Promise<LessonEntry[]> {
+export async function listLessonHistory(studentId: string, locale: "en" | "es" = "en"): Promise<LessonEntry[]> {
   const rows = await pastClassRows(studentId);
   if (!rows.length) return [];
   const ids = rows.map((row) => row.id);
 
-  const [recordingRows, transcriptRows, vocabRows, assignmentRows] = await Promise.all([
+  const [recordingRows, transcriptRows, vocabRows, assignmentRows, summaryRows] = await Promise.all([
     db
       .selectDistinct({ sessionId: recordings.sessionId })
       .from(recordings)
@@ -106,6 +108,10 @@ export async function listLessonHistory(studentId: string): Promise<LessonEntry[
       .select({ id: assignments.id, sessionId: assignments.sessionId })
       .from(assignments)
       .where(inArray(assignments.sessionId, ids)),
+    db
+      .select({ sessionId: classSummaries.sessionId, en: classSummaries.contentEn, es: classSummaries.contentEs })
+      .from(classSummaries)
+      .where(and(inArray(classSummaries.sessionId, ids), eq(classSummaries.status, "ready"))),
   ]);
   const submitted = assignmentRows.length
     ? await db
@@ -125,6 +131,9 @@ export async function listLessonHistory(studentId: string): Promise<LessonEntry[
   const withRecording = new Set(recordingRows.map((row) => row.sessionId));
   const withTranscript = new Set(transcriptRows.map((row) => row.sessionId));
   const vocabCount = new Map(vocabRows.map((row) => [row.sessionId, row.count]));
+  const summaries = new Map(
+    summaryRows.map((row) => [row.sessionId, (locale === "es" ? row.es : row.en)?.overview ?? row.en?.overview ?? null]),
+  );
 
   return rows.map((row) => {
     const own = assignmentRows.filter((item) => item.sessionId === row.id);
@@ -132,6 +141,7 @@ export async function listLessonHistory(studentId: string): Promise<LessonEntry[
       id: row.id,
       topic: row.topic,
       teacherName: row.teacherName,
+      teacherAvatar: row.teacherAvatar,
       startsAt: row.startsAt.toISOString(),
       durationMinutes: row.durationMinutes,
       classType: row.classType,
@@ -141,6 +151,7 @@ export async function listLessonHistory(studentId: string): Promise<LessonEntry[
       homework: row.homework,
       hasRecording: withRecording.has(row.id),
       hasTranscript: withTranscript.has(row.id),
+      summary: summaries.get(row.id) ?? null,
       vocabularyCount: vocabCount.get(row.id) ?? 0,
       assignmentCount: own.length,
       pendingAssignments: own.filter((item) => !done.has(item.id)).length,

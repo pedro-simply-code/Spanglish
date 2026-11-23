@@ -110,7 +110,7 @@ export function CommercePackagesOverview({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("commerce.packages.title")}
         subtitle={

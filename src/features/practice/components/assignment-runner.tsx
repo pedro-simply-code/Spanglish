@@ -59,7 +59,7 @@ export function AssignmentRunner({
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={assignment.title}
         subtitle={t("subtitle", {
@@ -67,7 +67,7 @@ export function AssignmentRunner({
           teacher: assignment.teacherName,
         })}
         items={[
-          { title: t("practice"), to: "/practice" },
+          { title: t("practice"), to: "/study" },
           { title: assignment.title },
         ]}
       />
@@ -240,7 +240,7 @@ export function AssignmentRunner({
           </Stack>
         </SectionCard>
         <LinkButton
-          href="/practice"
+          href="/study"
           variant="text"
           startIcon={<IconArrowLeft size={16} />}
           sx={{ alignSelf: "flex-start" }}

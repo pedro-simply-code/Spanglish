@@ -130,7 +130,7 @@ export function MarketingPackagesSection({
         />
         <Grid container spacing={3} sx={{ mt: 4 }}>
           {filteredPlans.map((plan) => (
-            <Grid key={plan.id} size={{ xs: 12, md: 4 }}>
+            <Grid key={plan.id} size={{ xs: 12, sm: 6, md: filteredPlans.length > 3 ? 3 : 4 }}>
               <PlanTeaser plan={plan} />
             </Grid>
           ))}
@@ -156,7 +156,7 @@ export function MarketingPackagesSection({
               {t("packages.getStarted")}
             </LinkButton>
             <LinkButton
-              href={`/login?next=${encodeURIComponent("/pricing")}`}
+              href={`/login?next=${encodeURIComponent("/credits?tab=buy")}`}
               variant="outlined"
               color="secondary"
               sx={ctaSx}

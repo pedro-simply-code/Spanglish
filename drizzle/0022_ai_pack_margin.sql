@@ -1,0 +1,2 @@
+ALTER TABLE "ai_credit_packs" ADD COLUMN "margin_percent" integer DEFAULT 20 NOT NULL;--> statement-breakpoint
+ALTER TABLE "ai_credit_packs" ADD CONSTRAINT "ai_credit_packs_margin_range" CHECK ("ai_credit_packs"."margin_percent" >= 0 AND "ai_credit_packs"."margin_percent" <= 90);

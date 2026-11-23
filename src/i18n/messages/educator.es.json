@@ -447,7 +447,8 @@
         "video": "Vídeo",
         "audio": "Audio",
         "form": "Formulario",
-        "recording": "Grabación"
+        "recording": "Grabación",
+        "practice": "Juegos de práctica"
       },
       "level": {
         "all": "Todos los niveles",
@@ -490,7 +491,8 @@
         "due": "Entrega: {date}",
         "questions": "{count} preguntas · {minutes} min",
         "openPractice": "Abrir práctica",
-        "openMaterial": "Abrir material"
+        "openMaterial": "Abrir material",
+        "openGames": "Jugar"
       },
       "composer": {
         "type": "Tipo",
@@ -700,7 +702,9 @@
         "finishQuestionsTitle": "Responde todas las preguntas",
         "finishQuestions": "Respondiste {answered} de {total} preguntas.",
         "practiceSavedTitle": "Práctica guardada",
-        "practiceSaved": "Las respuestas de «{title}» se guardaron ({points}/{total} puntos)."
+        "practiceSaved": "Las respuestas de «{title}» se guardaron ({points}/{total} puntos).",
+        "addWordsTitle": "Faltan palabras",
+        "addWords": "Agrega al menos 4 palabras o frases con su traducción."
       },
       "assignments": {
         "openAssignments": "Tareas abiertas",
@@ -836,6 +840,101 @@
         "studentName": "Nombre del estudiante",
         "sharing": "Compartiendo…",
         "shareMaterial": "Compartir material"
+      },
+      "practice": {
+        "title": "Palabras y frases",
+        "help": "Cada palabra sirve para todos los juegos: tarjetas, memoria, escucha y elige, dictado y ordena la frase (usa el ejemplo). Graba tu voz con el micrófono; si no grabas, se lee con la voz del navegador.",
+        "term": "Español",
+        "termPlaceholder": "la playa",
+        "translation": "Inglés",
+        "translationPlaceholder": "the beach",
+        "example": "Ejemplo (opcional)",
+        "examplePlaceholder": "Vamos a la playa el sábado.",
+        "record": "Grabar tu voz",
+        "recordAgain": "Grabar de nuevo",
+        "stopRecording": "Detener grabación",
+        "playRecording": "Escuchar tu grabación",
+        "playVoice": "Escuchar",
+        "remove": "Quitar",
+        "add": "Agregar palabra",
+        "paste": "Pegar una lista",
+        "pasteLabel": "Una por línea: español | inglés | ejemplo (opcional)",
+        "pastePlaceholder": "la playa | the beach | Vamos a la playa el sábado.\nel boleto | the ticket",
+        "pasteAdd": "Agregar a la lista",
+        "pasteEmpty": "No encontramos líneas con \"español | inglés\".",
+        "micDenied": "Permite el micrófono en tu navegador para grabar.",
+        "uploadFailed": "No se pudo guardar la grabación. Inténtalo de nuevo."
+      },
+      "games": {
+        "pickGame": "Elige un juego",
+        "chooseGame": "Elegir otro juego",
+        "materials": "Materiales",
+        "tooFew": "Se necesitan al menos {min} palabras para jugar.",
+        "addWords": "Agregar palabras",
+        "myWordsTitle": "Practica tu vocabulario",
+        "myWordsText": "Juegos con tus {count} palabras: tarjetas, memoria, escucha y dictado.",
+        "myWordsStart": "Jugar",
+        "hear": "Escuchar",
+        "next": "Siguiente",
+        "check": "Comprobar",
+        "progress": "{current} de {total}",
+        "score": "{score} de {total}",
+        "great": "¡Excelente trabajo!",
+        "good": "¡Muy bien! Sigue practicando.",
+        "keepGoing": "¡Vas bien! Inténtalo otra vez.",
+        "playAgain": "Jugar otra vez",
+        "flashcards": {
+          "title": "Tarjetas",
+          "description": "Escucha la palabra, voltea la tarjeta y repasa las que no sabías.",
+          "left": "Quedan {count}",
+          "tapFlip": "Toca para ver el significado",
+          "tapBack": "Toca para volver",
+          "again": "Repasar",
+          "knew": "¡Lo sé!"
+        },
+        "memory": {
+          "title": "Memoria",
+          "description": "Encuentra las parejas: palabra en español y su significado.",
+          "help": "Voltea dos tarjetas y encuentra las parejas",
+          "moves": "{moves} intentos"
+        },
+        "listen": {
+          "title": "Escucha y elige",
+          "description": "Escucha la palabra y elige qué significa.",
+          "play": "Escuchar",
+          "slow": "Más despacio",
+          "question": "¿Qué significa lo que escuchaste?"
+        },
+        "dictation": {
+          "title": "Dictado",
+          "description": "Escucha y escribe exactamente lo que oyes.",
+          "label": "Escribe lo que escuchaste",
+          "right": "¡Perfecto!",
+          "accents": "¡Casi! Revisa las tildes:",
+          "wrong": "La respuesta correcta es:"
+        },
+        "order": {
+          "title": "Ordena la frase",
+          "description": "Toca las palabras en el orden correcto para armar la frase.",
+          "unavailable": "Necesita frases de 3 palabras o más (agrega ejemplos).",
+          "help": "Toca las palabras en orden para armar la frase.",
+          "hint": "Pista: «{word}» = {translation}",
+          "right": "¡Correcto!"
+        }
+      },
+      "board": {
+        "summary": {
+          "all": "Materiales",
+          "forms": "Formularios de práctica",
+          "listen": "Para escuchar o ver",
+          "games": "Juegos de palabras"
+        },
+        "teacher": "Maestro",
+        "allTeachers": "Todos los maestros",
+        "clear": "Limpiar filtros",
+        "byType": "Por tipo",
+        "byTeacher": "Por maestro",
+        "byTeacherHint": "Toca uno para ver solo sus materiales"
       }
     },
     "payouts": {

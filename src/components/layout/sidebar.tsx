@@ -70,7 +70,9 @@ function SidebarContent({ actor, compact, onNavigate }: SidebarContentProps) {
           <List disablePadding>
             {navSections.map((section) => (
               <Box component="li" key={section.label} sx={{ listStyle: "none" }}>
-                {compact ? (
+                {!section.label ? (
+                  <Box sx={{ height: compact ? 12 : 16 }} />
+                ) : compact ? (
                   <Box sx={{ display: "flex", justifyContent: "center", py: 1.5 }}>
                     <IconDots size={14} />
                   </Box>
@@ -95,7 +97,9 @@ function SidebarContent({ actor, compact, onNavigate }: SidebarContentProps) {
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const href = item.href === "/home" ? homePath : item.href;
-                  const selected = pathname === href;
+                  const selected =
+                    pathname === href ||
+                    Boolean(item.matches?.some((prefix) => pathname.startsWith(prefix)));
 
                   return (
                     <ListItemButton

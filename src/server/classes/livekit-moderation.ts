@@ -76,3 +76,18 @@ export async function muteParticipantMicrophone(roomName: string, identity: stri
     message: muted ? t("moderation.participantMuted") : t("moderation.alreadyMuted"),
   };
 }
+/**
+ * Closes the LiveKit room for everyone: every participant is disconnected
+ * (reason ROOM_DELETED). Used when the teacher ends the class on purpose.
+ */
+export async function closeLiveKitRoom(roomName: string) {
+  const client = getRoomServiceClient();
+  if (!client) return false;
+  try {
+    await client.deleteRoom(roomName);
+    return true;
+  } catch {
+    // Already gone (everyone left) or never created.
+    return false;
+  }
+}

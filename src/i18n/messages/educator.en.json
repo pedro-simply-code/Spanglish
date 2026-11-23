@@ -447,7 +447,8 @@
         "video": "Video",
         "audio": "Audio",
         "form": "Form",
-        "recording": "Recording"
+        "recording": "Recording",
+        "practice": "Practice games"
       },
       "level": {
         "all": "All levels",
@@ -490,7 +491,8 @@
         "due": "Due {date}",
         "questions": "{count} questions · {minutes} min",
         "openPractice": "Open practice",
-        "openMaterial": "Open material"
+        "openMaterial": "Open material",
+        "openGames": "Play"
       },
       "composer": {
         "type": "Type",
@@ -700,7 +702,9 @@
         "finishQuestionsTitle": "Finish every question",
         "finishQuestions": "You answered {answered} of {total} questions.",
         "practiceSavedTitle": "Practice saved",
-        "practiceSaved": "Answers for “{title}” were saved ({points}/{total} points)."
+        "practiceSaved": "Answers for “{title}” were saved ({points}/{total} points).",
+        "addWordsTitle": "Words missing",
+        "addWords": "Add at least 4 words or phrases with their translation."
       },
       "assignments": {
         "openAssignments": "Open assignments",
@@ -836,6 +840,101 @@
         "studentName": "Student name",
         "sharing": "Sharing…",
         "shareMaterial": "Share material"
+      },
+      "practice": {
+        "title": "Words and phrases",
+        "help": "Each word works in every game: flashcards, memory, listen and choose, dictation and sentence order (uses the example). Record your voice with the mic; without a recording the browser voice reads it.",
+        "term": "Spanish",
+        "termPlaceholder": "la playa",
+        "translation": "English",
+        "translationPlaceholder": "the beach",
+        "example": "Example (optional)",
+        "examplePlaceholder": "Vamos a la playa el sábado.",
+        "record": "Record your voice",
+        "recordAgain": "Record again",
+        "stopRecording": "Stop recording",
+        "playRecording": "Play your recording",
+        "playVoice": "Listen",
+        "remove": "Remove",
+        "add": "Add word",
+        "paste": "Paste a list",
+        "pasteLabel": "One per line: Spanish | English | example (optional)",
+        "pastePlaceholder": "la playa | the beach | Vamos a la playa el sábado.\nel boleto | the ticket",
+        "pasteAdd": "Add to the list",
+        "pasteEmpty": "No lines with \"Spanish | English\" found.",
+        "micDenied": "Allow the microphone in your browser to record.",
+        "uploadFailed": "The recording couldn’t be saved. Please try again."
+      },
+      "games": {
+        "pickGame": "Pick a game",
+        "chooseGame": "Choose another game",
+        "materials": "Materials",
+        "tooFew": "You need at least {min} words to play.",
+        "addWords": "Add words",
+        "myWordsTitle": "Practice your vocabulary",
+        "myWordsText": "Games with your {count} words: flashcards, memory, listening and dictation.",
+        "myWordsStart": "Play",
+        "hear": "Listen",
+        "next": "Next",
+        "check": "Check",
+        "progress": "{current} of {total}",
+        "score": "{score} of {total}",
+        "great": "Excellent work!",
+        "good": "Nice! Keep practicing.",
+        "keepGoing": "Good start! Try again.",
+        "playAgain": "Play again",
+        "flashcards": {
+          "title": "Flashcards",
+          "description": "Hear the word, flip the card and review the ones you didn’t know.",
+          "left": "{count} left",
+          "tapFlip": "Tap to see the meaning",
+          "tapBack": "Tap to go back",
+          "again": "Review",
+          "knew": "I knew it!"
+        },
+        "memory": {
+          "title": "Memory",
+          "description": "Find the pairs: the Spanish word and its meaning.",
+          "help": "Flip two cards and find the pairs",
+          "moves": "{moves} tries"
+        },
+        "listen": {
+          "title": "Listen and choose",
+          "description": "Hear the word and pick what it means.",
+          "play": "Listen",
+          "slow": "Slower",
+          "question": "What does what you heard mean?"
+        },
+        "dictation": {
+          "title": "Dictation",
+          "description": "Listen and type exactly what you hear.",
+          "label": "Type what you heard",
+          "right": "Perfect!",
+          "accents": "Almost! Check the accents:",
+          "wrong": "The right answer is:"
+        },
+        "order": {
+          "title": "Order the sentence",
+          "description": "Tap the words in the right order to build the sentence.",
+          "unavailable": "Needs sentences of 3+ words (add examples).",
+          "help": "Tap the words in order to build the sentence.",
+          "hint": "Hint: “{word}” = {translation}",
+          "right": "Correct!"
+        }
+      },
+      "board": {
+        "summary": {
+          "all": "Materials",
+          "forms": "Practice forms",
+          "listen": "To listen or watch",
+          "games": "Word games"
+        },
+        "teacher": "Teacher",
+        "allTeachers": "All teachers",
+        "clear": "Clear filters",
+        "byType": "By type",
+        "byTeacher": "By teacher",
+        "byTeacherHint": "Tap one to see only their materials"
       }
     },
     "payouts": {

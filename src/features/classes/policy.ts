@@ -48,7 +48,7 @@ const englishPolicyMessages = {
   "policy.joinRelaxed":
     "Join window relaxed for testing. The room is open before the usual pre-start window.",
   "policy.joinClosed": "The join window closed {minutes} minutes after the class started.",
-  "policy.joinOpen": "The classroom is open. Your teacher is waiting.",
+  "policy.joinOpen": "The classroom is open. If your teacher hasn't started the class yet, you'll wait there until they do.",
 } as const;
 
 type PolicyMessageKey = keyof typeof englishPolicyMessages;

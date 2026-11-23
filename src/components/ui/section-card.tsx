@@ -10,6 +10,8 @@ type SectionCardProps = {
   subtitle?: string;
   action?: ReactNode;
   children: ReactNode;
+  /** Inner padding on every side (bottom included); default 30px. */
+  padding?: string;
 };
 
 /**
@@ -21,10 +23,11 @@ export function SectionCard({
   subtitle,
   action,
   children,
+  padding,
 }: SectionCardProps) {
   return (
     <Card elevation={9} sx={{ height: "100%" }}>
-      <CardContent sx={{ p: "30px" }}>
+      <CardContent sx={padding ? { p: padding, "&:last-child": { pb: padding } } : { p: "30px" }}>
         {title ? (
           <Stack
             direction="row"

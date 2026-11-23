@@ -39,8 +39,19 @@ function timeFormatter(locale: AppLocale) {
   });
 }
 
+/** Weekday, day, month and year, for the date block on class cards. */
+function datePartsFormatter(locale: AppLocale) {
+  return new Intl.DateTimeFormat(dateTimeLocale(locale), {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: classTimeZone,
+  });
+}
+
 function getPart(iso: string, type: Intl.DateTimeFormatPartTypes, locale: AppLocale) {
-  return longDateFormatter(locale)
+  return datePartsFormatter(locale)
     .formatToParts(new Date(iso))
     .find((part) => part.type === type)?.value;
 }

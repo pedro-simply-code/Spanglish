@@ -41,7 +41,7 @@ export function PlatformRoomsOverview({ policy }: { policy: ClassroomPolicyFlags
   ];
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.classroomDefaults")}
         subtitle={t("platform.rooms.subtitle")}

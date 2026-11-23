@@ -308,7 +308,7 @@ export function ClassLearningPanel({
                 </Typography>
               )}
               {isParticipant && learning.vocabulary.length ? (
-                <LinkButton href="/vocabulary" size="small" variant="text" sx={{ mt: 1 }}>
+                <LinkButton href="/study?tab=vocabulary" size="small" variant="text" sx={{ mt: 1 }}>
                   {t("class.reviewWords")}
                 </LinkButton>
               ) : null}

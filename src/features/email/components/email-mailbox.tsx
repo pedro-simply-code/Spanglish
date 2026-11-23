@@ -170,7 +170,7 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
   const unreadInbox = emails.filter((email) => email.inbox && email.unread).length;
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("email.breadcrumb.title")}
         subtitle={

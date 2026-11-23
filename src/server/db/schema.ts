@@ -14,6 +14,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { RoleCode } from "@/lib/auth-roles";
+import type { AiVoiceFeedback, AiVoiceState } from "@/lib/ai-practice";
+import type { LessonSummaryContent, LessonSummaryStatus, TranscriptSpeakerRole } from "@/lib/lesson-summary";
 
 /*
  * Authentication tables are owned by Better Auth (src/server/auth/auth.ts).
@@ -571,6 +573,8 @@ export const classTranscriptSegments = pgTable(
     speakerIdentity: text("speaker_identity").notNull(),
     speakerUserId: text("speaker_user_id").references(() => users.id, { onDelete: "set null" }),
     speakerName: text("speaker_name").notNull(),
+    /** teacher | student | staff | guest, from the speaker's place in the class. */
+    speakerRole: text("speaker_role").$type<TranscriptSpeakerRole>(),
     body: text("body").notNull(),
     lang: text("lang").notNull(),
     spokenAt: timestamp("spoken_at", { withTimezone: true }).notNull(),
@@ -578,6 +582,28 @@ export const classTranscriptSegments = pgTable(
   },
   (table) => [index("class_transcript_segments_session_idx").on(table.sessionId, table.spokenAt)],
 );
+
+/**
+ * Claude's summary of a class, written from its transcript when the class
+ * ends. One row per class: both languages are kept so each person reads it in
+ * the language of their interface.
+ */
+export const classSummaries = pgTable("class_summaries", {
+  sessionId: text("session_id")
+    .primaryKey()
+    .references(() => classSessions.id, { onDelete: "cascade" }),
+  status: text("status").$type<LessonSummaryStatus>().notNull().default("pending"),
+  contentEn: jsonb("content_en").$type<LessonSummaryContent>(),
+  contentEs: jsonb("content_es").$type<LessonSummaryContent>(),
+  /** Transcript lines the summary was written from. */
+  lineCount: integer("line_count").notNull().default(0),
+  inputTokens: integer("input_tokens").notNull().default(0),
+  outputTokens: integer("output_tokens").notNull().default(0),
+  costMicros: integer("cost_micros").notNull().default(0),
+  error: text("error"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 export type PricingClassType = ClassType;
 
@@ -775,6 +801,172 @@ export const assignmentSubmissions = pgTable(
   (table) => [
     uniqueIndex("assignment_submissions_unique_idx").on(table.assignmentId, table.studentId),
     index("assignment_submissions_student_idx").on(table.studentId, table.submittedAt),
+  ],
+);
+
+export type AiConversationStatus = "active" | "finished";
+export type AiConversationMode = "chat" | "voice";
+export type AiConversationBilling = "free" | "credit" | "legacy";
+
+/**
+ * Role-play scenes for AI practice. Titles, the AI's role and the first line
+ * are set by hand (no tokens spent to start); the picture is a stored SVG.
+ */
+export const aiScenarios = pgTable("ai_scenarios", {
+  key: text("key").primaryKey(),
+  emoji: text("emoji").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  active: boolean("active").notNull().default(true),
+  /** { en, es } shown to students. */
+  title: jsonb("title").$type<{ en: string; es: string }>().notNull(),
+  description: jsonb("description").$type<{ en: string; es: string }>().notNull(),
+  /** For the model (English): who the AI plays and where. */
+  role: text("role").notNull(),
+  scene: text("scene").notNull(),
+  /** First AI line, by the language the student learns: { spanish, english }. */
+  openings: jsonb("openings").$type<{ spanish: string; english: string }>().notNull(),
+  sceneSvg: text("scene_svg"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** A student's role-play practice with Claude (one scenario, a token budget). */
+export const aiConversations = pgTable(
+  "ai_conversations",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Scenario key (store, restaurant, …) or "custom". */
+    scenario: text("scenario").notNull(),
+    /** Free topic the student typed for a custom scenario. */
+    topic: text("topic").notNull().default(""),
+    /** Language practiced (spanish / english) and the learner's level. */
+    language: text("language").notNull(),
+    level: text("level").notNull(),
+    title: text("title").notNull(),
+    /** Simple SVG scene drawn by the model when the conversation starts. */
+    sceneSvg: text("scene_svg"),
+    /** Total tokens (input + output) spent, checked against `tokenLimit`. */
+    tokensUsed: integer("tokens_used").notNull().default(0),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    /** Cost in millionths of a US dollar, priced when each call was made (future AI credits). */
+    costMicros: integer("cost_micros").notNull().default(0),
+    tokenLimit: integer("token_limit").notNull(),
+    status: text("status").$type<AiConversationStatus>().notNull().default("active"),
+    /** "chat" (written role-play) or "voice" (speaking practice with Luna). */
+    mode: text("mode").$type<AiConversationMode>().notNull().default("chat"),
+    /** Voice: answers the model rated useful (score ≥ 3) and the sum of their scores. */
+    validAnswers: integer("valid_answers").notNull().default(0),
+    infoPoints: integer("info_points").notNull().default(0),
+    /** Voice: goals covered and Luna's notes about the student (sent instead of the full chat). */
+    voiceState: jsonb("voice_state").$type<AiVoiceState>(),
+    /** Voice: the final report, written once when it ends. */
+    feedback: jsonb("feedback").$type<AiVoiceFeedback>(),
+    /** How it was paid: free (from attended classes), credit (1 AI credit), legacy (before AI credits). */
+    billing: text("billing").$type<AiConversationBilling>().notNull().default("legacy"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("ai_conversations_user_idx").on(table.userId, table.createdAt)],
+);
+
+export const aiMessages = pgTable(
+  "ai_messages",
+  {
+    id: text("id").primaryKey(),
+    conversationId: text("conversation_id")
+      .notNull()
+      .references(() => aiConversations.id, { onDelete: "cascade" }),
+    role: text("role").$type<"user" | "assistant">().notNull(),
+    content: text("content").notNull(),
+    /** English version, made when the student taps "Translate" (kept to translate only once). */
+    translation: text("translation"),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("ai_messages_conversation_idx").on(table.conversationId, table.createdAt)],
+);
+
+/**
+ * AI credit packs on sale (admin → pricing). Admin sets the price and margin;
+ * the conversations a pack gives are calculated from env (src/lib/ai-credit-pricing.ts).
+ * 1 credit = 1 new conversation with Luna or in the chat.
+ */
+export const aiCreditPacks = pgTable(
+  "ai_credit_packs",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    priceCents: integer("price_cents").notNull(),
+    /** What the academy keeps, % of the price (after the card fee the rest pays the model). */
+    marginPercent: integer("margin_percent").notNull().default(20),
+    active: boolean("active").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check("ai_credit_packs_price_positive", sql`${table.priceCents} > 0`),
+    check("ai_credit_packs_margin_range", sql`${table.marginPercent} >= 0 AND ${table.marginPercent} <= 90`),
+  ],
+);
+
+/** A student's bought AI credits; the balance never goes below zero. */
+export const aiCreditAccounts = pgTable(
+  "ai_credit_accounts",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    balance: integer("balance").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check("ai_credit_accounts_balance_non_negative", sql`${table.balance} >= 0`)],
+);
+
+export type AiCreditReason = "purchase" | "grant" | "use" | "refund" | "adjustment";
+
+/** Every AI credit movement (purchases, conversations started, refunds). */
+export const aiCreditTransactions = pgTable(
+  "ai_credit_transactions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    delta: integer("delta").notNull(),
+    reason: text("reason").$type<AiCreditReason>().notNull(),
+    orderId: text("order_id"),
+    conversationId: text("conversation_id"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("ai_credit_transactions_user_idx").on(table.userId, table.createdAt)],
+);
+
+/** AI credit purchases (kept apart from class orders: no teacher payouts depend on them). */
+export const aiCreditOrders = pgTable(
+  "ai_credit_orders",
+  {
+    id: text("id").primaryKey(),
+    buyerUserId: text("buyer_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    packId: text("pack_id"),
+    credits: integer("credits").notNull(),
+    totalCents: integer("total_cents").notNull(),
+    currency: text("currency").notNull().default("USD"),
+    provider: text("provider").$type<OrderProvider>().notNull(),
+    providerRef: text("provider_ref"),
+    status: text("status").$type<OrderStatus>().notNull().default("paid"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("ai_credit_orders_buyer_idx").on(table.buyerUserId, table.createdAt),
+    uniqueIndex("ai_credit_orders_provider_ref_idx").on(table.provider, table.providerRef),
   ],
 );
 

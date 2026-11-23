@@ -112,7 +112,7 @@ export function ClassListCard({ item, now, policy, viewerId }: ClassListCardProp
 
   return (
     <Card elevation={9}>
-      <CardContent sx={{ p: { xs: "20px", md: "24px" } }}>
+      <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2.5}

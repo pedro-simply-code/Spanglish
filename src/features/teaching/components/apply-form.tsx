@@ -127,7 +127,7 @@ export function ApplyForm({ application }: { application: MyApplication }) {
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("teacher.apply.title")}
         subtitle={t("teacher.apply.subtitle")}

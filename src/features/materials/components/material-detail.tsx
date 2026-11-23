@@ -23,6 +23,7 @@ import {
   MaterialKindChip,
   MaterialStatusChip,
 } from "@/features/materials/components/material-kind-chip";
+import { PracticeGames } from "@/features/materials/components/practice-games";
 import { ShareMaterialDialog } from "@/features/materials/components/share-material-dialog";
 import {
   localizeAssignments,
@@ -83,11 +84,11 @@ export async function MaterialDetail({
   const questions = isTeacher
     ? localizeFormQuestions(sourceQuestions, sourceMaterial.id, t)
     : sourceQuestions;
-  const libraryHref = isTeacher ? "/teacher/materials" : "/materials";
+  const libraryHref = isTeacher ? "/teacher/materials" : "/study?tab=materials";
   const libraryLabel = isTeacher ? t("detail.title") : t("studentOverview.title");
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={material.title}
         subtitle={`${materialKindLabelForTitle(material, t)} · ${formatMaterialLevel(material.level, t)}`}
@@ -335,6 +336,14 @@ function MaterialPreview({
   questions: FormQuestion[];
   t: Translator;
 }) {
+  if (material.kind === "practice") {
+    return (
+      <Box sx={{ pt: 1 }}>
+        <PracticeGames items={material.practiceItems ?? []} />
+      </Box>
+    );
+  }
+
   if (material.kind === "form") {
     return (
       <Box sx={{ p: 2.5, bgcolor: "grey.100" }}>

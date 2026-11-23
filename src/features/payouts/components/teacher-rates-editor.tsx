@@ -67,7 +67,7 @@ export function TeacherRatesEditor({ settings, teachersByLevel }: Props) {
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title="Teacher pay rates"
         subtitle="Revenue share per delivered class: teachers keep the rest after the platform take."

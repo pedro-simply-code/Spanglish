@@ -26,7 +26,7 @@ export function IntegrationsOverview({ integrations }: { integrations: Integrati
   const t = useTranslations("admin");
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("management.integrations.title")}
         subtitle={t("management.integrations.subtitle")}

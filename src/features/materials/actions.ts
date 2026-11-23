@@ -15,6 +15,8 @@ import type {
   ShareMaterialInput,
 } from "@/features/materials/types";
 import type { MaterialKind } from "@/features/materials/types";
+import { MAX_PRACTICE_ITEMS, MIN_PRACTICE_ITEMS } from "@/lib/practice-games";
+import { isPracticeAudioKey } from "@/server/storage/practice-audio";
 
 const allowedKinds: readonly MaterialKind[] = [
   "document",
@@ -23,6 +25,7 @@ const allowedKinds: readonly MaterialKind[] = [
   "audio",
   "form",
   "recording",
+  "practice",
 ];
 
 type Translator = Awaited<ReturnType<typeof getTranslations>>;
@@ -97,6 +100,24 @@ export async function createMaterialAction(
           })
       : [];
 
+  // Practice games: clean words and phrases; recordings must be ours.
+  const practiceItems =
+    input.kind === "practice"
+      ? (input.practiceItems ?? [])
+          .map((item, index) => ({
+            id: `w${index + 1}`,
+            term: String(item.term ?? "").trim().slice(0, 120),
+            translation: String(item.translation ?? "").trim().slice(0, 160),
+            example: String(item.example ?? "").trim().slice(0, 240) || undefined,
+            audio: item.audio && isPracticeAudioKey(item.audio) ? item.audio : undefined,
+          }))
+          .filter((item) => item.term && item.translation)
+          .slice(0, MAX_PRACTICE_ITEMS)
+      : [];
+  if (input.kind === "practice" && practiceItems.length < MIN_PRACTICE_ITEMS) {
+    return failure(t, "addWordsTitle", "addWords");
+  }
+
   // The composer has no class picker: a new material goes to the library and
   // is attached to classes afterwards (share dialog).
   const materialId = `mat-${slugify(title)}-${Date.now().toString(36)}`;
@@ -117,6 +138,7 @@ export async function createMaterialAction(
       classId: input.classId,
       questions,
       questionCount: input.kind === "form" ? questions.length : undefined,
+      ...(input.kind === "practice" ? { items: practiceItems } : {}),
     },
   });
 

@@ -18,6 +18,7 @@
     "admin:promote": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/promote-admin.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "check:ai": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/check-ai.ts",
     "check:recordings": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/check-recordings.ts",
     "b2:cors": "tsx --env-file=.env --require ./scripts/server-only-shim.cjs scripts/b2-cors.ts"
   },

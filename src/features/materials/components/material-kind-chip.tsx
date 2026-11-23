@@ -14,6 +14,7 @@ const kindColors: Record<
   audio: "success",
   form: "warning",
   recording: "primary",
+  practice: "success",
 };
 
 const statusColors: Record<

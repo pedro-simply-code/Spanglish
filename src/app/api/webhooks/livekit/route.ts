@@ -7,6 +7,7 @@ import {
   recordParticipantJoined,
   recordParticipantLeft,
 } from "@/server/classes/attendance";
+import { scheduleLessonSummary } from "@/server/ai/lesson-summary";
 import { endClassLiveSession } from "@/server/classes/class-live-session";
 import { sessionIdFromRoomName } from "@/server/classes/class-repository";
 import { db } from "@/server/db";
@@ -21,6 +22,12 @@ import { recordings } from "@/server/db/schema";
  */
 
 const EGRESS_COMPLETE = 3;
+/** ParticipantInfo.Kind.AGENT */
+const PARTICIPANT_KIND_AGENT = 4;
+
+function isAgentParticipant(participant: { kind?: number; identity?: string } | undefined) {
+  return participant?.kind === PARTICIPANT_KIND_AGENT || Boolean(participant?.identity?.startsWith("agent-"));
+}
 
 export async function POST(request: Request) {
   if (!env.LIVEKIT_API_KEY || !env.LIVEKIT_API_SECRET) {
@@ -43,14 +50,28 @@ export async function POST(request: Request) {
     case "participant_joined":
     case "participant_left": {
       const identity = event.participant?.identity ?? "";
-      // Students join with their user id; guests and staff observers do not count.
-      if (!sessionId || !identity || identity.startsWith("guest-") || isStaffGuestIdentity(identity)) break;
+      // Students join with their user id; guests, staff observers and the
+      // classroom agent (it only transcribes) do not count.
+      if (
+        !sessionId ||
+        !identity ||
+        identity.startsWith("guest-") ||
+        isStaffGuestIdentity(identity) ||
+        isAgentParticipant(event.participant)
+      ) {
+        break;
+      }
       if (event.event === "participant_joined") await recordParticipantJoined(sessionId, identity, at);
       else await recordParticipantLeft(sessionId, identity, at);
       break;
     }
     case "room_finished": {
-      if (sessionId) await endClassLiveSession(sessionId);
+      if (sessionId) {
+        await endClassLiveSession(sessionId);
+        // Normally the agent asks for the summary when it leaves; this covers
+        // an agent that crashed. The wait lets its last lines arrive first.
+        scheduleLessonSummary(sessionId, 20_000);
+      }
       break;
     }
     case "egress_ended": {

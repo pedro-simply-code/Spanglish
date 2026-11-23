@@ -213,6 +213,8 @@ export async function listRecentOrders(limit = 50): Promise<OrderSummary[]> {
 
 export type StudentOrder = {
   id: string;
+  /** Package bought (to buy the same again). */
+  packageId: string | null;
   classType: ClassType;
   durationMinutes: number;
   credits: number;
@@ -228,6 +230,7 @@ export async function listOrdersForStudent(userId: string, limit = 50): Promise<
   const rows = await db
     .select({
       id: orders.id,
+      packageId: orders.packageId,
       classType: orders.classType,
       durationMinutes: orders.durationMinutes,
       credits: orders.credits,

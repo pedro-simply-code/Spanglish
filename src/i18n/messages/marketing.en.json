@@ -173,7 +173,7 @@
       "title": "Simple, transparent class credits",
       "subtitle": "Choose session length and class format, then compare package sizes",
       "plan": {
-        "details": "{count} classes · {type} · {duration} min",
+        "details": "{count, plural, one {# class} other {# classes}} · {type} · {duration} min",
         "individual": "Individual",
         "paired": "Paired",
         "perClass": "/ class",

@@ -7,6 +7,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import {
+  IconCards,
   IconArrowRight,
   IconClock,
   IconFileText,
@@ -20,13 +21,14 @@ import { MaterialKindChip } from "@/features/materials/components/material-kind-
 import { formatMaterialDate, formatMaterialLevel } from "@/features/materials/format";
 import type { Material } from "@/features/materials/types";
 
-const kindIcons = {
+export const kindIcons = {
   document: IconFileText,
   link: IconArrowRight,
   video: IconVideo,
   audio: IconMicrophone,
   form: IconFileText,
   recording: IconPlayerPlay,
+  practice: IconCards,
 } as const;
 
 type MaterialCardProps = {
@@ -159,7 +161,11 @@ export function MaterialCard({ material, href, dueAt, showVisibility = false }: 
               variant="outlined"
               endIcon={<IconArrowRight size={14} />}
             >
-              {material.kind === "form" ? t("card.openPractice") : t("card.openMaterial")}
+              {material.kind === "form"
+                ? t("card.openPractice")
+                : material.kind === "practice"
+                  ? t("card.openGames")
+                  : t("card.openMaterial")}
             </LinkButton>
           </Stack>
         </Stack>

@@ -1,20 +1,24 @@
 /** Shared by the classroom (client) and the transcript repository (server). */
 
-/** Languages the classroom speech recognizers can listen for. */
-export const CAPTION_LANGS = ["es-ES", "en-US"] as const;
-export type CaptionLang = (typeof CAPTION_LANGS)[number];
+import type { TranscriptSpeakerRole } from "@/lib/lesson-summary";
 
-export function isCaptionLang(value: unknown): value is CaptionLang {
-  return typeof value === "string" && (CAPTION_LANGS as readonly string[]).includes(value);
-}
-
-export type ClassCaptionsState = { enabled: boolean; lang: CaptionLang };
+/**
+ * Text-stream topic the classroom agent publishes live captions on (the
+ * LiveKit convention). Attributes: `lk.transcription_final` ("true"/"false"),
+ * `lk.segment_id`, and `spanglish.speaker` / `spanglish.speaker_name` for who spoke.
+ */
+export const TRANSCRIPTION_TOPIC = "lk.transcription";
+export const CAPTION_ATTR_FINAL = "lk.transcription_final";
+export const CAPTION_ATTR_SEGMENT = "lk.segment_id";
+export const CAPTION_ATTR_SPEAKER = "spanglish.speaker";
+export const CAPTION_ATTR_SPEAKER_NAME = "spanglish.speaker_name";
 
 /** A saved line of the class transcript. */
 export type ClassTranscriptLine = {
   id: string;
   speakerIdentity: string;
   speakerName: string;
+  speakerRole: TranscriptSpeakerRole | null;
   text: string;
   lang: string;
   at: string;

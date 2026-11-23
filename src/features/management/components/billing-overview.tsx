@@ -34,7 +34,7 @@ export function BillingOverview() {
   const invoiceRows = invoices(t);
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("management.billing.title")}
         subtitle={t("management.billing.subtitle")}

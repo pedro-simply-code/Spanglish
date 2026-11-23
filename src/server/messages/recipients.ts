@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, ilike, ne, or, sql } from "drizzle-orm";
+import { and, asc, ilike, isNull, ne, or, sql } from "drizzle-orm";
 import { getPrimaryRole, type RoleCode } from "@/lib/auth-roles";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
@@ -81,4 +81,20 @@ export async function verifyMessageRecipient(
       bounced: Boolean(row.emailBouncedAt),
     },
   };
+}
+/**
+ * Who students write to about their classes (e.g. a change outside the
+ * window): the academy's first manager, or the admin when there is none.
+ */
+export async function getAcademySupportContact(): Promise<{ email: string; name: string } | null> {
+  for (const role of ["manager", "admin"] as const) {
+    const [row] = await db
+      .select({ email: users.email, name: users.name })
+      .from(users)
+      .where(and(sql`${role} = any(${users.roles})`, isNull(users.emailBouncedAt)))
+      .orderBy(asc(users.createdAt))
+      .limit(1);
+    if (row) return row;
+  }
+  return null;
 }

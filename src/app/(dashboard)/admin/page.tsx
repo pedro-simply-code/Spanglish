@@ -48,7 +48,6 @@ async function AdminDashboardContent() {
         charts={charts}
         alerts={[...finance.alerts, ...alerts]}
         activity={activity}
-        topMargin={actor.twoFactorEnabled ? 3 : 0}
       />
     </>
   );

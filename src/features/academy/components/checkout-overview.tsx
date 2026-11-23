@@ -40,6 +40,8 @@ type StudentTranslator = ReturnType<typeof useTranslations<"student">>;
 type StudentKey = Parameters<StudentTranslator>[0];
 
 const planNameKeys: Record<string, string> = {
+  "paired-1": "pricing.plan.name.pairedSingle",
+  "one-on-one-1": "pricing.plan.name.single",
   "paired-30": "pricing.plan.name.pairedStarter",
   "paired-60": "pricing.plan.name.pairedProgress",
   "paired-90": "pricing.plan.name.pairedFluency",
@@ -49,7 +51,9 @@ const planNameKeys: Record<string, string> = {
 };
 
 function planName(t: StudentTranslator, plan: AcademyPlan) {
-  return t(planNameKeys[`${plan.type}-${plan.classes}`] as StudentKey);
+  const key = planNameKeys[`${plan.type}-${plan.classes}`];
+  // Sizes added in admin without a translation keep the name stored there.
+  return key ? t(key as StudentKey) : plan.name;
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
@@ -155,7 +159,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
 
   if (complete) {
     return (
-      <Box mt={3}>
+      <Box>
         <Breadcrumb
           title={t("checkout.result.titlePaid")}
           subtitle={t("checkout.result.subtitlePaid")}
@@ -197,7 +201,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
               mt={4}
             >
               <LinkButton
-                href="/schedule"
+                href="/classes?tab=book"
                 variant="contained"
                 size="large"
                 startIcon={<IconCalendarEvent size={18} />}
@@ -215,7 +219,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
   }
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("checkout.breadcrumbTitle")}
         subtitle={t("checkout.breadcrumbSubtitle")}
@@ -502,7 +506,7 @@ export function CheckoutOverview({ plans, stripe = { enabled: false, testMode: f
               <Divider sx={{ my: 2.5 }} />
 
               <LinkButton
-                href="/pricing"
+                href="/credits?tab=buy"
                 variant="text"
                 fullWidth
                 startIcon={<IconArrowLeft size={18} />}

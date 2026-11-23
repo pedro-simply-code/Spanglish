@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
-import { PricingOverview } from "@/features/academy";
-import { listPublishedAcademyPlans } from "@/server/pricing/packages";
+import { BuySection } from "@/app/(dashboard)/_student/buy-section";
+import { getActor } from "@/server/auth/session";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("student");
@@ -21,7 +22,9 @@ export default function PricingPage() {
   );
 }
 
+/** Students buy from "Mis créditos"; staff keep this page to preview the catalog. */
 async function PricingContent() {
-  const plans = await listPublishedAcademyPlans();
-  return <PricingOverview plans={plans} />;
+  const actor = await getActor();
+  if (actor.activeRole === "student") redirect("/credits?tab=buy");
+  return <BuySection />;
 }

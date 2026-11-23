@@ -30,7 +30,7 @@ const statusColor = {
 export function PlatformEmailOverview({ emailProvider, health }: PlatformEmailOverviewProps) {
   const t = useTranslations("admin");
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("common.page.email")}
         subtitle={t("platform.email.subtitle")}

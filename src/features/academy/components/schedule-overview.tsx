@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { defaultLocale, isAppLocale } from "@/i18n/config";
-import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -28,6 +27,7 @@ import {
   IconCalendarPlus,
   IconCheck,
   IconClock,
+  IconCreditCard,
   IconListCheck,
   IconMapPin,
   IconSchool,
@@ -35,6 +35,7 @@ import {
   IconStar,
   IconUser,
   IconUsers,
+  IconVideo,
 } from "@tabler/icons-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { classTypeLabel } from "@/lib/class-type-label";
@@ -48,6 +49,7 @@ import {
   getTrialLessonAvailabilityAction,
   listBookingSlotsAction,
 } from "@/features/academy/actions";
+import { SummaryRow, WizardStepCard, selectTileSx } from "@/features/academy/components/wizard-parts";
 import { lessonFocusOptions } from "@/features/academy/data";
 import { useAppToast } from "@/lib/use-app-toast";
 
@@ -135,118 +137,6 @@ function kindLabel(item: BookingBalance, t: StudentTranslator) {
   }
   const type = item.classType === "paired" ? "paired" : "one-on-one";
   return `${duration} · ${classTypeLabel(type, t)}`;
-}
-
-const selectTileSx = (selected: boolean) => ({
-  p: 2.5,
-  height: "100%",
-  borderRadius: 1,
-  border: "1px solid",
-  borderColor: selected ? "primary.main" : "divider",
-  bgcolor: selected ? "primary.light" : "background.paper",
-  boxShadow: selected ? "0 0 0 2px rgba(250,137,107,0.18)" : "none",
-  transition: "border-color 120ms ease, box-shadow 120ms ease",
-});
-
-function SummaryRow({
-  label,
-  value,
-  done,
-}: {
-  label: string;
-  value: string;
-  done?: boolean;
-}) {
-  return (
-    <Stack direction="row" justifyContent="space-between" spacing={2} alignItems="flex-start">
-      <Stack direction="row" spacing={1} alignItems="center">
-        {done !== undefined ? (
-          <Box
-            sx={{
-              width: 22,
-              height: 22,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor: done ? "success.light" : "action.hover",
-              color: done ? "success.dark" : "text.disabled",
-              flexShrink: 0,
-            }}
-          >
-            {done ? <IconCheck size={14} stroke={2.5} /> : null}
-          </Box>
-        ) : null}
-        <Typography variant="body2" color="text.secondary">
-          {label}
-        </Typography>
-      </Stack>
-      <Typography variant="subtitle2" fontWeight={600} textAlign="right" maxWidth="55%">
-        {value}
-      </Typography>
-    </Stack>
-  );
-}
-
-function WizardStepCard({
-  index,
-  label,
-  icon,
-  active,
-  complete,
-  disabled,
-  onSelect,
-}: {
-  index: number;
-  label: string;
-  icon: ReactNode;
-  active: boolean;
-  complete: boolean;
-  disabled: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <ButtonBase
-      onClick={onSelect}
-      disabled={disabled}
-      sx={{ display: "block", width: "100%", textAlign: "left", borderRadius: 1 }}
-    >
-      <Box
-        sx={{
-          ...selectTileSx(active),
-          opacity: disabled && !active ? 0.55 : 1,
-          px: 2,
-          py: 1.75,
-        }}
-      >
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor: active || complete ? "primary.main" : "action.selected",
-              color: active || complete ? "primary.contrastText" : "text.secondary",
-              flexShrink: 0,
-            }}
-          >
-            {complete && !active ? <IconCheck size={16} /> : index + 1}
-          </Box>
-          <Stack spacing={0.25} minWidth={0}>
-            <Stack direction="row" spacing={0.75} alignItems="center">
-              <Box sx={{ color: active ? "primary.main" : "text.secondary", display: "flex" }}>{icon}</Box>
-              <Typography variant="subtitle2" fontWeight={active ? 700 : 500} noWrap>
-                {label}
-              </Typography>
-            </Stack>
-          </Stack>
-        </Stack>
-      </Box>
-    </ButtonBase>
-  );
 }
 
 function ClassTypeCard({
@@ -415,6 +305,7 @@ export function ScheduleOverview({
     [trialEligible],
   );
   const creditKinds = balances.filter((item) => item.balance > 0);
+  const totalCredits = creditKinds.reduce((sum, item) => sum + item.balance, 0);
   const bookableKinds = useMemo(() => [...trialKinds, ...creditKinds], [trialKinds, creditKinds]);
   const [activeStep, setActiveStep] = useState(0);
   const [kind, setKind] = useState(bookableKinds[0] ? kindKey(bookableKinds[0]) : "");
@@ -644,308 +535,352 @@ export function ScheduleOverview({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("schedule.breadcrumbTitle")}
         subtitle={t("schedule.breadcrumbSubtitle")}
       />
 
-      {!creditKinds.length ? (
-        <Alert
-          severity="info"
-          sx={{ mb: 3 }}
-          action={
-            trialEligible ? undefined : (
-              <LinkButton href="/pricing" color="inherit" size="small">
-                {t("actions.seePackages")}
-              </LinkButton>
-            )
-          }
-        >
-          {trialEligible ? t("schedule.noCreditsTrial") : t("schedule.noCredits")}
-        </Alert>
-      ) : null}
+      {/* Credits at a glance, full width like the hero in My classes. */}
+      <Card
+        elevation={9}
+        sx={{ mb: 3, background: "linear-gradient(120deg, #FFFFFF 0%, #FBF2EF 100%)" }}
+      >
+        <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
+          <Grid container spacing={3} alignItems="center">
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar sx={{ width: 52, height: 52, bgcolor: "primary.main", color: "#fff" }}>
+                  <IconVideo size={26} />
+                </Avatar>
+                <Box minWidth={0}>
+                  <Typography variant="h5">
+                    {t("classes.overview.creditsLeft", { count: totalCredits })}
+                  </Typography>
+                  <Stack direction="row" gap={0.75} flexWrap="wrap" mt={0.75}>
+                    {creditKinds.map((item) => (
+                      <Chip
+                        key={`${item.classType}-${item.durationMinutes}`}
+                        size="small"
+                        variant="outlined"
+                        label={t("classes.overview.creditChip", {
+                          minutes: item.durationMinutes,
+                          type: classTypeLabel(item.classType, t),
+                          balance: item.balance,
+                          shared: item.shared ? t("classes.overview.shared") : "",
+                        })}
+                      />
+                    ))}
+                    {trialEligible ? (
+                      <Chip size="small" color="success" variant="outlined" label={t("schedule.freeTrialNoCredit")} />
+                    ) : null}
+                    {!creditKinds.length ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {trialEligible ? t("schedule.noCreditsTrial") : t("schedule.noCredits")}
+                      </Typography>
+                    ) : null}
+                  </Stack>
+                </Box>
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Stack direction="row" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
+                <LinkButton href="/credits?tab=buy" variant="outlined" startIcon={<IconCreditCard size={18} />}>
+                  {t("actions.viewPlans")}
+                </LinkButton>
+              </Stack>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card elevation={9}>
-            <CardContent sx={{ p: { xs: 2, sm: "30px" } }}>
-              <Grid container spacing={1.5} sx={{ mb: 3 }}>
-                {BOOKING_STEPS.map((step, index) => (
-                  <Grid key={step} size={{ xs: 6, sm: 3 }}>
-                    <WizardStepCard
-                      index={index}
-                      label={t(`schedule.step.${step}`)}
-                      icon={stepIcons[step]}
-                      active={activeStep === index}
-                      complete={activeStep > index}
-                      disabled={index > activeStep}
-                      onSelect={() => {
-                        if (index < activeStep) setActiveStep(index);
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-
-              <Stack spacing={0.5} mb={2.5}>
-                <Typography variant="h5">{t(`schedule.step.${BOOKING_STEPS[activeStep]!}`)}</Typography>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {stepSubtitle(BOOKING_STEPS[activeStep]!)}
-                </Typography>
-              </Stack>
-
-            {activeStep === 0 ? (
-              bookableKinds.length ? (
-                <Grid container spacing={2}>
-                  {bookableKinds.map((item) => {
-                    const key = kindKey(item);
-                    const canPick = item.trial || item.balance > 0;
-                    const creditLabel = item.trial
-                      ? t("schedule.trialLabel")
-                      : t("schedule.creditLabel", {
-                          balance: item.balance,
-                          shared:
-                            item.shared && partnerName
-                              ? t("schedule.sharedWith", { name: partnerName })
-                              : "",
-                        });
-                    return (
-                      <Grid key={key} size={{ xs: 12, sm: 6 }}>
-                        <Box sx={{ opacity: canPick ? 1 : 0.5, pointerEvents: canPick ? "auto" : "none" }}>
-                          <ClassTypeCard
-                            selected={key === kind}
-                            title={kindLabel(item, t)}
-                            detail={creditLabel}
-                            icon={item.shared ? <IconUsers size={20} /> : <IconSchool size={20} />}
-                            onSelect={() => handlePickKind(key)}
-                          />
-                        </Box>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-              ) : (
-                <Typography color="text.secondary">{t("schedule.noCreditsYet")}</Typography>
-              )
-            ) : null}
-
-            {activeStep === 1 ? (
-              teachers.length ? (
-                <Stack spacing={2}>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    useFlexGap
-                    alignItems="center"
-                    sx={{ width: "100%", minWidth: 0 }}
-                  >
-                    <TextField
-                      size="small"
-                      value={teacherSearch}
-                      onChange={(event) => setTeacherSearch(event.target.value)}
-                      placeholder={t("schedule.teacherSearchPlaceholder")}
-                      aria-label={t("schedule.teacherSearchPlaceholder")}
-                      sx={{ flex: 1, minWidth: 0 }}
-                      slotProps={{
-                        input: {
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <IconSearch size={16} />
-                            </InputAdornment>
-                          ),
-                        },
-                      }}
-                    />
-                    <TextField
-                      select
-                      size="small"
-                      value={teacherTagFilter}
-                      onChange={(event) => setTeacherTagFilter(event.target.value)}
-                      aria-label={t("schedule.teacherSpecialtyFilter")}
-                      sx={{ width: { xs: 118, sm: 152 }, flexShrink: 0 }}
-                      slotProps={{ select: { displayEmpty: true } }}
-                    >
-                      <MenuItem value="">{t("schedule.teacherSpecialtyAll")}</MenuItem>
-                      {teacherTags.map((tag) => (
-                        <MenuItem key={tag} value={tag} dense>
-                          {tag}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                    <TextField
-                      select
-                      size="small"
-                      value={teacherLevelFilter}
-                      onChange={(event) => setTeacherLevelFilter(event.target.value)}
-                      aria-label={t("schedule.teacherLevelFilter")}
-                      sx={{ width: { xs: 118, sm: 152 }, flexShrink: 0 }}
-                      slotProps={{ select: { displayEmpty: true } }}
-                    >
-                      <MenuItem value="">{t("schedule.teacherLevelAll")}</MenuItem>
-                      {teacherLevels.map((level) => (
-                        <MenuItem key={level} value={level} dense>
-                          {level}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Stack>
-                  {filteredTeachers.length ? (
-                    <>
-                      <Grid container spacing={2}>
-                        {pagedTeachers.map((item) => (
-                          <Grid key={item.id} size={{ xs: 12, md: 6 }}>
-                            <TeacherCard
-                              teacher={item}
-                              selected={item.id === teacherId}
-                              onSelect={() => setTeacherId(item.id)}
-                              t={t}
-                            />
-                          </Grid>
-                        ))}
-                      </Grid>
-                      <ListPagination
-                        page={teacherPage}
-                        total={filteredTeachers.length}
-                        pageSize={TEACHER_PAGE_SIZE}
-                        onPageChange={setTeacherPage}
-                      />
-                    </>
-                  ) : (
-                    <Typography color="text.secondary">{t("schedule.teacherNoMatches")}</Typography>
-                  )}
-                </Stack>
-              ) : (
-                <Typography color="text.secondary">{t("schedule.noTeachers")}</Typography>
-              )
-            ) : null}
-
-            {activeStep === 2 ? (
-              !teacher || !selectedKind ? (
-                <Typography color="text.secondary">{t("schedule.chooseFirst")}</Typography>
-              ) : loadingSlots ? (
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <CircularProgress size={18} />
-                  <Typography color="text.secondary">{t("schedule.loadingTimes")}</Typography>
-                </Stack>
-              ) : !days.length ? (
-                <Typography color="text.secondary">
-                  {t("schedule.noSlots", {
-                    teacher: teacher.name,
-                    minutes: selectedKind.durationMinutes,
-                  })}
-                </Typography>
-              ) : (
-                <Stack spacing={2}>
-                  <Grid container spacing={1.5}>
-                    {days.map((day) => {
-                      const selected = day.label === activeDay?.label;
-                      return (
-                        <Grid key={day.label} size={{ xs: 12, sm: 6, md: 4 }}>
-                          <ClassTypeCard
-                            selected={selected}
-                            title={day.label}
-                            detail={t("schedule.slotsOnDay", { count: day.times.length })}
-                            icon={<IconCalendarEvent size={20} />}
-                            onSelect={() => {
-                              setDayKey(day.label);
-                              setStartsAt("");
-                            }}
-                          />
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                  <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: 1,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      bgcolor: "action.hover",
-                    }}
-                  >
-                    <Typography variant="subtitle2" color="text.secondary" mb={1.5}>
-                      {activeDay?.label ?? "—"}
-                    </Typography>
-                    <Stack direction="row" gap={1} flexWrap="wrap">
-                      {activeDay?.times.map((slot) => (
-                        <Button
-                          key={slot}
-                          size="small"
-                          variant={slot === startsAt ? "contained" : "outlined"}
-                          onClick={() => setStartsAt(slot)}
-                        >
-                          {timeFormatter.format(new Date(slot))}
-                        </Button>
-                      ))}
-                    </Stack>
-                  </Box>
-                </Stack>
-              )
-            ) : null}
-
-            {activeStep === 3 ? (
-              <Stack spacing={2}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t("schedule.focus.label")}
-                </Typography>
+          <Stack spacing={3}>
+            {/* The steps sit where the tabs and filters do in the other two tabs. */}
+            <Card elevation={9}>
+              <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
                 <Grid container spacing={1.5}>
-                  {lessonFocusOptions.map((option) => (
-                    <Grid key={option} size={{ xs: 12, sm: 6 }}>
-                      <FocusOptionCard
-                        selected={focus === option}
-                        label={t(focusKeys[option] as StudentKey)}
-                        onSelect={() => setFocus(option)}
+                  {BOOKING_STEPS.map((step, index) => (
+                    <Grid key={step} size={{ xs: 6, sm: 3 }}>
+                      <WizardStepCard
+                        index={index}
+                        label={t(`schedule.step.${step}`)}
+                        icon={stepIcons[step]}
+                        active={activeStep === index}
+                        complete={activeStep > index}
+                        disabled={index > activeStep}
+                        onSelect={() => {
+                          if (index < activeStep) setActiveStep(index);
+                        }}
                       />
                     </Grid>
                   ))}
                 </Grid>
-                <Typography variant="body2" color="text.secondary">
-                  {t("schedule.stepReviewHint")}
-                </Typography>
-              </Stack>
-            ) : null}
+              </CardContent>
+            </Card>
 
-              <Divider sx={{ my: 3 }} />
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={() => setActiveStep((value) => Math.max(0, value - 1))}
-                >
-                  {t("schedule.back")}
-                </Button>
-                {activeStep < LAST_STEP ? (
-                  <Button
-                    variant="contained"
-                    size="large"
-                    disabled={!canContinue}
-                    onClick={() => setActiveStep((value) => Math.min(LAST_STEP, value + 1))}
-                  >
-                    {t("schedule.stepNext")}
-                  </Button>
+            <Card elevation={9}>
+              <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
+                <Stack spacing={0.5} mb={2.5}>
+                  <Typography variant="h5">{t(`schedule.step.${BOOKING_STEPS[activeStep]!}`)}</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {stepSubtitle(BOOKING_STEPS[activeStep]!)}
+                  </Typography>
+                </Stack>
+
+              {activeStep === 0 ? (
+                bookableKinds.length ? (
+                  <Grid container spacing={2}>
+                    {bookableKinds.map((item) => {
+                      const key = kindKey(item);
+                      const canPick = item.trial || item.balance > 0;
+                      const creditLabel = item.trial
+                        ? t("schedule.trialLabel")
+                        : t("schedule.creditLabel", {
+                            balance: item.balance,
+                            shared:
+                              item.shared && partnerName
+                                ? t("schedule.sharedWith", { name: partnerName })
+                                : "",
+                          });
+                      return (
+                        <Grid key={key} size={{ xs: 12, sm: 6 }}>
+                          <Box sx={{ opacity: canPick ? 1 : 0.5, pointerEvents: canPick ? "auto" : "none" }}>
+                            <ClassTypeCard
+                              selected={key === kind}
+                              title={kindLabel(item, t)}
+                              detail={creditLabel}
+                              icon={item.shared ? <IconUsers size={20} /> : <IconSchool size={20} />}
+                              onSelect={() => handlePickKind(key)}
+                            />
+                          </Box>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
                 ) : (
+                  <Typography color="text.secondary">{t("schedule.noCreditsYet")}</Typography>
+                )
+              ) : null}
+
+              {activeStep === 1 ? (
+                teachers.length ? (
+                  <Stack spacing={2}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      useFlexGap
+                      alignItems="center"
+                      sx={{ width: "100%", minWidth: 0 }}
+                    >
+                      <TextField
+                        size="small"
+                        value={teacherSearch}
+                        onChange={(event) => setTeacherSearch(event.target.value)}
+                        placeholder={t("schedule.teacherSearchPlaceholder")}
+                        aria-label={t("schedule.teacherSearchPlaceholder")}
+                        sx={{ flex: 1, minWidth: 0 }}
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <IconSearch size={16} />
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                      />
+                      <TextField
+                        select
+                        size="small"
+                        value={teacherTagFilter}
+                        onChange={(event) => setTeacherTagFilter(event.target.value)}
+                        aria-label={t("schedule.teacherSpecialtyFilter")}
+                        sx={{ width: { xs: 118, sm: 152 }, flexShrink: 0 }}
+                        slotProps={{ select: { displayEmpty: true } }}
+                      >
+                        <MenuItem value="">{t("schedule.teacherSpecialtyAll")}</MenuItem>
+                        {teacherTags.map((tag) => (
+                          <MenuItem key={tag} value={tag} dense>
+                            {tag}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                      <TextField
+                        select
+                        size="small"
+                        value={teacherLevelFilter}
+                        onChange={(event) => setTeacherLevelFilter(event.target.value)}
+                        aria-label={t("schedule.teacherLevelFilter")}
+                        sx={{ width: { xs: 118, sm: 152 }, flexShrink: 0 }}
+                        slotProps={{ select: { displayEmpty: true } }}
+                      >
+                        <MenuItem value="">{t("schedule.teacherLevelAll")}</MenuItem>
+                        {teacherLevels.map((level) => (
+                          <MenuItem key={level} value={level} dense>
+                            {level}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Stack>
+                    {filteredTeachers.length ? (
+                      <>
+                        <Grid container spacing={2}>
+                          {pagedTeachers.map((item) => (
+                            <Grid key={item.id} size={{ xs: 12, md: 6 }}>
+                              <TeacherCard
+                                teacher={item}
+                                selected={item.id === teacherId}
+                                onSelect={() => setTeacherId(item.id)}
+                                t={t}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                        <ListPagination
+                          page={teacherPage}
+                          total={filteredTeachers.length}
+                          pageSize={TEACHER_PAGE_SIZE}
+                          onPageChange={setTeacherPage}
+                        />
+                      </>
+                    ) : (
+                      <Typography color="text.secondary">{t("schedule.teacherNoMatches")}</Typography>
+                    )}
+                  </Stack>
+                ) : (
+                  <Typography color="text.secondary">{t("schedule.noTeachers")}</Typography>
+                )
+              ) : null}
+
+              {activeStep === 2 ? (
+                !teacher || !selectedKind ? (
+                  <Typography color="text.secondary">{t("schedule.chooseFirst")}</Typography>
+                ) : loadingSlots ? (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <CircularProgress size={18} />
+                    <Typography color="text.secondary">{t("schedule.loadingTimes")}</Typography>
+                  </Stack>
+                ) : !days.length ? (
+                  <Typography color="text.secondary">
+                    {t("schedule.noSlots", {
+                      teacher: teacher.name,
+                      minutes: selectedKind.durationMinutes,
+                    })}
+                  </Typography>
+                ) : (
+                  <Stack spacing={2}>
+                    <Grid container spacing={1.5}>
+                      {days.map((day) => {
+                        const selected = day.label === activeDay?.label;
+                        return (
+                          <Grid key={day.label} size={{ xs: 12, sm: 6, md: 4 }}>
+                            <ClassTypeCard
+                              selected={selected}
+                              title={day.label}
+                              detail={t("schedule.slotsOnDay", { count: day.times.length })}
+                              icon={<IconCalendarEvent size={20} />}
+                              onSelect={() => {
+                                setDayKey(day.label);
+                                setStartsAt("");
+                              }}
+                            />
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 1,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "action.hover",
+                      }}
+                    >
+                      <Typography variant="subtitle2" color="text.secondary" mb={1.5}>
+                        {activeDay?.label ?? "—"}
+                      </Typography>
+                      <Stack direction="row" gap={1} flexWrap="wrap">
+                        {activeDay?.times.map((slot) => (
+                          <Button
+                            key={slot}
+                            size="small"
+                            variant={slot === startsAt ? "contained" : "outlined"}
+                            onClick={() => setStartsAt(slot)}
+                          >
+                            {timeFormatter.format(new Date(slot))}
+                          </Button>
+                        ))}
+                      </Stack>
+                    </Box>
+                  </Stack>
+                )
+              ) : null}
+
+              {activeStep === 3 ? (
+                <Stack spacing={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t("schedule.focus.label")}
+                  </Typography>
+                  <Grid container spacing={1.5}>
+                    {lessonFocusOptions.map((option) => (
+                      <Grid key={option} size={{ xs: 12, sm: 6 }}>
+                        <FocusOptionCard
+                          selected={focus === option}
+                          label={t(focusKeys[option] as StudentKey)}
+                          onSelect={() => setFocus(option)}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("schedule.stepReviewHint")}
+                  </Typography>
+                </Stack>
+              ) : null}
+
+                <Divider sx={{ my: 3 }} />
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<IconCalendarPlus size={18} />}
-                    disabled={!teacher || !selectedKind || !startsAt || booking}
-                    onClick={() => setOpen(true)}
+                    variant="outlined"
+                    color="inherit"
+                    disabled={activeStep === 0}
+                    onClick={() => setActiveStep((value) => Math.max(0, value - 1))}
                   >
-                    {t("schedule.bookClass")}
+                    {t("schedule.back")}
                   </Button>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
+                  {activeStep < LAST_STEP ? (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      disabled={!canContinue}
+                      onClick={() => setActiveStep((value) => Math.min(LAST_STEP, value + 1))}
+                    >
+                      {t("schedule.stepNext")}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      startIcon={<IconCalendarPlus size={18} />}
+                      disabled={!teacher || !selectedKind || !startsAt || booking}
+                      onClick={() => setOpen(true)}
+                    >
+                      {t("schedule.bookClass")}
+                    </Button>
+                  )}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Stack>
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3} sx={{ position: { lg: "sticky" }, top: { lg: 88 } }}>
             <Card elevation={9}>
-              <CardContent sx={{ p: "30px" }}>
+              <CardContent sx={{ p: "15px", "&:last-child": { pb: "15px" } }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                   <Typography variant="h5">{t("schedule.bookingTitle")}</Typography>
                   <Chip
@@ -992,7 +927,7 @@ export function ScheduleOverview({
               </CardContent>
             </Card>
 
-            <SectionCard title={t("schedule.upcomingTitle")}>
+            <SectionCard title={t("schedule.upcomingTitle")} padding="15px">
               {upcoming.length ? (
                 <Stack spacing={1.5}>
                   {upcoming.map((item) => {

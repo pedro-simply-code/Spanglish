@@ -173,7 +173,7 @@
       "title": "Créditos de clase simples y transparentes",
       "subtitle": "Elige la duración de la sesión y el formato de clase, y luego compara los tamaños de los paquetes",
       "plan": {
-        "details": "{count} clases · {type} · {duration} min",
+        "details": "{count, plural, one {# clase} other {# clases}} · {type} · {duration} min",
         "individual": "Individual",
         "paired": "En pareja",
         "perClass": "/ clase",

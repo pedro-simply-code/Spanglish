@@ -110,7 +110,7 @@ export function SettingsOverview({
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={t("settings.breadcrumb.title")}
         subtitle={t("settings.breadcrumb.subtitle")}

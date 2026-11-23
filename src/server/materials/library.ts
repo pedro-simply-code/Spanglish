@@ -26,7 +26,7 @@ import { questionsFromPayload } from "@/server/learning/assignments";
 
 type Payload = Partial<
   Pick<Material, "fileName" | "fileSize" | "duration" | "classId" | "questionCount" | "estimatedMinutes" | "transcriptReady">
->;
+> & { items?: Material["practiceItems"] };
 
 function toMaterial(row: MaterialRow, ownerName: string): Material {
   const payload = (row.payload ?? {}) as Payload;
@@ -50,6 +50,7 @@ function toMaterial(row: MaterialRow, ownerName: string): Material {
     questionCount: payload.questionCount,
     estimatedMinutes: payload.estimatedMinutes,
     transcriptReady: payload.transcriptReady,
+    practiceItems: row.kind === "practice" ? (payload.items ?? []) : undefined,
     visibility: row.visibility,
     moderation: row.moderation,
     reviewNote: row.reviewNote,

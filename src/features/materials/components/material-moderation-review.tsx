@@ -63,7 +63,7 @@ export function MaterialModerationReview({
     });
 
   return (
-    <Box mt={3}>
+    <Box>
       <Breadcrumb
         title={material.title}
         subtitle={t("materials.moderation.reviewSubtitle")}

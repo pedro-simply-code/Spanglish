@@ -18,6 +18,11 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import { createMaterialAction } from "@/features/materials/actions";
 import { materialKindOptions } from "@/features/materials/data";
+import {
+  blankPracticeItem,
+  PracticeItemsEditor,
+  type DraftPracticeItem,
+} from "@/features/materials/components/practice-items-editor";
 import type {
   FormQuestionType,
   MaterialActionResult,
@@ -81,6 +86,9 @@ export function MaterialComposer() {
   const [visibility, setVisibility] = useState<"private" | "shared" | "global">("private");
   const [dueAt, setDueAt] = useState("");
   const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion()]);
+  const [practiceItems, setPracticeItems] = useState<DraftPracticeItem[]>(() =>
+    Array.from({ length: 4 }, blankPracticeItem),
+  );
   const [result, setResult] = useState<MaterialActionResult | null>(null);
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -104,6 +112,16 @@ export function MaterialComposer() {
         visibility,
         dueAt: dueAt || undefined,
         questions: kind === "form" ? questions : undefined,
+        practiceItems:
+          kind === "practice"
+            ? practiceItems.map((item) => ({
+                id: item.key,
+                term: item.term,
+                translation: item.translation,
+                example: item.example,
+                audio: item.audio,
+              }))
+            : undefined,
       });
 
       setResult(response);
@@ -226,6 +244,12 @@ export function MaterialComposer() {
           />
         </Grid>
       </Grid>
+
+      {kind === "practice" ? (
+        <Box sx={{ p: 3, bgcolor: "grey.100" }}>
+          <PracticeItemsEditor items={practiceItems} onChange={setPracticeItems} />
+        </Box>
+      ) : null}
 
       {kind === "form" ? (
         <Box sx={{ p: 3, bgcolor: "grey.100" }}>

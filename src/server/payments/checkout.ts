@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { env } from "@/env";
 import type { AuthSession } from "@/lib/auth-types";
 import { recordAuditEvent } from "@/server/audit/audit-log";
+import { fulfillAiStripeOrder } from "@/server/ai/credits";
 import { rowsOf } from "@/server/credits/credits";
 import { db } from "@/server/db";
 import { orders, users } from "@/server/db/schema";
@@ -105,8 +106,8 @@ export async function startStripeCheckout(
 }
 
 export type FulfillResult =
-  | { status: "paid"; orderId: string; credits: number; balance: number }
-  | { status: "already-paid"; orderId: string; credits: number }
+  | { status: "paid"; orderId: string; credits: number; balance: number; aiCredits?: boolean }
+  | { status: "already-paid"; orderId: string; credits: number; aiCredits?: boolean }
   | { status: "unpaid" | "not-found" | "mismatch" };
 
 /** Marks the order paid and adds its credits, exactly once. */
@@ -223,6 +224,19 @@ export async function fulfillFromReturn(
   if (!sessionId.startsWith("cs_")) return { status: "not-found" };
   const session = await stripe().checkout.sessions.retrieve(sessionId);
   if (session.metadata?.userId !== actor.userId) return { status: "not-found" };
+  if (session.metadata?.kind === "ai") {
+    // AI credit pack: same page, its own orders table.
+    const ai = await fulfillAiStripeOrder({
+      sessionId: session.id,
+      orderId: session.client_reference_id,
+      paymentStatus: session.payment_status,
+      amountTotal: session.amount_total,
+    });
+    if (ai.status === "paid" || ai.status === "already-paid") {
+      return { status: "already-paid", orderId: session.client_reference_id ?? "", credits: ai.credits, aiCredits: true };
+    }
+    return { status: ai.status };
+  }
   return fulfillStripeOrder({
     sessionId: session.id,
     orderId: session.client_reference_id,
