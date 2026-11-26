@@ -14,9 +14,7 @@ export { CommercePackagesOverview } from "@/features/admin/components/commerce-p
 export { PackageEditorDialog } from "@/features/admin/components/package-editor-dialog";
 export { CommercePublishOverview } from "@/features/admin/components/commerce-publish-overview";
 export { CommerceTeacherRatesOverview } from "@/features/admin/components/commerce-teacher-rates-overview";
-export { AdminOverviewChartsPanel } from "@/features/admin/components/admin-overview-charts";
 export { FinanceLedgerChartsPanel } from "@/features/admin/components/finance-ledger-charts";
-export { AdminOverviewToolbar } from "@/features/admin/components/admin-overview-toolbar";
 export { ExecutiveOverview } from "@/features/admin/components/executive-overview";
 export { FinanceLedgerOverview } from "@/features/admin/components/finance-ledger-overview";
 export { FinancePayoutsOverview } from "@/features/admin/components/finance-payouts-overview";
@@ -30,6 +28,8 @@ export { adminQuickActions, pairedRules } from "@/features/admin/data";
 export type {
   AcademyEconomicsSnapshot,
   AdminAlert,
+  AdminHome,
+  AdminHomeDay,
   AdminDashboardCharts,
   AdminDaySeries,
   AdminPackageDetail,
@@ -46,4 +46,5 @@ export type {
   TeacherRateTier,
 } from "@/features/admin/types";
 export { AiCreditPacksCard } from "@/features/admin/components/ai-credit-packs-card";
+export { AiCostReportCard } from "@/features/admin/components/ai-cost-report-card";
 export { PendingPaymentsCard } from "@/features/admin/components/pending-payments-card";

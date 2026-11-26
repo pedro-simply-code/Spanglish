@@ -5,6 +5,7 @@ import { auditLogs, users, type AuditSeverity } from "@/server/db/schema";
 
 /** Known audit actions. Keep names stable: dashboards and alerts filter on them. */
 export type AuditAction =
+  | "account.deleted"
   | "auth.sign_up"
   | "auth.sign_in"
   | "auth.sign_in_failed"

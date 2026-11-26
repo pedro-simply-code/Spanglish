@@ -25,6 +25,7 @@ export const permissions = [
   "classes:manage",
   "students:view",
   "materials:read",
+  "ai:practice",
   "materials:write",
   "materials:share",
   "forms:grade",
@@ -61,12 +62,14 @@ const studentPermissions: readonly Permission[] = [
   "classes:cancel-own",
   "classes:reschedule-own",
   "materials:read",
+  "ai:practice",
   "progress:view-own",
   "billing:view-own",
 ];
 
 const teacherPermissions: readonly Permission[] = [
-  ...studentPermissions,
+  // Practice with Luna is for students: it spends their credits and the API.
+  ...studentPermissions.filter((permission) => permission !== "ai:practice"),
   "classes:view-roster",
   "classes:manage",
   "students:view",

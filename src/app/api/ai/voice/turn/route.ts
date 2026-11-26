@@ -27,7 +27,7 @@ function sameOrigin(request: Request) {
 
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return apiError(403, "FORBIDDEN", "Cross-site request.");
-  const guard = await requireApiActor({ permission: "materials:read" });
+  const guard = await requireApiActor({ permission: "ai:practice" });
   if (guard.response) return guard.response;
   const actor = guard.actor;
 

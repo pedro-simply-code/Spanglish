@@ -1,7 +1,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { AuthSession } from "@/lib/auth-types";
 import { callClaude, isAnthropicConfigured } from "@/server/ai/anthropic";
-import { costMicros, failure, loadConversation, type AiResult } from "@/server/ai/conversations";
+import { aiRateLimited, costMicros, failure, loadConversation, type AiResult } from "@/server/ai/conversations";
 import { db } from "@/server/db";
 import { aiConversations, aiMessages } from "@/server/db/schema";
 
@@ -57,6 +57,7 @@ export async function translateConversation(
     .filter((row) => !row.translation && row.content !== HELP_TOKEN && translatableBody(row.content))
     .slice(-MAX_LINES);
   if (!missing.length) return { ok: true, data: done };
+  if (await aiRateLimited(actor.userId, "translatePerUser")) return { ok: false, error: "rate_limited" };
 
   let reply;
   try {

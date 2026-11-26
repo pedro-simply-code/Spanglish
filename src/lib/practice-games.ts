@@ -7,8 +7,10 @@ export type PracticeItem = {
   term: string;
   /** English meaning. */
   translation: string;
-  /** Optional Spanish sentence (dictation and "order the sentence"). */
+  /** Optional Spanish sentence (dictation, "complete the sentence", "build the sentence"). */
   example?: string;
+  /** English of the example sentence: the prompt of "translate with tiles". */
+  exampleTranslation?: string;
   /** Teacher's recording (practice-audio key); without it the browser voice reads the term. */
   audio?: string;
 };

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Material } from "@/features/materials";
 import type { AuthSession } from "@/lib/auth-types";
 import { hasPermission, hasRole } from "@/lib/auth-roles";
+import { parseLessonSettings } from "@/lib/lesson";
 import { recordAuditEvent } from "@/server/audit/audit-log";
 import { db } from "@/server/db";
 import {
@@ -26,7 +27,7 @@ import { questionsFromPayload } from "@/server/learning/assignments";
 
 type Payload = Partial<
   Pick<Material, "fileName" | "fileSize" | "duration" | "classId" | "questionCount" | "estimatedMinutes" | "transcriptReady">
-> & { items?: Material["practiceItems"] };
+> & { items?: Material["practiceItems"]; lesson?: unknown };
 
 function toMaterial(row: MaterialRow, ownerName: string): Material {
   const payload = (row.payload ?? {}) as Payload;
@@ -51,6 +52,7 @@ function toMaterial(row: MaterialRow, ownerName: string): Material {
     estimatedMinutes: payload.estimatedMinutes,
     transcriptReady: payload.transcriptReady,
     practiceItems: row.kind === "practice" ? (payload.items ?? []) : undefined,
+    lesson: row.kind === "practice" ? parseLessonSettings(payload.lesson) : undefined,
     visibility: row.visibility,
     moderation: row.moderation,
     reviewNote: row.reviewNote,
@@ -89,7 +91,7 @@ export async function listLibraryForStaffOrTeacher(actor: AuthSession) {
   return withOwners(rows);
 }
 
-async function classMaterialIds(studentId: string) {
+export async function classMaterialIds(studentId: string) {
   const rows = await db
     .select({ ids: classSessions.materialIds })
     .from(classSessions)

@@ -84,11 +84,11 @@ export function ClassroomHostToolbar({
   const [shareAnchor, setShareAnchor] = useState<HTMLElement | null>(null);
   const [recordingAnchor, setRecordingAnchor] = useState<HTMLElement | null>(null);
 
-  const refreshWaiting = () => {
+  const refreshWaiting = useCallback(() => {
     void listClassroomWaitingAction(classId).then((result) => {
       if (result.ok) setPending(result.pending);
     });
-  };
+  }, [classId]);
 
   const refreshEgress = useCallback(() => {
     void getClassroomEgressStatusAction(classId).then((status) => {
@@ -105,7 +105,7 @@ export function ClassroomHostToolbar({
       refreshEgress();
     }, 4000);
     return () => window.clearInterval(id);
-  }, [classId, refreshEgress]);
+  }, [classId, refreshEgress, refreshWaiting]);
 
   const run = async (action: () => Promise<{ ok: boolean; message: string }>) => {
     const result = await action();

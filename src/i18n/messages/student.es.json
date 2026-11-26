@@ -199,7 +199,7 @@
     "classes": {
       "overview": {
         "staffTitle": "Clases de la academia",
-        "staffSubtitle": "Todas las sesiones programadas de la academia. Cambia a Gerente en la barra superior para las operaciones diarias.",
+        "staffSubtitle": "Todas las sesiones programadas de la academia. Cambia a Coordinador en la barra superior para las operaciones diarias.",
         "title": "Mis clases",
         "subtitle": "Únete, revisa, reprograma o cancela tus clases en vivo.",
         "creditsLeft": "{count, plural, one {# crédito de clase restante} other {# créditos de clase restantes}}",
@@ -1435,7 +1435,8 @@
           "homework": "Hacer la tarea de «{topic}»",
           "book": "Reservar tu próxima clase",
           "profileGoal": "Cuéntale a tu maestro tu meta 🎯",
-          "profilePhoto": "Agrega una foto para que tu maestro te reconozca 📸"
+          "profilePhoto": "Agrega una foto para que tu maestro te reconozca 📸",
+          "lesson": "Termina la lección «{title}»"
         },
         "go": "Ir",
         "allDone": "¡Todo listo por hoy! 🎉",
@@ -1449,7 +1450,9 @@
         "noLessons": "Aquí verás el resumen de tu última clase.",
         "nextAchievementTitle": "Tu próximo logro 🏆",
         "allAchievements": "Ver logros",
-        "allAchievementsDone": "¡Desbloqueaste todos los logros!"
+        "allAchievementsDone": "¡Desbloqueaste todos los logros!",
+        "weekXp": "{xp} XP de práctica",
+        "aiSummary": "Resumen con IA"
       },
       "credits": {
         "title": "Mis créditos",
@@ -1630,7 +1633,9 @@
         "ai_credit": "La cuenta de Anthropic no tiene saldo. Agrega créditos en console.anthropic.com.",
         "ai_rate": "Luna está recibiendo muchas solicitudes. Espera un momento e inténtalo de nuevo.",
         "voice_too_short": "Responde al menos 2 preguntas para recibir tu informe.",
-        "no_credits": "Ya usaste tus conversaciones gratis. Compra créditos de IA para seguir practicando."
+        "no_credits": "Ya usaste tus conversaciones gratis. Compra créditos de IA para seguir practicando.",
+        "busy": "Luna todavía está respondiendo tu último mensaje. Espera un momento.",
+        "rate_limited": "Vas un poco rápido. Espera un minuto e inténtalo de nuevo."
       },
       "paused": "En pausa",
       "spent": "Sin tokens",

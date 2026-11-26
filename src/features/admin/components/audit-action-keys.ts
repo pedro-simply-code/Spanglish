@@ -1,5 +1,6 @@
 /** Maps audit action codes to keys in the admin message namespace. */
 export const adminAuditActionKeys: Record<string, string> = {
+  "account.deleted": "audit.action.accountDeleted",
   "auth.sign_up": "audit.action.signUp",
   "auth.sign_in": "audit.action.signIn",
   "auth.sign_in_failed": "audit.action.signInFailed",

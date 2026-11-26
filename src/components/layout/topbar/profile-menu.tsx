@@ -10,10 +10,17 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { IconMail } from "@tabler/icons-react";
+import { IconCalendarEvent, IconChecklist, IconInbox, IconMail, IconUserCircle } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import type { NavTranslator } from "@/components/layout/nav-data";
-import { getProfileLinksByRole } from "@/components/layout/topbar/header-data";
+import { getProfileLinksByRole, type ProfileLinkIcon } from "@/components/layout/topbar/header-data";
+
+const linkIcons: Record<ProfileLinkIcon, typeof IconMail> = {
+  account: IconUserCircle,
+  calendar: IconCalendarEvent,
+  inbox: IconInbox,
+  tasks: IconChecklist,
+};
 import { signOutAction } from "@/features/auth";
 import type { AuthSession } from "@/features/auth";
 
@@ -44,7 +51,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
         sx={{ color: open ? "primary.main" : "inherit" }}
       >
         <Avatar
-          src="/images/profile/user-1.jpg"
+          src={actor.image ?? undefined}
           alt={actor.name}
           sx={{ width: 35, height: 35 }}
         />
@@ -63,7 +70,7 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
 
         <Stack direction="row" py={3} spacing={2} alignItems="center">
           <Avatar
-            src="/images/profile/user-1.jpg"
+            src={actor.image ?? undefined}
             alt={actor.name}
             sx={{ width: 95, height: 95 }}
           />
@@ -106,11 +113,10 @@ export function ProfileMenu({ actor }: { actor: AuthSession }) {
                   justifyContent="center"
                   flexShrink={0}
                 >
-                  <Avatar
-                    src={profileLink.icon}
-                    alt={profileLink.title}
-                    sx={{ width: 24, height: 24, borderRadius: 0 }}
-                  />
+                  {(() => {
+                    const LinkIcon = linkIcons[profileLink.icon];
+                    return <LinkIcon size={24} color="var(--mui-palette-primary-main, currentColor)" aria-hidden />;
+                  })()}
                 </Box>
                 <Box>
                   <Typography

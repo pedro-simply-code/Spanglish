@@ -13,6 +13,8 @@ import { getClassPolicy } from "@/server/classes/class-policy";
 import { listBalancesForStudent } from "@/server/credits/credits";
 import { listAssignmentsForStudent } from "@/server/learning/assignments";
 import { getStudentInsights, listLessonHistory } from "@/server/learning/insights";
+import { classMaterialIds } from "@/server/materials/library";
+import { getStudentPracticeHome } from "@/server/teaching/teacher-home";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("student");
@@ -38,13 +40,14 @@ async function HomeContent() {
   const now = appNow();
   const policy = getClassPolicy();
 
-  const [completion, classes, balances, insights, assignments, lessons] = await Promise.all([
+  const [completion, classes, balances, insights, assignments, lessons, practice] = await Promise.all([
     getProfileCompletion(actor),
     loadClassesForActor(actor),
     listBalancesForStudent(actor.userId),
     getStudentInsights(actor.userId, timeZone),
     listAssignmentsForStudent(actor.userId),
     listLessonHistory(actor.userId, (await getLocale()) === "es" ? "es" : "en"),
+    classMaterialIds(actor.userId).then((ids) => getStudentPracticeHome(actor.userId, ids)),
   ]);
 
   const upcoming = classes
@@ -93,6 +96,7 @@ async function HomeContent() {
         insights={insights}
         pendingAssignments={pendingAssignments}
         lastLesson={lessons[0] ?? null}
+        practice={practice}
         profileReminder={
           !completion.hasGoal ? "goal" : !completion.hasPhoto ? "photo" : null
         }

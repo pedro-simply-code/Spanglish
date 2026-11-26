@@ -21,6 +21,7 @@ import {
   IconMedal,
   IconNotebook,
   IconSchool,
+  IconSparkles,
   IconStar,
   IconTargetArrow,
   IconTrophy,
@@ -82,6 +83,8 @@ type HomeOverviewProps = {
   lastLesson: LessonEntry | null;
   /** A gentle profile nudge at the end of the to-do list (goal first, then photo). */
   profileReminder?: "goal" | "photo" | null;
+  /** Practice lessons: XP this week and sets from their classes still to finish. */
+  practice?: { weekXp: number; pending: { id: string; title: string }[] };
 };
 
 /** The student's home: next class, credits, what to do now, and real progress. */
@@ -95,6 +98,7 @@ export function HomeOverview({
   pendingAssignments,
   lastLesson,
   profileReminder = null,
+  practice = { weekXp: 0, pending: [] },
 }: HomeOverviewProps) {
   const t = useTranslations("student.learn.home");
   const tStudent = useTranslations("student");
@@ -125,6 +129,9 @@ export function HomeOverview({
       href: `/practice/${assignment.id}`,
       icon: IconChecklist,
     });
+  }
+  for (const lesson of practice.pending) {
+    todo.push({ key: `lesson-${lesson.id}`, label: t("todo.lesson", { title: lesson.title }), href: `/materials/${lesson.id}`, icon: IconSchool });
   }
   if (insights.wordsDue) {
     todo.push({ key: "words", label: t("todo.words", { count: insights.wordsDue }), href: "/study?tab=vocabulary", icon: IconCards });
@@ -239,10 +246,10 @@ export function HomeOverview({
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Grid key={stat.key} size={{ xs: 12, sm: 6, lg: 3 }}>
-              <Card elevation={9}>
-                <CardContent sx={{ p: "24px" }}>
-                  <Stack direction="row" spacing={2} alignItems="center">
+            <Grid key={stat.key} size={{ xs: 6, lg: 3 }}>
+              <Card elevation={9} sx={{ height: "100%" }}>
+                <CardContent sx={{ p: { xs: "16px", sm: "24px" } }}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 1, sm: 2 }} alignItems={{ sm: "center" }}>
                     <Avatar sx={{ bgcolor: `${stat.color}.light`, color: `${stat.color}.main`, width: 48, height: 48 }}>
                       <Icon size={24} />
                     </Avatar>
@@ -262,7 +269,11 @@ export function HomeOverview({
         })}
 
         <Grid size={{ xs: 12, lg: 6 }}>
-          <SectionCard title={t("weekTitle")} subtitle={t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })}>
+          <SectionCard title={t("weekTitle")} subtitle={
+              practice.weekXp
+                ? `${t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })} · ${t("weekXp", { xp: practice.weekXp })}`
+                : t("weekSubtitle", { minutes: insights.weeklyMinutes.reduce((sum, day) => sum + day.minutes, 0) })
+            }>
             <WeeklyActivityChart
               categories={insights.weeklyMinutes.map((day) =>
                 format.dateTime(new Date(`${day.date}T12:00:00Z`), { weekday: "short", timeZone: "UTC" }),
@@ -312,12 +323,23 @@ export function HomeOverview({
                     {date(lastLesson.startsAt)} · {t("with", { name: lastLesson.teacherName })}
                   </Typography>
                 </Stack>
+                {!lastLesson.recap && lastLesson.summary ? (
+                  <Chip
+                    icon={<IconSparkles size={14} />}
+                    label={t("aiSummary")}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                    sx={{ alignSelf: "flex-start" }}
+                  />
+                ) : null}
                 <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "pre-wrap" }}>
-                  {lastLesson.recap
-                    ? lastLesson.recap.length > 240
-                      ? `${lastLesson.recap.slice(0, 240)}…`
-                      : lastLesson.recap
-                    : t("noRecap")}
+                  {(() => {
+                    // The teacher's note first; the AI summary when there is none.
+                    const text = lastLesson.recap ?? lastLesson.summary;
+                    if (!text) return t("noRecap");
+                    return text.length > 240 ? `${text.slice(0, 240)}…` : text;
+                  })()}
                 </Typography>
                 <Stack direction="row" spacing={1}>
                   <LinkButton href={`/classes/${lastLesson.id}`} size="small" variant="outlined">

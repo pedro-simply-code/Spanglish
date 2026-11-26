@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -38,11 +38,14 @@ export function FinanceProvidersOverview({ providers, settings }: Props) {
   const router = useRouter();
   const { showError, showSuccess } = useAppToast();
   const [draft, setDraft] = useState(settings);
+  const [savedSettings, setSavedSettings] = useState(settings);
   const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
+  // New settings from the server (after saving): start the draft from them.
+  if (savedSettings !== settings) {
+    setSavedSettings(settings);
     setDraft(settings);
-  }, [settings]);
+  }
   const dirty =
     draft.stripeCheckoutEnabled !== settings.stripeCheckoutEnabled ||
     draft.stripePayoutEnabled !== settings.stripePayoutEnabled ||

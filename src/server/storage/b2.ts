@@ -91,6 +91,13 @@ export async function headRecordingObject(key: string) {
  * (play, not save) and it expires: 90 minutes covers a 50-minute class with
  * pauses and seeking, after which a copied link stops working.
  */
+/**
+ * Short-lived private link to a class recording: 2 minutes, so a link copied
+ * from the browser stops working almost at once. The player asks for a new
+ * one when it expires (src/components/ui/recording-player.tsx).
+ */
+export const RECORDING_LINK_SECONDS = 120;
+
 export async function getRecordingDownloadUrl(key: string, fileName: string) {
   const client = getB2Client();
   if (!client || !env.B2_BUCKET_NAME) return null;
@@ -101,7 +108,7 @@ export async function getRecordingDownloadUrl(key: string, fileName: string) {
       Key: key,
       ResponseContentDisposition: `inline; filename="${fileName.replace(/[^\w.-]/g, "_")}"`,
     }),
-    { expiresIn: 60 * 90 },
+    { expiresIn: RECORDING_LINK_SECONDS },
   );
 }
 

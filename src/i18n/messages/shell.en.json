@@ -245,6 +245,25 @@
         "effectiveSubtitle": "{permissions} permissions from {roles, plural, one {role} other {roles}}",
         "activeDashboard": "Active dashboard",
         "defaultNote": "The Student role is the account default and cannot be removed. The academy always keeps at least one administrator."
+      },
+      "deleteAccount": {
+        "title": "Delete account",
+        "subtitle": "Remove your account and your personal data.",
+        "explain": "You can delete your account at any time. Cancel your upcoming classes first.",
+        "button": "Delete my account",
+        "dialogTitle": "Delete your account?",
+        "warning": "This can't be undone. Unused class and AI credits are lost.",
+        "deleted": "Deleted: your sign-in methods, conversations with Luna, what you said in class transcripts, your words, homework answers and messages, and the summaries and recordings of classes where you were the only student.",
+        "kept": "Kept without your name or email: your past purchases and attended classes, because the academy needs them for its accounts and to pay teachers.",
+        "typeEmail": "Type {email} to confirm",
+        "cancel": "Cancel",
+        "confirm": "Delete forever",
+        "deleting": "Deleting…",
+        "errors": {
+          "not_student": "Only student accounts can be deleted here. Write to the academy to close a teacher or staff account.",
+          "upcoming_classes": "You have upcoming classes. Cancel them first, then delete your account.",
+          "email_mismatch": "The email doesn't match your account."
+        }
       }
     },
     "permissions": {

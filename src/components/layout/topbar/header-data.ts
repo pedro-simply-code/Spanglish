@@ -104,11 +104,13 @@ export function getHeaderNotifications(t: HeaderTranslator): NotificationItem[] 
   }));
 }
 
+export type ProfileLinkIcon = "account" | "calendar" | "inbox" | "tasks";
+
 export type ProfileLink = {
   href: string;
   title: string;
   subtitle: string;
-  icon: string;
+  icon: ProfileLinkIcon;
 };
 
 type ProfileLinkDefinition = Omit<ProfileLink, "title" | "subtitle"> & {
@@ -121,13 +123,13 @@ const profileLinkDefinitions = {
     href: "/settings",
     titleKey: "profileMenu.links.profileTitle",
     subtitleKey: "profileMenu.links.profileSubtitle",
-    icon: "/images/svgs/icon-account.svg",
+    icon: "account",
   },
   messages: {
     href: "/apps/email",
     titleKey: "profileMenu.links.messagesTitle",
     subtitleKey: "profileMenu.links.messagesSubtitle",
-    icon: "/images/svgs/icon-inbox.svg",
+    icon: "inbox",
   },
 } satisfies Record<string, ProfileLinkDefinition>;
 
@@ -140,7 +142,7 @@ const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = 
       href: "/apply",
       titleKey: "nav.teachWithUs",
       subtitleKey: "profileMenu.links.teachSubtitle",
-      icon: "/images/svgs/icon-tasks.svg",
+      icon: "tasks",
     },
   ],
   teacher: [
@@ -150,13 +152,13 @@ const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = 
       href: "/classes",
       titleKey: "nav.myClasses",
       subtitleKey: "profileMenu.links.classesTeacherSubtitle",
-      icon: "/images/svgs/icon-dd-date.svg",
+      icon: "calendar",
     },
     {
       href: "/teacher/earnings",
       titleKey: "nav.earnings",
       subtitleKey: "profileMenu.links.earningsSubtitle",
-      icon: "/images/svgs/icon-tasks.svg",
+      icon: "tasks",
     },
   ],
   manager: [
@@ -166,13 +168,13 @@ const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = 
       href: "/apps/calendar",
       titleKey: "nav.academySchedule",
       subtitleKey: "profileMenu.links.academyScheduleSubtitle",
-      icon: "/images/svgs/icon-dd-date.svg",
+      icon: "calendar",
     },
     {
       href: "/manager/payouts",
       titleKey: "nav.teacherPayouts",
       subtitleKey: "profileMenu.links.payoutsSubtitle",
-      icon: "/images/svgs/icon-tasks.svg",
+      icon: "tasks",
     },
   ],
   admin: [
@@ -181,19 +183,19 @@ const profileLinksDefinitionByRole: Record<RoleCode, ProfileLinkDefinition[]> = 
       href: "/admin/finance/payouts",
       titleKey: "nav.payoutApprovals",
       subtitleKey: "profileMenu.links.payoutApprovalsSubtitle",
-      icon: "/images/svgs/icon-tasks.svg",
+      icon: "tasks",
     },
     {
       href: "/admin/audit",
       titleKey: "nav.auditLog",
       subtitleKey: "profileMenu.links.auditSubtitle",
-      icon: "/images/svgs/icon-inbox.svg",
+      icon: "inbox",
     },
     {
       href: "/admin/platform/integrations",
       titleKey: "nav.integrations",
       subtitleKey: "profileMenu.links.integrationsSubtitle",
-      icon: "/images/svgs/icon-dd-date.svg",
+      icon: "calendar",
     },
   ],
 };

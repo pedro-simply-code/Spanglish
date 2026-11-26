@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/env", () => ({ env: { ANTHROPIC_API_KEY: "test-key", ANTHROPIC_MODEL: "test-model" } }));
+vi.mock("@/env", () => ({
+  env: { ANTHROPIC_API_KEY: "test-key", ANTHROPIC_MODEL: "test-model", ANTHROPIC_BASE_URL: "https://api.anthropic.com" },
+}));
 
 vi.mock("@/server/db", () => ({ db: {} }));
 

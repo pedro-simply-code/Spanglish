@@ -34,6 +34,7 @@ export const blankPracticeItem = (): DraftPracticeItem => ({
   term: "",
   translation: "",
   example: "",
+  exampleTranslation: "",
 });
 
 /** Best format the browser can record (Chrome/Firefox: webm, Safari: mp4). */
@@ -118,7 +119,7 @@ export function PracticeItemsEditor({
     timerRef.current = window.setTimeout(stopRecording, MAX_RECORDING_MS);
   };
 
-  /** One item per line: "término | translation | ejemplo (optional)". */
+  /** One item per line: "término | translation | ejemplo | example translation" (last two optional). */
   const addPasted = () => {
     const parsed = pasted
       .split("\n")
@@ -129,6 +130,7 @@ export function PracticeItemsEditor({
         term: parts[0]!.trim(),
         translation: parts[1]!.trim(),
         example: parts[2]?.trim() ?? "",
+        exampleTranslation: parts[3]?.trim() ?? "",
       }));
     if (!parsed.length) {
       showError({ message: t("pasteEmpty") });
@@ -150,78 +152,91 @@ export function PracticeItemsEditor({
       </Box>
 
       {items.map((item, index) => (
-        <Stack key={item.key} direction={{ xs: "column", md: "row" }} spacing={1.5} alignItems={{ md: "center" }}>
-          <Typography variant="body2" color="text.secondary" width={24} flexShrink={0}>
-            {index + 1}.
-          </Typography>
-          <TextField
-            size="small"
-            label={t("term")}
-            placeholder={t("termPlaceholder")}
-            value={item.term}
-            inputProps={{ maxLength: 120, lang: "es" }}
-            onChange={(event) => update(item.key, { term: event.target.value })}
-            sx={{ flex: 1 }}
-          />
-          <TextField
-            size="small"
-            label={t("translation")}
-            placeholder={t("translationPlaceholder")}
-            value={item.translation}
-            inputProps={{ maxLength: 160 }}
-            onChange={(event) => update(item.key, { translation: event.target.value })}
-            sx={{ flex: 1 }}
-          />
-          <TextField
-            size="small"
-            label={t("example")}
-            placeholder={t("examplePlaceholder")}
-            value={item.example ?? ""}
-            inputProps={{ maxLength: 240, lang: "es" }}
-            onChange={(event) => update(item.key, { example: event.target.value })}
-            sx={{ flex: 1.4 }}
-          />
-          <Stack direction="row" spacing={0.5} alignItems="center" flexShrink={0}>
-            <Tooltip title={recordingKey === item.key ? t("stopRecording") : item.audio ? t("recordAgain") : t("record")}>
-              <span>
-                <IconButton
-                  size="small"
-                  color={recordingKey === item.key ? "error" : item.audio ? "success" : "default"}
-                  disabled={(recordingKey !== null && recordingKey !== item.key) || uploadingKey === item.key}
-                  onClick={() => void record(item)}
-                  aria-label={t("record")}
-                >
-                  {uploadingKey === item.key ? (
-                    <CircularProgress size={16} />
-                  ) : recordingKey === item.key ? (
-                    <IconPlayerStopFilled size={18} />
-                  ) : (
-                    <IconMicrophone size={18} />
-                  )}
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title={item.audio ? t("playRecording") : t("playVoice")}>
-              <span>
-                <IconButton size="small" disabled={!item.term.trim()} onClick={() => play(item)} aria-label={t("playVoice")}>
-                  <IconVolume size={18} />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title={t("remove")}>
-              <span>
-                <IconButton
-                  size="small"
-                  disabled={items.length <= 1}
-                  onClick={() => onChange(items.filter((other) => other.key !== item.key))}
-                  aria-label={t("remove")}
-                >
-                  <IconTrash size={18} />
-                </IconButton>
-              </span>
-            </Tooltip>
+        <Box key={item.key} sx={{ p: 1.5, bgcolor: "background.paper", borderRadius: 2, border: 1, borderColor: "divider" }}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} alignItems={{ md: "center" }}>
+            <Typography variant="body2" color="text.secondary" width={24} flexShrink={0}>
+              {index + 1}.
+            </Typography>
+            <TextField
+              size="small"
+              label={t("term")}
+              placeholder={t("termPlaceholder")}
+              value={item.term}
+              inputProps={{ maxLength: 120, lang: "es" }}
+              onChange={(event) => update(item.key, { term: event.target.value })}
+              sx={{ flex: 1 }}
+            />
+            <TextField
+              size="small"
+              label={t("translation")}
+              placeholder={t("translationPlaceholder")}
+              value={item.translation}
+              inputProps={{ maxLength: 160 }}
+              onChange={(event) => update(item.key, { translation: event.target.value })}
+              sx={{ flex: 1 }}
+            />
+            <Stack direction="row" spacing={0.5} alignItems="center" flexShrink={0}>
+              <Tooltip title={recordingKey === item.key ? t("stopRecording") : item.audio ? t("recordAgain") : t("record")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    color={recordingKey === item.key ? "error" : item.audio ? "success" : "default"}
+                    disabled={(recordingKey !== null && recordingKey !== item.key) || uploadingKey === item.key}
+                    onClick={() => void record(item)}
+                    aria-label={t("record")}
+                  >
+                    {uploadingKey === item.key ? (
+                      <CircularProgress size={16} />
+                    ) : recordingKey === item.key ? (
+                      <IconPlayerStopFilled size={18} />
+                    ) : (
+                      <IconMicrophone size={18} />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={item.audio ? t("playRecording") : t("playVoice")}>
+                <span>
+                  <IconButton size="small" disabled={!item.term.trim()} onClick={() => play(item)} aria-label={t("playVoice")}>
+                    <IconVolume size={18} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={t("remove")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={items.length <= 1}
+                    onClick={() => onChange(items.filter((other) => other.key !== item.key))}
+                    aria-label={t("remove")}
+                  >
+                    <IconTrash size={18} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
           </Stack>
-        </Stack>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} mt={1.5} pl={{ md: "36px" }} pr={{ md: "116px" }}>
+            <TextField
+              size="small"
+              label={t("example")}
+              placeholder={t("examplePlaceholder")}
+              value={item.example ?? ""}
+              inputProps={{ maxLength: 240, lang: "es" }}
+              onChange={(event) => update(item.key, { example: event.target.value })}
+              sx={{ flex: 1 }}
+            />
+            <TextField
+              size="small"
+              label={t("exampleTranslation")}
+              placeholder={t("exampleTranslationPlaceholder")}
+              value={item.exampleTranslation ?? ""}
+              inputProps={{ maxLength: 240 }}
+              onChange={(event) => update(item.key, { exampleTranslation: event.target.value })}
+              sx={{ flex: 1 }}
+            />
+          </Stack>
+        </Box>
       ))}
 
       <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>

@@ -1,4 +1,4 @@
-import { EmailMailbox } from "@/features/email/components/email-mailbox";
+import { EmailMailbox } from "@/features/email";
 import { getActor } from "@/server/auth/session";
 import { listMailboxForUser } from "@/server/messages/mailbox";
 

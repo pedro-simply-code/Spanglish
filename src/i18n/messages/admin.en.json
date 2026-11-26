@@ -58,14 +58,14 @@
       }
     },
     "alert": {
-      "emailBounce": "{count} account(s) with bounced email",
+      "emailBounce": "{count, plural, one {# account with bounced email} other {# accounts with bounced email}}",
       "emailBounceDetail": "Transactional mail is suppressed for these addresses.",
       "emailFromMissing": "EMAIL_FROM is not set",
       "emailFromMissingDetail": "Auth codes and security emails cannot send until from-address is configured.",
       "integrationNotReady": "{name} not ready",
       "joinWindowOn": "CLASS_RELAX_JOIN_WINDOW is on",
       "joinWindowOnDetail": "Anyone can join classes outside the scheduled window in production.",
-      "managerWithout2Fa": "{count} manager account(s) without 2FA",
+      "managerWithout2Fa": "{count, plural, one {# coordinator account without 2FA} other {# coordinator accounts without 2FA}}",
       "managerWithout2FaDetail": "Enable authenticator apps before handling payouts or role changes."
     },
     "audit": {
@@ -118,7 +118,8 @@
         "twoFactorEnabled": "2FA turned on",
         "twoFactorLockout": "2FA locked after failed codes",
         "aiCreditsPurchased": "AI credits purchased",
-        "aiPackSaved": "AI credit pack saved"
+        "aiPackSaved": "AI credit pack saved",
+        "accountDeleted": "Account deleted"
       },
       "unknownAccount": "Unknown account"
     },
@@ -322,24 +323,6 @@
         "verified": "{count} ({percent}%)"
       }
     },
-    "executiveStat": {
-      "accounts": {
-        "helper": "Rows in users",
-        "label": "Total accounts"
-      },
-      "integrations": {
-        "helper": "From environment configuration",
-        "label": "Integrations healthy"
-      },
-      "security": {
-        "helper": "Warning or critical audit events",
-        "label": "Security alerts (7d)"
-      },
-      "sessions": {
-        "helper": "Current sign-ins",
-        "label": "Active sessions"
-      }
-    },
     "finance": {
       "ledger": {
         "chart": {
@@ -485,45 +468,43 @@
         "via": "via {method}"
       },
       "billing": {
-        "date": {
-          "nov10": "Nov 10, 2026",
-          "nov12": "Nov 12, 2026",
-          "nov13": "Nov 13, 2026",
-          "nov14": "Nov 14, 2026",
-          "nov15": "Nov 15, 2026"
-        },
-        "demoNotice": "Checkout is a clearly labeled static demo. Invoice actions validate permissions but do not charge a card or write to a payments provider.",
-        "issued": "issued {date}",
-        "plan": {
-          "individual": "Individual · {minutes} min · {classes} classes",
-          "paired": "Paired · {minutes} min · {classes} classes"
-        },
+        "title": "Billing",
+        "subtitle": "Real purchases: class packages and AI credit packs.",
         "planCatalog": "Plan catalog",
-        "recentInvoices": "Recent invoices",
-        "recentInvoicesSubtitle": "The last five plans issued to students",
+        "recentOrders": "Recent orders",
+        "recentOrdersSubtitle": "The last {count} purchases (classes and AI credits)",
+        "empty": "No purchases yet.",
+        "item": {
+          "classes": "{type} · {minutes} min · {classes, plural, one {# class} other {# classes}}",
+          "ai": "AI credits · {credits, plural, one {# conversation} other {# conversations}}"
+        },
+        "provider": {
+          "stripe": "Stripe",
+          "demo": "Demo purchase",
+          "manual": "Manual"
+        },
         "stat": {
-          "mrr": {
-            "helper": "+8.4% vs. October",
-            "label": "Monthly recurring revenue"
+          "paid": {
+            "label": "Sales this month",
+            "helper": "{orders, plural, one {# order} other {# orders}} · {buyers, plural, one {# buyer} other {# buyers}}"
           },
-          "open": {
-            "helper": "2 awaiting payment",
-            "label": "Open invoices"
+          "split": {
+            "label": "Classes this month",
+            "helper": "AI credits: {ai}"
           },
-          "refunds": {
-            "helper": "3 credited classes",
-            "label": "Refunds this month"
+          "pending": {
+            "label": "Pending payments",
+            "helper": "{count, plural, =0 {Nothing waiting} one {# order waiting} other {# orders waiting}}"
           },
-          "renewal": {
-            "helper": "Target is 80%",
-            "label": "Renewal rate"
+          "refunded": {
+            "label": "Refunds this month",
+            "helper": "{count, plural, =0 {None} one {# order} other {# orders}}"
           }
         },
-        "subtitle": "Plans, invoices, and refunds for the academy.",
-        "title": "Billing",
         "status": {
           "paid": "paid",
-          "due": "due",
+          "pending": "pending",
+          "canceled": "canceled",
           "refunded": "refunded"
         }
       },
@@ -868,33 +849,6 @@
         "verifiedEmail": "Verified account email"
       }
     },
-    "overview": {
-      "activityEmpty": "No audit events yet.",
-      "chart": {
-        "bookings": "All bookings by lifecycle status (now)",
-        "cashCollected": "Cash collected (USD per day)",
-        "classes": "Classes",
-        "fullFinanceHint": "Revenue",
-        "individual": "Individual {percent}%",
-        "paired": "Paired {percent}%",
-        "revenue": "Revenue",
-        "sessions": "Sessions scheduled to start (daily)"
-      },
-      "dataNote": "Platform KPIs and operations charts load from PostgreSQL. Finance trends and margin detail are on Credit ledger.",
-      "healthEmpty": "No open alerts. Integrations, email, and security look clear from current data.",
-      "openAuditLog": "Open full audit log",
-      "operations": {
-        "subtitle": "Booking volume and a quick revenue pulse (last 7 days).",
-        "title": "Operations"
-      },
-      "subtitle": "Here's today's snapshot of Spanglish — revenue, enrollments, and anything that needs your attention.",
-      "toolbar": {
-        "latestActivity": "Latest activity",
-        "platformHealth": "Platform health",
-        "studentsCredits": "Students & credits"
-      },
-      "welcome": "Welcome, {name}"
-    },
     "payoutBatch": {
       "manager": "Estimated from live_classes",
       "period": "Through {date}"
@@ -1013,6 +967,101 @@
         "mismatch": "The amount paid doesn't match: check it in Stripe.",
         "error": "Couldn't reach Stripe. Try again."
       }
+    },
+    "aiCost": {
+      "title": "Luna: real cost vs credits sold",
+      "subtitle": "Claude's cost saved with every call, against the AI credit packs paid each month.",
+      "month": "Month",
+      "conversations": "Conversations",
+      "conversationsValue": "{free} free · {paid} paid",
+      "freeCost": "Cost (free)",
+      "paidCost": "Cost (paid)",
+      "summaryCost": "Class summaries",
+      "revenue": "Packs sold",
+      "fees": "Card fees",
+      "margin": "Margin",
+      "note": "Costs use AI_PRICE_INPUT_PER_MTOK and AI_PRICE_OUTPUT_PER_MTOK; if the margin turns red after changing ANTHROPIC_MODEL, update those and AI_CREDIT_USD_PER_MTOK. Free conversations (per attended class) and class summaries are pure cost."
+    },
+    "home": {
+      "title": "Hi, {firstName} 👋",
+      "subtitle": "The business and the platform at a glance.",
+      "actionsTitle": "Needs your action",
+      "actionsSubtitle": "Only you can unblock these · most severe first",
+      "actionsCount": "{count, plural, one {# item} other {# items}}",
+      "open": "Open",
+      "allClear": "Nothing needs your action right now. 🎉",
+      "tile": {
+        "revenue": "Revenue this month",
+        "revenueChange": "{percent}% vs. last month",
+        "revenueNoCompare": "Classes and AI credits",
+        "margin": "Margin this month",
+        "marginHelper": "{percent}% after fees, teachers and AI",
+        "deferred": "Prepaid, not taught",
+        "deferredHelper": "{count, plural, one {# credit to deliver} other {# credits to deliver}}",
+        "paying": "Paying students",
+        "payingHelper": "{count, plural, =0 {No first-time buyers this month} one {# bought for the first time} other {# bought for the first time}}"
+      },
+      "chartTitle": "Last 30 days",
+      "chartSubtitle": "Revenue and costs per day · {zone}",
+      "ledger": "Credit ledger",
+      "series": {
+        "revenue": "Revenue",
+        "teacher": "Teacher pay",
+        "ai": "AI cost",
+        "classes": "Classes",
+        "canceled": "Canceled"
+      },
+      "classesTitle": "Classes per day",
+      "classesSummary": "{held} taught or scheduled · {canceled} canceled ({rate}%)",
+      "marginTitle": "Where the money goes",
+      "marginSubtitle": "This month, in USD",
+      "margin": {
+        "revenue": "Revenue",
+        "fees": "Payment fees (estimated)",
+        "teacher": "Teacher pay",
+        "ai": "AI cost (Luna and summaries)",
+        "result": "Margin",
+        "note": "Teachers count per class taught; revenue when it is collected."
+      },
+      "growthTitle": "Growth",
+      "students": "Students",
+      "growth": {
+        "new": "Sign-ups this month",
+        "newLastMonth": "{count} last month",
+        "active": "Active",
+        "activeOf": "Had a class in 30 days · of {total}",
+        "trials": "Trial → purchase",
+        "trialsNote": "{converted} of {trials} bought",
+        "outOfCredits": "Out of credits",
+        "outOfCreditsNote": "Bought before, nothing booked now"
+      },
+      "opsTitle": "Operations today",
+      "opsSubtitle": "The coordinator's day, summarized",
+      "ops": {
+        "today": "Classes today",
+        "live": "{count} live now",
+        "notOpened": "Rooms not opened",
+        "notOpenedNote": "Started more than 5 min ago",
+        "pending": "Coordinator to-dos",
+        "urgent": "{count, plural, =0 {Nothing urgent} one {# urgent} other {# urgent}}",
+        "hint": "Details are on the coordinator dashboard."
+      },
+      "healthTitle": "Platform health",
+      "healthSubtitle": "{ok} of {total} integrations ready",
+      "configure": "Configure",
+      "integration": {
+        "connected": "Ready",
+        "action-needed": "Check",
+        "not-configured": "Not set up"
+      },
+      "health": {
+        "security": "Security alerts (7 days)",
+        "bounced": "Bounced emails",
+        "no2fa": "Coordinators or admin without 2FA"
+      },
+      "activityTitle": "Recent activity",
+      "auditLog": "Audit log",
+      "activityEmpty": "No audit events yet."
     }
   }
 }

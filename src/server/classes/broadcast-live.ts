@@ -1,5 +1,4 @@
-import { getClassStatus } from "@/features/classes/policy";
-import type { LiveClass } from "@/features/classes";
+import { getClassStatus, type LiveClass } from "@/features/classes";
 import { env } from "@/env";
 import { isClassLiveSessionActive } from "@/server/classes/class-live-session";
 

@@ -1,4 +1,4 @@
-import { academyPlans } from "@/features/academy/data";
+import { academyPlans } from "@/features/academy";
 import type { ClassKind } from "@/server/credits/credits";
 import { listPricingPackageRows } from "@/server/pricing/packages";
 

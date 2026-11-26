@@ -18,6 +18,8 @@ import {
   overDailyCap,
   VOICE_REPLY_MAX_TOKENS,
   VOICE_REPORT_MAX_TOKENS,
+  aiRateLimited,
+  withConversationLock,
   type AiResult,
   type ConversationRow,
 } from "@/server/ai/conversations";
@@ -121,6 +123,7 @@ export async function startVoicePractice(
   const custom = String(input.topic ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
   if (!preset && custom.length < 3) return { ok: false, error: "invalid" };
   if (await overDailyCap(actor.userId, "voice")) return { ok: false, error: "daily_limit" };
+  if (await aiRateLimited(actor.userId, "startPerUser")) return { ok: false, error: "rate_limited" };
   const profile = await getUserProfile(actor.userId);
   const topic = preset ? VOICE_TOPICS.find((item) => item.key === preset)! : null;
   const id = `aic-${randomUUID()}`;
@@ -148,7 +151,7 @@ export async function startVoicePractice(
       content: voiceOpening(firstName(actor.name), preset ? VOICE_TOPIC_SETUP[preset].opening : customOpening(custom)),
     });
   } catch (error) {
-    await refundConversation(actor.userId, id, billing);
+    await refundConversation(actor.userId, id, billing, "voice");
     throw error;
   }
   return { ok: true, data: { id } };
@@ -160,6 +163,17 @@ export async function startVoicePractice(
  * updates goals and notes, and writes the report when Luna says goodbye.
  */
 export async function voiceTurn(
+  actor: AuthSession,
+  input: { conversationId: string; text: string; help: boolean; locale: "en" | "es" },
+  onSpoken: (piece: string) => void,
+): Promise<AiResult<{ messageId: string; finished: boolean }>> {
+  if (await aiRateLimited(actor.userId, "messagePerUser")) return { ok: false, error: "rate_limited" };
+  return withConversationLock(actor.userId, String(input.conversationId ?? ""), () =>
+    voiceTurnNow(actor, input, onSpoken),
+  );
+}
+
+async function voiceTurnNow(
   actor: AuthSession,
   input: { conversationId: string; text: string; help: boolean; locale: "en" | "es" },
   onSpoken: (piece: string) => void,

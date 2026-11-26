@@ -171,7 +171,7 @@ async function ClassRoomContent({ params, searchParams }: ClassRoomPageProps) {
       })
     : null;
 
-  const viewerAvatarUrl = getAccountAvatarUrl(viewerId);
+  const viewerAvatarUrl = getAccountAvatarUrl(viewerId, actor?.image);
 
   const video =
     join.canJoin &&

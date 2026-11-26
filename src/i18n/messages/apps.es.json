@@ -29,7 +29,7 @@
       "roles": {
         "student": "Estudiante",
         "teacher": "Profesor",
-        "manager": "Gerente",
+        "manager": "Coordinador",
         "admin": "Administrador"
       },
       "labels": {

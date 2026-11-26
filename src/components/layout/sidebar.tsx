@@ -178,7 +178,7 @@ function SidebarContent({ actor, compact, onNavigate }: SidebarContentProps) {
         }}
       >
         <Avatar
-          src="/images/profile/user-1.jpg"
+          src={actor.image ?? undefined}
           alt={actor.name}
           sx={{ width: 40, height: 40 }}
         />

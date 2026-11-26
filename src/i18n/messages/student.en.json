@@ -1435,7 +1435,8 @@
           "homework": "Do the homework from “{topic}”",
           "book": "Book your next class",
           "profileGoal": "Tell your teacher your goal 🎯",
-          "profilePhoto": "Add a photo so your teacher recognizes you 📸"
+          "profilePhoto": "Add a photo so your teacher recognizes you 📸",
+          "lesson": "Finish the lesson “{title}”"
         },
         "go": "Go",
         "allDone": "All done for today! 🎉",
@@ -1449,7 +1450,9 @@
         "noLessons": "Your last class recap will show up here.",
         "nextAchievementTitle": "Your next achievement 🏆",
         "allAchievements": "See achievements",
-        "allAchievementsDone": "You unlocked every achievement!"
+        "allAchievementsDone": "You unlocked every achievement!",
+        "weekXp": "{xp} practice XP",
+        "aiSummary": "AI summary"
       },
       "credits": {
         "title": "My credits",
@@ -1630,7 +1633,9 @@
         "ai_credit": "The Anthropic account has no balance. Add credits at console.anthropic.com.",
         "ai_rate": "Luna is receiving many requests. Wait a moment and try again.",
         "voice_too_short": "Answer at least 2 questions to get your report.",
-        "no_credits": "You used your free conversations. Buy AI credits to keep practicing."
+        "no_credits": "You used your free conversations. Buy AI credits to keep practicing.",
+        "busy": "Luna is still answering your last message. Wait a moment.",
+        "rate_limited": "You're going a little fast. Wait a minute and try again."
       },
       "paused": "Paused",
       "spent": "No tokens left",

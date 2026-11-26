@@ -7,7 +7,7 @@ import {
   readLocalClassRecording,
 } from "@/server/storage/local-recordings";
 
-/** GET /api/class-recordings/download?id=<recordingId> — watch or download. */
+/** GET /api/class-recordings/download?id=<recordingId> — stream a class recording (no download button). */
 export async function GET(request: Request) {
   await connection();
 
@@ -25,7 +25,8 @@ export async function GET(request: Request) {
   if (recording.storage === "b2") {
     const url = await getRecordingDownloadUrl(recording.objectKey, fileName);
     if (!url) return new Response("Storage not configured", { status: 503 });
-    return Response.redirect(url, 302);
+    // Not cached: every request (first load or the player renewing) gets a fresh 2-minute link.
+    return new Response(null, { status: 302, headers: { Location: url, "Cache-Control": "no-store" } });
   }
 
   const ref = localRecordingRef(recording.objectKey);

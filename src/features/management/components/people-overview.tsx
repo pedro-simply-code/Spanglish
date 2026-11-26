@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -59,10 +59,13 @@ function UserListFilters({
   const t = useTranslations("admin");
   const roleT = useTranslations("shell");
   const [draft, setDraft] = useState(searchQuery);
+  const [shownQuery, setShownQuery] = useState(searchQuery);
 
-  useEffect(() => {
+  // The URL's search changed (back button, a link): show it in the box.
+  if (shownQuery !== searchQuery) {
+    setShownQuery(searchQuery);
     setDraft(searchQuery);
-  }, [searchQuery]);
+  }
 
   const pushFilters = (role: RoleCode | "", q: string) => {
     const params = new URLSearchParams();

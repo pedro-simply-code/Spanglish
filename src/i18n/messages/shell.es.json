@@ -245,6 +245,25 @@
         "effectiveSubtitle": "{permissions} permisos de {roles, plural, one {rol} other {roles}}",
         "activeDashboard": "Panel activo",
         "defaultNote": "El rol de estudiante es el predeterminado y no se puede quitar. La academia siempre conserva al menos un administrador."
+      },
+      "deleteAccount": {
+        "title": "Borrar cuenta",
+        "subtitle": "Elimina tu cuenta y tus datos personales.",
+        "explain": "Puedes borrar tu cuenta cuando quieras. Primero cancela tus próximas clases.",
+        "button": "Borrar mi cuenta",
+        "dialogTitle": "¿Borrar tu cuenta?",
+        "warning": "No se puede deshacer. Los créditos de clases y de IA que no usaste se pierden.",
+        "deleted": "Se borra: tus formas de iniciar sesión, las conversaciones con Luna, lo que dijiste en las transcripciones de clase, tus palabras, respuestas de tareas y mensajes, y los resúmenes y grabaciones de las clases donde eras el único estudiante.",
+        "kept": "Se conserva sin tu nombre ni tu correo: tus compras y clases pasadas, porque la academia las necesita para su contabilidad y para pagar a los maestros.",
+        "typeEmail": "Escribe {email} para confirmar",
+        "cancel": "Cancelar",
+        "confirm": "Borrar para siempre",
+        "deleting": "Borrando…",
+        "errors": {
+          "not_student": "Aquí solo se pueden borrar cuentas de estudiante. Escribe a la academia para cerrar una cuenta de maestro o del equipo.",
+          "upcoming_classes": "Tienes clases próximas. Cancélalas primero y luego borra tu cuenta.",
+          "email_mismatch": "El correo no coincide con tu cuenta."
+        }
       }
     },
     "permissions": {

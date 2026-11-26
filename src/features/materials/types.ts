@@ -1,3 +1,4 @@
+import type { LessonSettings } from "@/lib/lesson";
 import type { PracticeItem } from "@/lib/practice-games";
 
 export type MaterialKind =
@@ -60,6 +61,8 @@ export type Material = {
   estimatedMinutes?: number;
   /** Practice games: the words and phrases (with optional teacher recordings). */
   practiceItems?: PracticeItem[];
+  /** Practice lesson: which exercise types and how long. */
+  lesson?: LessonSettings;
   /** private (author), shared (teachers and staff), global (students too). */
   visibility?: "private" | "shared" | "global";
   /** Global materials need a manager's approval. */
@@ -158,6 +161,7 @@ export type CreateMaterialInput = {
   }[];
   /** Practice games: words and phrases. */
   practiceItems?: PracticeItem[];
+  lesson?: LessonSettings;
 };
 
 export type ShareMaterialInput = {

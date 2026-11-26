@@ -32,6 +32,7 @@
     "@mui/material-nextjs": "^7.3.10",
     "@mui/x-date-pickers": "^9.18.0",
     "@neondatabase/serverless": "^1.2.1",
+    "@sentry/nextjs": "11.16.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tabler/icons-react": "^3.51.0",
     "apexcharts": "^4.7.0",

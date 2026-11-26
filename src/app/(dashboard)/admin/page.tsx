@@ -4,15 +4,10 @@ import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import { AdminTwoFactorNotice } from "@/features/auth";
 import { ExecutiveOverview } from "@/features/admin";
-import {
-  formatAuditActivity,
-  getExecutiveStats,
-  getPlatformHealthAlerts,
-  getRecentAuditForDashboard,
-} from "@/server/admin/insights";
-import { getAdminDashboardCharts } from "@/server/admin/dashboard-charts";
+import { resolveTimeZone } from "@/lib/timezone";
+import { getAdminHome } from "@/server/admin/admin-home";
 import { requireDashboard } from "@/server/auth/session";
-import { getAdminFinanceOverview } from "@/server/teaching/dashboards";
+import { getUserProfile } from "@/server/auth/user-repository";
 
 export const metadata: Metadata = adminStaticMetadata("dashboard");
 
@@ -26,29 +21,14 @@ export default function AdminDashboardPage() {
 
 async function AdminDashboardContent() {
   const actor = await requireDashboard("admin");
-  const [stats, alerts, recent, finance, charts] = await Promise.all([
-    getExecutiveStats(),
-    getPlatformHealthAlerts(),
-    getRecentAuditForDashboard(),
-    getAdminFinanceOverview(),
-    getAdminDashboardCharts(),
-  ]);
-  const activity = await Promise.all(recent.map((entry) => formatAuditActivity(entry)));
-  const nameParts = actor.name.trim().split(/\s+/).filter(Boolean);
-  const firstName = nameParts[0] ?? actor.name;
-  const lastName = nameParts.slice(1).join(" ");
+  const profile = await getUserProfile(actor.userId);
+  const timeZone = resolveTimeZone(profile?.timezone);
+  const home = await getAdminHome(timeZone);
 
   return (
     <>
       {actor.twoFactorEnabled ? null : <AdminTwoFactorNotice userId={actor.userId} />}
-      <ExecutiveOverview
-        firstName={firstName}
-        lastName={lastName}
-        stats={stats}
-        charts={charts}
-        alerts={[...finance.alerts, ...alerts]}
-        activity={activity}
-      />
+      <ExecutiveOverview firstName={actor.name.trim().split(/\s+/)[0] || actor.name} timeZone={timeZone} home={home} />
     </>
   );
 }

@@ -29,6 +29,13 @@ export const authRateLimitRules = {
   signUpPerEmail: { limit: 3, windowSeconds: 60 * 60 },
 } satisfies Record<string, RateLimitRule>;
 
+/** Per-user limits for practice with Luna (each call costs API money). */
+export const aiRateLimitRules = {
+  messagePerUser: { limit: 20, windowSeconds: 60 },
+  startPerUser: { limit: 10, windowSeconds: 60 * 60 },
+  translatePerUser: { limit: 30, windowSeconds: 60 * 60 },
+} satisfies Record<string, RateLimitRule>;
+
 /**
  * Counts one hit for `key` in a fixed window stored in Postgres and reports
  * whether the caller is still under the limit. A single upsert keeps it atomic

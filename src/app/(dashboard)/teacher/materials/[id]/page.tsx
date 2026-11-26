@@ -14,6 +14,7 @@ import {
 } from "@/features/materials";
 import { getActorWithPermission } from "@/server/auth/session";
 import { getMaterialForViewer, getMaterialQuestions } from "@/server/materials/library";
+import { listPracticeResults } from "@/server/materials/practice-results";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("educator.metadata.material");
@@ -40,6 +41,7 @@ async function TeacherMaterial({ params }: MaterialPageProps) {
   const material = await getMaterialForViewer(actor, id);
   if (!material) notFound();
 
+  const isStaff = actor.roles.includes("manager") || actor.roles.includes("admin");
   // Assignments, submissions and forms are still demo data (not in the database yet).
   const assignments = getAssignmentsForMaterial(id);
   const submissions = assignments.flatMap((assignment) => getSubmissions(assignment.id));
@@ -53,6 +55,11 @@ async function TeacherMaterial({ params }: MaterialPageProps) {
         assignments={assignments}
         submissions={submissions}
         questions={await questionsFor(id)}
+        practiceResults={
+          material.kind === "practice" && (material.ownerId === actor.userId || isStaff)
+            ? await listPracticeResults(actor, id)
+            : undefined
+        }
       />
       {material.ownerId === actor.userId ? (
         <Box mt={3}>

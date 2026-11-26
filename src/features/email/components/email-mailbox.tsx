@@ -52,6 +52,12 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
   const composeOpen = searchParams.get("compose") === "1";
 
   const [emails, setEmails] = useState<Email[]>(initialEmails);
+  const [loadedEmails, setLoadedEmails] = useState(initialEmails);
+  // Fresh emails from the server (after a refresh): show them.
+  if (loadedEmails !== initialEmails) {
+    setLoadedEmails(initialEmails);
+    setEmails(initialEmails);
+  }
   const [filter, setFilter] = useState<EmailFilterId>("inbox");
   const [search, setSearch] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -163,9 +169,6 @@ export function EmailMailbox({ initialEmails }: EmailMailboxProps) {
     });
   };
 
-  useEffect(() => {
-    setEmails(initialEmails);
-  }, [initialEmails]);
 
   const unreadInbox = emails.filter((email) => email.inbox && email.unread).length;
 

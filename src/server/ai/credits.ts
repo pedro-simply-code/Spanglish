@@ -9,7 +9,6 @@ import { recordAuditEvent } from "@/server/audit/audit-log";
 import { rowsOf } from "@/server/credits/credits";
 import { db } from "@/server/db";
 import {
-  aiConversations,
   aiCreditAccounts,
   aiCreditOrders,
   aiCreditPacks,
@@ -105,14 +104,40 @@ export async function attendedClassCount(userId: string) {
 }
 
 async function freeUsed(userId: string) {
-  const rows = await db
-    .select({ mode: aiConversations.mode, value: count() })
-    .from(aiConversations)
-    .where(and(eq(aiConversations.userId, userId), eq(aiConversations.billing, "free")))
-    .groupBy(aiConversations.mode);
-  const used: Record<AiConversationMode, number> = { voice: 0, chat: 0 };
-  for (const row of rows) used[row.mode] = Number(row.value);
-  return used;
+  const [row] = await db
+    .select({ voice: aiCreditAccounts.freeUsedVoice, chat: aiCreditAccounts.freeUsedChat })
+    .from(aiCreditAccounts)
+    .where(eq(aiCreditAccounts.userId, userId))
+    .limit(1);
+  return { voice: row?.voice ?? 0, chat: row?.chat ?? 0 } satisfies Record<AiConversationMode, number>;
+}
+
+const FREE_COLUMN = { voice: sql.raw('"free_used_voice"'), chat: sql.raw('"free_used_chat"') } as const;
+
+/**
+ * Takes one free conversation if any is left, in a single statement: the
+ * counter only goes up while it is below the total, so two requests at once
+ * can't both take the last one.
+ */
+async function takeFreeConversation(userId: string, mode: AiConversationMode, total: number) {
+  if (total <= 0) return false;
+  const column = FREE_COLUMN[mode];
+  const result = await db.execute(sql`
+    INSERT INTO ai_credit_accounts (user_id, balance, ${column}, updated_at)
+    VALUES (${userId}, 0, 1, now())
+    ON CONFLICT (user_id) DO UPDATE SET ${column} = ai_credit_accounts.${column} + 1, updated_at = now()
+    WHERE ai_credit_accounts.${column} < ${total}
+    RETURNING user_id
+  `);
+  return rowsOf(result).length > 0;
+}
+
+async function giveBackFreeConversation(userId: string, mode: AiConversationMode) {
+  const column = FREE_COLUMN[mode];
+  await db.execute(sql`
+    UPDATE ai_credit_accounts SET ${column} = greatest(${column} - 1, 0), updated_at = now()
+    WHERE user_id = ${userId}
+  `);
 }
 
 export async function aiCreditBalance(userId: string) {
@@ -148,7 +173,9 @@ export async function chargeConversation(
   conversationId: string,
 ): Promise<AiConversationBilling | null> {
   const allowance = await getAiAllowance(userId);
-  if (allowance.free[mode].left > 0) return "free";
+  if (allowance.free[mode].left > 0 && (await takeFreeConversation(userId, mode, allowance.free[mode].total))) {
+    return "free";
+  }
 
   // Only takes the credit if there is one (the check keeps it from going below zero).
   const result = await db.execute(sql`
@@ -169,7 +196,13 @@ export async function chargeConversation(
 }
 
 /** Gives the credit back when the conversation could not be created. */
-export async function refundConversation(userId: string, conversationId: string, billing: AiConversationBilling) {
+export async function refundConversation(
+  userId: string,
+  conversationId: string,
+  billing: AiConversationBilling,
+  mode: AiConversationMode,
+) {
+  if (billing === "free") return giveBackFreeConversation(userId, mode);
   if (billing !== "credit") return;
   await addAiCredits({ userId, delta: 1, reason: "refund", conversationId });
 }

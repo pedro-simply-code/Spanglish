@@ -30,7 +30,7 @@ export async function startAiConversationAction(input: {
   scenario: string;
   topic?: string;
 }): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const locale = (await getLocale()) === "es" ? "es" : "en";
   const result = await startAiConversation(actor, { ...input, locale });
@@ -44,7 +44,7 @@ export async function sendAiMessageAction(input: {
   conversationId: string;
   text: string;
 }): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const result = await sendAiMessage(actor, input);
   if (!result.ok) return { ok: false, message: await errorMessage(result.error), finished: result.error === "finished" };
@@ -52,7 +52,7 @@ export async function sendAiMessageAction(input: {
 }
 
 export async function finishAiConversationAction(conversationId: string): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   await finishAiConversation(actor, conversationId);
   revalidatePath("/speak");
@@ -61,7 +61,7 @@ export async function finishAiConversationAction(conversationId: string): Promis
 }
 
 export async function resumeAiConversationAction(conversationId: string): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const result = await resumeAiConversation(actor, conversationId);
   if (!result.ok) return { ok: false, message: await errorMessage(result.error) };
@@ -74,7 +74,7 @@ export async function startVoicePracticeAction(input: {
   topicKey?: string;
   topic?: string;
 }): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const locale = (await getLocale()) === "es" ? "es" : "en";
   const result = await startVoicePractice(actor, { ...input, locale });
@@ -86,7 +86,7 @@ export async function startVoicePracticeAction(input: {
 
 /** Ends Luna's voice practice and writes the report (also retries a failed report). */
 export async function finishVoicePracticeAction(conversationId: string): Promise<AiActionResult> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const locale = (await getLocale()) === "es" ? "es" : "en";
   const result = await finishVoicePractice(actor, { conversationId, locale });
@@ -103,7 +103,7 @@ export async function finishVoicePracticeAction(conversationId: string): Promise
 export async function translateConversationAction(
   conversationId: string,
 ): Promise<{ ok: boolean; message: string; translations?: Record<string, string> }> {
-  const actor = await getActorWithPermission("materials:read");
+  const actor = await getActorWithPermission("ai:practice");
   if (!actor) return { ok: false, message: await errorMessage("forbidden") };
   const result = await translateConversation(actor, String(conversationId));
   if (!result.ok) return { ok: false, message: await errorMessage(result.error) };

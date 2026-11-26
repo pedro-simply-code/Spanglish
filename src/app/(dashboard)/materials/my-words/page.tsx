@@ -7,7 +7,7 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { LinkButton } from "@/components/ui/link-button";
 import { SectionCard } from "@/components/ui/section-card";
-import { PracticeGames } from "@/features/materials";
+import { PracticeArea } from "@/features/materials";
 import { MIN_PRACTICE_ITEMS, type PracticeItem } from "@/lib/practice-games";
 import { requireDashboard } from "@/server/auth/session";
 import { listStudentWords } from "@/server/learning/vocabulary";
@@ -57,7 +57,7 @@ async function Content() {
             {t("tooFew", { min: MIN_PRACTICE_ITEMS })}
           </Alert>
         ) : (
-          <PracticeGames items={items} />
+          <PracticeArea items={items} />
         )}
       </SectionCard>
     </Box>

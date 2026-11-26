@@ -1463,17 +1463,22 @@ export function ClassroomLiveKitStage({
         }
       });
 
+    // The maps live for the whole component; keep them for the cleanup below.
+    const filmstripTiles = filmstripTileRefs.current;
+    const screenShareTiles = screenShareTileRefs.current;
+    const galleryTiles = galleryTileRefs.current;
+    const tracks = trackRegistry.current;
     return () => {
       cancelled = true;
       setLiveRoom(null);
       room.removeAllListeners();
-      filmstripTileRefs.current.forEach((tile) => tile.remove());
-      filmstripTileRefs.current.clear();
-      screenShareTileRefs.current.forEach((tile) => tile.remove());
-      screenShareTileRefs.current.clear();
-      galleryTileRefs.current.forEach((tile) => tile.remove());
-      galleryTileRefs.current.clear();
-      trackRegistry.current.clear();
+      filmstripTiles.forEach((tile) => tile.remove());
+      filmstripTiles.clear();
+      screenShareTiles.forEach((tile) => tile.remove());
+      screenShareTiles.clear();
+      galleryTiles.forEach((tile) => tile.remove());
+      galleryTiles.clear();
+      tracks.clear();
       if (room.state !== ConnectionState.Disconnected) {
         void room.disconnect();
       }

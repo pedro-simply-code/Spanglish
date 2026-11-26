@@ -16,6 +16,7 @@ export { RegisterForm } from "@/features/auth/components/register-form";
 export { OnboardingForm } from "@/features/auth/components/onboarding-form";
 export { TwoFactorForm } from "@/features/auth/components/two-factor-form";
 export { SecuritySettings } from "@/features/auth/components/security-settings";
+export { DeleteAccountCard } from "@/features/auth/components/delete-account-card";
 export {
   completeOnboardingAction,
   setLocaleAction,

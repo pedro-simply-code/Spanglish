@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -11,12 +12,36 @@ import { IconX } from "@tabler/icons-react";
 export const recordingStreamUrl = (id: string) =>
   `/api/class-recordings/download?id=${encodeURIComponent(id)}`;
 
+/** Times the player asks for a new link in a row before giving up (a real error). */
+const MAX_RENEWALS = 3;
+
 /**
  * Class video player without the browser's download option. Hiding the
- * button and the right-click menu stops casual saving; the link it streams
- * from expires, so a copied URL stops working soon after.
+ * button and the right-click menu stops casual saving; the private link it
+ * streams from lasts 2 minutes, so a copied URL stops working almost at once.
+ * When the link expires mid-class (seeking, a pause), the player quietly asks
+ * for a new one and goes on from the same second.
  */
 export function RecordingVideo({ recordingId, maxHeight = 480 }: { recordingId: string; maxHeight?: number | string }) {
+  const renewals = useRef(0);
+
+  const renew = (video: HTMLVideoElement) => {
+    if (renewals.current >= MAX_RENEWALS) return;
+    renewals.current += 1;
+    const at = video.currentTime;
+    const playing = !video.paused;
+    video.src = `${recordingStreamUrl(recordingId)}&r=${Date.now()}`;
+    video.addEventListener(
+      "loadedmetadata",
+      () => {
+        video.currentTime = at;
+        if (playing) void video.play().catch(() => undefined);
+      },
+      { once: true },
+    );
+    video.load();
+  };
+
   return (
     <Box
       component="video"
@@ -26,6 +51,10 @@ export function RecordingVideo({ recordingId, maxHeight = 480 }: { recordingId: 
       disablePictureInPicture
       controlsList="nodownload noremoteplayback noplaybackrate"
       onContextMenu={(event: React.MouseEvent) => event.preventDefault()}
+      onError={(event: React.SyntheticEvent<HTMLVideoElement>) => renew(event.currentTarget)}
+      onPlaying={() => {
+        renewals.current = 0;
+      }}
       src={recordingStreamUrl(recordingId)}
       sx={{ width: "100%", maxHeight, bgcolor: "common.black", borderRadius: 1, display: "block" }}
     />

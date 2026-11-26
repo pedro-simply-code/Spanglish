@@ -26,7 +26,7 @@
       },
       "staff": {
         "title": "Acceso de invitado del equipo",
-        "description": "Los controles de anfitrión son solo para el profesor que imparte esta clase. Como gerente o administrador, únete con un enlace de invitado del equipo: la misma barra de herramientas y los mismos iconos que un estudiante (incluido levantar la mano). Puedes usar el micrófono, la cámara y compartir pantalla sin pedir permiso; silenciar a todos y bloquear los micrófonos del público no te afectan. Para impartir una clase, cambia al panel del profesor.",
+        "description": "Los controles de anfitrión son solo para el profesor que imparte esta clase. Como coordinador o administrador, únete con un enlace de invitado del equipo: la misma barra de herramientas y los mismos iconos que un estudiante (incluido levantar la mano). Puedes usar el micrófono, la cámara y compartir pantalla sin pedir permiso; silenciar a todos y bloquear los micrófonos del público no te afectan. Para impartir una clase, cambia al panel del profesor.",
         "viewOnlyHint": "Los visitantes que solo observan deben usar el enlace de invitado que copiaron del profesor.",
         "preparing": "Preparando enlace…",
         "join": "Unirse como invitado del equipo"
@@ -193,7 +193,7 @@
       "signInStart": "Inicia sesión para comenzar esta clase.",
       "onlyTeacherStartEnd": "Solo el profesor asignado a esta clase puede iniciar o terminar la sesión en vivo.",
       "signInStaff": "Inicia sesión para unirte como invitado del equipo.",
-      "staffOnly": "Los enlaces de invitado del equipo son solo para cuentas de gerente o administrador.",
+      "staffOnly": "Los enlaces de invitado del equipo son solo para cuentas de coordinador o administrador.",
       "youAreTeacher": "Eres el profesor de la clase: actualiza esta página para impartirla.",
       "staffLinkReady": "Enlace de invitado del equipo listo.",
       "alreadyOpen": "La sesión en vivo ya está abierta (inicio del profesor desactivado).",

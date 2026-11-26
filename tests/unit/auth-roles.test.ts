@@ -49,14 +49,21 @@ describe("permissions", () => {
     expect(hasPermission(["admin"], "payouts:approve")).toBe(true);
   });
 
-  it("each role includes every permission of the roles below it", () => {
-    const student = new Set(getPermissions(["student"]));
+  it("each role includes every permission of the roles below it (except practice with Luna)", () => {
+    const student = new Set(getPermissions(["student"]).filter((permission) => permission !== "ai:practice"));
     const teacher = new Set(getPermissions(["teacher"]));
     const manager = new Set(getPermissions(["manager"]));
     const admin = new Set(getPermissions(["admin"]));
     for (const permission of student) expect(teacher.has(permission)).toBe(true);
     for (const permission of teacher) expect(manager.has(permission)).toBe(true);
     for (const permission of manager) expect(admin.has(permission)).toBe(true);
+  });
+
+  it("only students practice with Luna", () => {
+    expect(getPermissions(["student"])).toContain("ai:practice");
+    for (const role of ["teacher", "manager", "admin"] as const) {
+      expect(getPermissions([role])).not.toContain("ai:practice");
+    }
   });
 });
 

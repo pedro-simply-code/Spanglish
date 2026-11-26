@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useState, type ReactElement, type Ref } from "react";
+import { forwardRef, useState, type ReactElement, type Ref } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -53,32 +53,37 @@ export function EmailCompose({
   sendPending,
 }: EmailComposeProps) {
   const t = useTranslations("apps");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(Boolean(openOnMount));
   const [to, setTo] = useState(initial?.to ?? "");
   const [toValid, setToValid] = useState<boolean | null>(null);
   const [subject, setSubject] = useState(initial?.subject ?? "");
   const [body, setBody] = useState(initial?.body ?? "");
+  const [loadedInitial, setLoadedInitial] = useState(initial);
+  const [loadedDraft, setLoadedDraft] = useState<EmailComposeInitial | null | undefined>(null);
+  const [openedOnMount, setOpenedOnMount] = useState(openOnMount);
 
-  useEffect(() => {
+  // New values from the parent: fill the form while rendering (no extra effect pass).
+  if (initial !== loadedInitial) {
+    setLoadedInitial(initial);
     if (initial) {
       setTo(initial.to ?? "");
       setSubject(initial.subject ?? "");
       setBody(initial.body ?? "");
     }
-  }, [initial]);
-
-  useEffect(() => {
+  }
+  if (openOnMount !== openedOnMount) {
+    setOpenedOnMount(openOnMount);
     if (openOnMount) setOpen(true);
-  }, [openOnMount]);
-
-  useEffect(() => {
+  }
+  if (draft !== loadedDraft) {
+    setLoadedDraft(draft);
     if (draft) {
       setTo(draft.to ?? "");
       setSubject(draft.subject ?? "");
       setBody(draft.body ?? "");
       setOpen(true);
     }
-  }, [draft]);
+  }
 
   const send = () => {
     if (!onSend) {

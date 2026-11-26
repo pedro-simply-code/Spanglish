@@ -6,6 +6,7 @@ import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { MaterialDetail, getFormQuestions } from "@/features/materials";
 import { getActorWithPermission } from "@/server/auth/session";
 import { getMaterialForViewer, getMaterialQuestions } from "@/server/materials/library";
+import { getPracticeStats } from "@/server/materials/practice-results";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("educator.metadata.studentMaterial");
@@ -38,6 +39,7 @@ async function MaterialContent({ params }: MaterialPageProps) {
       viewer="student"
       grants={[]}
       questions={await questionsFor(id)}
+      practiceStats={material.kind === "practice" ? await getPracticeStats(actor.userId, id) : undefined}
     />
   );
 }

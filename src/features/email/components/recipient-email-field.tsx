@@ -43,12 +43,14 @@ export function RecipientEmailField({
     admin: t("email.roles.admin"),
   };
 
+  const trimmed = value.trim();
+  // An empty field has nothing to suggest or check (no state change needed).
+  const shownOptions = trimmed ? options : [];
+  const shownVerified = trimmed ? verified : null;
+  const shownUnknown = trimmed ? unknown : false;
+
   useEffect(() => {
-    const trimmed = value.trim();
     if (!trimmed) {
-      setOptions([]);
-      setVerified(null);
-      setUnknown(false);
       onValidityChange?.(null);
       return;
     }
@@ -70,11 +72,11 @@ export function RecipientEmailField({
     }, 280);
 
     return () => window.clearTimeout(timer);
-  }, [value, onValidityChange]);
+  }, [trimmed, onValidityChange]);
 
   const selected =
-    verified ??
-    options.find((option) => option.email.toLowerCase() === value.trim().toLowerCase()) ??
+    shownVerified ??
+    shownOptions.find((option) => option.email.toLowerCase() === value.trim().toLowerCase()) ??
     null;
 
   return (
@@ -82,7 +84,7 @@ export function RecipientEmailField({
       <Autocomplete
         freeSolo
         filterOptions={(items, state) => filter(items, state)}
-        options={options}
+        options={shownOptions}
         loading={loading}
         inputValue={value}
         value={selected}
@@ -125,13 +127,13 @@ export function RecipientEmailField({
           />
         )}
       />
-      {unknown ? (
+      {shownUnknown ? (
         <FormHelperText error>{t("email.compose.recipientUnknown")}</FormHelperText>
-      ) : verified?.bounced ? (
+      ) : shownVerified?.bounced ? (
         <FormHelperText>{t("email.compose.recipientBounced")}</FormHelperText>
-      ) : verified ? (
+      ) : shownVerified ? (
         <FormHelperText>
-          {verified.name} · {roleLabels[verified.role]}
+          {shownVerified.name} · {roleLabels[shownVerified.role]}
         </FormHelperText>
       ) : (
         <FormHelperText>{t("email.compose.recipientHint")}</FormHelperText>

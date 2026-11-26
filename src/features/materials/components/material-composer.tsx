@@ -18,6 +18,8 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import { createMaterialAction } from "@/features/materials/actions";
 import { materialKindOptions } from "@/features/materials/data";
+import { LessonSettingsEditor } from "@/features/materials/components/lesson-settings-editor";
+import { DEFAULT_LESSON, type LessonSettings } from "@/lib/lesson";
 import {
   blankPracticeItem,
   PracticeItemsEditor,
@@ -89,6 +91,7 @@ export function MaterialComposer() {
   const [practiceItems, setPracticeItems] = useState<DraftPracticeItem[]>(() =>
     Array.from({ length: 4 }, blankPracticeItem),
   );
+  const [lesson, setLesson] = useState<LessonSettings>(DEFAULT_LESSON);
   const [result, setResult] = useState<MaterialActionResult | null>(null);
   const { showError, showSuccess } = useAppToast();
   const [pending, startTransition] = useTransition();
@@ -119,9 +122,11 @@ export function MaterialComposer() {
                 term: item.term,
                 translation: item.translation,
                 example: item.example,
+                exampleTranslation: item.exampleTranslation,
                 audio: item.audio,
               }))
             : undefined,
+        lesson: kind === "practice" ? lesson : undefined,
       });
 
       setResult(response);
@@ -248,6 +253,13 @@ export function MaterialComposer() {
       {kind === "practice" ? (
         <Box sx={{ p: 3, bgcolor: "grey.100" }}>
           <PracticeItemsEditor items={practiceItems} onChange={setPracticeItems} />
+          <Box mt={4}>
+            <LessonSettingsEditor
+              items={practiceItems.map((item) => ({ ...item, id: item.key }))}
+              value={lesson}
+              onChange={setLesson}
+            />
+          </Box>
         </Box>
       ) : null}
 

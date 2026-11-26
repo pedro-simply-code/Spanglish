@@ -3,7 +3,8 @@ import { Suspense } from "react";
 import { AppCardSkeleton } from "@/components/ui/app-card-skeleton";
 import { adminStaticMetadata } from "@/i18n/static-page-metadata";
 import Stack from "@mui/material/Stack";
-import { AiCreditPacksCard, CommercePackagesOverview } from "@/features/admin";
+import { AiCostReportCard, AiCreditPacksCard, CommercePackagesOverview } from "@/features/admin";
+import { aiCostReport } from "@/server/ai/cost-report";
 import { aiPricingConfig, listAiCreditPacks } from "@/server/ai/credits";
 import { adminPackageKindToClassType, parseAdminPackageKindParam } from "@/lib/admin-package-filter";
 import { DEFAULT_PAGE_SIZE, pageOffset, parsePageParam } from "@/lib/pagination";
@@ -31,10 +32,11 @@ async function Content({ searchParams }: PageProps) {
   const pageSize = DEFAULT_PAGE_SIZE;
   const offset = pageOffset(page, pageSize);
 
-  const [total, packages, aiPacks] = await Promise.all([
+  const [total, packages, aiPacks, aiCost] = await Promise.all([
     countCommercePackages(undefined, classType),
     listAdminPackageDetailsPaginated({ offset, limit: pageSize, classType }),
     listAiCreditPacks(),
+    aiCostReport(3),
   ]);
 
   return (
@@ -48,6 +50,7 @@ async function Content({ searchParams }: PageProps) {
       />
       {/* Keyed by the saved packs so the editor resets after each save. */}
       <AiCreditPacksCard key={JSON.stringify(aiPacks)} packs={aiPacks} config={aiPricingConfig()} />
+      <AiCostReportCard months={aiCost} />
     </Stack>
   );
 }

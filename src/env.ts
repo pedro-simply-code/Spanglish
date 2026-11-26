@@ -119,6 +119,8 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     /** Cheapest current Claude model by default; change without a deploy of code. */
     ANTHROPIC_MODEL: z.string().min(1).default("claude-haiku-5-5"),
+    /** Claude API address; change it only to use a fake server in development or tests. */
+    ANTHROPIC_BASE_URL: z.string().url().default("https://api.anthropic.com"),
     /** Total tokens (input + output, scene included) one practice conversation may use. */
     AI_CONVERSATION_TOKEN_LIMIT: z.coerce.number().int().min(2000).max(200000).default(10000),
     /** USD per million tokens for ANTHROPIC_MODEL; used to show the cost of each conversation. */
@@ -221,6 +223,7 @@ export const env = createEnv({
     PAYOUT_PROCESSING_BUSINESS_DAYS: process.env.PAYOUT_PROCESSING_BUSINESS_DAYS,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL,
+    ANTHROPIC_BASE_URL: process.env.ANTHROPIC_BASE_URL,
     AI_CONVERSATION_TOKEN_LIMIT: process.env.AI_CONVERSATION_TOKEN_LIMIT,
     AI_CONVERSATIONS_PER_DAY: process.env.AI_CONVERSATIONS_PER_DAY,
     AI_FREE_CONVERSATIONS_PER_CLASS: process.env.AI_FREE_CONVERSATIONS_PER_CLASS,

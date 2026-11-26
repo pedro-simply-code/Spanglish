@@ -23,7 +23,8 @@ import {
   MaterialKindChip,
   MaterialStatusChip,
 } from "@/features/materials/components/material-kind-chip";
-import { PracticeGames } from "@/features/materials/components/practice-games";
+import { PracticeArea, type PracticeStatsView } from "@/features/materials/components/practice-area";
+import { PracticeResultsCard, type PracticeResultRow } from "@/features/materials/components/practice-results-card";
 import { ShareMaterialDialog } from "@/features/materials/components/share-material-dialog";
 import {
   localizeAssignments,
@@ -59,6 +60,10 @@ type MaterialDetailProps = {
   assignments?: Assignment[];
   submissions?: Submission[];
   questions?: FormQuestion[];
+  /** Practice sets: the student's own record. */
+  practiceStats?: PracticeStatsView;
+  /** Practice sets: every student's results (author and staff). */
+  practiceResults?: PracticeResultRow[];
 };
 
 type Translator = Awaited<ReturnType<typeof getTranslations<"educator.materials">>>;
@@ -70,6 +75,8 @@ export async function MaterialDetail({
   assignments: sourceAssignments = [],
   submissions: sourceSubmissions = [],
   questions: sourceQuestions = [],
+  practiceStats,
+  practiceResults,
 }: MaterialDetailProps) {
   const t = await getTranslations("educator.materials");
   const locale = await getLocale();
@@ -163,9 +170,13 @@ export async function MaterialDetail({
               ))}
             </Stack>
 
-            <MaterialPreview material={material} questions={questions} t={t} />
+            <MaterialPreview material={material} questions={questions} t={t} viewer={viewer} practiceStats={practiceStats} />
           </Stack>
         </SectionCard>
+
+        {material.kind === "practice" && practiceResults ? (
+          <PracticeResultsCard results={practiceResults} />
+        ) : null}
 
         <SectionCard
           title={isTeacher ? t("detail.sharedWith") : t("detail.howToUse")}
@@ -331,15 +342,31 @@ function MaterialPreview({
   material,
   questions,
   t,
+  viewer,
+  practiceStats,
 }: {
   material: Material;
   questions: FormQuestion[];
   t: Translator;
+  viewer: "teacher" | "student";
+  practiceStats?: PracticeStatsView;
 }) {
   if (material.kind === "practice") {
     return (
       <Box sx={{ pt: 1 }}>
-        <PracticeGames items={material.practiceItems ?? []} />
+        {viewer === "teacher" ? (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            {t("lesson.teacherPreview")}
+          </Alert>
+        ) : null}
+        <PracticeArea
+          items={material.practiceItems ?? []}
+          settings={material.lesson}
+          materialId={material.id}
+          save={viewer === "student"}
+          stats={practiceStats}
+          title={material.title}
+        />
       </Box>
     );
   }

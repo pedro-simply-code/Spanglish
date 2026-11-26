@@ -1,5 +1,4 @@
 import type { AuthSession } from "@/lib/auth-types";
-import { hasRole } from "@/lib/auth-roles";
 import type { LiveClass } from "@/features/classes/types";
 import {
   getClassView,
@@ -11,9 +10,6 @@ import {
 
 const STAFF_WINDOW_DAYS = 60;
 
-function isStaff(actor: AuthSession) {
-  return actor.activeRole === "admin";
-}
 
 /** Classes for the active dashboard — not the union of every role on the account. */
 export async function loadClassesForActor(actor: AuthSession): Promise<LiveClass[]> {

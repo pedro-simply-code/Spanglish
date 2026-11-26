@@ -1,6 +1,6 @@
 import { getRecordingStorageMode } from "@/server/storage/recordings";
 import { connection } from "next/server";
-import { and, count, desc, eq, gt, gte, isNotNull, ne, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import type {
   AdminAlert,
@@ -18,7 +18,7 @@ import { listAuditEvents, type AuditListEntry } from "@/server/audit/audit-log";
 import { googleSignInEnabled } from "@/server/auth/auth";
 import { stripeEnabled, stripeTestMode, stripeWebhookEnabled } from "@/server/payments/stripe";
 import { db } from "@/server/db";
-import { auditLogs, sessions, users } from "@/server/db/schema";
+import { auditLogs, type sessions, users } from "@/server/db/schema";
 import type { Integration, IntegrationStatus, PersonAccount } from "@/features/management";
 import {
   economicsToAdminStats,
@@ -483,68 +483,6 @@ export async function getEmailHealthRows(): Promise<EmailHealthRow[]> {
       metric: t("emailHealth.metric.webhook"),
       value: webhookOk ? t("emailHealth.value.configured") : t("emailHealth.value.missingSecret"),
       status: webhookOk ? "ok" : env.EMAIL_PROVIDER === "postmark" ? "action" : "watch",
-    },
-  ];
-}
-
-export async function getExecutiveStats(): Promise<AdminStat[]> {
-  const [t, locale, integrations] = await Promise.all([
-    getTranslations("admin"),
-    getLocale(),
-    buildIntegrationStatuses(),
-  ]);
-  const connected = integrations.filter((item) => item.status === "connected").length;
-
-  await connection(); // live data, read the clock at request time
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-  const [totalUsers, activeSessions, securityAlerts] = await Promise.all([
-    countTable(users),
-    db
-      .select({ value: count() })
-      .from(sessions)
-      .where(gt(sessions.expiresAt, new Date()))
-      .then((rows) => rows[0]?.value ?? 0),
-    db
-      .select({ value: count() })
-      .from(auditLogs)
-      .where(
-        and(
-          gte(auditLogs.createdAt, weekAgo),
-          ne(auditLogs.severity, "info"),
-        ),
-      )
-      .then((rows) => rows[0]?.value ?? 0),
-  ]);
-
-  return [
-    {
-      id: "accounts",
-      label: t("executiveStat.accounts.label"),
-      value: formatInt(totalUsers, locale),
-      helper: t("executiveStat.accounts.helper"),
-      href: "/admin/organization/users",
-    },
-    {
-      id: "sessions",
-      label: t("executiveStat.sessions.label"),
-      value: formatInt(activeSessions, locale),
-      helper: t("executiveStat.sessions.helper"),
-      href: "/admin/organization/users",
-    },
-    {
-      id: "security",
-      label: t("executiveStat.security.label"),
-      value: formatInt(securityAlerts, locale),
-      helper: t("executiveStat.security.helper"),
-      href: "/admin/audit",
-    },
-    {
-      id: "integrations",
-      label: t("executiveStat.integrations.label"),
-      value: `${connected} / ${integrations.length}`,
-      helper: t("executiveStat.integrations.helper"),
-      href: "/admin/platform/integrations",
     },
   ];
 }

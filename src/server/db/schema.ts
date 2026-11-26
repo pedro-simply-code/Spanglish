@@ -683,6 +683,29 @@ export const materials = pgTable(
   ],
 );
 
+/** One finished practice lesson (Duolingo-style) by a student. */
+export const practiceResults = pgTable(
+  "practice_results",
+  {
+    id: text("id").primaryKey(),
+    materialId: text("material_id")
+      .notNull()
+      .references(() => materials.id, { onDelete: "cascade" }),
+    studentUserId: text("student_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    correct: integer("correct").notNull(),
+    total: integer("total").notNull(),
+    xp: integer("xp").notNull(),
+    seconds: integer("seconds").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("practice_results_material_idx").on(table.materialId, table.createdAt),
+    index("practice_results_student_idx").on(table.studentUserId, table.materialId),
+  ],
+);
+
 /** Words the teacher adds to a class; copied into each student's word list. */
 export const classVocabulary = pgTable(
   "class_vocabulary",
@@ -855,6 +878,8 @@ export const aiConversations = pgTable(
     costMicros: integer("cost_micros").notNull().default(0),
     tokenLimit: integer("token_limit").notNull(),
     status: text("status").$type<AiConversationStatus>().notNull().default("active"),
+    /** Set while Luna answers a message, so two sends at once can't both run. */
+    busyUntil: timestamp("busy_until", { withTimezone: true }),
     /** "chat" (written role-play) or "voice" (speaking practice with Luna). */
     mode: text("mode").$type<AiConversationMode>().notNull().default("chat"),
     /** Voice: answers the model rated useful (score ≥ 3) and the sum of their scores. */
@@ -922,6 +947,12 @@ export const aiCreditAccounts = pgTable(
       .primaryKey()
       .references(() => users.id, { onDelete: "cascade" }),
     balance: integer("balance").notNull().default(0),
+    /**
+     * Free conversations already used per practice. Counted here (not from the
+     * conversations) so two tabs starting at once can't both take the last one.
+     */
+    freeUsedVoice: integer("free_used_voice").notNull().default(0),
+    freeUsedChat: integer("free_used_chat").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [check("ai_credit_accounts_balance_non_negative", sql`${table.balance} >= 0`)],

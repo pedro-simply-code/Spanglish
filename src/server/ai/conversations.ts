@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import { env } from "@/env";
 import {
   CUSTOM_SCENARIO,
@@ -17,6 +17,7 @@ import {
   type ClaudeMessage,
 } from "@/server/ai/anthropic";
 import { chargeConversation, refundConversation } from "@/server/ai/credits";
+import { aiRateLimitRules, checkRateLimits } from "@/server/auth/rate-limit";
 import { readFeedback } from "@/server/ai/voice-report";
 import { voiceEmoji, voiceGoals } from "@/server/ai/voice-topics";
 import { getUserProfile } from "@/server/auth/user-repository";
@@ -62,7 +63,16 @@ export type AiResult<T = undefined> =
   | { ok: true; data: T }
   | {
       ok: false;
-      error: "not_configured" | "daily_limit" | "no_credits" | "not_found" | "finished" | "invalid" | ClaudeFailure;
+      error:
+        | "not_configured"
+        | "daily_limit"
+        | "no_credits"
+        | "not_found"
+        | "finished"
+        | "invalid"
+        | "busy"
+        | "rate_limited"
+        | ClaudeFailure;
     };
 
 /** Logs the real API error on the server (never the key) and returns a UI reason. */
@@ -314,6 +324,7 @@ export async function startAiConversation(
   const scenario = custom ? undefined : (await scenariosByKey([input.scenario])).get(input.scenario);
   if (!custom && (!scenario || !scenario.active)) return { ok: false, error: "invalid" };
   if (await overDailyCap(actor.userId, "chat")) return { ok: false, error: "daily_limit" };
+  if (await aiRateLimited(actor.userId, "startPerUser")) return { ok: false, error: "rate_limited" };
 
   const profile = await getUserProfile(actor.userId);
   // Students are English speakers learning Spanish: the practice is always in Spanish.
@@ -342,7 +353,7 @@ export async function startAiConversation(
       content: opening,
     });
   } catch (error) {
-    await refundConversation(actor.userId, id, billing);
+    await refundConversation(actor.userId, id, billing, "chat");
     throw error;
   }
   return { ok: true, data: { id } };
@@ -356,7 +367,60 @@ export async function conversationMessages(conversationId: string) {
     .orderBy(asc(aiMessages.createdAt));
 }
 
+/** Whether this user is over a Luna limit (messages a minute, new conversations or translations an hour). */
+export async function aiRateLimited(userId: string, kind: keyof typeof aiRateLimitRules) {
+  const result = await checkRateLimits([{ key: `ai:${kind}:${userId}`, rule: aiRateLimitRules[kind] }]);
+  return !result.allowed;
+}
+
+/** Longest a turn may hold the conversation (a crashed request frees it after this). */
+const TURN_LOCK = sql`interval '90 seconds'`;
+
+/**
+ * Runs one turn while holding the conversation: a second send (another tab, a
+ * double click) gets "busy" instead of passing the token check at the same
+ * time and adding a second reply.
+ */
+export async function withConversationLock<T>(
+  userId: string,
+  conversationId: string,
+  turn: () => Promise<AiResult<T>>,
+): Promise<AiResult<T>> {
+  const taken = await db
+    .update(aiConversations)
+    .set({ busyUntil: sql`now() + ${TURN_LOCK}` })
+    .where(
+      and(
+        eq(aiConversations.id, conversationId),
+        eq(aiConversations.userId, userId),
+        or(isNull(aiConversations.busyUntil), lt(aiConversations.busyUntil, sql`now()`)),
+      ),
+    )
+    .returning({ id: aiConversations.id });
+  if (!taken.length) {
+    const [exists] = await db
+      .select({ id: aiConversations.id })
+      .from(aiConversations)
+      .where(and(eq(aiConversations.id, conversationId), eq(aiConversations.userId, userId)))
+      .limit(1);
+    return { ok: false, error: exists ? "busy" : "not_found" };
+  }
+  try {
+    return await turn();
+  } finally {
+    await db.update(aiConversations).set({ busyUntil: null }).where(eq(aiConversations.id, conversationId));
+  }
+}
+
 export async function sendAiMessage(
+  actor: AuthSession,
+  input: { conversationId: string; text: string },
+): Promise<AiResult<{ finished: boolean; reply: string }>> {
+  if (await aiRateLimited(actor.userId, "messagePerUser")) return { ok: false, error: "rate_limited" };
+  return withConversationLock(actor.userId, String(input.conversationId ?? ""), () => sendAiMessageNow(actor, input));
+}
+
+async function sendAiMessageNow(
   actor: AuthSession,
   input: { conversationId: string; text: string },
 ): Promise<AiResult<{ finished: boolean; reply: string }>> {

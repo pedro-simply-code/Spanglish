@@ -36,6 +36,7 @@ import {
   roleCodes,
   roleDefinitions,
   ProfileSettings,
+  DeleteAccountCard,
   SecuritySettings,
   signOutAction,
   switchDashboardAction,
@@ -81,7 +82,7 @@ export function SettingsOverview({
     weekly: true,
     achievements: false,
   });
-  const accountAvatarUrl = getAccountAvatarUrl(actor.userId);
+  const accountAvatarUrl = getAccountAvatarUrl(actor.userId, actor.image);
 
   const grantedPermissions = getPermissions(actor.roles);
 
@@ -455,10 +456,15 @@ export function SettingsOverview({
           ) : null}
 
           {tab === securityTab ? (
-            <SecuritySettings
-              hasPassword={hasPassword}
-              twoFactorEnabled={actor.twoFactorEnabled}
-            />
+            <Stack spacing={3}>
+              <SecuritySettings
+                hasPassword={hasPassword}
+                twoFactorEnabled={actor.twoFactorEnabled}
+              />
+              {actor.roles.length === 1 && actor.roles[0] === "student" ? (
+                <DeleteAccountCard email={actor.email} />
+              ) : null}
+            </Stack>
           ) : null}
         </CardContent>
       </Card>

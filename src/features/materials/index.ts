@@ -1,5 +1,6 @@
 export {
   createMaterialAction,
+  savePracticeResultAction,
   reviewMaterialAction,
   setMaterialVisibilityAction,
   shareMaterialAction,
@@ -85,3 +86,5 @@ export type {
   SubmitPracticeInput,
 } from "@/features/materials/types";
 export { PracticeGames } from "@/features/materials/components/practice-games";
+export { PracticeArea } from "@/features/materials/components/practice-area";
+export { LessonPlayer } from "@/features/materials/components/lesson-player";

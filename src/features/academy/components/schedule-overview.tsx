@@ -304,14 +304,14 @@ export function ScheduleOverview({
         : [],
     [trialEligible],
   );
-  const creditKinds = balances.filter((item) => item.balance > 0);
+  const creditKinds = useMemo(() => balances.filter((item) => item.balance > 0), [balances]);
   const totalCredits = creditKinds.reduce((sum, item) => sum + item.balance, 0);
   const bookableKinds = useMemo(() => [...trialKinds, ...creditKinds], [trialKinds, creditKinds]);
   const [activeStep, setActiveStep] = useState(0);
   const [kind, setKind] = useState(bookableKinds[0] ? kindKey(bookableKinds[0]) : "");
   const [teacherId, setTeacherId] = useState("");
-  const [slots, setSlots] = useState<string[] | null>(null);
-  const [loadingSlots, setLoadingSlots] = useState(false);
+  /** Free times, tagged with the teacher + class kind they were loaded for. */
+  const [loaded, setLoaded] = useState<{ key: string; slots: string[] | null }>({ key: "", slots: null });
   const [dayKey, setDayKey] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [focus, setFocus] = useState(lessonFocusOptions[0] ?? "Conversation practice");
@@ -324,6 +324,12 @@ export function ScheduleOverview({
   const selectedKind = bookableKinds.find((item) => kindKey(item) === kind);
   const teacher = teachers.find((item) => item.id === teacherId);
   const kindParams = parseKindKey(kind);
+  // Which free times the wizard needs now; they are loaded below when it changes.
+  const slotsKey = teacherId && kindParams ? `${teacherId}|${kind}` : "";
+  const slots = slotsKey && loaded.key === slotsKey ? loaded.slots : null;
+  const loadingSlots = Boolean(slotsKey) && loaded.key !== slotsKey;
+  const setSlots = (update: (current: string[] | null) => string[] | null) =>
+    setLoaded((current) => ({ ...current, slots: update(current.slots) }));
 
   const dayFormatter = useMemo(
     () => new Intl.DateTimeFormat(intlLocale, { timeZone, weekday: "short", month: "short", day: "numeric" }),
@@ -347,9 +353,11 @@ export function ScheduleOverview({
     [timeZone, intlLocale],
   );
 
-  useEffect(() => {
+  const [trialFromServer, setTrialFromServer] = useState(trialEligibleFromServer);
+  if (trialFromServer !== trialEligibleFromServer) {
+    setTrialFromServer(trialEligibleFromServer);
     setTrialEligible(trialEligibleFromServer);
-  }, [trialEligibleFromServer]);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -361,23 +369,15 @@ export function ScheduleOverview({
     };
   }, []);
 
-  useEffect(() => {
-    if (trialEligible) return;
-    if (!kind.startsWith("trial-")) return;
-    const fallbackKey = creditKinds[0] ? kindKey(creditKinds[0]) : "";
-    setKind(fallbackKey);
-  }, [trialEligible, kind, creditKinds]);
+  // The free trial is no longer available: switch to the first class credit.
+  if (!trialEligible && kind.startsWith("trial-")) {
+    setKind(creditKinds[0] ? kindKey(creditKinds[0]) : "");
+  }
 
-  // Stable deps (`kind` string, not `selectedKind` object) — avoids infinite reload + blocked navigation.
+  // Load the free times when the teacher or the class kind changes.
   useEffect(() => {
-    if (!teacherId || !kindParams) {
-      setSlots(null);
-      setLoadingSlots(false);
-      return;
-    }
+    if (!slotsKey || !kindParams) return;
     let cancelled = false;
-    setLoadingSlots(true);
-    setSlots(null);
     listBookingSlotsAction({
       teacherId,
       classType: kindParams.classType,
@@ -385,17 +385,19 @@ export function ScheduleOverview({
     })
       .then((result) => {
         if (cancelled) return;
-        setSlots(result);
+        setLoaded({ key: slotsKey, slots: result });
         setDayKey("");
         setStartsAt("");
       })
-      .finally(() => {
-        if (!cancelled) setLoadingSlots(false);
+      .catch(() => {
+        if (!cancelled) setLoaded({ key: slotsKey, slots: [] });
       });
     return () => {
       cancelled = true;
     };
-  }, [teacherId, kind]);
+    // kindParams comes from `kind`, already in slotsKey.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slotsKey]);
 
   const days = useMemo(() => {
     const groups = new Map<string, string[]>();
@@ -443,15 +445,18 @@ export function ScheduleOverview({
     [filteredTeachers, teacherPage],
   );
 
-  useEffect(() => {
+  // New search or filters: back to the first page.
+  const filterKey = `${teacherSearch}|${teacherTagFilter}|${teacherLevelFilter}`;
+  const [pagedFilterKey, setPagedFilterKey] = useState(filterKey);
+  if (pagedFilterKey !== filterKey) {
+    setPagedFilterKey(filterKey);
     setTeacherPage(1);
-  }, [teacherSearch, teacherTagFilter, teacherLevelFilter]);
+  }
 
-  useEffect(() => {
-    if (teacherId && !filteredTeachers.some((item) => item.id === teacherId)) {
-      setTeacherId("");
-    }
-  }, [filteredTeachers, teacherId]);
+  // The chosen teacher was filtered out: unselect them.
+  if (teacherId && !filteredTeachers.some((item) => item.id === teacherId)) {
+    setTeacherId("");
+  }
 
   const canContinue =
     (activeStep === 0 && Boolean(kind && selectedKind)) ||
@@ -466,7 +471,6 @@ export function ScheduleOverview({
     setTeacherTagFilter("");
     setTeacherLevelFilter("");
     setTeacherPage(1);
-    setSlots(null);
     setDayKey("");
     setStartsAt("");
   };

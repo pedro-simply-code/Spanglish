@@ -1,9 +1,14 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { connection } from "next/server";
-import { classRoomHref } from "@/features/classes/data";
-import { formatClassDateTime, formatClassTime, formatClassTimeRange } from "@/features/classes/format";
-import { getClassStatus, getJoinState } from "@/features/classes/policy";
-import type { ManagerClassroomRow } from "@/features/management/data";
+import {
+  classRoomHref,
+  formatClassDateTime,
+  formatClassTime,
+  formatClassTimeRange,
+  getClassStatus,
+  getJoinState,
+} from "@/features/classes";
+import type { ManagerClassroomRow } from "@/features/management";
 import { isAppLocale, type AppLocale } from "@/i18n/config";
 import { classTypeLabel } from "@/lib/class-type-label";
 import { appNow, appNowDate } from "@/lib/app-clock";

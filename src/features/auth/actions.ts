@@ -12,8 +12,10 @@ import { recordAuditEvent, requestContextFromHeaders } from "@/server/audit/audi
 import { auth } from "@/server/auth/auth";
 import { notifyUser } from "@/server/auth/auth-events";
 import { checkRateLimits, rateLimitMessage } from "@/server/auth/rate-limit";
+import { getTranslations } from "next-intl/server";
 import {
   clearSession,
+  getActor,
   getActorAllowIncompleteProfile,
   getAuthState,
   getCurrentSessionId,
@@ -35,6 +37,7 @@ import {
   type OnboardingInput,
   type ProfileUpdateInput,
 } from "@/lib/profile-schema";
+import { deleteStudentAccount } from "@/server/auth/delete-account";
 import { db } from "@/server/db";
 import { sessions } from "@/server/db/schema";
 
@@ -377,4 +380,17 @@ export async function getPasswordStatusAction() {
   const actor = await getSession();
   if (!actor) return { hasPassword: false };
   return { hasPassword: await userHasPassword(actor.userId) };
+}
+
+/**
+ * Settings → Security → delete my account (students). The student types their
+ * email to confirm; afterwards they are signed out everywhere.
+ */
+export async function deleteAccountAction(confirmEmail: string): Promise<AuthActionResult> {
+  const t = await getTranslations("shell.settings.deleteAccount");
+  const actor = await getActor();
+  const result = await deleteStudentAccount(actor, String(confirmEmail ?? ""));
+  if (!result.ok) return { ok: false, message: t(`errors.${result.error}`) };
+  await clearSession().catch(() => undefined);
+  redirect("/login");
 }

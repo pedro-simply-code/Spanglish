@@ -58,14 +58,14 @@
       }
     },
     "alert": {
-      "emailBounce": "{count} cuenta(s) con correo rebotado",
+      "emailBounce": "{count, plural, one {# cuenta con correo rebotado} other {# cuentas con correo rebotado}}",
       "emailBounceDetail": "El correo transaccional está bloqueado para estas direcciones.",
       "emailFromMissing": "EMAIL_FROM no está configurado",
       "emailFromMissingDetail": "Los códigos de acceso y los correos de seguridad no se pueden enviar hasta configurar la dirección de remitente.",
       "integrationNotReady": "{name} no está listo",
       "joinWindowOn": "CLASS_RELAX_JOIN_WINDOW está activo",
       "joinWindowOnDetail": "Cualquiera puede unirse a clases fuera del horario programado en producción.",
-      "managerWithout2Fa": "{count} cuenta(s) de manager sin 2FA",
+      "managerWithout2Fa": "{count, plural, one {# cuenta de coordinador sin 2FA} other {# cuentas de coordinador sin 2FA}}",
       "managerWithout2FaDetail": "Activa una app de autenticación antes de gestionar pagos o cambios de rol."
     },
     "audit": {
@@ -118,7 +118,8 @@
         "twoFactorEnabled": "2FA activado",
         "twoFactorLockout": "2FA bloqueado tras códigos fallidos",
         "aiCreditsPurchased": "Créditos de IA comprados",
-        "aiPackSaved": "Pack de créditos de IA guardado"
+        "aiPackSaved": "Pack de créditos de IA guardado",
+        "accountDeleted": "Cuenta borrada"
       },
       "unknownAccount": "Cuenta desconocida"
     },
@@ -322,24 +323,6 @@
         "verified": "{count} ({percent}%)"
       }
     },
-    "executiveStat": {
-      "accounts": {
-        "helper": "Filas en users",
-        "label": "Total de cuentas"
-      },
-      "integrations": {
-        "helper": "Desde la configuración del entorno",
-        "label": "Integraciones correctas"
-      },
-      "security": {
-        "helper": "Eventos de auditoría de advertencia o críticos",
-        "label": "Alertas de seguridad (7 d)"
-      },
-      "sessions": {
-        "helper": "Inicios de sesión actuales",
-        "label": "Sesiones activas"
-      }
-    },
     "finance": {
       "ledger": {
         "chart": {
@@ -485,46 +468,44 @@
         "via": "vía {method}"
       },
       "billing": {
-        "date": {
-          "nov10": "10 nov 2026",
-          "nov12": "12 nov 2026",
-          "nov13": "13 nov 2026",
-          "nov14": "14 nov 2026",
-          "nov15": "15 nov 2026"
-        },
-        "demoNotice": "El pago es una demostración estática claramente indicada. Las acciones de factura validan permisos pero no cargan tarjetas ni escriben en un proveedor de pagos.",
-        "issued": "emitida el {date}",
-        "plan": {
-          "individual": "Individual · {minutes} min · {classes} clases",
-          "paired": "En pareja · {minutes} min · {classes} clases"
-        },
+        "title": "Facturación",
+        "subtitle": "Compras reales: paquetes de clases y paquetes de créditos de IA.",
         "planCatalog": "Catálogo de planes",
-        "recentInvoices": "Facturas recientes",
-        "recentInvoicesSubtitle": "Los últimos cinco planes emitidos a estudiantes",
+        "recentOrders": "Compras recientes",
+        "recentOrdersSubtitle": "Las últimas {count} compras (clases y créditos de IA)",
+        "empty": "Todavía no hay compras.",
+        "item": {
+          "classes": "{type} · {minutes} min · {classes, plural, one {# clase} other {# clases}}",
+          "ai": "Créditos de IA · {credits, plural, one {# conversación} other {# conversaciones}}"
+        },
+        "provider": {
+          "stripe": "Stripe",
+          "demo": "Compra de prueba",
+          "manual": "Manual"
+        },
         "stat": {
-          "mrr": {
-            "helper": "+8,4 % frente a octubre",
-            "label": "Ingresos mensuales recurrentes"
+          "paid": {
+            "label": "Ventas del mes",
+            "helper": "{orders, plural, one {# compra} other {# compras}} · {buyers, plural, one {# comprador} other {# compradores}}"
           },
-          "open": {
-            "helper": "2 pendientes de pago",
-            "label": "Facturas abiertas"
+          "split": {
+            "label": "Clases este mes",
+            "helper": "Créditos de IA: {ai}"
           },
-          "refunds": {
-            "helper": "3 clases acreditadas",
-            "label": "Reembolsos este mes"
+          "pending": {
+            "label": "Pagos pendientes",
+            "helper": "{count, plural, =0 {Nada en espera} one {# compra en espera} other {# compras en espera}}"
           },
-          "renewal": {
-            "helper": "Objetivo del 80 %",
-            "label": "Tasa de renovación"
+          "refunded": {
+            "label": "Reembolsos del mes",
+            "helper": "{count, plural, =0 {Ninguno} one {# compra} other {# compras}}"
           }
         },
-        "subtitle": "Planes, facturas y reembolsos de la academia.",
-        "title": "Facturación",
         "status": {
-          "paid": "pagada",
-          "due": "pendiente",
-          "refunded": "reembolsada"
+          "paid": "pagado",
+          "pending": "pendiente",
+          "canceled": "cancelado",
+          "refunded": "reembolsado"
         }
       },
       "breadcrumb": {
@@ -868,33 +849,6 @@
         "verifiedEmail": "Correo de cuenta verificada"
       }
     },
-    "overview": {
-      "activityEmpty": "Aún no hay eventos de auditoría.",
-      "chart": {
-        "bookings": "Todas las reservas por estado del ciclo de vida (ahora)",
-        "cashCollected": "Efectivo recaudado (USD por día)",
-        "classes": "Clases",
-        "fullFinanceHint": "Ingresos",
-        "individual": "Individual {percent}%",
-        "paired": "En pareja {percent}%",
-        "revenue": "Ingresos",
-        "sessions": "Sesiones programadas para iniciar (diarias)"
-      },
-      "dataNote": "Los KPI de la plataforma y los gráficos de operaciones cargan desde PostgreSQL. Las tendencias financieras y el detalle de márgenes están en Libro de créditos.",
-      "healthEmpty": "No hay alertas abiertas. Integraciones, correo y seguridad parecen correctos según los datos actuales.",
-      "openAuditLog": "Abrir registro completo de auditoría",
-      "operations": {
-        "subtitle": "Volumen de reservas y un pulso rápido de ingresos (últimos 7 días).",
-        "title": "Operaciones"
-      },
-      "subtitle": "Este es el resumen de hoy de Spanglish — ingresos, inscripciones y todo lo que requiere tu atención.",
-      "toolbar": {
-        "latestActivity": "Actividad reciente",
-        "platformHealth": "Salud de la plataforma",
-        "studentsCredits": "Estudiantes y créditos"
-      },
-      "welcome": "Bienvenido, {name}"
-    },
     "payoutBatch": {
       "manager": "Estimado desde live_classes",
       "period": "Hasta {date}"
@@ -1013,6 +967,101 @@
         "mismatch": "El monto pagado no coincide: revísalo en Stripe.",
         "error": "No se pudo contactar a Stripe. Intenta de nuevo."
       }
+    },
+    "aiCost": {
+      "title": "Luna: costo real vs créditos vendidos",
+      "subtitle": "El costo de Claude guardado en cada llamada, frente a los paquetes de créditos de IA pagados cada mes.",
+      "month": "Mes",
+      "conversations": "Conversaciones",
+      "conversationsValue": "{free} gratis · {paid} pagadas",
+      "freeCost": "Costo (gratis)",
+      "paidCost": "Costo (pagadas)",
+      "summaryCost": "Resúmenes de clase",
+      "revenue": "Paquetes vendidos",
+      "fees": "Comisión de tarjeta",
+      "margin": "Margen",
+      "note": "Los costos usan AI_PRICE_INPUT_PER_MTOK y AI_PRICE_OUTPUT_PER_MTOK; si el margen sale en rojo después de cambiar ANTHROPIC_MODEL, actualiza esas variables y AI_CREDIT_USD_PER_MTOK. Las conversaciones gratis (por clase asistida) y los resúmenes de clase son costo puro."
+    },
+    "home": {
+      "title": "Hola, {firstName} 👋",
+      "subtitle": "El negocio y la plataforma de un vistazo.",
+      "actionsTitle": "Requiere tu acción",
+      "actionsSubtitle": "Solo tú puedes resolverlo · lo más grave primero",
+      "actionsCount": "{count, plural, one {# pendiente} other {# pendientes}}",
+      "open": "Abrir",
+      "allClear": "Nada requiere tu acción ahora. 🎉",
+      "tile": {
+        "revenue": "Ingresos este mes",
+        "revenueChange": "{percent}% vs. mes anterior",
+        "revenueNoCompare": "Clases y créditos de IA",
+        "margin": "Margen este mes",
+        "marginHelper": "{percent}% después de comisiones, maestros e IA",
+        "deferred": "Prepagado sin impartir",
+        "deferredHelper": "{count, plural, one {# crédito por dar} other {# créditos por dar}}",
+        "paying": "Estudiantes que pagaron",
+        "payingHelper": "{count, plural, =0 {Ninguno nuevo este mes} one {# compró por primera vez} other {# compraron por primera vez}}"
+      },
+      "chartTitle": "Últimos 30 días",
+      "chartSubtitle": "Ingresos y costos por día · {zone}",
+      "ledger": "Libro de créditos",
+      "series": {
+        "revenue": "Ingresos",
+        "teacher": "Pago a maestros",
+        "ai": "Costo de IA",
+        "classes": "Clases",
+        "canceled": "Canceladas"
+      },
+      "classesTitle": "Clases por día",
+      "classesSummary": "{held} impartidas o programadas · {canceled} canceladas ({rate}%)",
+      "marginTitle": "A dónde va el dinero",
+      "marginSubtitle": "Este mes, en USD",
+      "margin": {
+        "revenue": "Ingresos",
+        "fees": "Comisiones de pago (estimadas)",
+        "teacher": "Pago a maestros",
+        "ai": "Costo de IA (Luna y resúmenes)",
+        "result": "Margen",
+        "note": "Los maestros cuentan por clase impartida; los ingresos, cuando se cobran."
+      },
+      "growthTitle": "Crecimiento",
+      "students": "Estudiantes",
+      "growth": {
+        "new": "Registros este mes",
+        "newLastMonth": "{count} el mes anterior",
+        "active": "Activos",
+        "activeOf": "Con clase en 30 días · de {total}",
+        "trials": "Prueba → compra",
+        "trialsNote": "{converted} de {trials} compraron",
+        "outOfCredits": "Sin créditos",
+        "outOfCreditsNote": "Ya compraron y no tienen nada reservado"
+      },
+      "opsTitle": "Operaciones de hoy",
+      "opsSubtitle": "El día del coordinador, en resumen",
+      "ops": {
+        "today": "Clases hoy",
+        "live": "{count} en vivo ahora",
+        "notOpened": "Salas sin abrir",
+        "notOpenedNote": "Empezaron hace más de 5 min",
+        "pending": "Pendientes del coordinador",
+        "urgent": "{count, plural, =0 {Nada urgente} one {# urgente} other {# urgentes}}",
+        "hint": "El detalle está en el panel del coordinador."
+      },
+      "healthTitle": "Salud de la plataforma",
+      "healthSubtitle": "{ok} de {total} integraciones listas",
+      "configure": "Configurar",
+      "integration": {
+        "connected": "Lista",
+        "action-needed": "Revisar",
+        "not-configured": "Sin configurar"
+      },
+      "health": {
+        "security": "Alertas de seguridad (7 días)",
+        "bounced": "Correos rebotados",
+        "no2fa": "Coordinadores o admin sin 2FA"
+      },
+      "activityTitle": "Actividad reciente",
+      "auditLog": "Registro de auditoría",
+      "activityEmpty": "Aún no hay eventos de auditoría."
     }
   }
 }

@@ -16,7 +16,6 @@ import {
  * cancel and reschedule live in `booking.ts`.
  */
 
-const DEFAULT_AVATAR = "/images/profile/user-1.jpg";
 
 export function classRoomName(sessionId: string) {
   return `class-${sessionId}`;
@@ -101,7 +100,7 @@ async function toViews(rows: ClassSessionRow[]): Promise<LiveClass[]> {
       id: row.id,
       teacherId: row.teacherId,
       teacherName: teacher?.name ?? "Teacher",
-      teacherAvatar: teacher?.image ?? DEFAULT_AVATAR,
+      teacherAvatar: teacher?.image ?? "",
       topic: row.topic,
       description: row.description,
       type: row.classType,

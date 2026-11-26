@@ -15,7 +15,9 @@ import type {
   ShareMaterialInput,
 } from "@/features/materials/types";
 import type { MaterialKind } from "@/features/materials/types";
+import { parseLessonSettings, type LessonOutcome } from "@/lib/lesson";
 import { MAX_PRACTICE_ITEMS, MIN_PRACTICE_ITEMS } from "@/lib/practice-games";
+import { savePracticeResult } from "@/server/materials/practice-results";
 import { isPracticeAudioKey } from "@/server/storage/practice-audio";
 
 const allowedKinds: readonly MaterialKind[] = [
@@ -109,6 +111,7 @@ export async function createMaterialAction(
             term: String(item.term ?? "").trim().slice(0, 120),
             translation: String(item.translation ?? "").trim().slice(0, 160),
             example: String(item.example ?? "").trim().slice(0, 240) || undefined,
+            exampleTranslation: String(item.exampleTranslation ?? "").trim().slice(0, 240) || undefined,
             audio: item.audio && isPracticeAudioKey(item.audio) ? item.audio : undefined,
           }))
           .filter((item) => item.term && item.translation)
@@ -138,7 +141,7 @@ export async function createMaterialAction(
       classId: input.classId,
       questions,
       questionCount: input.kind === "form" ? questions.length : undefined,
-      ...(input.kind === "practice" ? { items: practiceItems } : {}),
+      ...(input.kind === "practice" ? { items: practiceItems, lesson: parseLessonSettings(input.lesson) } : {}),
     },
   });
 
@@ -239,4 +242,13 @@ export async function shareMaterialAction(
     title: t("sharedTitle"),
     message: t("shared", { title: material.title, audience }),
   };
+}
+
+/** A student finished a practice lesson. */
+export async function savePracticeResultAction(materialId: string, outcome: LessonOutcome) {
+  const actor = await getActorWithPermission("materials:read");
+  if (!actor) return { ok: false as const, error: "forbidden" };
+  const result = await savePracticeResult(actor, String(materialId), outcome);
+  if (result.ok) revalidatePath(`/materials/${materialId}`);
+  return result;
 }

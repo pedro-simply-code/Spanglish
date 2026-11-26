@@ -35,7 +35,8 @@ export async function listTeachers(options: { bookableOnly?: boolean } = {}): Pr
     })
     .from(users)
     .leftJoin(teacherProfiles, eq(teacherProfiles.userId, users.id))
-    .where(sql`'teacher' = ANY(${users.roles})`)
+    // Deleted accounts keep their role (history stays intact) but are gone.
+    .where(sql`'teacher' = ANY(${users.roles}) AND ${users.email} NOT LIKE '%@deleted.invalid'`)
     .orderBy(users.name);
 
   return rows

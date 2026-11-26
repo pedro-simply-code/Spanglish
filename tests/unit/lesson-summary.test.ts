@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/env", () => ({ env: { LESSON_SUMMARY_ENABLED: true, AI_PRICE_INPUT_PER_MTOK: 1, AI_PRICE_OUTPUT_PER_MTOK: 5 } }));
+vi.mock("@/env", () => ({
+  env: {
+    LESSON_SUMMARY_ENABLED: true,
+    AI_PRICE_INPUT_PER_MTOK: 1,
+    AI_PRICE_OUTPUT_PER_MTOK: 5,
+    ANTHROPIC_BASE_URL: "https://api.anthropic.com",
+  },
+}));
 vi.mock("@/server/db", () => ({ db: {} }));
 vi.mock("next/server", () => ({ after: vi.fn() }));
 

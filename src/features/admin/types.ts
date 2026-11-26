@@ -153,3 +153,61 @@ export type AdminDashboardCharts = {
     unbatched: number;
   };
 };
+/* -------------------------------------------------------------- admin home */
+
+/** One day of the 30-day chart (amounts in cents). */
+export type AdminHomeDay = {
+  /** YYYY-MM-DD in the admin's time zone. */
+  date: string;
+  revenueCents: number;
+  teacherCents: number;
+  aiCents: number;
+  classes: number;
+  canceled: number;
+};
+
+export type AdminHome = {
+  /** Things only the admin can unblock, most severe first. */
+  actions: AdminAlert[];
+  business: {
+    /** Class packs + AI credit packs paid this month. */
+    revenueThisMonthCents: number;
+    revenueLastMonthCents: number;
+    /** Revenue − card fees − teacher pay − AI cost, this month. */
+    marginCents: number;
+    feeCents: number;
+    teacherCents: number;
+    aiCents: number;
+    /** Paid for and not taught yet (what the academy owes in classes). */
+    deferredCents: number;
+    creditsOutstanding: number;
+    /** Distinct buyers with a paid order this month, and how many bought for the first time. */
+    payingStudents: number;
+    firstTimeBuyers: number;
+  };
+  days: AdminHomeDay[];
+  growth: {
+    newThisMonth: number;
+    newLastMonth: number;
+    active30: number;
+    total: number;
+    outOfCredits: number;
+    /** Students who took a trial and of them, how many bought. */
+    trials: number;
+    trialsConverted: number;
+  };
+  operations: {
+    today: number;
+    live: number;
+    notOpened: number;
+    coordinatorPending: number;
+    coordinatorUrgent: number;
+  };
+  health: {
+    integrations: { id: string; name: string; status: "connected" | "action-needed" | "not-configured" }[];
+    securityEvents7d: number;
+    bouncedEmails: number;
+    staffWithout2Fa: number;
+  };
+  activity: DashboardAuditRow[];
+};

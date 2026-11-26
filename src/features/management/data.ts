@@ -1,16 +1,5 @@
 import type { RoleCode } from "@/lib/auth-roles";
 
-export type InvoiceStatus = "paid" | "due" | "refunded";
-
-export type Invoice = {
-  id: string;
-  student: string;
-  plan: string;
-  amount: string;
-  status: InvoiceStatus;
-  issuedAt: string;
-};
-
 export type StaffMember = {
   id: string;
   name: string;
@@ -99,76 +88,6 @@ export type AuditEntry = {
 };
 
 type Translator = (key: string, values?: Record<string, string | number>) => string;
-
-export const invoices = (t: Translator): Invoice[] => [
-  {
-    id: "inv-2041",
-    student: "Priya Shah",
-    plan: t("management.billing.plan.individual", { minutes: 50, classes: 30 }),
-    amount: "$510.00",
-    status: "paid",
-    issuedAt: t("management.billing.date.nov15"),
-  },
-  {
-    id: "inv-2040",
-    student: "Alex Rivera",
-    plan: t("management.billing.plan.individual", { minutes: 25, classes: 60 }),
-    amount: "$720.00",
-    status: "paid",
-    issuedAt: t("management.billing.date.nov14"),
-  },
-  {
-    id: "inv-2039",
-    student: "Mateo Silva",
-    plan: t("management.billing.plan.paired", { minutes: 50, classes: 30 }),
-    amount: "$510.00",
-    status: "due",
-    issuedAt: t("management.billing.date.nov13"),
-  },
-  {
-    id: "inv-2038",
-    student: "Hannah Kim",
-    plan: t("management.billing.plan.individual", { minutes: 50, classes: 60 }),
-    amount: "$1,020.00",
-    status: "due",
-    issuedAt: t("management.billing.date.nov12"),
-  },
-  {
-    id: "inv-2037",
-    student: "Diego Torres",
-    plan: t("management.billing.plan.paired", { minutes: 25, classes: 90 }),
-    amount: "$1,440.00",
-    status: "refunded",
-    issuedAt: t("management.billing.date.nov10"),
-  },
-];
-
-export const billingStats = (t: Translator) => [
-  {
-    id: "mrr",
-    label: t("management.billing.stat.mrr.label"),
-    value: "$12,480",
-    helper: t("management.billing.stat.mrr.helper"),
-  },
-  {
-    id: "open",
-    label: t("management.billing.stat.open.label"),
-    value: "$1,530",
-    helper: t("management.billing.stat.open.helper"),
-  },
-  {
-    id: "renewal",
-    label: t("management.billing.stat.renewal.label"),
-    value: "81%",
-    helper: t("management.billing.stat.renewal.helper"),
-  },
-  {
-    id: "refunds",
-    label: t("management.billing.stat.refunds.label"),
-    value: "$340",
-    helper: t("management.billing.stat.refunds.helper"),
-  },
-];
 
 export const staffMembers = (t: Translator): StaffMember[] => [
   {

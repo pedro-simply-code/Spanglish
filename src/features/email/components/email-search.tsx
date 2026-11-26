@@ -33,23 +33,22 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
     admin: t("email.roles.admin"),
   };
 
-  useEffect(() => {
-    const q = value.trim();
-    if (q.length < 2) {
-      setMatches([]);
-      return;
-    }
+  const query = value.trim();
+  // Under 2 letters there is nothing to suggest (no state change needed).
+  const visibleMatches = query.length < 2 ? [] : matches;
 
+  useEffect(() => {
+    if (query.length < 2) return;
     const timer = window.setTimeout(async () => {
-      const rows = await searchMessageRecipientsAction(q);
+      const rows = await searchMessageRecipientsAction(query);
       setMatches(rows);
     }, 280);
 
     return () => window.clearTimeout(timer);
-  }, [value]);
+  }, [query]);
 
   return (
-    <Box sx={{ p: 2, pb: matches.length && onPickRecipient ? 0 : 2 }}>
+    <Box sx={{ p: 2, pb: visibleMatches.length && onPickRecipient ? 0 : 2 }}>
       <Box display="flex">
         <Fab
           onClick={onToggleSidebar}
@@ -85,13 +84,13 @@ export function EmailSearch({ value, onChange, onToggleSidebar, onPickRecipient 
         />
       </Box>
 
-      {matches.length > 0 && onPickRecipient ? (
+      {visibleMatches.length > 0 && onPickRecipient ? (
         <Box sx={{ mt: 1, mb: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ px: 0.5 }}>
             {t("email.search.contacts")}
           </Typography>
           <List dense disablePadding>
-            {matches.map((recipient) => (
+            {visibleMatches.map((recipient) => (
               <ListItemButton
                 key={recipient.email}
                 onClick={() => onPickRecipient(recipient)}

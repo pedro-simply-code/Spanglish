@@ -5,7 +5,8 @@ import { env } from "@/env";
  * https://docs.claude.com/en/api/messages
  */
 
-const API_URL = "https://api.anthropic.com/v1/messages";
+/** ANTHROPIC_BASE_URL lets development and tests point at a fake server (no real calls). */
+const API_URL = `${env.ANTHROPIC_BASE_URL.replace(/\/+$/, "")}/v1/messages`;
 const API_VERSION = "2023-06-01";
 
 export type ClaudeMessage = { role: "user" | "assistant"; content: string };
